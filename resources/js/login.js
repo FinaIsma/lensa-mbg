@@ -40,7 +40,11 @@ function togglePassword() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    selectRole('admin_sistem');
+    const roleInput = document.getElementById('role');
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleFromUrl = urlParams.get('role');
+    const initialRole = roleFromUrl || (roleInput ? roleInput.value : 'admin_sistem') || 'admin_sistem';
+    selectRole(initialRole);
 });
 
 window.selectRole = selectRole;

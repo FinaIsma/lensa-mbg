@@ -26,16 +26,19 @@
                 @endif
                 <h1 class="login-title">Masuk ke Lensa MBG</h1>
                 <p class="login-subtitle">Pilih Role Anda Untuk Melanjutkan ke Sistem.</p>
+                @php
+                    $defaultRole = old('role', request('role', session('success') ? 'admin_sppg' : 'admin_sistem'));
+                @endphp
                 <form action="{{ route('login.process') }}" method="POST">
                     <div class="role-buttons">
-                        <button type="button" id="adminSistemButton" class="role-button active" onclick="selectRole('admin_sistem')">
+                        <button type="button" id="adminSistemButton" class="role-button {{ $defaultRole === 'admin_sistem' ? 'active' : '' }}" onclick="selectRole('admin_sistem')">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                             </svg>
                             <span>Admin Sistem</span>
                         </button>
 
-                        <button type="button" id="adminSppgButton" class="role-button" onclick="selectRole('admin_sppg')">
+                        <button type="button" id="adminSppgButton" class="role-button {{ $defaultRole === 'admin_sppg' ? 'active' : '' }}" onclick="selectRole('admin_sppg')">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
@@ -46,7 +49,7 @@
                         </button>
                     </div>
 
-                    <input type="hidden" name="role" id="role" value="admin_sistem">
+                    <input type="hidden" name="role" id="role" value="{{ $defaultRole }}">
 
                     <div class="form-group">
 

@@ -20,3 +20,6 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::get('/api/wilayah/provinces', [WilayahController::class, 'getProvinces']);
 Route::get('/api/wilayah/regencies/{provinceId}', [WilayahController::class, 'getRegencies']);
 Route::get('/api/wilayah/districts/{regencyId}', [WilayahController::class, 'getDistricts']);
+
+// API route to check email uniqueness dynamically
+Route::get('/api/check-email', [RegisterController::class, 'checkEmail'])->name('api.check-email');
