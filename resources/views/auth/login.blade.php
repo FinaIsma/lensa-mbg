@@ -94,7 +94,7 @@
 
                 <div id="registerSection" class="register-section hidden">
                     <p class="register-text">Belum Punya Akun?</p>
-                    <a href="#" class="register-button">
+                    <a href="{{ route('register') }}" class="register-button">
                         Register
                     </a>
                 </div>
