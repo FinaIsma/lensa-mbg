@@ -70,11 +70,12 @@ function togglePassword() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Read the initial role from the data attribute set by the server
-    // This preserves: old('role') after failed login, and ?tab= from register redirect
-    const initRole = document.body.dataset.initRole || 'admin_sistem';
+    const roleInput = document.getElementById('role');
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleFromUrl = urlParams.get('role') || urlParams.get('tab');
+    const initRole = roleFromUrl || document.body.dataset.initRole || (roleInput ? roleInput.value : 'admin_sistem') || 'admin_sistem';
 
-    // Pass resetFields=false so we don't wipe old() email value
+    // Pass resetFields=false so we don't wipe old() email value or success alerts on load
     selectRole(initRole, false);
 });
 

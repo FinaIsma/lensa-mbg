@@ -24,13 +24,11 @@
                 <h1 class="register-title">Daftar Akun</h1>
                 <p class="register-subtitle">Lengkapi data untuk membuat akun SPPG.</p>
 
-                @if ($errors->has('general'))
-                    <div class="alert-error">
-                        {{ $errors->first('general') }}
-                    </div>
-                @endif
+                <div id="alert_general" class="alert-error" style="{{ $errors->has('general') ? '' : 'display: none;' }}">
+                    {{ $errors->first('general') }}
+                </div>
 
-                <form action="{{ route('register.process') }}" method="POST" enctype="multipart/form-data">
+                <form id="registerForm" action="{{ route('register.process') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <!-- 1. DATA AKUN -->
@@ -46,9 +44,7 @@
                                 </svg>
                                 <input type="text" id="nama_lengkap" name="nama_lengkap" value="{{ old('nama_lengkap') }}" placeholder="Masukkan Nama Lengkap" required>
                             </div>
-                            @error('nama_lengkap')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_nama_lengkap">@error('nama_lengkap') {{ $message }} @enderror</div>
                         </div>
 
                         <div class="form-group">
@@ -58,11 +54,9 @@
                                     <rect x="3" y="5" width="18" height="14" rx="2"></rect>
                                     <polyline points="3,7 12,13 21,7"></polyline>
                                 </svg>
-                                <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="Masukkan Email" autocomplete="email" required>
+                                <input type="email" id="email" name="email" value="{{ $errors->has('email') ? '' : old('email') }}" placeholder="Masukkan Email" autocomplete="email" required>
                             </div>
-                            @error('email')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_email">@error('email') {{ $message }} @enderror</div>
                         </div>
                     </div>
 
@@ -75,9 +69,7 @@
                                 </svg>
                                 <input type="tel" id="no_telepon" name="no_telepon" value="{{ old('no_telepon') }}" placeholder="08xxxxxxxxx" required>
                             </div>
-                            @error('no_telepon')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_no_telepon">@error('no_telepon') {{ $message }} @enderror</div>
                         </div>
 
                         <div class="form-group">
@@ -95,9 +87,7 @@
                                     </svg>
                                 </button>
                             </div>
-                            @error('password')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_password">@error('password') {{ $message }} @enderror</div>
                         </div>
                     </div>
 
@@ -116,6 +106,7 @@
                                 </svg>
                             </button>
                         </div>
+                        <div class="error" id="error_password_confirmation">@error('password_confirmation') {{ $message }} @enderror</div>
                     </div>
 
                     <!-- 2. DATA SPPG -->
@@ -132,9 +123,7 @@
                                 </svg>
                                 <input type="text" id="nama_sppg" name="nama_sppg" value="{{ old('nama_sppg') }}" placeholder="Masukkan Nama SPPG" required>
                             </div>
-                            @error('nama_sppg')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_nama_sppg">@error('nama_sppg') {{ $message }} @enderror</div>
                         </div>
 
                         <div class="form-group">
@@ -146,9 +135,7 @@
                                 </svg>
                                 <input type="text" id="alamat_sppg" name="alamat_sppg" value="{{ old('alamat_sppg') }}" placeholder="Masukkan Alamat SPPG" required>
                             </div>
-                            @error('alamat_sppg')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_alamat_sppg">@error('alamat_sppg') {{ $message }} @enderror</div>
                         </div>
                     </div>
 
@@ -163,9 +150,7 @@
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </div>
-                            @error('provinsi')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_provinsi">@error('provinsi') {{ $message }} @enderror</div>
                         </div>
 
                         <div class="form-group">
@@ -178,9 +163,7 @@
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </div>
-                            @error('kabupaten_kota')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_kabupaten_kota">@error('kabupaten_kota') {{ $message }} @enderror</div>
                         </div>
 
                         <div class="form-group">
@@ -193,9 +176,7 @@
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </div>
-                            @error('kecamatan')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_kecamatan">@error('kecamatan') {{ $message }} @enderror</div>
                         </div>
                     </div>
 
@@ -224,9 +205,7 @@
                                 </div>
                                 <div class="file-preview-area" id="preview_ktp"></div>
                             </div>
-                            @error('foto_ktp')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_foto_ktp">@error('foto_ktp') {{ $message }} @enderror</div>
                         </div>
 
                         <!-- Card 2: Foto Kantor -->
@@ -248,9 +227,7 @@
                                 </div>
                                 <div class="file-preview-area" id="preview_kantor"></div>
                             </div>
-                            @error('foto_kantor_sppg')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_foto_kantor_sppg">@error('foto_kantor_sppg') {{ $message }} @enderror</div>
                         </div>
 
                         <!-- Card 3: Surat Resmi / SK -->
@@ -274,25 +251,21 @@
                                 </div>
                                 <div class="file-preview-area" id="preview_surat"></div>
                             </div>
-                            @error('foto_surat_resmi')
-                                <div class="error">{{ $message }}</div>
-                            @enderror
+                            <div class="error" id="error_foto_surat_resmi">@error('foto_surat_resmi') {{ $message }} @enderror</div>
                         </div>
                     </div>
 
                     <!-- Terms & Conditions -->
                     <div class="terms-wrapper">
-                        <input type="checkbox" id="syarat_ketentuan" name="syarat_ketentuan" class="terms-checkbox" value="1" {{ old('syarat_ketentuan') ? 'checked' : '' }}>
+                        <input type="checkbox" id="syarat_ketentuan" name="syarat_ketentuan" class="terms-checkbox" value="1" {{ old('syarat_ketentuan') ? 'checked' : '' }} required>
                         <label for="syarat_ketentuan" class="terms-label">
                             Saya menyetujui <strong>syarat dan ketentuan</strong> yang berlaku
                         </label>
                     </div>
-                    @error('syarat_ketentuan')
-                        <div class="error" style="margin-top: -16px; margin-bottom: 16px;">{{ $message }}</div>
-                    @enderror
+                    <div class="error" id="error_syarat_ketentuan" style="margin-top: -16px; margin-bottom: 16px;">@error('syarat_ketentuan') {{ $message }} @enderror</div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="register-button">Daftar</button>
+                    <button type="submit" id="submitBtn" class="register-button">Daftar</button>
 
                     <!-- Bottom Link to Login -->
                     <div class="bottom-link">
