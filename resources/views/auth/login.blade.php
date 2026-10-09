@@ -19,6 +19,11 @@
 
         <main class="login-wrapper">
             <div class="login-card">
+                @if (session('success'))
+                    <div class="success-alert" style="background-color: #ECFDF5; border: 1px solid #10B981; color: #065F46; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; text-align: left;">
+                        <strong>Berhasil!</strong> {{ session('success') }}
+                    </div>
+                @endif
                 <h1 class="login-title">Masuk ke Lensa MBG</h1>
                 <p class="login-subtitle">Pilih Role Anda Untuk Melanjutkan ke Sistem.</p>
                 <form action="{{ route('login.process') }}" method="POST">
@@ -67,7 +72,7 @@
                                 <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
                             </svg>
                             <input type="password" id="password" name="password" placeholder="Masukkan Password" autocomplete="current-password" required>
-                            <button type="button" class="password-toggle" saria-label="Tampilkan password">
+                            <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Tampilkan password">
                                 <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
@@ -84,7 +89,7 @@
 
                 <div id="registerSection" class="register-section hidden">
                     <p class="register-text">Belum Punya Akun?</p>
-                    <a href="#" class="register-button">
+                    <a href="{{ route('register') }}" class="register-button">
                         Register
                     </a>
                 </div>

@@ -18,9 +18,11 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('nama_sppg');
-            $table->string('nama_pegawai');
             $table->string('no_telepon');
             $table->text('alamat_sppg');
+            $table->string('provinsi')->nullable();
+            $table->string('kabupaten_kota')->nullable();
+            $table->string('kecamatan')->nullable();
 
             $table->string('foto_ktp')->nullable();
             $table->string('foto_kantor_sppg')->nullable();
