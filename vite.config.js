@@ -10,9 +10,11 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/css/login.css',
                 'resources/css/register.css',
+                'resources/css/admin_sppg.css',
                 'resources/js/app.js',
                 'resources/js/login.js',
                 'resources/js/register.js',
+                'resources/js/admin_sppg.js',
             ],
             refresh: true,
             fonts: [
