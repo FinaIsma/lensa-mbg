@@ -42,7 +42,7 @@ class RegisterTest extends TestCase
             'syarat_ketentuan' => '1',
         ]);
 
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect(route('login', ['role' => 'admin_sppg']));
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('users', [
@@ -97,4 +97,61 @@ class RegisterTest extends TestCase
 
         $response->assertSessionHasErrors(['email' => 'Email sudah terdaftar dalam sistem.']);
     }
+
+    public function test_check_email_api_endpoint()
+    {
+        User::create([
+            'nama' => 'Existing User',
+            'email' => 'used@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'admin_sppg',
+        ]);
+
+        $resExists = $this->getJson('/api/check-email?email=used@example.com');
+        $resExists->assertOk();
+        $resExists->assertJson([
+            'available' => false,
+            'message' => 'Email sudah terdaftar dalam sistem.',
+        ]);
+
+        $resAvailable = $this->getJson('/api/check-email?email=available_new@example.com');
+        $resAvailable->assertOk();
+        $resAvailable->assertJson([
+            'available' => true,
+        ]);
+    }
+
+    public function test_ajax_register_with_duplicate_email_returns_json_422()
+    {
+        User::create([
+            'nama' => 'Existing User',
+            'email' => 'existing@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'admin_sppg',
+        ]);
+
+        $response = $this->postJson('/register', [
+            'nama_lengkap' => 'Another User',
+            'email' => 'existing@example.com',
+            'no_telepon' => '0899755665',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'nama_sppg' => 'SPPG Malang',
+            'alamat_sppg' => 'Jalan Malang',
+            'provinsi' => 'Jawa Timur',
+            'kabupaten_kota' => 'Kota Malang',
+            'kecamatan' => 'Klojen',
+            'foto_ktp' => UploadedFile::fake()->image('ktp.jpg'),
+            'foto_kantor_sppg' => UploadedFile::fake()->image('kantor.jpg'),
+            'foto_surat_resmi' => UploadedFile::fake()->create('surat.pdf', 100, 'application/pdf'),
+            'syarat_ketentuan' => '1',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['email']);
+        $response->assertJsonFragment([
+            'email' => ['Email sudah terdaftar dalam sistem.']
+        ]);
+    }
 }
+

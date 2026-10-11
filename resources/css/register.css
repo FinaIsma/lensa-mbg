@@ -525,6 +525,23 @@ body {
     color: #DC2626;
     font-size: 12px;
     margin-top: 5px;
+    min-height: 18px;
+}
+
+.input-wrapper input.is-invalid,
+.input-wrapper select.is-invalid {
+    border-color: #DC2626 !important;
+    background-color: #FEF2F2 !important;
+}
+
+.input-wrapper input.is-invalid:focus,
+.input-wrapper select.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+.upload-card.is-invalid {
+    border-color: #DC2626 !important;
+    background-color: #FEF2F2 !important;
 }
 
 .alert-error {
@@ -535,6 +552,27 @@ body {
     border-radius: 8px;
     margin-bottom: 20px;
     font-size: 13.5px;
+}
+
+.btn-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    border-top-color: #FFFFFF;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.register-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 /* Responsive */

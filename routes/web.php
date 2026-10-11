@@ -53,3 +53,5 @@ Route::middleware(['auth', 'role:admin_sistem'])->prefix('admin')->name('admin.'
         return redirect()->route('admin.dashboard')->with('info', 'Fitur Audit Trail sedang dalam tahap pengembangan.');
     })->name('audit');
 });
+// API route to check email uniqueness dynamically
+Route::get('/api/check-email', [RegisterController::class, 'checkEmail'])->name('api.check-email');

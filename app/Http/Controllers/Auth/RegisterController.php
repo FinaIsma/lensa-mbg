@@ -17,6 +17,21 @@ class RegisterController extends Controller
         return view('auth.register');
     }
 
+    public function checkEmail(Request $request)
+    {
+        $email = trim($request->query('email', ''));
+        if (empty($email)) {
+            return response()->json(['available' => true]);
+        }
+
+        $exists = User::where('email', $email)->exists();
+
+        return response()->json([
+            'available' => !$exists,
+            'message' => $exists ? 'Email sudah terdaftar dalam sistem.' : null,
+        ]);
+    }
+
     public function register(Request $request, SupabaseStorageService $supabase)
     {
         foreach (['foto_ktp', 'foto_kantor_sppg', 'foto_surat_resmi'] as $field) {
@@ -44,6 +59,7 @@ class RegisterController extends Controller
             'foto_ktp' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
             'foto_kantor_sppg' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
             'foto_surat_resmi' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'syarat_ketentuan' => ['accepted'],
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Email wajib diisi.',
@@ -104,8 +120,28 @@ class RegisterController extends Controller
                 ]);
             });
 
-            return redirect()->route('login')->with('success', 'Pendaftaran akun SPPG berhasil diajukan! Akun Anda sedang menunggu proses verifikasi oleh Admin Sistem.');
+            $successMessage = 'Pendaftaran akun SPPG berhasil diajukan! Akun Anda sedang menunggu proses verifikasi oleh Admin Sistem.';
+
+            if ($request->expectsJson() || $request->ajax()) {
+                session()->flash('success', $successMessage);
+                return response()->json([
+                    'success' => true,
+                    'message' => $successMessage,
+                    'redirect' => route('login', ['role' => 'admin_sppg']),
+                ]);
+            }
+
+            return redirect()->route('login', ['role' => 'admin_sppg'])->with('success', $successMessage);
         } catch (\Exception $e) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'message' => 'Terjadi kesalahan saat memproses pendaftaran. Silakan coba lagi.',
+                    'errors' => [
+                        'general' => ['Terjadi kesalahan saat memproses pendaftaran: ' . $e->getMessage()]
+                    ]
+                ], 500);
+            }
+
             return back()
                 ->withInput()
                 ->withErrors(['general' => 'Terjadi kesalahan saat memproses pendaftaran. Silakan coba lagi. (' . $e->getMessage() . ')']);

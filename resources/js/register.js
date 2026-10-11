@@ -46,6 +46,9 @@ const FALLBACK_PROVINCES = [
 document.addEventListener('DOMContentLoaded', () => {
     initWilayahDropdowns();
     initFileUploads();
+    initEmailLiveCheck();
+    initAjaxFormSubmission();
+    initInputClearErrorListeners();
 });
 
 // 1. Password Visibility Toggle
@@ -292,11 +295,13 @@ function initFileUploads() {
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 fileInput.files = e.dataTransfer.files;
                 updateFileDisplay(fileInput, dropzone, preview);
+                clearFieldError(item.id);
             }
         });
 
         fileInput.addEventListener('change', () => {
             updateFileDisplay(fileInput, dropzone, preview);
+            clearFieldError(item.id);
         });
     });
 
@@ -376,6 +381,185 @@ function initFileUploads() {
             }
         }
     }
+}
+
+// 4. Live Check Email Availability
+function initEmailLiveCheck() {
+    const emailInput = document.getElementById('email');
+    const emailError = document.getElementById('error_email');
+    if (!emailInput) return;
+
+    let debounceTimer;
+
+    emailInput.addEventListener('blur', () => {
+        checkEmailUnique(emailInput.value.trim());
+    });
+
+    emailInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        // Clear immediate error style when user types
+        emailInput.classList.remove('is-invalid');
+        if (emailError && emailError.textContent.includes('terdaftar')) {
+            emailError.textContent = '';
+        }
+
+        const val = emailInput.value.trim();
+        if (val.length > 5 && val.includes('@') && val.includes('.')) {
+            debounceTimer = setTimeout(() => {
+                checkEmailUnique(val);
+            }, 600);
+        }
+    });
+
+    async function checkEmailUnique(email) {
+        if (!email || !email.includes('@') || !email.includes('.')) return;
+
+        try {
+            const res = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
+            const data = await res.json();
+            if (!data.available) {
+                emailInput.classList.add('is-invalid');
+                if (emailError) {
+                    emailError.textContent = data.message || 'Email sudah terdaftar dalam sistem.';
+                }
+            } else {
+                emailInput.classList.remove('is-invalid');
+                if (emailError && emailError.textContent.includes('terdaftar')) {
+                    emailError.textContent = '';
+                }
+            }
+        } catch (err) {
+            console.warn('Could not verify email:', err);
+        }
+    }
+}
+
+// 5. AJAX Form Submission to prevent losing filled fields and uploaded files
+function initAjaxFormSubmission() {
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const emailInput = document.getElementById('email');
+    const alertGeneral = document.getElementById('alert_general');
+
+    if (!form || !submitBtn) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Clear all previous errors
+        document.querySelectorAll('.error').forEach(el => el.textContent = '');
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        if (alertGeneral) {
+            alertGeneral.style.display = 'none';
+            alertGeneral.textContent = '';
+        }
+
+        // Button Loading State
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <span class="btn-spinner"></span>
+            <span>Mendaftarkan Akun...</span>
+        `;
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 422 && data.errors) {
+                    let firstErrorElement = null;
+
+                    for (const [field, messages] of Object.entries(data.errors)) {
+                        const errorEl = document.getElementById(`error_${field}`);
+                        if (errorEl) {
+                            errorEl.textContent = messages[0];
+                        }
+
+                        const inputEl = document.getElementById(field);
+                        if (inputEl) {
+                            inputEl.classList.add('is-invalid');
+                            if (!firstErrorElement) firstErrorElement = inputEl;
+                        }
+
+                        // Specific requirement: reset only email input box while keeping all other inputs and uploaded files intact
+                        if (field === 'email' && emailInput) {
+                            emailInput.value = '';
+                            emailInput.classList.add('is-invalid');
+                            emailInput.focus();
+                            firstErrorElement = emailInput;
+                        }
+                    }
+
+                    if (firstErrorElement) {
+                        firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else {
+                    if (alertGeneral) {
+                        alertGeneral.textContent = data.message || (data.errors && data.errors.general ? data.errors.general[0] : 'Terjadi kesalahan sistem saat pendaftaran.');
+                        alertGeneral.style.display = 'block';
+                        alertGeneral.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+                return;
+            }
+
+            // Registration Successful
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            } else {
+                window.location.href = '/login';
+            }
+
+        } catch (error) {
+            console.error('Submission error:', error);
+            if (alertGeneral) {
+                alertGeneral.textContent = 'Koneksi terputus atau terjadi kesalahan jaringan. Silakan periksa koneksi dan coba lagi.';
+                alertGeneral.style.display = 'block';
+                alertGeneral.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    });
+}
+
+// Helper to clear error when user types or changes input
+function initInputClearErrorListeners() {
+    const fields = [
+        'nama_lengkap', 'no_telepon', 'password', 'password_confirmation',
+        'nama_sppg', 'alamat_sppg', 'provinsi', 'kabupaten_kota', 'kecamatan', 'syarat_ketentuan'
+    ];
+
+    fields.forEach(fieldId => {
+        const el = document.getElementById(fieldId);
+        if (!el) return;
+
+        const eventType = (el.tagName === 'SELECT' || el.type === 'checkbox') ? 'change' : 'input';
+        el.addEventListener(eventType, () => {
+            clearFieldError(fieldId);
+        });
+    });
+}
+
+function clearFieldError(fieldId) {
+    const errorEl = document.getElementById(`error_${fieldId}`);
+    if (errorEl) errorEl.textContent = '';
+    const inputEl = document.getElementById(fieldId);
+    if (inputEl) inputEl.classList.remove('is-invalid');
 }
 
 function formatTitleCase(str) {
