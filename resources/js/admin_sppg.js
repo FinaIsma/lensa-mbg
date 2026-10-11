@@ -121,8 +121,52 @@ window.renderSppgModalContent = function (item) {
 window.openDetailModal = function (item) {
     const content = document.getElementById('detailModalContent');
     if (!content) return;
+
+    const form = document.getElementById('formDetail');
+    if (form) {
+        const baseUpdateUrl = window.adminSppgUpdateBase || '/admin/sppg';
+        form.action = `${baseUpdateUrl}/${item.raw_id}/status`;
+    }
+
+    const inputStatus = document.getElementById('inputDetailStatusVal');
+    const btn = document.getElementById('btnDetailDeactivate');
+
+    if (btn && inputStatus) {
+        if (item.status === 'nonaktif') {
+            inputStatus.value = 'aktif';
+            btn.className = 'btn-modal-action-activate';
+            btn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <polyline points="17 11 19 13 23 9"></polyline>
+                </svg>
+                <span id="btnDetailText">Aktifkan</span>
+            `;
+        } else {
+            inputStatus.value = 'nonaktif';
+            btn.className = 'btn-modal-action-deactivate';
+            btn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="18" y1="8" x2="23" y2="13"></line>
+                    <line x1="23" y1="8" x2="18" y2="13"></line>
+                </svg>
+                <span id="btnDetailText">Nonaktifkan</span>
+            `;
+        }
+    }
+
     content.innerHTML = window.renderSppgModalContent(item);
     document.getElementById('modalDetail').classList.remove('hidden');
+};
+
+window.submitDeactivateDetail = function () {
+    const form = document.getElementById('formDetail');
+    if (form) {
+        form.submit();
+    }
 };
 
 window.openVerifikasiModal = function (item) {
@@ -155,5 +199,15 @@ window.closeModal = function (modalId) {
 document.addEventListener('click', function(e) {
     if (e.target.classList && e.target.classList.contains('modal-backdrop')) {
         e.target.classList.add('hidden');
+    }
+});
+
+// Dismiss modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const detail = document.getElementById('modalDetail');
+        const verif = document.getElementById('modalVerifikasi');
+        if (detail) detail.classList.add('hidden');
+        if (verif) verif.classList.add('hidden');
     }
 });

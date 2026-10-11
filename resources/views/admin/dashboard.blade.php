@@ -317,11 +317,25 @@
                 <h3 class="modal-title">Detail SPPG</h3>
                 <button type="button" class="btn-close" onclick="closeModal('modalDetail')">&times;</button>
             </div>
-            <div class="modal-body" id="detailModalContent">
-            </div>
-            <div class="modal-footer full-width-footer">
-                <button type="button" class="btn-modal-close" onclick="closeModal('modalDetail')">Tutup</button>
-            </div>
+            <form id="formDetail" action="" method="POST">
+                @csrf
+                <input type="hidden" name="status" id="inputDetailStatusVal" value="nonaktif">
+
+                <div class="modal-body" id="detailModalContent">
+                </div>
+
+                <div class="modal-footer full-width-footer">
+                    <button type="button" id="btnDetailDeactivate" class="btn-modal-action-deactivate" onclick="submitDeactivateDetail()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="18" y1="8" x2="23" y2="13"></line>
+                            <line x1="23" y1="8" x2="18" y2="13"></line>
+                        </svg>
+                        <span id="btnDetailText">Nonaktifkan</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

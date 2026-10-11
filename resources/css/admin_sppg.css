@@ -57,11 +57,13 @@ button, input, select, textarea {
     padding: 24px 28px 20px;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .brand-link {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
 }
 
@@ -1103,3 +1105,68 @@ button, input, select, textarea {
     border-color: #64748B;
     color: #0F172A;
 }
+
+.btn-modal-action-deactivate {
+    border: 1.5px solid #DC2626;
+    background-color: #FFFFFF;
+    color: #DC2626;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    width: 100%;
+}
+
+.btn-modal-action-deactivate svg {
+    stroke: #DC2626;
+    transition: stroke 0.15s ease;
+}
+
+.btn-modal-action-deactivate:hover {
+    background-color: #FEF2F2;
+    border-color: #B91C1C;
+    color: #B91C1C;
+}
+
+.btn-modal-action-deactivate:hover svg {
+    stroke: #B91C1C;
+}
+
+.btn-modal-action-activate {
+    border: 1.5px solid #16A34A;
+    background-color: #FFFFFF;
+    color: #16A34A;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    width: 100%;
+}
+
+.btn-modal-action-activate svg {
+    stroke: #16A34A;
+    transition: stroke 0.15s ease;
+}
+
+.btn-modal-action-activate:hover {
+    background-color: #F0FDF4;
+    border-color: #15803D;
+    color: #15803D;
+}
+
+.btn-modal-action-activate:hover svg {
+    stroke: #15803D;
+}
+
