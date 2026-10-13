@@ -6,12 +6,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/*
- * Modul 8. Receiving  |  tabel: receivings
- * Dokumen penerimaan bahan. receiving_no dibuat sistem (contoh RCV-20261011-001), unik.
- * received_at = waktu barang fisik diterima (diisi user); confirmed_at = waktu konfirmasi di sistem (server).
- * Setelah confirmed: is_locked = true, perubahan hanya lewat Correction Request.
- */
 return new class extends Migration
 {
     public function up(): void
