@@ -34,7 +34,8 @@ Route::get('/api/wilayah/provinces', [WilayahController::class, 'getProvinces'])
 Route::get('/api/wilayah/regencies/{provinceId}', [WilayahController::class, 'getRegencies']);
 Route::get('/api/wilayah/districts/{regencyId}', [WilayahController::class, 'getDistricts']);
 
-// Admin Sistem Routes
+use App\Http\Controllers\Admin\CorrectionRequestController;
+
 Route::middleware(['auth', 'role:admin_sistem'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/sppg', [SppgManagementController::class, 'index'])->name('sppg.index');
@@ -45,11 +46,11 @@ Route::middleware(['auth', 'role:admin_sistem'])->prefix('admin')->name('admin.'
         return redirect()->route('admin.dashboard')->with('info', 'Fitur Monitoring sedang dalam tahap pengembangan.');
     })->name('monitoring');
 
-    Route::get('/correction-request', function () {
-        return redirect()->route('admin.dashboard')->with('info', 'Fitur Correction Request sedang dalam tahap pengembangan.');
-    })->name('correction');
+    Route::get('/correction-request', [CorrectionRequestController::class, 'index'])->name('correction');
+    Route::post('/correction-request/{id}/approve', [CorrectionRequestController::class, 'approve'])->name('correction.approve');
+    Route::post('/correction-request/{id}/reject', [CorrectionRequestController::class, 'reject'])->name('correction.reject');
 
     Route::get('/audit-trail', [AuditTrailController::class, 'index'])->name('audit');
-    });
+});
 // API route to check email uniqueness dynamically
 Route::get('/api/check-email', [RegisterController::class, 'checkEmail'])->name('api.check-email');

@@ -31,4 +31,9 @@ class Sppg extends Model
     {
         return $this->belongsTo(User::class, 'id_user', 'id_user');
     }
+
+    public function correctionRequests()
+    {
+        return $this->hasMany(CorrectionRequest::class, 'id_sppg', 'id_sppg');
+    }
 }
