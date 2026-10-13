@@ -13,6 +13,7 @@ export default defineConfig({
                 'resources/css/admin_sppg.css',
                 'resources/css/audit-trail.css',
                 'resources/css/correction-request.css',
+                'resources/css/sidebar-navbar.css',
                 'resources/js/app.js',
                 'resources/js/login.js',
                 'resources/js/register.js',

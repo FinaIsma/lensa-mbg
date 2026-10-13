@@ -13,16 +13,7 @@
 
         <!-- Main Workspace -->
         <div class="main-wrapper">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-user-section">
-                    <div class="avatar-circle"></div>
-                    <div class="user-info">
-                        <span class="user-name">{{ Auth::user()->nama ?? 'Nanda' }}</span>
-                        <span class="user-role">Admin Sistem</span>
-                    </div>
-                </div>
-            </header>
+            @include('admin.partials.navbar')
 
             <!-- Main Content Container -->
             <main class="content-body">
