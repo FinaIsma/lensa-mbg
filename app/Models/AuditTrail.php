@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\Keys;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -11,16 +12,6 @@ use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
-
-/**
- * Jejak aktivitas penting. Ditulis OTOMATIS oleh kode lewat AuditTrail::catat(), tidak pernah diisi manual oleh pengguna.
- * Tabel ini hanya boleh ditambah: update dan delete ditolak.
- *
- * Cara pakai (di controller/service, di DALAM DB::transaction yang sama dengan aksinya):
- *
- *   AuditTrail::catat('confirm', $receiving, ['status' => 'draft'], ['status' => 'confirmed']);
- *   AuditTrail::catat('correction_apply', $receivingItem, ['qty_received' => 40], ['qty_received' => 45], $correction->id);
- */
 
 class AuditTrail extends Model
 {
@@ -75,8 +66,6 @@ class AuditTrail extends Model
     }
 
     /**
-     * Catat satu aktivitas. Pelaku selalu user yang sedang login (bukan dari input form).
-     *
      * @param string      $aksi        salah satu kunci AKTIVITAS
      * @param Model       $objek       data yang terkena aksi (nama tabelnya jadi auditable_type)
      * @param array|null  $lama        nilai sebelum (hanya kolom yang berubah)
@@ -151,18 +140,20 @@ class AuditTrail extends Model
         return $q->whereIn('audit_trails.auditable_type', $tabel ?: ['-']);
     }
 
-    public function scopeRentang(Builder $q, ?string $rentang): Builder
+    /** Filter tanggal dari-sampai (format Y-m-d, dua-duanya boleh kosong). Batas dihitung satu hari penuh. */
+    public function scopeRentang(Builder $q, ?string $dari, ?string $sampai): Builder
     {
-        $mulai = match ($rentang) {
-            'hari_ini' => now()->startOfDay(),
-            '7_hari'   => now()->subDays(6)->startOfDay(),
-            '30_hari'  => now()->subDays(29)->startOfDay(),
-            default    => null,
-        };
+        if ($dari) {
+            $q->where('audit_trails.created_at', '>=', Carbon::parse($dari)->startOfDay());
+        }
+        if ($sampai) {
+            $q->where('audit_trails.created_at', '<=', Carbon::parse($sampai)->endOfDay());
+        }
 
-        return $mulai ? $q->where('audit_trails.created_at', '>=', $mulai) : $q;
+        return $q;
     }
 
+    /** Cari nama pengguna atau kode data (PB-xxx, nomor penerimaan, nomor pembelian, nomor koreksi). */
     public function scopeCari(Builder $q, ?string $kata): Builder
     {
         $kata = trim((string) $kata);
@@ -209,6 +200,7 @@ class AuditTrail extends Model
     {
         return 'AUD-' . str_pad((string) $this->id, 4, '0', STR_PAD_LEFT);
     }
+
     public function getPelakuAttribute(): string
     {
         return ($this->pelaku_nama ?? '(user dihapus)') . ' - ' . ($this->pelaku_sppg ?? 'Admin');
