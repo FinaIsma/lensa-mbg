@@ -341,129 +341,135 @@
             </div>
 
             {{-- Card 1: Informasi Pengajuan --}}
-            <h3 class="cr-section-title">Informasi Pengajuan</h3>
             <div class="cr-info-card">
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">ID Pengajuan</span>
-                    <span class="cr-kv-value">{{ $row->kode_pengajuan }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">Jenis Data</span>
-                    <span class="cr-kv-value">{{ $row->jenis_data }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">Tanggal Pengajuan</span>
-                    <span class="cr-kv-value">{{ $row->requested_at ? $row->requested_at->locale('id')->translatedFormat('d F Y') : '-' }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">Pengaju</span>
-                    <span class="cr-kv-value">{{ $row->requester->nama ?? 'Yu Ji-Min' }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">Reviewer</span>
-                    <span class="cr-kv-value">{{ $row->reviewer->nama ?? '-' }}</span>
+                <h3 class="cr-card-title">Informasi Pengajuan</h3>
+                <div class="cr-card-body cr-body-indent">
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">ID Pengajuan</span>
+                        <span class="cr-kv-value">{{ $row->kode_pengajuan }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">Jenis Data</span>
+                        <span class="cr-kv-value">{{ $row->jenis_data }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">Tanggal Pengajuan</span>
+                        <span class="cr-kv-value">{{ $row->requested_at ? $row->requested_at->locale('id')->translatedFormat('d F Y') : '-' }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">Pengaju</span>
+                        <span class="cr-kv-value">{{ $row->requester->nama ?? 'Yu Ji-Min' }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">Reviewer</span>
+                        <span class="cr-kv-value">{{ $row->reviewer->nama ?? '-' }}</span>
+                    </div>
                 </div>
             </div>
 
             {{-- Card 2: Informasi SPPG --}}
-            <h3 class="cr-section-title">Informasi SPPG</h3>
             <div class="cr-info-card">
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-                            <line x1="9" y1="22" x2="9" y2="22.01"></line>
-                            <line x1="15" y1="22" x2="15" y2="22.01"></line>
-                            <line x1="9" y1="6" x2="9" y2="6.01"></line>
-                            <line x1="15" y1="6" x2="15" y2="6.01"></line>
-                            <line x1="9" y1="10" x2="9" y2="10.01"></line>
-                            <line x1="15" y1="10" x2="15" y2="10.01"></line>
-                            <line x1="9" y1="14" x2="9" y2="14.01"></line>
-                            <line x1="15" y1="14" x2="15" y2="14.01"></line>
-                        </svg>
-                        Nama SPPG
-                    </span>
-                    <span class="cr-kv-value">{{ $row->sppg->nama_sppg ?? 'SPPG Malang 01' }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
-                            <line x1="7" y1="8" x2="7.01" y2="8"></line>
-                            <line x1="11" y1="8" x2="17" y2="8"></line>
-                            <line x1="7" y1="12" x2="17" y2="12"></line>
-                        </svg>
-                        ID SPPG
-                    </span>
-                    <span class="cr-kv-value">{{ $row->kode_sppg }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                            <circle cx="12" cy="10" r="3"></circle>
-                        </svg>
-                        Alamat Lengkap
-                    </span>
-                    <span class="cr-kv-value">{{ $row->sppg->alamat_sppg ?? 'Jl Bedali Lawang' }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="2" y1="12" x2="22" y2="12"></line>
-                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                        </svg>
-                        Provinsi
-                    </span>
-                    <span class="cr-kv-value">{{ $row->sppg->provinsi ?? 'Jawa Timur' }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 21h18"></path>
-                            <path d="M5 21V7l8-4v18"></path>
-                            <path d="M19 21V11l-6-4"></path>
-                        </svg>
-                        Kota/Kabupaten
-                    </span>
-                    <span class="cr-kv-value">{{ $row->sppg->kabupaten_kota ?? 'Kabupaten Malang' }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
-                        </svg>
-                        Kecamatan
-                    </span>
-                    <span class="cr-kv-value">{{ $row->sppg->kecamatan ?? 'Lawang' }}</span>
+                <h3 class="cr-card-title">Informasi SPPG</h3>
+                <div class="cr-card-body">
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                                <line x1="9" y1="22" x2="9" y2="22.01"></line>
+                                <line x1="15" y1="22" x2="15" y2="22.01"></line>
+                                <line x1="9" y1="6" x2="9" y2="6.01"></line>
+                                <line x1="15" y1="6" x2="15" y2="6.01"></line>
+                                <line x1="9" y1="10" x2="9" y2="10.01"></line>
+                                <line x1="15" y1="10" x2="15" y2="10.01"></line>
+                                <line x1="9" y1="14" x2="9" y2="14.01"></line>
+                                <line x1="15" y1="14" x2="15" y2="14.01"></line>
+                            </svg>
+                            Nama SPPG
+                        </span>
+                        <span class="cr-kv-value">{{ $row->sppg->nama_sppg ?? 'SPPG Malang 01' }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                <line x1="7" y1="8" x2="7.01" y2="8"></line>
+                                <line x1="11" y1="8" x2="17" y2="8"></line>
+                                <line x1="7" y1="12" x2="17" y2="12"></line>
+                            </svg>
+                            ID SPPG
+                        </span>
+                        <span class="cr-kv-value">{{ $row->kode_sppg }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Alamat Lengkap
+                        </span>
+                        <span class="cr-kv-value">{{ $row->sppg->alamat_sppg ?? 'Jl Bedali Lawang' }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            Provinsi
+                        </span>
+                        <span class="cr-kv-value">{{ $row->sppg->provinsi ?? 'Jawa Timur' }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 21h18"></path>
+                                <path d="M5 21V7l8-4v18"></path>
+                                <path d="M19 21V11l-6-4"></path>
+                            </svg>
+                            Kota/Kabupaten
+                        </span>
+                        <span class="cr-kv-value">{{ $row->sppg->kabupaten_kota ?? 'Kabupaten Malang' }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                            </svg>
+                            Kecamatan
+                        </span>
+                        <span class="cr-kv-value">{{ $row->sppg->kecamatan ?? 'Lawang' }}</span>
+                    </div>
                 </div>
             </div>
 
             {{-- Card 3: Detail Koreksi --}}
-            <h3 class="cr-section-title">Detail Koreksi</h3>
             <div class="cr-info-card">
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">ID Data</span>
-                    <span class="cr-kv-value">{{ $row->target_data_display }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">Data Lama</span>
-                    <span class="cr-kv-value">{{ $row->tampil_old_value }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">Data Baru</span>
-                    <span class="cr-kv-value">{{ $row->tampil_new_value }}</span>
-                </div>
-                <div class="cr-kv-row">
-                    <span class="cr-kv-label">Alasan Koreksi</span>
-                    <span class="cr-kv-value">{{ $row->reason }}</span>
+                <h3 class="cr-card-title">Detail Koreksi</h3>
+                <div class="cr-card-body cr-body-indent">
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">ID Data</span>
+                        <span class="cr-kv-value">{{ $row->target_data_display }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">Data Lama</span>
+                        <span class="cr-kv-value">{{ $row->tampil_old_value }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">Data Baru</span>
+                        <span class="cr-kv-value">{{ $row->tampil_new_value }}</span>
+                    </div>
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">Alasan Koreksi</span>
+                        <span class="cr-kv-value">{{ $row->reason }}</span>
+                    </div>
                 </div>
             </div>
 
             {{-- Card 4: Lampiran Bukti --}}
-            <h3 class="cr-section-title">Detail Koreksi</h3>
             <div class="cr-info-card">
+                <h3 class="cr-card-title">Detail Koreksi</h3>
                 <div class="cr-file-box">
                     <div class="cr-file-left">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -520,6 +526,5 @@
             @endif
         </template>
     @endforeach
-
 </body>
 </html>
