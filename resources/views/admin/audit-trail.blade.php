@@ -33,15 +33,7 @@
         @include('admin.partials.sidebar')
 
         <div class="main-wrapper">
-            <header class="top-header">
-                <div class="header-user-section">
-                    <div class="avatar-circle" aria-hidden="true">{{ $inisial }}</div>
-                    <div class="user-info">
-                        <span class="user-name">{{ $namaUser }}</span>
-                        <span class="user-role">Admin Sistem</span>
-                    </div>
-                </div>
-            </header>
+            @include('admin.partials.navbar')
 
             <main class="content-body">
                 @if (session('success'))
