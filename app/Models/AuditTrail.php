@@ -13,6 +13,9 @@ use LogicException;
 use RuntimeException;
 
 /**
+ * Jejak aktivitas penting. Ditulis OTOMATIS oleh kode lewat AuditTrail::catat(), tidak pernah diisi manual oleh pengguna.
+ * Tabel ini hanya boleh ditambah: update dan delete ditolak.
+ *
  * Cara pakai (di controller/service, di DALAM DB::transaction yang sama dengan aksinya):
  *
  *   AuditTrail::catat('confirm', $receiving, ['status' => 'draft'], ['status' => 'confirmed']);
@@ -71,10 +74,8 @@ class AuditTrail extends Model
         static::deleting(fn () => throw new LogicException('Audit trail tidak boleh dihapus.'));
     }
 
-    //penulisan
-
     /**
-     * catat satu aktivitas. pelaku selalu user yang sedang login (bukan dari input form).
+     * Catat satu aktivitas. Pelaku selalu user yang sedang login (bukan dari input form).
      *
      * @param string      $aksi        salah satu kunci AKTIVITAS
      * @param Model       $objek       data yang terkena aksi (nama tabelnya jadi auditable_type)
@@ -83,6 +84,34 @@ class AuditTrail extends Model
      * @param int|null    $koreksiId   isi untuk aksi koreksi; jika $objek sendiri CorrectionRequest, otomatis terisi
      */
     public static function catat(string $aksi, Model $objek, ?array $lama = null, ?array $baru = null, ?int $koreksiId = null): self
+    {
+        if ($koreksiId === null && $objek->getTable() === 'correction_requests') {
+            $koreksiId = (int) $objek->getKey();
+        }
+
+        return static::catatPada($aksi, $objek->getTable(), (int) $objek->getKey(), $lama, $baru, $koreksiId);
+    }
+
+    /**
+     * @param Model $koreksi baris correction_requests
+     */
+    public static function catatKoreksi(string $aksi, Model $koreksi, ?array $lama = null, ?array $baru = null): self
+    {
+        if (! str_starts_with($aksi, 'correction_')) {
+            throw new InvalidArgumentException('catatKoreksi hanya untuk aksi correction_*. Untuk aksi lain pakai catat().');
+        }
+
+        $f = $koreksi->field_name;
+        [$lamaDefault, $baruDefault] = match ($aksi) {
+            'correction_approve' => [['status' => 'pending'], ['status' => 'approved']],
+            'correction_reject'  => [['status' => 'pending'], ['status' => 'rejected']],
+            default              => [[$f => $koreksi->old_value], [$f => $koreksi->new_value]],
+        };
+
+        return static::catatPada($aksi, $koreksi->target_table, (int) $koreksi->target_id, $lama ?? $lamaDefault, $baru ?? $baruDefault, (int) $koreksi->getKey());
+    }
+
+    private static function catatPada(string $aksi, string $tabel, int $id, ?array $lama, ?array $baru, ?int $koreksiId): self
     {
         if (! array_key_exists($aksi, self::AKTIVITAS)) {
             throw new InvalidArgumentException("Aksi audit '{$aksi}' tidak dikenal. Pilihan: " . implode(', ', array_keys(self::AKTIVITAS)));
@@ -93,23 +122,17 @@ class AuditTrail extends Model
             throw new RuntimeException('Audit trail harus punya pelaku: user harus sedang login.');
         }
 
-        if ($koreksiId === null && $objek->getTable() === 'correction_requests') {
-            $koreksiId = (int) $objek->getKey();
-        }
-
         return static::create([
             'correction_request_id' => $koreksiId,
             'id_user'               => $pelaku,
             'action'                => $aksi,
-            'auditable_type'        => $objek->getTable(),
-            'auditable_id'          => $objek->getKey(),
+            'auditable_type'        => $tabel,
+            'auditable_id'          => $id,
             'old_values'            => $lama,
             'new_values'            => $baru,
         ]);
     }
 
-    // query untuk halaman
-    //dasar query halaman: tambah nama pelaku dan nama SPPG-nya (kalau punya)
     public function scopeDaftar(Builder $q): Builder
     {
         return $q
@@ -118,7 +141,6 @@ class AuditTrail extends Model
             ->select('audit_trails.*', 'u.nama as pelaku_nama', 's.nama_sppg as pelaku_sppg');
     }
 
-    //filter modul
     public function scopeModul(Builder $q, ?string $modul): Builder
     {
         if (! $modul) {
@@ -129,7 +151,6 @@ class AuditTrail extends Model
         return $q->whereIn('audit_trails.auditable_type', $tabel ?: ['-']);
     }
 
-    //filter tanggal: hari_ini | 7_hari | 30_hari
     public function scopeRentang(Builder $q, ?string $rentang): Builder
     {
         $mulai = match ($rentang) {
@@ -142,7 +163,6 @@ class AuditTrail extends Model
         return $mulai ? $q->where('audit_trails.created_at', '>=', $mulai) : $q;
     }
 
-    //cari nama pengguna atau kode data (PB-xxx, nomor penerimaan, nomor pembelian, nomor koreksi)
     public function scopeCari(Builder $q, ?string $kata): Builder
     {
         $kata = trim((string) $kata);
@@ -170,7 +190,6 @@ class AuditTrail extends Model
         });
     }
 
-    // tampilan (dihitung, tidak disimpan)
     public static function daftarModul(): array
     {
         return array_values(array_unique(self::MODUL));
@@ -190,7 +209,6 @@ class AuditTrail extends Model
     {
         return 'AUD-' . str_pad((string) $this->id, 4, '0', STR_PAD_LEFT);
     }
-
     public function getPelakuAttribute(): string
     {
         return ($this->pelaku_nama ?? '(user dihapus)') . ' - ' . ($this->pelaku_sppg ?? 'Admin');
