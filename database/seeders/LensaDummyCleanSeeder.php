@@ -7,12 +7,10 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Menghapus SEMUA data di 21 tabel Lensa MBG (bukan hanya data dummy) dan mereset nomor id ke 1.
- * Tabel sppg dan users TIDAK disentuh.
- *
- * Pakai saat masih tahap pengembangan, sebelum ada data asli:
+ * pake ini pas data masih dummy sblm ada data asli:
  *   php artisan db:seed --class=LensaDummyCleanSeeder
  */
+
 class LensaDummyCleanSeeder extends Seeder
 {
     /** Urut dari tabel paling "bawah" (yang merujuk) ke paling "atas", agar tidak melanggar foreign key. */

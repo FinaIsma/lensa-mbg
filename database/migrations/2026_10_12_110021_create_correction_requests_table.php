@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Schema;
 // pengategorian tabel jd modul ini nanti taro di model aja atau trsrh
 // receiving_items, purchase_items, production_batches, material_usages, distributions, waste_surplus_records, material_lots
 
-
 return new class extends Migration
 {
     public function up(): void

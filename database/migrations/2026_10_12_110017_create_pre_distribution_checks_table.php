@@ -6,11 +6,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/*
- * Modul 12. Hasil Produksi  |  tabel: pre_distribution_checks
- * Hasil produksi: portions_ready menjadi production_batches.actual_porsi (diisi oleh kode, bukan trigger).
- * reported_condition = kondisi menurut laporan admin (teks), bukan hasil uji.
- */
 return new class extends Migration
 {
     public function up(): void
