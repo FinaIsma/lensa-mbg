@@ -7,7 +7,7 @@
     </div>
 
     <nav class="sidebar-nav">
-        <a href="{{ route('admin.dashboard') }}" class="nav-item active">
+        <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="7" height="7" rx="1"></rect>
                 <rect x="14" y="3" width="7" height="7" rx="1"></rect>
@@ -17,7 +17,7 @@
             <span>Dashboard</span>
         </a>
 
-        <a href="{{ route('admin.sppg.index') }}" class="nav-item">
+        <a href="{{ route('admin.sppg.index') }}" class="nav-item {{ request()->routeIs('admin.sppg.*') ? 'active' : '' }}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
@@ -27,7 +27,7 @@
             <span>User Management</span>
         </a>
 
-        <a href="{{ route('admin.correction') }}" class="nav-item">
+        <a href="{{ route('admin.correction') }}" class="nav-item {{ request()->routeIs('admin.correction*') ? 'active' : '' }}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
@@ -37,7 +37,7 @@
             <span>Correction Request</span>
         </a>
 
-        <a href="{{ route('admin.audit') }}" class="nav-item">
+        <a href="{{ route('admin.audit') }}" class="nav-item {{ request()->routeIs('admin.audit*') ? 'active' : '' }}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                 <polyline points="3 3 3 8 8 8"></polyline>

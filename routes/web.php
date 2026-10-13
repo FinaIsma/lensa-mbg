@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AuditTrailController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -39,7 +40,6 @@ Route::middleware(['auth', 'role:admin_sistem'])->prefix('admin')->name('admin.'
     Route::get('/sppg', [SppgManagementController::class, 'index'])->name('sppg.index');
     Route::get('/sppg/{id}', [SppgManagementController::class, 'show'])->name('sppg.show');
     Route::post('/sppg/{id}/status', [SppgManagementController::class, 'updateStatus'])->name('sppg.updateStatus');
-
     // Interactive placeholder routes for sidebar items
     Route::get('/monitoring', function () {
         return redirect()->route('admin.dashboard')->with('info', 'Fitur Monitoring sedang dalam tahap pengembangan.');
@@ -49,9 +49,7 @@ Route::middleware(['auth', 'role:admin_sistem'])->prefix('admin')->name('admin.'
         return redirect()->route('admin.dashboard')->with('info', 'Fitur Correction Request sedang dalam tahap pengembangan.');
     })->name('correction');
 
-    Route::get('/audit-trail', function () {
-        return redirect()->route('admin.dashboard')->with('info', 'Fitur Audit Trail sedang dalam tahap pengembangan.');
-    })->name('audit');
-});
+    Route::get('/audit-trail', [AuditTrailController::class, 'index'])->name('audit');
+    });
 // API route to check email uniqueness dynamically
 Route::get('/api/check-email', [RegisterController::class, 'checkEmail'])->name('api.check-email');
