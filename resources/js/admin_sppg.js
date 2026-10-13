@@ -159,6 +159,7 @@ window.openDetailModal = function (item) {
     }
 
     content.innerHTML = window.renderSppgModalContent(item);
+    content.scrollTop = 0;
     document.getElementById('modalDetail').classList.remove('hidden');
 };
 
@@ -177,6 +178,7 @@ window.openVerifikasiModal = function (item) {
     const baseUpdateUrl = window.adminSppgUpdateBase || '/admin/sppg';
     form.action = `${baseUpdateUrl}/${item.raw_id}/status`;
     content.innerHTML = window.renderSppgModalContent(item);
+    content.scrollTop = 0;
 
     document.getElementById('modalVerifikasi').classList.remove('hidden');
 };

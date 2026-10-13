@@ -267,7 +267,12 @@
         <div class="modal-dialog">
             <div class="modal-header">
                 <h3 class="modal-title">Detail SPPG</h3>
-                <button type="button" class="btn-close" onclick="closeModal('modalDetail')">&times;</button>
+                <button type="button" class="btn-close" onclick="closeModal('modalDetail')" aria-label="Tutup">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <form id="formDetail" action="" method="POST">
                 @csrf
@@ -296,7 +301,12 @@
         <div class="modal-dialog">
             <div class="modal-header">
                 <h3 class="modal-title">Detail SPPG</h3>
-                <button type="button" class="btn-close" onclick="closeModal('modalVerifikasi')">&times;</button>
+                <button type="button" class="btn-close" onclick="closeModal('modalVerifikasi')" aria-label="Tutup">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <form id="formVerifikasi" action="" method="POST">
                 @csrf
