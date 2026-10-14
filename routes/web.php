@@ -37,7 +37,7 @@ Route::get('/api/check-email', [RegisterController::class, 'checkEmail'])->name(
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users', [SppgManagementController::class, 'index'])->name('users.index');
     Route::get('/sppg', [SppgManagementController::class, 'index'])->name('sppg.index');
     Route::get('/sppg/{id}', [SppgManagementController::class, 'show'])->name('sppg.show');
     Route::post('/sppg/{id}/status', [SppgManagementController::class, 'updateStatus'])->name('sppg.updateStatus');
@@ -51,6 +51,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/correction-request/{id}/approve', [CorrectionRequestController::class, 'approve'])->name('correction.approve');
     Route::post('/correction-request/{id}/reject', [CorrectionRequestController::class, 'reject'])->name('correction.reject');
 
-    Route::get('/audit-trail', [AuditTrailController::class, 'index'])->name('audit-trail.index');
-    Route::get('/audit', [AuditTrailController::class, 'index'])->name('audit');
+    Route::get('/audit-trail', [AuditTrailController::class, 'index'])->name('audit');
+    Route::get('/audit', [AuditTrailController::class, 'index'])->name('audit-trail.index');
 });

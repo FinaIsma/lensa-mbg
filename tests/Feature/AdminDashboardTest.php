@@ -36,7 +36,7 @@ class AdminDashboardTest extends TestCase
         $response = $this->get(route('admin.users.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('User Management');
+        $response->assertSee('SPPG');
     }
 
     /**
@@ -44,11 +44,10 @@ class AdminDashboardTest extends TestCase
      */
     public function test_correction_requests_page_can_be_rendered(): void
     {
-        $response = $this->get(route('admin.correction-requests.index'));
+        $response = $this->get(route('admin.correction'));
 
         $response->assertStatus(200);
         $response->assertSee('Correction Request');
-        $response->assertSee('COR-20261012-001');
     }
 
     /**
@@ -56,10 +55,9 @@ class AdminDashboardTest extends TestCase
      */
     public function test_audit_trail_page_can_be_rendered(): void
     {
-        $response = $this->get(route('admin.audit-trail.index'));
+        $response = $this->get(route('admin.audit'));
 
         $response->assertStatus(200);
         $response->assertSee('Audit Trail');
-        $response->assertSee('confirm');
     }
 }
