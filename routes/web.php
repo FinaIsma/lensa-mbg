@@ -1,22 +1,19 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\SppgManagementController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\WilayahController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuditTrailController;
+use App\Http\Controllers\Admin\CorrectionRequestController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\LoginController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    if (Auth::check()) {
-        if (Auth::user()->role === 'admin_sistem') {
+    if (auth()->check()) {
+        if (auth()->user()->role === 'admin_sistem') {
             return redirect()->route('admin.dashboard');
         }
-        if (Auth::user()->role === 'admin_sppg') {
-            return redirect()->route('sppg.dashboard');
-        }
+
+        return redirect()->route('sppg.dashboard');
     }
 
     return redirect()->route('login');
@@ -26,6 +23,14 @@ Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.process');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+<<<<<<< HEAD
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/correction-requests', [CorrectionRequestController::class, 'index'])->name('correction-requests.index');
+    Route::get('/audit-trail', [AuditTrailController::class, 'index'])->name('audit-trail.index');
+});
+=======
 Route::get('/register', [RegisterController::class, 'showRegister'])->name('register');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.process');
 
@@ -54,3 +59,4 @@ Route::middleware(['auth', 'role:admin_sistem'])->prefix('admin')->name('admin.'
 });
 // API route to check email uniqueness dynamically
 Route::get('/api/check-email', [RegisterController::class, 'checkEmail'])->name('api.check-email');
+>>>>>>> origin/Main

@@ -2,24 +2,27 @@
 
 namespace App\Models;
 
-use App\Support\Keys;
-use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
-use LogicException;
-use RuntimeException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AuditTrail extends Model
 {
-    public const UPDATED_AT = null;
-
     protected $table = 'audit_trails';
 
-    protected $guarded = [];
+    protected $primaryKey = 'id';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'correction_request_id',
+        'id_user',
+        'action',
+        'auditable_type',
+        'auditable_id',
+        'old_values',
+        'new_values',
+        'created_at',
+    ];
 
     protected $casts = [
         'old_values' => 'array',
@@ -27,6 +30,48 @@ class AuditTrail extends Model
         'created_at' => 'datetime',
     ];
 
+<<<<<<< HEAD
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
+
+    public function correctionRequest(): BelongsTo
+    {
+        return $this->belongsTo(CorrectionRequest::class, 'correction_request_id', 'id');
+    }
+
+    /**
+     * Map auditable_type to module name.
+     */
+    public function getModulAttribute(): string
+    {
+        return match ($this->auditable_type) {
+            'distributions', 'distribution_destinations' => 'Distribusi',
+            'production_batches', 'menus', 'recipes', 'materials' => 'Produksi',
+            'receivings', 'receiving_items', 'purchases' => 'Penerimaan',
+            'sppg', 'users' => 'Master Data',
+            default => 'Koreksi',
+        };
+    }
+
+    /**
+     * Map action to Indonesian activity text.
+     */
+    public function getAktivitasAttribute(): string
+    {
+        return match ($this->action) {
+            'confirm' => 'Konfirmasi Data',
+            'correction_request' => 'Mengajukan koreksi',
+            'correction_approve' => 'Menyetujui koreksi',
+            'correction_reject' => 'Menolak koreksi',
+            'correction_apply' => 'Menerapkan koreksi',
+            'create' => 'Menambah data',
+            'update' => 'Mengubah data',
+            'delete' => 'Menghapus data',
+            default => ucfirst(str_replace('_', ' ', (string) $this->action)),
+        };
+=======
     public const AKTIVITAS = [
         'confirm'            => 'Mengonfirmasi',
         'void'               => 'Membatalkan (void)',
@@ -239,5 +284,6 @@ class AuditTrail extends Model
         }
 
         return $hasil;
+>>>>>>> origin/Main
     }
 }
