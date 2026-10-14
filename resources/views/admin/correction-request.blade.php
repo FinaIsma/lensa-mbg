@@ -335,25 +335,61 @@
             {{-- Card 1: Informasi Pengajuan --}}
             <div class="cr-info-card">
                 <h3 class="cr-card-title">Informasi Pengajuan</h3>
-                <div class="cr-card-body cr-body-indent">
+                <div class="cr-card-body">
                     <div class="cr-kv-row">
-                        <span class="cr-kv-label">ID Pengajuan</span>
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                <line x1="7" y1="8" x2="7.01" y2="8"></line>
+                                <line x1="11" y1="8" x2="17" y2="8"></line>
+                                <line x1="7" y1="12" x2="17" y2="12"></line>
+                            </svg>
+                            ID Pengajuan
+                        </span>
                         <span class="cr-kv-value">{{ $row->kode_pengajuan }}</span>
                     </div>
                     <div class="cr-kv-row">
-                        <span class="cr-kv-label">Jenis Data</span>
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                <path d="M2 17l10 5 10-5"></path>
+                                <path d="M2 12l10 5 10-5"></path>
+                            </svg>
+                            Jenis Data
+                        </span>
                         <span class="cr-kv-value">{{ $row->jenis_data }}</span>
                     </div>
                     <div class="cr-kv-row">
-                        <span class="cr-kv-label">Tanggal Pengajuan</span>
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Tanggal Pengajuan
+                        </span>
                         <span class="cr-kv-value">{{ $row->requested_at ? $row->requested_at->locale('id')->translatedFormat('d F Y') : '-' }}</span>
                     </div>
                     <div class="cr-kv-row">
-                        <span class="cr-kv-label">Pengaju</span>
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Pengaju
+                        </span>
                         <span class="cr-kv-value">{{ $row->requester->nama ?? 'Yu Ji-Min' }}</span>
                     </div>
                     <div class="cr-kv-row">
-                        <span class="cr-kv-label">Reviewer</span>
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <polyline points="16 11 18 13 22 9"></polyline>
+                            </svg>
+                            Reviewer
+                        </span>
                         <span class="cr-kv-value">{{ $row->reviewer->nama ?? '-' }}</span>
                     </div>
                 </div>
@@ -439,21 +475,47 @@
             {{-- Card 3: Detail Koreksi --}}
             <div class="cr-info-card">
                 <h3 class="cr-card-title">Detail Koreksi</h3>
-                <div class="cr-card-body cr-body-indent">
+                <div class="cr-card-body">
                     <div class="cr-kv-row">
-                        <span class="cr-kv-label">ID Data</span>
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            ID Data
+                        </span>
                         <span class="cr-kv-value">{{ $row->target_data_display }}</span>
                     </div>
                     <div class="cr-kv-row">
-                        <span class="cr-kv-label">Data Lama</span>
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Data Lama
+                        </span>
                         <span class="cr-kv-value">{{ $row->tampil_old_value }}</span>
                     </div>
                     <div class="cr-kv-row">
-                        <span class="cr-kv-label">Data Baru</span>
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 11 12 14 22 4"></polyline>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                            </svg>
+                            Data Baru
+                        </span>
                         <span class="cr-kv-value">{{ $row->tampil_new_value }}</span>
                     </div>
                     <div class="cr-kv-row">
-                        <span class="cr-kv-label">Alasan Koreksi</span>
+                        <span class="cr-kv-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Alasan Koreksi
+                        </span>
                         <span class="cr-kv-value">{{ $row->reason }}</span>
                     </div>
                 </div>
