@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Sppg extends Model
 {
+    use HasFactory;
+
     protected $table = 'sppg';
 
     protected $primaryKey = 'id_sppg';
@@ -13,9 +16,11 @@ class Sppg extends Model
     protected $fillable = [
         'id_user',
         'nama_sppg',
-        'nama_pegawai',
         'no_telepon',
         'alamat_sppg',
+        'provinsi',
+        'kabupaten_kota',
+        'kecamatan',
         'foto_ktp',
         'foto_kantor_sppg',
         'foto_surat_resmi',

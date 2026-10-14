@@ -39,7 +39,7 @@ class LoginController extends Controller
                     Auth::logout();
 
                     return back()->withErrors([
-                        'email' => 'Akun SPPG masih menunggu verifikasi atau sudah dinonaktifkan.',
+                        'sppg_status' => 'Akun SPPG masih menunggu verifikasi atau sudah dinonaktifkan.',
                     ])->withInput();
                 }
 
