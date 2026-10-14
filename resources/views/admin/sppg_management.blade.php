@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPPG Management - Admin Sistem Lensa MBG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <script>window.adminSppgUpdateBase = '{{ url('admin/sppg') }}';</script>
     @vite(['resources/css/admin_sppg.css', 'resources/js/admin_sppg.js'])
 </head>
@@ -44,10 +48,10 @@
                     <p class="page-subtitle">Kelola akun pengguna sistem Lensa MBG, atur role dan status akses</p>
                 </div>
 
-                <!-- 4 Stat Summary Cards -->
+                <!-- 4 Stat Summary Cards (Static) -->
                 <div class="stat-cards-grid">
                     <!-- Card 1: Total SPPG -->
-                    <a href="{{ route('admin.sppg.index') }}" class="stat-card {{ !request('status_verif') && !request('card_filter') ? 'active-card' : '' }}">
+                    <div class="stat-card">
                         <div class="stat-icon-wrapper icon-blue">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="4" y="2" width="16" height="20" rx="2"></rect>
@@ -63,10 +67,10 @@
                             <span class="stat-value">{{ $totalCount }}</span>
                             <span class="stat-subtext">SPPG Terdaftar</span>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- Card 2: Belum Verifikasi -->
-                    <a href="{{ route('admin.sppg.index', ['status_verif' => 'Belum Diverifikasi']) }}" class="stat-card {{ request('status_verif') === 'Belum Diverifikasi' || request('card_filter') === 'pending' ? 'active-card' : '' }}">
+                    <div class="stat-card">
                         <div class="stat-icon-wrapper icon-yellow">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -80,10 +84,10 @@
                             <span class="stat-value">{{ $pendingCount }}</span>
                             <span class="stat-subtext">Menunggu Verifikasi</span>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- Card 3: Status Aktif -->
-                    <a href="{{ route('admin.sppg.index', ['card_filter' => 'aktif']) }}" class="stat-card {{ request('card_filter') === 'aktif' || request('status_verif') === 'Terverifikasi' ? 'active-card' : '' }}">
+                    <div class="stat-card">
                         <div class="stat-icon-wrapper icon-green">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -95,10 +99,10 @@
                             <span class="stat-value">{{ $activeCount }}</span>
                             <span class="stat-subtext">SPPG Aktif</span>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- Card 4: Status Nonaktif -->
-                    <a href="{{ route('admin.sppg.index', ['card_filter' => 'nonaktif']) }}" class="stat-card {{ request('card_filter') === 'nonaktif' || request('status_verif') === 'Ditolak' ? 'active-card' : '' }}">
+                    <div class="stat-card">
                         <div class="stat-icon-wrapper icon-red">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                                 <circle cx="12" cy="12" r="10" fill="#DC2626"></circle>
@@ -110,7 +114,7 @@
                             <span class="stat-value">{{ $inactiveCount }}</span>
                             <span class="stat-subtext">SPPG Nonaktif</span>
                         </div>
-                    </a>
+                    </div>
                 </div>
 
                 <!-- Filter & Search Control Panel -->
@@ -283,7 +287,7 @@
 
                 <div class="modal-footer full-width-footer">
                     <button type="button" id="btnDetailDeactivate" class="btn-modal-action-deactivate" onclick="submitDeactivateDetail()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                             <circle cx="8.5" cy="7" r="4"></circle>
                             <line x1="18" y1="8" x2="23" y2="13"></line>
@@ -318,7 +322,7 @@
                 <div class="modal-footer full-width-footer">
                     <div class="verify-action-grid">
                         <button type="button" class="btn-modal-action-approve" onclick="submitVerifikasi('aktif')">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                 <circle cx="12" cy="12" r="10" fill="#16A34A"/>
                                 <path d="M8 12.5l2.5 2.5 5.5-5.5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
@@ -326,7 +330,7 @@
                         </button>
 
                         <button type="button" class="btn-modal-action-reject" onclick="submitVerifikasi('nonaktif')">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                 <circle cx="12" cy="12" r="10" fill="#DC2626"/>
                                 <path d="M15 9l-6 6m0-6l6 6" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>

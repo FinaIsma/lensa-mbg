@@ -284,7 +284,7 @@
                 <div class="modal-footer full-width-footer">
                     <div class="verify-action-grid">
                         <button type="button" class="btn-modal-action-approve" onclick="submitVerifikasi('aktif')">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                 <circle cx="12" cy="12" r="10" fill="#16A34A"/>
                                 <path d="M8 12.5l2.5 2.5 5.5-5.5" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
@@ -292,7 +292,7 @@
                         </button>
 
                         <button type="button" class="btn-modal-action-reject" onclick="submitVerifikasi('nonaktif')">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                                 <circle cx="12" cy="12" r="10" fill="#DC2626"/>
                                 <path d="M15 9l-6 6m0-6l6 6" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
