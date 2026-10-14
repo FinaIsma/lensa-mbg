@@ -1,0 +1,56 @@
+/* ==========================================================================
+   DASHBOARD & ANALYTICS SPECIFIC STYLES
+   ========================================================================== */
+
+/* Dashboard Banner Alert */
+.dashboard-banner-alert {
+    background-color: #FEF3C7;
+    border: 1px solid #FDE68A;
+    color: #92400E;
+    padding: 16px 20px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 16px;
+}
+
+.banner-text-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.btn-banner-action {
+    background-color: #D97706;
+    color: #FFFFFF;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-banner-action:hover {
+    background-color: #B45309;
+}
+
+/* Chart Canvas Wrapper Smooth Transition */
+.chart-container-wrapper {
+    position: relative;
+    width: 100%;
+    transition: opacity 0.2s ease;
+}
+
+/* Custom mini scrollbar for dashboard tables */
+.dashboard-table-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+.dashboard-table-scroll::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+}

@@ -17,8 +17,8 @@ class CorrectionRequestController extends Controller
         [$dari, $sampai] = $this->rentangTanggal($request);
 
         // Dynamic counts for top stat cards
-        $totalCount    = CorrectionRequest::count();
-        $pendingCount  = CorrectionRequest::where('status', 'pending')->count();
+        $totalCount = CorrectionRequest::count();
+        $pendingCount = CorrectionRequest::where('status', 'pending')->count();
         $approvedCount = CorrectionRequest::whereIn('status', ['approved', 'applied'])->count();
         $rejectedCount = CorrectionRequest::where('status', 'rejected')->count();
 
@@ -29,8 +29,8 @@ class CorrectionRequestController extends Controller
             ->jenisData($request->query('jenis_data'))
             ->statusFilter($request->query('status'))
             ->rentang($dari, $sampai)
-            ->orderBy('requested_at', 'asc')
-            ->orderBy('id', 'asc');
+            ->orderBy('requested_at', 'desc')
+            ->orderBy('id', 'desc');
 
         // Paginate 7 items per page as requested by UI design
         $rows = $query->paginate(7)->withQueryString();
@@ -41,15 +41,15 @@ class CorrectionRequestController extends Controller
         $daftarJenisData = CorrectionRequest::daftarJenisData();
 
         return view('admin.correction-request', [
-            'rows'            => $rows,
-            'totalCount'      => $totalCount,
-            'pendingCount'    => $pendingCount,
-            'approvedCount'   => $approvedCount,
-            'rejectedCount'   => $rejectedCount,
-            'sppgs'           => $sppgs,
+            'rows' => $rows,
+            'totalCount' => $totalCount,
+            'pendingCount' => $pendingCount,
+            'approvedCount' => $approvedCount,
+            'rejectedCount' => $rejectedCount,
+            'sppgs' => $sppgs,
             'daftarJenisData' => $daftarJenisData,
-            'dari'            => $dari,
-            'sampai'          => $sampai,
+            'dari' => $dari,
+            'sampai' => $sampai,
         ]);
     }
 
@@ -62,7 +62,7 @@ class CorrectionRequestController extends Controller
         }
 
         $koreksi->update([
-            'status'      => 'approved',
+            'status' => 'approved',
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
             'review_note' => $request->input('note', 'Pengajuan koreksi disetujui.'),
@@ -85,7 +85,7 @@ class CorrectionRequestController extends Controller
         $note = trim((string) $request->input('note'));
 
         $koreksi->update([
-            'status'      => 'rejected',
+            'status' => 'rejected',
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
             'review_note' => $note ?: 'Pengajuan koreksi ditolak.',

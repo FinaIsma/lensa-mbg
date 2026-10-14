@@ -59,8 +59,8 @@ class SppgManagementController extends Controller
             }
         }
 
-        // Paginate 7 items per page
-        $sppgs = $query->orderBy('id_sppg', 'asc')->paginate(7)->withQueryString();
+        // Paginate 7 items per page (ordered newest first)
+        $sppgs = $query->orderByDesc('id_sppg')->paginate(7)->withQueryString();
 
         return view('admin.sppg_management', compact(
             'totalCount',

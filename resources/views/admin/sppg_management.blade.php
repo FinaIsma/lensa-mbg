@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPPG Management - Admin Sistem Lensa MBG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>window.adminSppgUpdateBase = '{{ url('admin/sppg') }}';</script>
-    @vite(['resources/css/admin_sppg.css', 'resources/js/admin_sppg.js'])
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    @vite(['resources/css/sppg_management.css', 'resources/js/sppg_management.js'])
 </head>
 <body>
     <div class="admin-container">
@@ -44,10 +48,10 @@
                     <p class="page-subtitle">Kelola akun pengguna sistem Lensa MBG, atur role dan status akses</p>
                 </div>
 
-                <!-- 4 Stat Summary Cards -->
+                <!-- 4 Stat Summary Cards (Static) -->
                 <div class="stat-cards-grid">
                     <!-- Card 1: Total SPPG -->
-                    <a href="{{ route('admin.sppg.index') }}" class="stat-card {{ !request('status_verif') && !request('card_filter') ? 'active-card' : '' }}">
+                    <div class="stat-card">
                         <div class="stat-icon-wrapper icon-blue">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="4" y="2" width="16" height="20" rx="2"></rect>
@@ -63,10 +67,10 @@
                             <span class="stat-value">{{ $totalCount }}</span>
                             <span class="stat-subtext">SPPG Terdaftar</span>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- Card 2: Belum Verifikasi -->
-                    <a href="{{ route('admin.sppg.index', ['status_verif' => 'Belum Diverifikasi']) }}" class="stat-card {{ request('status_verif') === 'Belum Diverifikasi' || request('card_filter') === 'pending' ? 'active-card' : '' }}">
+                    <div class="stat-card">
                         <div class="stat-icon-wrapper icon-yellow">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -80,10 +84,10 @@
                             <span class="stat-value">{{ $pendingCount }}</span>
                             <span class="stat-subtext">Menunggu Verifikasi</span>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- Card 3: Status Aktif -->
-                    <a href="{{ route('admin.sppg.index', ['card_filter' => 'aktif']) }}" class="stat-card {{ request('card_filter') === 'aktif' || request('status_verif') === 'Terverifikasi' ? 'active-card' : '' }}">
+                    <div class="stat-card">
                         <div class="stat-icon-wrapper icon-green">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -95,10 +99,10 @@
                             <span class="stat-value">{{ $activeCount }}</span>
                             <span class="stat-subtext">SPPG Aktif</span>
                         </div>
-                    </a>
+                    </div>
 
                     <!-- Card 4: Status Nonaktif -->
-                    <a href="{{ route('admin.sppg.index', ['card_filter' => 'nonaktif']) }}" class="stat-card {{ request('card_filter') === 'nonaktif' || request('status_verif') === 'Ditolak' ? 'active-card' : '' }}">
+                    <div class="stat-card">
                         <div class="stat-icon-wrapper icon-red">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                                 <circle cx="12" cy="12" r="10" fill="#DC2626"></circle>
@@ -110,7 +114,7 @@
                             <span class="stat-value">{{ $inactiveCount }}</span>
                             <span class="stat-subtext">SPPG Nonaktif</span>
                         </div>
-                    </a>
+                    </div>
                 </div>
 
                 <!-- Filter & Search Control Panel -->
@@ -196,7 +200,7 @@
                                             @if ($item->status === 'aktif')
                                                 <span class="badge-verif badge-terverifikasi">Terverifikasi</span>
                                             @elseif ($item->status === 'menunggu_verifikasi')
-                                                <span class="badge-verif badge-belum">Belum<br>Diverifikasi</span>
+                                                <span class="badge-verif badge-belum">Belum Diverifikasi</span>
                                             @else
                                                 <span class="badge-verif badge-ditolak">Ditolak</span>
                                             @endif
@@ -267,7 +271,12 @@
         <div class="modal-dialog">
             <div class="modal-header">
                 <h3 class="modal-title">Detail SPPG</h3>
-                <button type="button" class="btn-close" onclick="closeModal('modalDetail')">&times;</button>
+                <button type="button" class="btn-close" onclick="closeModal('modalDetail')" aria-label="Tutup">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <form id="formDetail" action="" method="POST">
                 @csrf
@@ -296,7 +305,12 @@
         <div class="modal-dialog">
             <div class="modal-header">
                 <h3 class="modal-title">Detail SPPG</h3>
-                <button type="button" class="btn-close" onclick="closeModal('modalVerifikasi')">&times;</button>
+                <button type="button" class="btn-close" onclick="closeModal('modalVerifikasi')" aria-label="Tutup">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <form id="formVerifikasi" action="" method="POST">
                 @csrf
