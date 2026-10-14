@@ -2,56 +2,70 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CorrectionRequest extends Model
 {
-    use HasFactory;
-
     protected $table = 'correction_requests';
 
-    protected $guarded = [];
+    protected $primaryKey = 'id';
+
+    public const JENIS_DATA = [
+        'distributions'             => 'Distribusi',
+        'distribution_destinations' => 'Distribusi',
+        'production_batches'        => 'Produksi',
+        'materials'                 => 'Produksi',
+        'material_usages'           => 'Produksi',
+        'processing_steps'          => 'Produksi',
+        'pre_distribution_checks'   => 'Produksi',
+        'menus'                     => 'Menu',
+        'recipes'                   => 'Menu',
+        'recipe_items'              => 'Menu',
+        'receivings'                => 'Penerimaan',
+        'receiving_items'           => 'Penerimaan',
+        'purchases'                 => 'Pengadaan',
+        'purchase_items'            => 'Pengadaan',
+        'material_lots'             => 'Stok',
+        'stock_movements'           => 'Stok',
+        'waste_surplus_records'     => 'Waste & Surplus',
+    ];
+
+    protected $fillable = [
+        'id_sppg',
+        'requested_by',
+        'reviewed_by',
+        'request_no',
+        'target_table',
+        'target_id',
+        'field_name',
+        'old_value',
+        'new_value',
+        'reason',
+        'status',
+        'requested_at',
+        'reviewed_at',
+        'review_note',
+        'applied_at',
+    ];
 
     protected $casts = [
         'requested_at' => 'datetime',
-        'reviewed_at'  => 'datetime',
-        'applied_at'   => 'datetime',
+        'reviewed_at' => 'datetime',
+        'applied_at' => 'datetime',
     ];
 
-    public const JENIS_DATA = [
-        'distributions'            => 'Distribusi',
-        'production_batches'       => 'Produksi',
-        'material_usages'          => 'Produksi',
-        'processing_steps'         => 'Produksi',
-        'pre_distribution_checks'  => 'Produksi',
-        'receivings'               => 'Penerimaan',
-        'receiving_items'          => 'Penerimaan',
-        'purchases'                => 'Pengadaan',
-        'purchase_items'           => 'Pengadaan',
-        'material_lots'            => 'Stok',
-        'stock_movements'          => 'Stok',
-        'waste_surplus_records'    => 'Waste & Surplus',
-        'menus'                    => 'Menu',
-        'recipes'                  => 'Menu',
-        'recipe_items'             => 'Menu',
-    ];
-
-    public function sppg()
+    public function sppg(): BelongsTo
     {
         return $this->belongsTo(Sppg::class, 'id_sppg', 'id_sppg');
     }
 
-    public function requester()
+    public function requester(): BelongsTo
     {
         return $this->belongsTo(User::class, 'requested_by', 'id_user');
     }
 
-    public function reviewer()
+    public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by', 'id_user');
     }

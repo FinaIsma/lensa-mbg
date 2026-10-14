@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use App\Support\Keys;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,17 +16,38 @@ use RuntimeException;
 
 class AuditTrail extends Model
 {
-    public const UPDATED_AT = null;
-
     protected $table = 'audit_trails';
 
-    protected $guarded = [];
+    protected $primaryKey = 'id';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'correction_request_id',
+        'id_user',
+        'action',
+        'auditable_type',
+        'auditable_id',
+        'old_values',
+        'new_values',
+        'created_at',
+    ];
 
     protected $casts = [
         'old_values' => 'array',
         'new_values' => 'array',
         'created_at' => 'datetime',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
+
+    public function correctionRequest(): BelongsTo
+    {
+        return $this->belongsTo(CorrectionRequest::class, 'correction_request_id', 'id');
+    }
 
     public const AKTIVITAS = [
         'confirm'            => 'Mengonfirmasi',
@@ -38,24 +60,24 @@ class AuditTrail extends Model
     ];
 
     public const MODUL = [
-        'purchases'                => 'Pembelian',
-        'purchase_items'           => 'Pembelian',
-        'receivings'               => 'Penerimaan Bahan',
-        'receiving_items'          => 'Penerimaan Bahan',
-        'material_lots'            => 'Stok',
-        'stock_movements'          => 'Stok',
-        'production_batches'       => 'Produksi',
-        'material_usages'          => 'Produksi',
-        'processing_steps'         => 'Produksi',
-        'pre_distribution_checks'  => 'Produksi',
-        'distributions'            => 'Distribusi',
-        'waste_surplus_records'    => 'Waste & Surplus',
-        'correction_requests'      => 'Koreksi',
-        'menus'                    => 'Menu',
-        'recipes'                  => 'Menu',
-        'recipe_items'             => 'Menu',
-        'suppliers'                => 'Pemasok',
-        'materials'                => 'Bahan',
+        'purchases'                 => 'Pembelian',
+        'purchase_items'            => 'Pembelian',
+        'receivings'                => 'Penerimaan Bahan',
+        'receiving_items'           => 'Penerimaan Bahan',
+        'material_lots'             => 'Stok',
+        'stock_movements'           => 'Stok',
+        'production_batches'        => 'Produksi',
+        'material_usages'           => 'Produksi',
+        'processing_steps'          => 'Produksi',
+        'pre_distribution_checks'   => 'Produksi',
+        'distributions'             => 'Distribusi',
+        'waste_surplus_records'     => 'Waste & Surplus',
+        'correction_requests'       => 'Koreksi',
+        'menus'                     => 'Menu',
+        'recipes'                   => 'Menu',
+        'recipe_items'              => 'Menu',
+        'suppliers'                 => 'Pemasok',
+        'materials'                 => 'Bahan',
         'distribution_destinations' => 'Tujuan Distribusi',
     ];
 
@@ -191,9 +213,14 @@ class AuditTrail extends Model
         return self::AKTIVITAS[$this->action] ?? $this->action;
     }
 
+    public function getAktivitasAttribute(): string
+    {
+        return self::AKTIVITAS[$this->action] ?? ucfirst(str_replace('_', ' ', (string) $this->action));
+    }
+
     public function getModulAttribute(): string
     {
-        return self::MODUL[$this->auditable_type] ?? $this->auditable_type;
+        return self::MODUL[$this->auditable_type] ?? ucfirst(str_replace('_', ' ', (string) $this->auditable_type));
     }
 
     public function getKodeAuditAttribute(): string

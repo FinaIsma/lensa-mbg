@@ -10,6 +10,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() !== 'pgsql') {
+            return;
+        }
+
         $tables = [
             'suppliers',
             'materials',
@@ -41,6 +45,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() !== 'pgsql') {
+            return;
+        }
+
         $tables = [
             'suppliers',
             'materials',

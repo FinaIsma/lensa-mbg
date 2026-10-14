@@ -39,7 +39,9 @@ return new class extends Migration
             $t->index(['id_sppg', 'status']);
         });
 
-        DB::statement('ALTER TABLE correction_requests ADD CONSTRAINT correction_requests_reason_chk CHECK (char_length(btrim(reason)) > 0)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE correction_requests ADD CONSTRAINT correction_requests_reason_chk CHECK (char_length(btrim(reason)) > 0)');
+        }
     }
 
     public function down(): void
