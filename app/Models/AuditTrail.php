@@ -2,8 +2,17 @@
 
 namespace App\Models;
 
+use App\Support\Keys;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
+use LogicException;
+use RuntimeException;
 
 class AuditTrail extends Model
 {
@@ -30,7 +39,6 @@ class AuditTrail extends Model
         'created_at' => 'datetime',
     ];
 
-<<<<<<< HEAD
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_user', 'id_user');
@@ -41,37 +49,6 @@ class AuditTrail extends Model
         return $this->belongsTo(CorrectionRequest::class, 'correction_request_id', 'id');
     }
 
-    /**
-     * Map auditable_type to module name.
-     */
-    public function getModulAttribute(): string
-    {
-        return match ($this->auditable_type) {
-            'distributions', 'distribution_destinations' => 'Distribusi',
-            'production_batches', 'menus', 'recipes', 'materials' => 'Produksi',
-            'receivings', 'receiving_items', 'purchases' => 'Penerimaan',
-            'sppg', 'users' => 'Master Data',
-            default => 'Koreksi',
-        };
-    }
-
-    /**
-     * Map action to Indonesian activity text.
-     */
-    public function getAktivitasAttribute(): string
-    {
-        return match ($this->action) {
-            'confirm' => 'Konfirmasi Data',
-            'correction_request' => 'Mengajukan koreksi',
-            'correction_approve' => 'Menyetujui koreksi',
-            'correction_reject' => 'Menolak koreksi',
-            'correction_apply' => 'Menerapkan koreksi',
-            'create' => 'Menambah data',
-            'update' => 'Mengubah data',
-            'delete' => 'Menghapus data',
-            default => ucfirst(str_replace('_', ' ', (string) $this->action)),
-        };
-=======
     public const AKTIVITAS = [
         'confirm'            => 'Mengonfirmasi',
         'void'               => 'Membatalkan (void)',
@@ -83,24 +60,24 @@ class AuditTrail extends Model
     ];
 
     public const MODUL = [
-        'purchases'                => 'Pembelian',
-        'purchase_items'           => 'Pembelian',
-        'receivings'               => 'Penerimaan Bahan',
-        'receiving_items'          => 'Penerimaan Bahan',
-        'material_lots'            => 'Stok',
-        'stock_movements'          => 'Stok',
-        'production_batches'       => 'Produksi',
-        'material_usages'          => 'Produksi',
-        'processing_steps'         => 'Produksi',
-        'pre_distribution_checks'  => 'Produksi',
-        'distributions'            => 'Distribusi',
-        'waste_surplus_records'    => 'Waste & Surplus',
-        'correction_requests'      => 'Koreksi',
-        'menus'                    => 'Menu',
-        'recipes'                  => 'Menu',
-        'recipe_items'             => 'Menu',
-        'suppliers'                => 'Pemasok',
-        'materials'                => 'Bahan',
+        'purchases'                 => 'Pembelian',
+        'purchase_items'            => 'Pembelian',
+        'receivings'                => 'Penerimaan Bahan',
+        'receiving_items'           => 'Penerimaan Bahan',
+        'material_lots'             => 'Stok',
+        'stock_movements'           => 'Stok',
+        'production_batches'        => 'Produksi',
+        'material_usages'           => 'Produksi',
+        'processing_steps'          => 'Produksi',
+        'pre_distribution_checks'   => 'Produksi',
+        'distributions'             => 'Distribusi',
+        'waste_surplus_records'     => 'Waste & Surplus',
+        'correction_requests'       => 'Koreksi',
+        'menus'                     => 'Menu',
+        'recipes'                   => 'Menu',
+        'recipe_items'              => 'Menu',
+        'suppliers'                 => 'Pemasok',
+        'materials'                 => 'Bahan',
         'distribution_destinations' => 'Tujuan Distribusi',
     ];
 
@@ -236,9 +213,14 @@ class AuditTrail extends Model
         return self::AKTIVITAS[$this->action] ?? $this->action;
     }
 
+    public function getAktivitasAttribute(): string
+    {
+        return self::AKTIVITAS[$this->action] ?? ucfirst(str_replace('_', ' ', (string) $this->action));
+    }
+
     public function getModulAttribute(): string
     {
-        return self::MODUL[$this->auditable_type] ?? $this->auditable_type;
+        return self::MODUL[$this->auditable_type] ?? ucfirst(str_replace('_', ' ', (string) $this->auditable_type));
     }
 
     public function getKodeAuditAttribute(): string
@@ -284,6 +266,5 @@ class AuditTrail extends Model
         }
 
         return $hasil;
->>>>>>> origin/Main
     }
 }

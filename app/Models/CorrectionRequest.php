@@ -11,6 +11,26 @@ class CorrectionRequest extends Model
 
     protected $primaryKey = 'id';
 
+    public const JENIS_DATA = [
+        'distributions'             => 'Distribusi',
+        'distribution_destinations' => 'Distribusi',
+        'production_batches'        => 'Produksi',
+        'materials'                 => 'Produksi',
+        'material_usages'           => 'Produksi',
+        'processing_steps'          => 'Produksi',
+        'pre_distribution_checks'   => 'Produksi',
+        'menus'                     => 'Menu',
+        'recipes'                   => 'Menu',
+        'recipe_items'              => 'Menu',
+        'receivings'                => 'Penerimaan',
+        'receiving_items'           => 'Penerimaan',
+        'purchases'                 => 'Pengadaan',
+        'purchase_items'            => 'Pengadaan',
+        'material_lots'             => 'Stok',
+        'stock_movements'           => 'Stok',
+        'waste_surplus_records'     => 'Waste & Surplus',
+    ];
+
     protected $fillable = [
         'id_sppg',
         'requested_by',
@@ -40,51 +60,16 @@ class CorrectionRequest extends Model
         return $this->belongsTo(Sppg::class, 'id_sppg', 'id_sppg');
     }
 
-<<<<<<< HEAD
     public function requester(): BelongsTo
-=======
-    public function requester()
->>>>>>> origin/Main
     {
         return $this->belongsTo(User::class, 'requested_by', 'id_user');
     }
 
-<<<<<<< HEAD
     public function reviewer(): BelongsTo
-=======
-    public function reviewer()
->>>>>>> origin/Main
     {
         return $this->belongsTo(User::class, 'reviewed_by', 'id_user');
     }
 
-<<<<<<< HEAD
-    /**
-     * Map database target_table to user friendly Indonesian label.
-     */
-    public function getJenisDataAttribute(): string
-    {
-        return match ($this->target_table) {
-            'distributions', 'distribution_destinations' => 'Distribusi',
-            'production_batches', 'materials', 'material_usages', 'menus', 'recipes' => 'Produksi',
-            'receivings', 'receiving_items', 'purchases', 'purchase_items' => 'Penerimaan',
-            default => ucfirst(str_replace('_', ' ', (string) $this->target_table)),
-        };
-    }
-
-    /**
-     * Map database status to user friendly Indonesian status.
-     */
-    public function getStatusLabelAttribute(): string
-    {
-        return match ($this->status) {
-            'approved', 'applied' => 'Disetujui',
-            'rejected' => 'Ditolak',
-            'pending', 'waiting' => 'Menunggu',
-            default => ucfirst((string) $this->status),
-        };
-    }
-=======
     public function evidences()
     {
         return $this->hasMany(Evidence::class, 'evidenceable_id', 'id')
@@ -283,5 +268,4 @@ class CorrectionRequest extends Model
             $item->target_data_code = $resolved[$item->target_table . ':' . $item->target_id] ?? $item->kode_pengajuan;
         });
     }
->>>>>>> origin/Main
 }
