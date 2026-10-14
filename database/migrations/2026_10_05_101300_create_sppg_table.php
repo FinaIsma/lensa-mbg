@@ -29,7 +29,7 @@ return new class extends Migration
             $table->enum('status', [
                 'menunggu_verifikasi',
                 'aktif',
-                'nonaktif'
+                'nonaktif',
             ])->default('menunggu_verifikasi');
 
             $table->timestamps();
