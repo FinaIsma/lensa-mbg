@@ -158,3 +158,104 @@
     color: #071E49;
 }
 
+/* --- Header User Profile & Dropdown --- */
+.header-profile-dropdown {
+    position: relative;
+}
+
+.header-user-btn {
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    font-family: inherit;
+    text-align: left;
+}
+
+.header-user-btn:hover,
+.header-profile-dropdown.open .header-user-btn {
+    background-color: #F1F5F9;
+}
+
+.dropdown-chevron {
+    color: #64748B;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.header-profile-dropdown.open .dropdown-chevron {
+    transform: rotate(180deg);
+}
+
+.profile-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 150px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(7, 30, 73, 0.12), 0 8px 10px -6px rgba(7, 30, 73, 0.08);
+    padding: 6px;
+    display: none;
+    z-index: 100;
+    animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header-profile-dropdown.open .profile-dropdown-menu {
+    display: block;
+}
+
+.dropdown-logout-form {
+    margin: 0;
+}
+
+.dropdown-logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #DC2626;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+}
+
+.dropdown-logout-btn svg {
+    color: #DC2626;
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.dropdown-logout-btn:hover {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+}
+
+.dropdown-logout-btn:hover svg {
+    transform: translateX(3px);
+}
+
