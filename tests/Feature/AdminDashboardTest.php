@@ -22,21 +22,31 @@ class AdminDashboardTest extends TestCase
         $response->assertSee('Tren Pendaftaran SPPG');
         $response->assertSee('Status Pengajuan Koreksi');
         $response->assertSee('Preview Fitur Utama');
-        $response->assertSee('User Management');
+        $response->assertSee('SPPG Management');
         $response->assertSee('Correction Request');
         $response->assertSee('Audit Trail');
         $response->assertSee('Lihat Selengkapnya');
     }
 
     /**
-     * Test user management page can be rendered.
+     * Test sppg management page can be rendered.
      */
-    public function test_user_management_page_can_be_rendered(): void
+    public function test_sppg_management_page_can_be_rendered(): void
+    {
+        $response = $this->get(route('admin.sppg.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('SPPG Management');
+    }
+
+    /**
+     * Test user management route redirects to sppg page.
+     */
+    public function test_user_management_page_redirects_to_sppg(): void
     {
         $response = $this->get(route('admin.users.index'));
 
-        $response->assertStatus(200);
-        $response->assertSee('SPPG');
+        $response->assertRedirect('/admin/sppg');
     }
 
     /**

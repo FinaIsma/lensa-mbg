@@ -225,7 +225,7 @@
         <!-- 3 Feature Preview Cards Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             
-            <!-- Card 1: User Management -->
+            <!-- Card 1: SPPG Management -->
             <div class="flex flex-col">
                 <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex-1 flex flex-col justify-between">
                     <div>
@@ -240,7 +240,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-slate-900">User Management</h3>
+                                <h3 class="text-sm font-bold text-slate-900">SPPG Management</h3>
                             </div>
                         </div>
                         <p class="text-xs text-slate-500 font-normal mb-4 leading-relaxed">
@@ -289,7 +289,7 @@
 
                 <!-- Action Button Outside / Attached Below -->
                 <div class="mt-4">
-                    <a href="{{ route('admin.users.index') }}"
+                    <a href="{{ route('admin.sppg.index') }}"
                        class="w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-4 text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors duration-150 shadow-sm group">
                         <span>Lihat Selengkapnya</span>
                         <svg class="w-4 h-4 text-slate-600 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

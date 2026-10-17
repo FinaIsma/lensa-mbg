@@ -4,7 +4,6 @@ use App\Http\Controllers\Admin\AuditTrailController;
 use App\Http\Controllers\Admin\CorrectionRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SppgManagementController;
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\WilayahController;
@@ -37,7 +36,7 @@ Route::get('/api/check-email', [RegisterController::class, 'checkEmail'])->name(
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/users', [SppgManagementController::class, 'index'])->name('users.index');
+    Route::redirect('/users', '/admin/sppg')->name('users.index');
     Route::get('/sppg', [SppgManagementController::class, 'index'])->name('sppg.index');
     Route::get('/sppg/{id}', [SppgManagementController::class, 'show'])->name('sppg.show');
     Route::post('/sppg/{id}/status', [SppgManagementController::class, 'updateStatus'])->name('sppg.updateStatus');
