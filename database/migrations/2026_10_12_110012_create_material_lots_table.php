@@ -27,7 +27,7 @@ return new class extends Migration
             $t->boolean('is_locked')->default(true);
             $t->timestamps();
 
-            $t->unique('receiving_item_id');
+            $t->unique('receiving_item_id'); // 1 receiving_item = 1 lot
             $t->index(['material_id', 'status', 'expiry_date']);
         });
 

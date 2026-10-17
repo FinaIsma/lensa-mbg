@@ -7,14 +7,14 @@ use Illuminate\Database\Schema\ForeignKeyDefinition;
 
 class Keys
 {
-    public const SPPG_TABLE = 'sppg';
-    public const SPPG_PK    = 'id_sppg';
-    public const SPPG_TYPE  = 'bigint';
-    public const SPPG_OWNER = 'id_user';
+    public const SPPG_TABLE = 'sppg';      // nama tabel SPPG
+    public const SPPG_PK    = 'id_sppg';   // nama kolom primary key SPPG
+    public const SPPG_TYPE  = 'bigint';    // tipe PK: 'bigint' | 'int' | 'uuid'
+    public const SPPG_OWNER = 'id_user';   // kolom di tabel SPPG yang menunjuk ke user pemiliknya
 
-    public const USER_TABLE = 'users';
-    public const USER_PK    = 'id_user';
-    public const USER_TYPE  = 'bigint';
+    public const USER_TABLE = 'users';     // nama tabel user
+    public const USER_PK    = 'id_user';   // nama kolom primary key user
+    public const USER_TYPE  = 'bigint';    // tipe PK: 'bigint' | 'int' | 'uuid'
 
     public static function sppg(Blueprint $t, string $column = 'id_sppg', bool $nullable = false): ForeignKeyDefinition
     {
@@ -24,6 +24,11 @@ class Keys
     public static function user(Blueprint $t, string $column, bool $nullable = false): ForeignKeyDefinition
     {
         return self::make($t, $column, self::USER_TYPE, self::USER_TABLE, self::USER_PK, $nullable);
+    }
+
+    public static function staff(Blueprint $t, string $column, bool $nullable = false): ForeignKeyDefinition
+    {
+        return self::to($t, $column, 'staff', $nullable);
     }
 
     public static function to(Blueprint $t, string $column, string $table, bool $nullable = false, bool $index = true): ForeignKeyDefinition

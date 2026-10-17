@@ -6,25 +6,18 @@ use App\Support\Keys;
 use DateTimeImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * Data dummy Lensa MBG: satu skenario utuh dari supplier sampai audit trail, supaya semua laman
- * punya data untuk ditampilkan tanpa menunggu laman input selesai dikodekan.
- *
- * Jalankan : php artisan db:seed --class=LensaDummySeeder
- * Hapus    : php artisan db:seed --class=LensaDummyCleanSeeder
- *
- * - Memakai SPPG berstatus 'aktif' pertama (atau SPPG pertama) beserta user pemiliknya; tidak membuat sppg/users baru.
- * - Semua tanggal RELATIF terhadap hari ini, jadi lot "mendekati expired" dan "expired" selalu ada.
- * - Stok konsisten: current_qty setiap lot = SUM(stock_movements), seperti aturan aplikasi.
- * - Menolak jalan jika tabel suppliers sudah berisi (supaya tidak menimpa data nyata).
- */
+
 class LensaDummySeeder extends Seeder
 {
     private DateTimeImmutable $today;
     private $sppg;
     private $user;
+    private $userNama;
+    private $staff;
+    private $staffNama;
 
     /** @var array<string,int> kode bahan => id material */
     private array $mat = [];
@@ -43,14 +36,12 @@ class LensaDummySeeder extends Seeder
     private int $batchSeq = 0;
     private int $corSeq = 0;
 
-    /** Tabel yang hanya punya created_at (tanpa updated_at). */
     private array $noTs = ['stock_movements', 'audit_trails'];
 
     public function run(): void
     {
         $this->today = new DateTimeImmutable('today');
 
-        // SPPG: pilih yang berstatus 'aktif' lebih dulu, jika tidak ada pakai SPPG pertama.
         $this->sppg = null;
         if (Schema::hasColumn(Keys::SPPG_TABLE, 'status')) {
             $this->sppg = DB::table(Keys::SPPG_TABLE)->where('status', 'aktif')->orderBy(Keys::SPPG_PK)->value(Keys::SPPG_PK);
@@ -62,7 +53,6 @@ class LensaDummySeeder extends Seeder
             return;
         }
 
-        // User yang tercatat sebagai pembuat data = user pemilik SPPG itu (kolom Keys::SPPG_OWNER di tabel SPPG).
         $this->user = DB::table(Keys::SPPG_TABLE)->where(Keys::SPPG_PK, $this->sppg)->value(Keys::SPPG_OWNER)
             ?: DB::table(Keys::USER_TABLE)->orderBy(Keys::USER_PK)->value(Keys::USER_PK);
 
@@ -78,6 +68,18 @@ class LensaDummySeeder extends Seeder
         }
 
         DB::transaction(function () {
+            $this->userNama = DB::table(Keys::USER_TABLE)->where(Keys::USER_PK, $this->user)->value('nama');
+
+            $this->staff = DB::table('staff')->where('id_sppg', $this->sppg)->whereIn('status', ['menunggu', 'aktif'])->value('id');
+            if (! $this->staff) {
+                $now = $this->t(0, '07:00:00');
+                $this->staff = DB::table('staff')->insertGetId([
+                    'id_sppg' => $this->sppg, 'nama' => 'Staff Dummy', 'email' => 'staff.dummy.' . $this->sppg . '@lensa.test',
+                    'password' => Hash::make('password'), 'status' => 'aktif', 'created_at' => $now, 'updated_at' => $now,
+                ]);
+            }
+            $this->staffNama = DB::table('staff')->where('id', $this->staff)->value('nama');
+
             $this->master();
             $this->procurement();
             $this->production();
@@ -87,9 +89,6 @@ class LensaDummySeeder extends Seeder
         $this->command->info('Data dummy Lensa MBG selesai dibuat untuk SPPG id=' . $this->sppg . '.');
     }
 
-    // =========================================================================================
-    // 1. DATA MASTER
-    // =========================================================================================
     private function master(): void
     {
         // [kunci, nama, status]
@@ -105,7 +104,6 @@ class LensaDummySeeder extends Seeder
             ]);
         }
 
-        // [kode, nama, kategori, satuan, min_stock]  (Wortel sengaja min_stock tinggi => muncul "stok kritis")
         foreach ([
             ['BRS', 'Beras putih', 'Karbohidrat', 'kg', 50],
             ['AYM', 'Daging ayam', 'Protein hewani', 'kg', 30],
@@ -217,7 +215,7 @@ class LensaDummySeeder extends Seeder
     {
         $seq = ++$this->poSeq;
         $poId = $this->ins('purchases', [
-            'supplier_id' => $this->sup[$supKey], 'id_sppg' => $this->sppg, 'created_by' => $this->user,
+            'supplier_id' => $this->sup[$supKey], 'id_sppg' => $this->sppg, 'created_by' => $this->staff,
             'purchase_no' => sprintf('PO-%s-%03d', $this->ymd($day), $seq),
             'purchase_date' => $this->d($day), 'status' => $receive ? 'received' : 'ordered',
             'created_at' => $this->t($day), 'updated_at' => $this->t($day),
@@ -238,19 +236,19 @@ class LensaDummySeeder extends Seeder
         $rd = $day + 1; // barang datang sehari setelah PO
         $rcvNo = sprintf('RCV-%s-%03d', $this->ymd($rd), $seq);
         $rcvId = $this->ins('receivings', [
-            'purchase_id' => $poId, 'id_sppg' => $this->sppg, 'received_by' => $this->user,
+            'purchase_id' => $poId, 'id_sppg' => $this->sppg, 'received_by' => $this->staff,
             'receiving_no' => $rcvNo, 'received_at' => $this->t($rd, '09:15:00'),
             'status' => 'confirmed', 'is_locked' => true, 'confirmed_at' => $this->t($rd, '09:40:00'),
             'created_at' => $this->t($rd, '09:15:00'),
         ]);
 
         $this->ins('evidences', [
-            'uploaded_by' => $this->user, 'evidenceable_type' => 'receivings', 'evidenceable_id' => $rcvId,
+            'uploaded_by' => $this->staff, 'evidenceable_type' => 'receivings', 'evidenceable_id' => $rcvId,
             'file_path' => 'evidence/receiving/' . $rcvNo . '-barang.jpg', 'file_type' => 'image/jpeg',
             'description' => 'Foto bahan saat diterima', 'is_public' => false, 'uploaded_at' => $this->t($rd, '09:20:00'),
         ]);
         $this->ins('evidences', [
-            'uploaded_by' => $this->user, 'evidenceable_type' => 'receivings', 'evidenceable_id' => $rcvId,
+            'uploaded_by' => $this->staff, 'evidenceable_type' => 'receivings', 'evidenceable_id' => $rcvId,
             'file_path' => 'evidence/receiving/' . $rcvNo . '-surat-jalan.pdf', 'file_type' => 'application/pdf',
             'description' => 'Surat jalan', 'is_public' => false, 'uploaded_at' => $this->t($rd, '09:22:00'),
         ]);
@@ -336,7 +334,7 @@ class LensaDummySeeder extends Seeder
         $confirmed = $status !== 'draft';
         $id = $this->ins('production_batches', [
             'menu_id' => $this->menu[$m], 'recipe_id' => $this->recipe[$m][$ukuran], 'id_sppg' => $this->sppg,
-            'created_by' => $this->user, 'batch_code' => sprintf('BTC-%s-%03d', $this->ymd($day), ++$this->batchSeq),
+            'created_by' => $this->staff, 'batch_code' => sprintf('BTC-%s-%03d', $this->ymd($day), ++$this->batchSeq),
             'production_date' => $this->d($day), 'target_porsi' => $target, 'actual_porsi' => null, 'total_cost' => null,
             'status' => $status, 'is_locked' => $confirmed, 'created_at' => $this->t($day, '04:30:00'),
         ]);
@@ -384,7 +382,7 @@ class LensaDummySeeder extends Seeder
         if ($withEvidence) {
             foreach ([1 => 'pemasakan', 2 => 'pengemasan'] as $i => $label) {
                 $this->ins('evidences', [
-                    'uploaded_by' => $this->user, 'evidenceable_type' => 'processing_steps', 'evidenceable_id' => $ids[$i],
+                    'uploaded_by' => $this->staff, 'evidenceable_type' => 'processing_steps', 'evidenceable_id' => $ids[$i],
                     'file_path' => 'evidence/processing/batch' . $batchId . '-' . $label . '.jpg', 'file_type' => 'image/jpeg',
                     'description' => 'Foto tahap ' . $label, 'is_public' => true, 'uploaded_at' => $this->t($day, '09:30:00'),
                 ]);
@@ -397,7 +395,7 @@ class LensaDummySeeder extends Seeder
         $ids = [];
         foreach ($rows as [$nama, $start, $end, $status]) {
             $ids[] = $this->ins('processing_steps', [
-                'production_batch_id' => $batchId, 'recorded_by' => $this->user, 'step_name' => $nama,
+                'production_batch_id' => $batchId, 'recorded_by' => $this->staff, 'step_name' => $nama,
                 'started_at' => $this->t($day, $start), 'ended_at' => $end ? $this->t($day, $end) : null,
                 'status' => $status, 'note' => null, 'created_at' => $this->t($day, $start),
             ]);
@@ -409,7 +407,7 @@ class LensaDummySeeder extends Seeder
     private function result(int $batchId, int $day, int $ready, string $kondisi, bool $withEvidence): void
     {
         $pid = $this->ins('pre_distribution_checks', [
-            'production_batch_id' => $batchId, 'checked_by' => $this->user, 'portions_ready' => $ready,
+            'production_batch_id' => $batchId, 'checked_by' => $this->staff, 'portions_ready' => $ready,
             'reported_condition' => $kondisi, 'note' => null, 'checked_at' => $this->t($day, '10:45:00'),
             'created_at' => $this->t($day, '10:45:00'),
         ]);
@@ -417,7 +415,7 @@ class LensaDummySeeder extends Seeder
 
         if ($withEvidence) {
             $this->ins('evidences', [
-                'uploaded_by' => $this->user, 'evidenceable_type' => 'pre_distribution_checks', 'evidenceable_id' => $pid,
+                'uploaded_by' => $this->staff, 'evidenceable_type' => 'pre_distribution_checks', 'evidenceable_id' => $pid,
                 'file_path' => 'evidence/pre-distribution/batch' . $batchId . '.jpg', 'file_type' => 'image/jpeg',
                 'description' => 'Foto hasil produksi siap kirim', 'is_public' => true, 'uploaded_at' => $this->t($day, '10:50:00'),
             ]);
@@ -427,14 +425,14 @@ class LensaDummySeeder extends Seeder
     private function dist(int $batchId, string $destKey, int $portions, int $day, string $time, string $status, bool $withEvidence): int
     {
         $id = $this->ins('distributions', [
-            'production_batch_id' => $batchId, 'destination_id' => $this->dest[$destKey], 'recorded_by' => $this->user,
+            'production_batch_id' => $batchId, 'destination_id' => $this->dest[$destKey], 'recorded_by' => $this->staff,
             'portions_sent' => $portions, 'status' => $status, 'distributed_at' => $this->t($day, $time),
             'created_at' => $this->t($day, $time),
         ]);
 
         if ($withEvidence) {
             $this->ins('evidences', [
-                'uploaded_by' => $this->user, 'evidenceable_type' => 'distributions', 'evidenceable_id' => $id,
+                'uploaded_by' => $this->staff, 'evidenceable_type' => 'distributions', 'evidenceable_id' => $id,
                 'file_path' => 'evidence/distribution/dist' . $id . '.jpg', 'file_type' => 'image/jpeg',
                 'description' => 'Foto serah terima di lokasi', 'is_public' => true, 'uploaded_at' => $this->t($day, $time),
             ]);
@@ -449,7 +447,7 @@ class LensaDummySeeder extends Seeder
         $lot = $lotKey ? $this->lots[$lotKey] : null;
         $id = $this->ins('waste_surplus_records', [
             'production_batch_id' => $batchId, 'material_lot_id' => $lot['id'] ?? null, 'distribution_id' => $distId,
-            'id_sppg' => $this->sppg, 'recorded_by' => $this->user, 'record_type' => $type, 'qty' => $qty,
+            'id_sppg' => $this->sppg, 'recorded_by' => $this->staff, 'record_type' => $type, 'qty' => $qty,
             'reason' => $reason, 'recorded_at' => $this->t($day, '14:00:00'), 'status' => 'active',
             'created_at' => $this->t($day, '14:00:00'),
         ]);
@@ -502,7 +500,7 @@ class LensaDummySeeder extends Seeder
     {
         $reviewed = $status !== 'pending';
         return $this->ins('correction_requests', [
-            'id_sppg' => $this->sppg, 'requested_by' => $this->user, 'reviewed_by' => $reviewed ? $this->user : null,
+            'id_sppg' => $this->sppg, 'requested_by' => $this->staff, 'reviewed_by' => $reviewed ? $this->user : null,
             'request_no' => sprintf('COR-%s-%03d', $this->ymd($day), ++$this->corSeq),
             'target_table' => $table, 'target_id' => $targetId, 'field_name' => $field,
             'old_value' => $old, 'new_value' => $new, 'reason' => $reason, 'status' => $status,
@@ -517,7 +515,7 @@ class LensaDummySeeder extends Seeder
     private function corrEvidence(int $corId, string $file, int $day, string $type = 'image/jpeg'): void
     {
         $this->ins('evidences', [
-            'uploaded_by' => $this->user, 'evidenceable_type' => 'correction_requests', 'evidenceable_id' => $corId,
+            'uploaded_by' => $this->staff, 'evidenceable_type' => 'correction_requests', 'evidenceable_id' => $corId,
             'file_path' => 'evidence/correction/' . $file, 'file_type' => $type,
             'description' => 'Bukti pendukung koreksi', 'is_public' => false, 'uploaded_at' => $this->t($day, '09:05:00'),
         ]);
@@ -531,7 +529,7 @@ class LensaDummySeeder extends Seeder
     private function move(int $lotId, string $type, string $dir, float $qty, string $refType, int $refId, int $day, string $time): void
     {
         $this->ins('stock_movements', [
-            'material_lot_id' => $lotId, 'created_by' => $this->user, 'movement_type' => $type, 'direction' => $dir,
+            'material_lot_id' => $lotId, 'created_by' => $this->staff, 'movement_type' => $type, 'direction' => $dir,
             'qty' => $qty, 'reference_type' => $refType, 'reference_id' => $refId, 'created_at' => $this->t($day, $time),
         ]);
 
@@ -549,8 +547,12 @@ class LensaDummySeeder extends Seeder
 
     private function audit(string $action, string $type, int $id, array $old, array $new, int $day, string $time, ?int $corId = null): void
     {
+        // Persetujuan/penolakan/penerapan koreksi dilakukan kepala SPPG (users); aksi lain oleh staff.
+        $kepala = in_array($action, ['correction_approve', 'correction_reject', 'correction_apply'], true);
         $this->ins('audit_trails', [
-            'correction_request_id' => $corId, 'id_user' => $this->user, 'action' => $action,
+            'correction_request_id' => $corId, 'id_sppg' => $this->sppg,
+            'actor_type' => $kepala ? 'user' : 'staff', 'actor_id' => $kepala ? $this->user : $this->staff,
+            'actor_nama' => $kepala ? $this->userNama : $this->staffNama, 'action' => $action,
             'auditable_type' => $type, 'auditable_id' => $id,
             'old_values' => json_encode($old), 'new_values' => json_encode($new), 'created_at' => $this->t($day, $time),
         ]);
