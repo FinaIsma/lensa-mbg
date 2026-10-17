@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (auth()->check()) {
-        if (auth()->user()->role === 'admin_sistem') {
+        if (auth()->user()->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
 

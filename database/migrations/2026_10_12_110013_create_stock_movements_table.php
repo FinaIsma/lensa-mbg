@@ -29,6 +29,7 @@ return new class extends Migration
 
         DB::statement('ALTER TABLE stock_movements ADD CONSTRAINT stock_movements_qty_chk CHECK (qty > 0)');
 
+        // arah harus sesuai tipe (VOID_REVERSAL boleh IN atau OUT, tergantung transaksi yang dibatalkan)
         DB::statement("ALTER TABLE stock_movements ADD CONSTRAINT stock_movements_direction_chk CHECK (
             (movement_type IN ('RECEIVE_IN', 'CORRECTION_IN') AND direction = 'IN')
             OR (movement_type IN ('PRODUCTION_OUT', 'DISPOSAL_OUT', 'CORRECTION_OUT') AND direction = 'OUT')

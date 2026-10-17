@@ -3,23 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Trail - Admin Sistem Lensa MBG</title>
+    <title>Audit Trail - Kepala SPPG Lensa MBG</title>
+    {{-- Memakai CSS yang sama dengan halaman SPPG Management (layout, header, kartu, tabel, filter, pagination). --}}
+    @vite(['resources/css/admin_sppg.css'])
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Hanya untuk bagian yang tidak ada di halaman SPPG: profil berinisial, filter tanggal, dan panel detail.
+           Variabel diberi awalan --au- agar tidak bertabrakan dengan variabel di CSS lain. */
+        :root {
+            --au-primary: #071E49; --au-second: #042A70; --au-bg: #F1F5F9; --au-element: #D9D9D9; --au-white: #FFFFFF;
+            --au-line: rgba(7, 30, 73, .12); --au-muted: rgba(7, 30, 73, .62);
+            --au-ok: #1a7f4f; --au-ok-bg: #dff4e8; --au-bad: #b42318; --au-bad-bg: #fde7e4; --au-info-bg: rgba(4, 42, 112, .10);
+        }
 
-    @vite(['resources/css/audit-trail.css', 'resources/js/audit-trail.js'])
+        /* Profil: lingkaran berwarna + 1 huruf inisial. Ukuran mengikuti .avatar-circle milik CSS yang sudah ada. */
+        .avatar-circle { display: grid; place-items: center; background: var(--au-second); color: var(--au-white); font-weight: 600; line-height: 1; }
+
+        /* Filter tanggal (tombol + popover kalender) */
+        .au-date { position: relative; }
+        .au-date-btn { text-align: left; cursor: pointer; min-width: 190px; }
+        .au-datepop { display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; width: 290px; background: var(--au-white); border: 1px solid var(--au-line); border-radius: 10px; padding: 16px; box-shadow: 0 12px 30px rgba(7, 30, 73, .16); }
+        .au-datepop.open { display: block; }
+        .au-datepop label { display: block; font-size: 12px; font-weight: 500; margin: 0 0 4px; color: var(--au-primary); }
+        .au-datepop input[type=date] { width: 100%; height: 38px; border: 1px solid var(--au-line); border-radius: 6px; padding: 0 10px; font: inherit; color: var(--au-primary); margin-bottom: 12px; }
+        .au-datepop .act { display: flex; gap: 8px; justify-content: flex-end; }
+        .au-btn { height: 36px; padding: 0 16px; border-radius: 6px; font: inherit; cursor: pointer; border: 1px solid var(--au-line); background: var(--au-white); color: var(--au-primary); }
+        .au-btn.main { background: var(--au-primary); border-color: var(--au-primary); color: var(--au-white); }
+
+        tr.au-sel td { background: var(--au-bg); }
+
+        /* Panel detail: menimpa halaman dari kanan (bukan bagian dari tata letak) */
+        .au-backdrop { position: fixed; inset: 0; background: rgba(7, 30, 73, .38); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 1040; }
+        .au-backdrop.open { opacity: 1; pointer-events: auto; }
+        .au-drawer { position: fixed; top: 0; right: 0; height: 100vh; width: min(460px, 100%); background: var(--au-bg); color: var(--au-primary); z-index: 1050; overflow-y: auto; padding: 28px 24px 36px; border-radius: 16px 0 0 16px; box-shadow: -12px 0 40px rgba(7, 30, 73, .22); transform: translateX(105%); transition: transform .25s ease; outline: 0; font-size: 14px; }
+        .au-drawer.open { transform: translateX(0); }
+        .au-head { display: flex; justify-content: space-between; align-items: center; }
+        .au-head h2 { margin: 0; font-size: 18px; font-weight: 600; }
+        .au-x { width: 34px; height: 34px; border-radius: 50%; border: 0; background: var(--au-element); color: var(--au-primary); display: grid; place-items: center; cursor: pointer; }
+        .au-x:hover { background: var(--au-primary); color: var(--au-white); }
+        .au-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; margin: 8px 0 22px; }
+        .au-badge { padding: 4px 12px; border-radius: 5px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+        .au-badge.ok { background: var(--au-ok-bg); color: var(--au-ok); } .au-badge.bad { background: var(--au-bad-bg); color: var(--au-bad); } .au-badge.info { background: var(--au-info-bg); color: var(--au-second); }
+        .au-drawer h3 { font-size: 14px; font-weight: 600; margin: 24px 0 10px; display: flex; justify-content: space-between; }
+        .au-box { background: var(--au-white); border-radius: 10px; padding: 16px 18px; font-size: 12.5px; margin: 0; }
+        .au-box + .au-box { margin-top: 12px; }
+        .au-kv { display: flex; gap: 16px; padding: 5px 0; } .au-kv dt { width: 110px; flex: none; font-weight: 500; } .au-kv dd { margin: 0; }
+        .au-box .lbl { font-weight: 600; margin-bottom: 6px; }
+        .au-box .line { padding: 1px 0; word-break: break-word; }
+        .au-bukti { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--au-white); border: 1.5px dashed var(--au-primary); border-radius: 6px; padding: 12px; }
+        .au-bukti img { width: 100%; height: 130px; object-fit: cover; border-radius: 6px; display: block; }
+        .au-bukti .file { display: flex; align-items: center; justify-content: center; height: 130px; border-radius: 6px; background: var(--au-element); padding: 8px; text-align: center; font-size: 12px; word-break: break-all; color: var(--au-primary); }
+    </style>
 </head>
 <body>
 @php
+    /** Nilai apa pun -> teks pendek untuk bagian "Perubahan Data". */
     $tampil = function ($v) {
         if (is_null($v)) return '-';
         if (is_bool($v)) return $v ? 'Ya' : 'Tidak';
         if (is_array($v)) return json_encode($v, JSON_UNESCAPED_UNICODE);
         return (string) $v;
     };
-    $namaUser = \Illuminate\Support\Facades\Auth::user()->nama ?? 'Nanda';
     $inisial = mb_strtoupper(mb_substr(trim($namaUser), 0, 1)) ?: 'A';
     $tglPendek = fn ($ymd) => \Illuminate\Support\Carbon::parse($ymd)->locale('id')->translatedFormat('j M Y');
     $labelTanggal = match (true) {
@@ -30,11 +74,22 @@
     };
 @endphp
     <div class="admin-container">
-        @include('admin.partials.sidebar')
+        @include($sidebar)
 
+        <!-- Main Workspace -->
         <div class="main-wrapper">
-            @include('admin.partials.navbar')
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-user-section">
+                    <div class="avatar-circle" aria-hidden="true">{{ $inisial }}</div>
+                    <div class="user-info">
+                        <span class="user-name">{{ $namaUser }}</span>
+                        <span class="user-role">Kepala SPPG</span>
+                    </div>
+                </div>
+            </header>
 
+            <!-- Main Content Container -->
             <main class="content-body">
                 @if (session('success'))
                     <div class="alert alert-success">
@@ -57,11 +112,13 @@
                     </div>
                 @endif
 
+                <!-- Page Header Title -->
                 <div class="page-title-section">
                     <h1 class="page-title">Audit Trail</h1>
-                    <p class="page-subtitle">Riwayat Perubahan dan Penelusuran Data Lensa MBG</p>
+                    <p class="page-subtitle">Riwayat perubahan dan penelusuran data {{ $namaSppg }}</p>
                 </div>
 
+                <!-- 3 Stat Summary Cards -->
                 <div class="stat-cards-grid">
                     <div class="stat-card">
                         <div class="stat-icon-wrapper icon-blue">
@@ -110,8 +167,9 @@
                     </div>
                 </div>
 
+                <!-- Filter & Search Control Panel -->
                 <div class="table-card">
-                    <form action="{{ route('admin.audit') }}" method="GET" class="filter-bar-form" id="filterForm">
+                    <form action="{{ route($routeName) }}" method="GET" class="filter-bar-form" id="filterForm">
                         <div class="search-input-box">
                             <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
@@ -121,6 +179,7 @@
                         </div>
 
                         <div class="filter-actions-group">
+                            <!-- Filter tanggal: pilih dari kalender -->
                             <div class="select-dropdown-box au-date">
                                 <button type="button" class="select-status-verif au-date-btn" id="dateBtn" aria-haspopup="true" aria-expanded="false">{{ $labelTanggal }}</button>
                                 <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -150,7 +209,7 @@
                                 </svg>
                             </div>
 
-                            <a href="{{ route('admin.audit') }}" class="btn-reset-filter">
+                            <a href="{{ route($routeName) }}" class="btn-reset-filter">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                                     <polyline points="3 3 3 8 8 8"></polyline>
@@ -160,8 +219,9 @@
                         </div>
                     </form>
 
+                    <!-- Audit Table -->
                     <div class="table-responsive">
-                        <table class="audit-table">
+                        <table class="sppg-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -170,7 +230,7 @@
                                     <th>Modul</th>
                                     <th>Aktivitas</th>
                                     <th>Data</th>
-                                    <th>Aksi</th>
+                                    <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -178,11 +238,11 @@
                                     <tr>
                                         <td class="text-secondary">{{ $rows->firstItem() + $loop->index }}</td>
                                         <td class="text-secondary">{{ $row->created_at->locale('id')->translatedFormat('j M Y, H.i') }}</td>
-                                        <td class="text-dark">{{ $row->pelaku }}</td>
+                                        <td class="font-medium text-dark">{{ $row->pelaku }}</td>
                                         <td class="text-dark">{{ $row->modul }}</td>
                                         <td class="text-dark">{{ $row->aktivitas_label }}</td>
-                                        <td class="text-dark">{{ $row->kode_data }}</td>
-                                        <td>
+                                        <td class="font-medium text-dark">{{ $row->kode_data }}</td>
+                                        <td class="text-center">
                                             <button type="button" class="btn-action btn-detail" data-detail="{{ $row->id }}">
                                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
@@ -203,6 +263,7 @@
                         </table>
                     </div>
 
+                    <!-- Pagination Footer -->
                     <div class="table-pagination-footer">
                         <div class="pagination-info">
                             Menampilkan {{ $rows->firstItem() ?? 0 }}-{{ $rows->lastItem() ?? 0 }} dari {{ $rows->total() }} data
@@ -216,9 +277,9 @@
         </div>
     </div>
 
+    <!-- Panel Detail Audit Trail (menimpa halaman). Isinya diambil dari <template> milik baris yang diklik. -->
     <div class="au-backdrop" id="detailBackdrop"></div>
     <aside class="au-drawer" id="detailDrawer" role="dialog" aria-modal="true" aria-label="Detail Audit Trail" aria-hidden="true" tabindex="-1">
-        <div class="au-scroll" id="detailScroll">
         <div class="au-head">
             <h2>Detail Audit Trail</h2>
             <button type="button" class="au-x" id="detailClose" aria-label="Tutup">
@@ -226,7 +287,6 @@
             </button>
         </div>
         <div id="detailBody"></div>
-        </div>
     </aside>
 
     @foreach ($rows as $row)
@@ -248,7 +308,7 @@
             </dl>
 
             @if (! empty($row->old_values) || ! empty($row->new_values))
-                <h3><span>Perubahan Data</span><span class="au-kode">{{ $row->kode_data }}</span></h3>
+                <h3><span>Perubahan Data</span><span style="font-weight:500">{{ $row->kode_data }}</span></h3>
                 @if (! empty($row->old_values))
                     <div class="au-box">
                         <div class="lbl">Data Lama</div>
@@ -269,7 +329,7 @@
 
             @if ($kor)
                 <h3>Alasan Perubahan</h3>
-                <div class="au-box au-box--alasan">{{ $kor->reason }}</div>
+                <div class="au-box" style="min-height:70px">{{ $kor->reason }}</div>
 
                 @if ($bkt->isNotEmpty())
                     <h3>Bukti</h3>
@@ -290,5 +350,59 @@
         </template>
     @endforeach
 
+    <script>
+    (function () {
+        var drawer = document.getElementById('detailDrawer');
+        var body = document.getElementById('detailBody');
+        var backdrop = document.getElementById('detailBackdrop');
+        var activeRow = null;
+
+        function openDetail(id, row) {
+            var tpl = document.getElementById('detail-' + id);
+            if (!tpl) return;
+            body.innerHTML = '';
+            body.appendChild(tpl.content.cloneNode(true));
+            drawer.scrollTop = 0;
+            drawer.classList.add('open');
+            backdrop.classList.add('open');
+            drawer.setAttribute('aria-hidden', 'false');
+            if (activeRow) activeRow.classList.remove('au-sel');
+            activeRow = row; if (row) row.classList.add('au-sel');
+            drawer.focus();
+        }
+        function closeDetail() {
+            drawer.classList.remove('open');
+            backdrop.classList.remove('open');
+            drawer.setAttribute('aria-hidden', 'true');
+            if (activeRow) { activeRow.classList.remove('au-sel'); activeRow = null; }
+        }
+        document.querySelectorAll('[data-detail]').forEach(function (b) {
+            b.addEventListener('click', function () { openDetail(b.getAttribute('data-detail'), b.closest('tr')); });
+        });
+        document.getElementById('detailClose').addEventListener('click', closeDetail);
+        backdrop.addEventListener('click', closeDetail);
+
+        // Filter tanggal (popover kalender)
+        var dateBtn = document.getElementById('dateBtn');
+        var datePop = document.getElementById('datePop');
+        function toggleDate(open) {
+            var show = typeof open === 'boolean' ? open : !datePop.classList.contains('open');
+            datePop.classList.toggle('open', show);
+            dateBtn.setAttribute('aria-expanded', show ? 'true' : 'false');
+        }
+        dateBtn.addEventListener('click', function (e) { e.stopPropagation(); toggleDate(); });
+        datePop.addEventListener('click', function (e) { e.stopPropagation(); });
+        document.addEventListener('click', function () { toggleDate(false); });
+        document.getElementById('dateClear').addEventListener('click', function () {
+            document.getElementById('dari').value = '';
+            document.getElementById('sampai').value = '';
+            document.getElementById('filterForm').submit();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') { closeDetail(); toggleDate(false); }
+        });
+    })();
+    </script>
 </body>
 </html>

@@ -6,12 +6,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-// kolom correction_requests.target_table isinya nama tabel yang dikoreksi
-// nama modul buat tampilan dan filter dibuat di kode lewat pemetaan tabel ke modul, ga disimpen di database.
-// pengategorian tabel jd modul ini nanti taro di model aja atau trsrh
-// receiving_items, purchase_items, production_batches, material_usages, distributions, waste_surplus_records, material_lots
-
-
 return new class extends Migration
 {
     public function up(): void
@@ -39,9 +33,7 @@ return new class extends Migration
             $t->index(['id_sppg', 'status']);
         });
 
-        if (DB::getDriverName() === 'pgsql') {
-            DB::statement('ALTER TABLE correction_requests ADD CONSTRAINT correction_requests_reason_chk CHECK (char_length(btrim(reason)) > 0)');
-        }
+        DB::statement('ALTER TABLE correction_requests ADD CONSTRAINT correction_requests_reason_chk CHECK (char_length(btrim(reason)) > 0)');
     }
 
     public function down(): void
