@@ -24,7 +24,6 @@
         activeRow = row;
         if (row) row.classList.add('cr-sel');
 
-        // Bind decision buttons inside cloned template
         bindDecisionButtons(id);
 
         drawer.focus();
@@ -50,7 +49,6 @@
     if (closeBtn) closeBtn.addEventListener('click', closeDetail);
     if (backdrop) backdrop.addEventListener('click', closeDetail);
 
-    // Filter Date Popover
     var dateBtn    = document.getElementById('dateBtn');
     var datePop    = document.getElementById('datePop');
     var dateClear  = document.getElementById('dateClear');
@@ -90,7 +88,6 @@
         });
     }
 
-    // Approve & Reject Modals
     var approveModal = document.getElementById('approveModal');
     var rejectModal  = document.getElementById('rejectModal');
     var approveForm  = document.getElementById('approveForm');
@@ -121,7 +118,6 @@
         }
     }
 
-    // Close Modals
     document.querySelectorAll('[data-close-modal]').forEach(function (btn) {
         btn.addEventListener('click', function () {
             if (approveModal) approveModal.classList.remove('open');
@@ -141,7 +137,6 @@
         });
     }
 
-    // Escape listener
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             closeDetail();

@@ -1,32 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 @import './sidebar-navbar.css';
 
-:root {
-    --au-primary: #071E49;
-    --au-second: #042A70;
-    --au-bg: #F1F5F9;
-    --au-element: #D9D9D9;
-    --au-white: #FFFFFF;
-    --au-line: rgba(7, 30, 73, .12);
-    --au-muted: rgba(7, 30, 73, .62);
-    --au-ok: #1a7f4f;
-    --au-ok-bg: #dff4e8;
-    --au-bad: #b42318;
-    --au-bad-bg: #fde7e4;
-    --au-info-bg: rgba(4, 42, 112, .10);
-
-    --au-font: 'Poppins', sans-serif;
-    --au-radius-sm: 6px;
-    --au-radius-md: 8px;
-}
-
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
 body {
-    font-family: var(--au-font);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #F8FAFC;
     color: #0F172A;
     line-height: 1.5;
@@ -39,7 +23,10 @@ a {
     text-decoration: none;
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
     font-family: inherit;
 }
 
@@ -53,7 +40,7 @@ button, input, select, textarea {
     align-items: center;
     gap: 12px;
     padding: 14px 18px;
-    border-radius: var(--au-radius-md);
+    border-radius: 12px;
     margin-bottom: 24px;
     font-size: 14px;
     font-weight: 500;
@@ -77,8 +64,9 @@ button, input, select, textarea {
 
 .page-title {
     font-size: 26px;
-    font-weight: 600;
-    color: var(--au-primary);
+    font-weight: 700;
+    color: #071E49;
+    letter-spacing: -0.02em;
 }
 
 .page-subtitle {
@@ -89,14 +77,14 @@ button, input, select, textarea {
 
 .stat-cards-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 260px));
-    gap: 22px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
     margin-bottom: 28px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .stat-cards-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -108,13 +96,20 @@ button, input, select, textarea {
 
 .stat-card {
     background-color: #FFFFFF;
-    border-radius: var(--au-radius-md);
+    border-radius: 16px;
     padding: 20px 22px;
     border: 1px solid #F1F5F9;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     display: flex;
     align-items: center;
     gap: 16px;
+    cursor: default;
+    user-select: text;
+}
+
+.stat-card:hover {
+    transform: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .stat-icon-wrapper {
@@ -127,9 +122,20 @@ button, input, select, textarea {
     flex-shrink: 0;
 }
 
-.icon-blue   { background-color: #E0F2FE; color: #0284C7; }
-.icon-yellow { background-color: #FEF3C7; color: #D97706; }
-.icon-green  { background-color: #DCFCE7; color: #16A34A; }
+.icon-blue {
+    background-color: #E0F2FE;
+    color: #0284C7;
+}
+
+.icon-yellow {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.icon-green {
+    background-color: #DCFCE7;
+    color: #16A34A;
+}
 
 .stat-content {
     display: flex;
@@ -138,28 +144,28 @@ button, input, select, textarea {
 
 .stat-label {
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 500;
     color: #64748B;
     line-height: 1.2;
 }
 
 .stat-value {
     font-size: 26px;
-    font-weight: 600;
-    color: var(--au-primary);
+    font-weight: 700;
+    color: #071E49;
     line-height: 1.2;
     margin: 4px 0 2px;
 }
 
 .stat-subtext {
     font-size: 11.5px;
-    font-weight: 400;
+    font-weight: 500;
     color: #94A3B8;
 }
 
 .table-card {
     background-color: #FFFFFF;
-    border-radius: var(--au-radius-md);
+    border-radius: 16px;
     padding: 26px;
     border: 1px solid #F1F5F9;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
@@ -193,7 +199,7 @@ button, input, select, textarea {
     width: 100%;
     padding: 10px 14px 10px 42px;
     border: 1px solid #E2E8F0;
-    border-radius: var(--au-radius-sm);
+    border-radius: 10px;
     font-size: 13.5px;
     color: #0F172A;
     outline: none;
@@ -213,6 +219,7 @@ button, input, select, textarea {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .select-dropdown-box {
@@ -224,9 +231,9 @@ button, input, select, textarea {
     -webkit-appearance: none;
     padding: 10px 38px 10px 16px;
     border: 1px solid #E2E8F0;
-    border-radius: var(--au-radius-sm);
+    border-radius: 10px;
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 500;
     color: #1E293B;
     background-color: #FFFFFF;
     cursor: pointer;
@@ -253,11 +260,12 @@ button, input, select, textarea {
     gap: 8px;
     padding: 10px 16px;
     border: 1px solid #E2E8F0;
-    border-radius: var(--au-radius-sm);
+    border-radius: 10px;
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 500;
     color: #475569;
     background-color: #FFFFFF;
+    text-decoration: none;
     cursor: pointer;
     transition: all 0.15s ease;
 }
@@ -285,11 +293,11 @@ button, input, select, textarea {
     left: 0;
     z-index: 20;
     width: 290px;
-    background: var(--au-white);
-    border: 1px solid var(--au-line);
-    border-radius: var(--au-radius-md);
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
     padding: 16px;
-    box-shadow: 0 12px 30px rgba(7, 30, 73, .16);
+    box-shadow: 0 12px 30px rgba(7, 30, 73, 0.14);
 }
 
 .au-datepop.open {
@@ -299,20 +307,26 @@ button, input, select, textarea {
 .au-datepop label {
     display: block;
     font-size: 12px;
-    font-weight: 500;
-    margin: 0 0 4px;
-    color: var(--au-primary);
+    font-weight: 600;
+    margin: 0 0 6px;
+    color: #071E49;
 }
 
 .au-datepop input[type=date] {
     width: 100%;
     height: 38px;
-    border: 1px solid var(--au-line);
-    border-radius: var(--au-radius-sm);
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
     padding: 0 10px;
     font: inherit;
-    color: var(--au-primary);
+    font-size: 13px;
+    color: #071E49;
     margin-bottom: 12px;
+    outline: none;
+}
+
+.au-datepop input[type=date]:focus {
+    border-color: #3B82F6;
 }
 
 .au-datepop .act {
@@ -324,18 +338,31 @@ button, input, select, textarea {
 .au-btn {
     height: 36px;
     padding: 0 16px;
-    border-radius: var(--au-radius-sm);
+    border-radius: 8px;
     font: inherit;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    border: 1px solid var(--au-line);
-    background: var(--au-white);
-    color: var(--au-primary);
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
+    color: #475569;
+    transition: all 0.15s ease;
+}
+
+.au-btn:hover {
+    background-color: #F8FAFC;
+    color: #0F172A;
 }
 
 .au-btn.main {
-    background: var(--au-primary);
-    border-color: var(--au-primary);
-    color: var(--au-white);
+    background: #071E49;
+    border-color: #071E49;
+    color: #FFFFFF;
+}
+
+.au-btn.main:hover {
+    background: #042A70;
+    border-color: #042A70;
 }
 
 .table-responsive {
@@ -343,45 +370,62 @@ button, input, select, textarea {
     overflow-x: auto;
 }
 
-.audit-table {
+.sppg-table {
     width: 100%;
     border-collapse: collapse;
-    text-align: center;
-}
-
-.audit-table thead th {
-    padding: 14px 16px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--au-primary);
-    border-bottom: 1.5px solid #E2E8F0;
-    white-space: nowrap;
-    text-align: center;
-}
-
-.audit-table tbody td {
-    padding: 14px 16px;
-    font-size: 13.5px;
-    color: var(--au-primary);
-    border-bottom: 1px solid #F1F5F9;
-    vertical-align: middle;
-    text-align: center;
-}
-
-.audit-table thead th:first-child,
-.audit-table tbody td:first-child {
     text-align: left;
 }
 
-.audit-table tbody tr:hover,
-.audit-table tr.au-sel td {
-    background-color: var(--au-bg);
+.sppg-table thead th {
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #071E49;
+    border-bottom: 1.5px solid #E2E8F0;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
 }
 
-.font-medium { font-weight: 500; }
-.text-dark   { color: var(--au-primary); }
-.text-secondary { color: #475569; }
-.text-center { text-align: center; }
+.sppg-table tbody td {
+    padding: 14px 16px;
+    font-size: 13.5px;
+    color: #071E49;
+    border-bottom: 1px solid #F1F5F9;
+    vertical-align: middle;
+}
+
+.sppg-table tbody tr:hover,
+.sppg-table tr.au-sel td {
+    background-color: #F8FAFC;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.text-navy {
+    color: #071E49;
+}
+
+.text-dark {
+    color: #071E49;
+}
+
+.text-secondary {
+    color: #475569;
+}
+
+.text-muted {
+    color: #475569;
+}
+
+.text-center {
+    text-align: center;
+}
 
 .btn-action {
     display: inline-flex;
@@ -389,7 +433,7 @@ button, input, select, textarea {
     justify-content: center;
     gap: 6px;
     padding: 6px 14px;
-    border-radius: var(--au-radius-sm);
+    border-radius: 8px;
     font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
@@ -420,7 +464,6 @@ button, input, select, textarea {
     align-items: center;
     padding-top: 20px;
     margin-top: 12px;
-    border-top: 1px solid #E2E8F0;
     font-size: 13px;
     color: #64748B;
     flex-wrap: wrap;
@@ -449,22 +492,24 @@ button, input, select, textarea {
     align-items: center;
     justify-content: center;
     border: 1px solid transparent;
-    border-radius: var(--au-radius-sm);
+    border-radius: 6px;
     color: #64748B;
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 500;
+    text-decoration: none;
     transition: all 0.15s ease;
 }
 
 .pagination-links li.page-item:first-child .page-link,
 .pagination-links li.page-item:last-child .page-link {
     border: 1px solid #E2E8F0;
+    border-radius: 6px;
 }
 
 .pagination-links li.page-item.active .page-link {
     background-color: #0F172A;
     color: #FFFFFF;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .pagination-links li.page-item:not(.active):not(.disabled) .page-link:hover {
@@ -475,10 +520,10 @@ button, input, select, textarea {
 .au-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(7, 30, 73, .38);
+    background: rgba(7, 30, 73, 0.38);
     opacity: 0;
     pointer-events: none;
-    transition: opacity .2s;
+    transition: opacity 0.25s ease;
     z-index: 1040;
 }
 
@@ -492,38 +537,77 @@ button, input, select, textarea {
     top: 16px;
     right: 16px;
     bottom: 16px;
-    width: min(460px, calc(100% - 32px));
-    background: var(--au-bg);
-    color: var(--au-primary);
+    width: min(480px, calc(100% - 32px));
+    height: calc(100vh - 32px);
+    background: #F8FAFC;
+    color: #071E49;
     z-index: 1050;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border-radius: 16px;
-    box-shadow: 0 16px 48px rgba(7, 30, 73, .22);
+    box-shadow: 0 16px 48px rgba(7, 30, 73, 0.22);
     transform: translateX(calc(100% + 32px));
     opacity: 0;
     visibility: hidden;
-    transition: transform .3s ease, opacity .3s ease, visibility 0s linear .3s;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0s linear 0.3s;
     outline: 0;
-    font-family: var(--au-font);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 14px;
+    padding: 24px;
 }
 
 .au-drawer.open {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
-    transition: transform .3s ease, opacity .3s ease, visibility 0s;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0s;
+}
+
+.au-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.au-head h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #071E49;
+}
+
+.au-x {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 0;
+    background: #E2E8F0;
+    color: #071E49;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.au-x:hover {
+    background: #071E49;
+    color: #FFFFFF;
 }
 
 .au-scroll {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 28px 24px 36px;
+    padding: 0 4px 10px 0;
+    display: flex;
+    flex-direction: column;
     scrollbar-width: thin;
-    scrollbar-color: rgba(7, 30, 73, .25) transparent;
+    scrollbar-color: rgba(7, 30, 73, 0.25) transparent;
 }
 
 .au-scroll::-webkit-scrollbar {
@@ -531,37 +615,8 @@ button, input, select, textarea {
 }
 
 .au-scroll::-webkit-scrollbar-thumb {
-    background: rgba(7, 30, 73, .25);
+    background: rgba(7, 30, 73, 0.25);
     border-radius: 9999px;
-}
-
-.au-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.au-head h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.au-x {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 0;
-    background: var(--au-element);
-    color: var(--au-primary);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-}
-
-.au-x:hover {
-    background: var(--au-primary);
-    color: var(--au-white);
 }
 
 .au-meta {
@@ -570,90 +625,111 @@ button, input, select, textarea {
     align-items: center;
     gap: 10px;
     font-size: 13px;
-    margin: 8px 0 22px;
+    font-weight: 500;
+    color: #64748B;
+    margin-bottom: 18px;
+    flex-shrink: 0;
 }
 
 .au-badge {
     padding: 4px 12px;
-    border-radius: var(--au-radius-sm);
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
 }
 
-.au-badge.ok   { background: var(--au-ok-bg);   color: var(--au-ok); }
-.au-badge.bad  { background: var(--au-bad-bg);  color: var(--au-bad); }
-.au-badge.info { background: var(--au-info-bg); color: var(--au-second); }
-
-.au-drawer h3 {
-    font-size: 14px;
-    font-weight: 600;
-    margin: 24px 0 10px;
-    display: flex;
-    justify-content: space-between;
+.au-badge.ok {
+    background-color: #DCFCE7;
+    color: #16A34A;
 }
 
-.au-kode {
-    font-weight: 400;
+.au-badge.bad {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
+.au-badge.info {
+    background-color: #E0F2FE;
+    color: #0284C7;
+}
+
+.au-drawer h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #071E49;
+    margin: 16px 0 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .au-box {
-    background: var(--au-white);
-    border-radius: var(--au-radius-md);
-    padding: 16px 18px;
-    font-size: 12.5px;
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 18px 20px;
+    border: 1px solid #F1F5F9;
+    box-shadow: 0 2px 6px rgba(7, 30, 73, 0.03);
+    font-size: 13px;
     margin: 0;
+    color: #071E49;
 }
 
 .au-box + .au-box {
-    margin-top: 12px;
-}
-
-.au-box--alasan {
-    min-height: 70px;
+    margin-top: 10px;
 }
 
 .au-kv {
     display: flex;
     gap: 16px;
-    padding: 5px 0;
+    padding: 6px 0;
+    font-size: 13.5px;
 }
 
 .au-kv dt {
-    width: 110px;
+    width: 120px;
     flex: none;
-    font-weight: 400;
+    font-weight: 500;
+    color: #64748B;
 }
 
 .au-kv dd {
     margin: 0;
+    font-weight: 600;
+    color: #071E49;
 }
 
 .au-box .lbl {
-    font-weight: 600;
-    margin-bottom: 6px;
+    font-weight: 700;
+    color: #071E49;
+    font-size: 12.5px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 .au-box .line {
-    padding: 1px 0;
+    padding: 3px 0;
     word-break: break-word;
+    font-size: 13px;
+    color: #334155;
 }
 
 .au-bukti {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    background: var(--au-white);
-    border: 1.5px dashed var(--au-primary);
-    border-radius: var(--au-radius-sm);
-    padding: 12px;
+    gap: 12px;
+    background: #FFFFFF;
+    border: 1.5px dashed #CBD5E1;
+    border-radius: 12px;
+    padding: 14px;
 }
 
 .au-bukti img {
     width: 100%;
     height: 130px;
     object-fit: cover;
-    border-radius: var(--au-radius-sm);
+    border-radius: 8px;
     display: block;
 }
 
@@ -662,11 +738,12 @@ button, input, select, textarea {
     align-items: center;
     justify-content: center;
     height: 130px;
-    border-radius: var(--au-radius-sm);
-    background: var(--au-element);
-    padding: 8px;
+    border-radius: 8px;
+    background: #F1F5F9;
+    padding: 10px;
     text-align: center;
     font-size: 12px;
     word-break: break-all;
-    color: var(--au-primary);
+    color: #071E49;
+    font-weight: 500;
 }

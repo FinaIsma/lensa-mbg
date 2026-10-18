@@ -4,10 +4,10 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Daftar Akun SPPG - Lensa MBG</title>
-        @vite(['resources/css/register.css', 'resources/js/register.js'])
+        @vite(['resources/css/auth/register.css', 'resources/js/auth/register.js'])
     </head>
 
-    <body>
+    <body style="background-image: url('{{ asset('images/Background.png') }}');">
         <header class="header">
             <div class="logo-left">
                 <a href="{{ route('login') }}">
@@ -21,6 +21,13 @@
 
         <main class="register-wrapper">
             <div class="register-card">
+                <a href="{{ route('login') }}" class="btn-back-login" aria-label="Kembali ke halaman login" title="Kembali ke Login">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+
                 <h1 class="register-title">Daftar Akun</h1>
                 <p class="register-subtitle">Lengkapi data untuk membuat akun SPPG.</p>
 
@@ -31,8 +38,7 @@
                 <form id="registerForm" action="{{ route('register.process') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
-                    <!-- 1. DATA AKUN -->
-                    <h2 class="form-section-title">Data Akun</h2>
+                    <h2 class="form-section-title">Data Akun Kepala SPPG</h2>
 
                     <div class="grid-2">
                         <div class="form-group">
@@ -109,7 +115,83 @@
                         <div class="error" id="error_password_confirmation">@error('password_confirmation') {{ $message }} @enderror</div>
                     </div>
 
-                    <!-- 2. DATA SPPG -->
+                    <h2 class="form-section-title">Data Akun Staff SPPG</h2>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="staff_nama_lengkap">Nama Lengkap <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                <input type="text" id="staff_nama_lengkap" name="staff_nama_lengkap" value="{{ old('staff_nama_lengkap') }}" placeholder="Masukkan Nama Lengkap" required>
+                            </div>
+                            <div class="error" id="error_staff_nama_lengkap">@error('staff_nama_lengkap') {{ $message }} @enderror</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="staff_email">Email <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                                    <polyline points="3,7 12,13 21,7"></polyline>
+                                </svg>
+                                <input type="email" id="staff_email" name="staff_email" value="{{ $errors->has('staff_email') ? '' : old('staff_email') }}" placeholder="Masukkan Email" autocomplete="email" required>
+                            </div>
+                            <div class="error" id="error_staff_email">@error('staff_email') {{ $message }} @enderror</div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="staff_no_telepon">No Telepon <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                                <input type="tel" id="staff_no_telepon" name="staff_no_telepon" value="{{ old('staff_no_telepon') }}" placeholder="08xxxxxxxxx" required>
+                            </div>
+                            <div class="error" id="error_staff_no_telepon">@error('staff_no_telepon') {{ $message }} @enderror</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="staff_password">Password <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                    <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+                                </svg>
+                                <input type="password" id="staff_password" name="staff_password" placeholder="Masukkan Password" required>
+                                <button type="button" class="password-toggle" onclick="toggleRegisterPassword('staff_password', 'eyeIconStaffPassword')" aria-label="Tampilkan password">
+                                    <svg id="eyeIconStaffPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="error" id="error_staff_password">@error('staff_password') {{ $message }} @enderror</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="staff_password_confirmation">Konfirmasi Password <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                                <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+                            </svg>
+                            <input type="password" id="staff_password_confirmation" name="staff_password_confirmation" placeholder="Masukkan Konfirmasi Password" required>
+                            <button type="button" class="password-toggle" onclick="toggleRegisterPassword('staff_password_confirmation', 'eyeIconStaffConfirm')" aria-label="Tampilkan password">
+                                <svg id="eyeIconStaffConfirm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="error" id="error_staff_password_confirmation">@error('staff_password_confirmation') {{ $message }} @enderror</div>
+                    </div>
+
                     <h2 class="form-section-title">Data SPPG</h2>
 
                     <div class="grid-2">
@@ -133,7 +215,7 @@
                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
                                 </svg>
-                                <input type="text" id="alamat_sppg" name="alamat_sppg" value="{{ old('alamat_sppg') }}" placeholder="Masukkan Alamat SPPG" required>
+                                <input type="text" id="alamat_sppg" name="alamat_sppg" value="{{ old('alamat_sppg') }}" placeholder="Masukkan Nama SPPG" required>
                             </div>
                             <div class="error" id="error_alamat_sppg">@error('alamat_sppg') {{ $message }} @enderror</div>
                         </div>
@@ -157,7 +239,7 @@
                             <label for="kabupaten_kota">Kabupaten / Kota <span class="required">*</span></label>
                             <div class="input-wrapper">
                                 <select id="kabupaten_kota" name="kabupaten_kota" data-old="{{ old('kabupaten_kota') }}" disabled required>
-                                    <option value="">Pilih Kab/Kota</option>
+                                    <option value="">Pilih Kabupaten/Kota</option>
                                 </select>
                                 <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="6 9 12 15 18 9"></polyline>
@@ -180,11 +262,10 @@
                         </div>
                     </div>
 
-                    <!-- 3. UPLOAD DOKUMEN -->
                     <h2 class="form-section-title">Upload Dokumen</h2>
 
                     <div class="upload-grid">
-                        <!-- Card 1: KTP -->
+
                         <div class="upload-card">
                             <div class="upload-card-header">
                                 <div class="upload-title">KTP Penanggung Jawab <span class="required">*</span></div>
@@ -201,14 +282,13 @@
                                         <line x1="15" y1="15" x2="12" y2="12"></line>
                                     </svg>
                                     <div class="upload-action-text">Klik untuk unggah</div>
-                                    <div class="upload-format-text">Format: JPG, PNG • Maks. 5 MB</div>
+                                    <div class="upload-format-text">Format: JPG,PNG • Maks. 5 MB</div>
                                 </div>
                                 <div class="file-preview-area" id="preview_ktp"></div>
                             </div>
                             <div class="error" id="error_foto_ktp">@error('foto_ktp') {{ $message }} @enderror</div>
                         </div>
 
-                        <!-- Card 2: Foto Kantor -->
                         <div class="upload-card">
                             <div class="upload-card-header">
                                 <div class="upload-title">Foto Kantor SPPG <span class="required">*</span></div>
@@ -223,14 +303,13 @@
                                         <polyline points="21 15 16 10 5 21"></polyline>
                                     </svg>
                                     <div class="upload-action-text">Klik untuk unggah</div>
-                                    <div class="upload-format-text">Format: JPG, PNG • Maks. 5 MB</div>
+                                    <div class="upload-format-text">Format: JPG,PNG • Maks. 5 MB</div>
                                 </div>
                                 <div class="file-preview-area" id="preview_kantor"></div>
                             </div>
                             <div class="error" id="error_foto_kantor_sppg">@error('foto_kantor_sppg') {{ $message }} @enderror</div>
                         </div>
 
-                        <!-- Card 3: Surat Resmi / SK -->
                         <div class="upload-card">
                             <div class="upload-card-header">
                                 <div class="upload-title">Surat Resmi / SK <span class="required">*</span></div>
@@ -247,7 +326,7 @@
                                         <line x1="15" y1="15" x2="12" y2="12"></line>
                                     </svg>
                                     <div class="upload-action-text">Klik untuk unggah</div>
-                                    <div class="upload-format-text">Format: PDF, JPG • Maks. 5 MB</div>
+                                    <div class="upload-format-text">Format: PDF,JPG • Maks. 5 MB</div>
                                 </div>
                                 <div class="file-preview-area" id="preview_surat"></div>
                             </div>
@@ -255,7 +334,6 @@
                         </div>
                     </div>
 
-                    <!-- Terms & Conditions -->
                     <div class="terms-wrapper">
                         <input type="checkbox" id="syarat_ketentuan" name="syarat_ketentuan" class="terms-checkbox" value="1" {{ old('syarat_ketentuan') ? 'checked' : '' }} required>
                         <label for="syarat_ketentuan" class="terms-label">
@@ -264,10 +342,8 @@
                     </div>
                     <div class="error" id="error_syarat_ketentuan" style="margin-top: -16px; margin-bottom: 16px;">@error('syarat_ketentuan') {{ $message }} @enderror</div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" id="submitBtn" class="register-button">Daftar</button>
+                    <button type="submit" id="submitBtn" class="register-button" {{ old('syarat_ketentuan') ? '' : 'disabled' }}>Daftar</button>
 
-                    <!-- Bottom Link to Login -->
                     <div class="bottom-link">
                         Sudah punya akun? <a href="{{ route('login') }}">Masuk</a>
                     </div>

@@ -3,7 +3,6 @@ window.initDashboardCharts = function (config) {
 
     const { trenChartData, sppgCrPeriodMap, koreksiChartData } = config;
 
-    // --- 1. Tren Pendaftaran SPPG Multi-line Chart ---
     const trenCanvas = document.getElementById('trenSppgChart');
     if (trenCanvas && trenChartData && typeof Chart !== 'undefined') {
         const trenCtx = trenCanvas.getContext('2d');
@@ -110,7 +109,6 @@ window.initDashboardCharts = function (config) {
             }
         });
 
-        // Status & Periode filter on Tren SPPG Chart
         const statusFilter = document.getElementById('statusFilter');
         const periodeFilter = document.getElementById('periodeFilter');
 
@@ -161,7 +159,6 @@ window.initDashboardCharts = function (config) {
         }
     }
 
-    // --- 2. Status Pengajuan Koreksi Bar Chart ---
     const koreksiCanvas = document.getElementById('statusKoreksiChart');
     if (koreksiCanvas && koreksiChartData && sppgCrPeriodMap && typeof Chart !== 'undefined') {
         const koreksiCtx = koreksiCanvas.getContext('2d');

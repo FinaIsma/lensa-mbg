@@ -3,13 +3,12 @@
 @section('title', 'Dashboard & Analytics')
 
 @push('styles')
-    @vite('resources/css/dashboard.css')
+    @vite('resources/css/admin/dashboard.css')
 @endpush
 
 @section('content')
 <div class="space-y-8 pb-12">
 
-    <!-- Top Title Section -->
     <div>
         <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Dashboard & Analytics
@@ -19,11 +18,10 @@
         </p>
     </div>
 
-    <!-- 4 KPI Stat Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        <!-- Total SPPG -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:border-blue-200">
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl bg-[#EFF6FF] flex items-center justify-center shrink-0">
                 <svg class="w-7 h-7 text-[#3B82F6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
@@ -43,8 +41,7 @@
             </div>
         </div>
 
-        <!-- Belum Verifikasi -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:border-amber-200">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl bg-[#FFFBEB] flex items-center justify-center shrink-0">
                 <svg class="w-7 h-7 text-[#F59E0B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -58,8 +55,7 @@
             </div>
         </div>
 
-        <!-- Status Aktif -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:border-emerald-200">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl bg-[#DCFCE7] flex items-center justify-center shrink-0">
                 <svg class="w-7 h-7 text-[#10B981]" viewBox="0 0 24 24" fill="currentColor">
                     <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" clip-rule="evenodd"/>
@@ -72,8 +68,7 @@
             </div>
         </div>
 
-        <!-- Status Nonaktif -->
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:border-rose-200">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl bg-[#FEE2E2] flex items-center justify-center shrink-0">
                 <svg class="w-7 h-7 text-[#EF4444]" viewBox="0 0 24 24" fill="currentColor">
                     <path fill-rule="evenodd" d="M12 2C6.47 2 2 6.48 2 12s4.47 10 10 10 10-4.48 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" clip-rule="evenodd"/>
@@ -88,7 +83,6 @@
 
     </div>
 
-    <!-- First Chart Section: Tren Pendaftaran SPPG -->
     <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/70 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
@@ -100,7 +94,6 @@
                 </p>
             </div>
 
-            <!-- Filters -->
             <div class="flex items-center gap-3">
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode</label>
@@ -134,12 +127,10 @@
             </div>
         </div>
 
-        <!-- Canvas Line Chart -->
         <div class="h-64 sm:h-72 w-full relative">
             <canvas id="trenSppgChart"></canvas>
         </div>
 
-        <!-- Legend matching mockup exactly -->
         <div class="flex items-center gap-6 mt-4 pt-4 border-t border-slate-100 text-xs font-medium text-slate-700 flex-wrap">
             <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span>
@@ -160,7 +151,6 @@
         </div>
     </div>
 
-    <!-- Second Chart Section: Status Pengajuan Koreksi -->
     <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/70 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
@@ -172,7 +162,6 @@
                 </p>
             </div>
 
-            <!-- Filters -->
             <div class="flex items-center gap-3">
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode</label>
@@ -205,13 +194,11 @@
             </div>
         </div>
 
-        <!-- Canvas Bar Chart -->
         <div class="h-60 w-full relative">
             <canvas id="statusKoreksiChart"></canvas>
         </div>
     </div>
 
-    <!-- Third Section: Preview Fitur Utama -->
     <div>
         <div class="mb-5">
             <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -222,14 +209,13 @@
             </p>
         </div>
 
-        <!-- 3 Feature Preview Cards Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             
-            <!-- Card 1: SPPG Management -->
+
             <div class="flex flex-col">
                 <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex-1 flex flex-col justify-between">
                     <div>
-                        <!-- Card Header -->
+
                         <div class="flex items-center gap-3 mb-3">
                             <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
                                 <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -247,7 +233,6 @@
                             Kelola akun pengguna SPPG, atur role dan status akses.
                         </p>
 
-                        <!-- Mini Table -->
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs">
                                 <thead>
@@ -287,7 +272,6 @@
                     </div>
                 </div>
 
-                <!-- Action Button Outside / Attached Below -->
                 <div class="mt-4">
                     <a href="{{ route('admin.sppg.index') }}"
                        class="w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-4 text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors duration-150 shadow-sm group">
@@ -299,11 +283,10 @@
                 </div>
             </div>
 
-            <!-- Card 2: Correction Request -->
             <div class="flex flex-col">
                 <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex-1 flex flex-col justify-between">
                     <div>
-                        <!-- Card Header -->
+
                         <div class="flex items-center gap-3 mb-3">
                             <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
                                 <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -321,7 +304,6 @@
                             Kelola akun pengguna SPPG, atur role dan status akses.
                         </p>
 
-                        <!-- Mini Table -->
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs">
                                 <thead>
@@ -359,7 +341,6 @@
                     </div>
                 </div>
 
-                <!-- Action Button Outside / Attached Below -->
                 <div class="mt-4">
                     <a href="{{ route('admin.correction-requests.index') }}"
                        class="w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-4 text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors duration-150 shadow-sm group">
@@ -371,11 +352,10 @@
                 </div>
             </div>
 
-            <!-- Card 3: Audit Trail -->
             <div class="flex flex-col">
                 <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex-1 flex flex-col justify-between">
                     <div>
-                        <!-- Card Header -->
+
                         <div class="flex items-center gap-3 mb-3">
                             <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
                                 <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -392,7 +372,6 @@
                             Kelola akun pengguna SPPG, atur role dan status akses.
                         </p>
 
-                        <!-- Mini Table with generous row height and column separation -->
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs">
                                 <thead>
@@ -421,8 +400,6 @@
                     </div>
                 </div>
 
-
-                <!-- Action Button Outside / Attached Below -->
                 <div class="mt-4">
                     <a href="{{ route('admin.audit-trail.index') }}"
                        class="w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-4 text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors duration-150 shadow-sm group">
@@ -441,7 +418,7 @@
 @endsection
 
 @push('scripts')
-@vite('resources/js/dashboard.js')
+@vite('resources/js/admin/dashboard.js')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof window.initDashboardCharts === 'function') {

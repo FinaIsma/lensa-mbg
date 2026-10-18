@@ -2,14 +2,15 @@
     $currentUser = \Illuminate\Support\Facades\Auth::user();
     $currentName = $currentUser->nama ?? 'Nanda';
     $inisial = mb_strtoupper(mb_substr(trim($currentName), 0, 1)) ?: 'A';
-    $currentRole = $currentUser->role ?? 'admin_sistem';
+    $currentRole = $currentUser->role ?? 'admin';
     $roleLabel = match ($currentRole) {
-        'admin_sistem' => 'Admin Sistem',
-        'admin_sppg'   => 'Admin SPPG',
-        default        => 'Administrator',
+        'admin' => 'Admin',
+        'kepala_sppg' => 'Kepala SPPG',
+        'staff' => 'Staff',
+        default => 'Administrator',
     };
 @endphp
-<!-- Top Navbar / Header -->
+
 <header class="top-header">
     <div class="header-profile-dropdown" id="profileDropdownWrapper">
         <button type="button" class="header-user-btn" id="profileDropdownBtn" aria-expanded="false" aria-haspopup="true">

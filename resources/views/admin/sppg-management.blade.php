@@ -9,17 +9,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>window.adminSppgUpdateBase = '{{ url('admin/sppg') }}';</script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-    @vite(['resources/css/sppg_management.css', 'resources/js/sppg_management.js'])
+    @vite(['resources/css/admin/sppg-management.css', 'resources/js/admin/sppg-management.js'])
 </head>
 <body>
     <div class="admin-container">
         @include('admin.partials.sidebar')
 
-        <!-- Main Workspace -->
         <div class="main-wrapper">
             @include('admin.partials.navbar')
 
-            <!-- Main Content Container -->
             <main class="content-body">
                 @if (session('success'))
                     <div class="alert alert-success">
@@ -42,15 +40,13 @@
                     </div>
                 @endif
 
-                <!-- Page Header Title -->
                 <div class="page-title-section">
                     <h1 class="page-title">SPPG Management</h1>
                     <p class="page-subtitle">Kelola akun pengguna sistem Lensa MBG, atur role dan status akses</p>
                 </div>
 
-                <!-- 4 Stat Summary Cards (Static) -->
                 <div class="stat-cards-grid">
-                    <!-- Card 1: Total SPPG -->
+
                     <div class="stat-card">
                         <div class="stat-icon-wrapper icon-blue">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -69,7 +65,6 @@
                         </div>
                     </div>
 
-                    <!-- Card 2: Belum Verifikasi -->
                     <div class="stat-card">
                         <div class="stat-icon-wrapper icon-yellow">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -86,7 +81,6 @@
                         </div>
                     </div>
 
-                    <!-- Card 3: Status Aktif -->
                     <div class="stat-card">
                         <div class="stat-icon-wrapper icon-green">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -101,7 +95,6 @@
                         </div>
                     </div>
 
-                    <!-- Card 4: Status Nonaktif -->
                     <div class="stat-card">
                         <div class="stat-icon-wrapper icon-red">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -117,7 +110,6 @@
                     </div>
                 </div>
 
-                <!-- Filter & Search Control Panel -->
                 <div class="table-card">
                     <form action="{{ route('admin.sppg.index') }}" method="GET" class="filter-bar-form">
                         <div class="search-input-box">
@@ -151,15 +143,14 @@
                         </div>
                     </form>
 
-                    <!-- SPPG Table -->
                     <div class="table-responsive">
                         <table class="sppg-table">
                             <thead>
                                 <tr>
                                     <th>IDSPPG</th>
-                                    <th>Nama Pegawai</th>
-                                    <th>Email</th>
                                     <th>SPPG</th>
+                                    <th>Kepala SPPG</th>
+                                    <th>Staff SPPG</th>
                                     <th>Status Verif</th>
                                     <th>Status</th>
                                     <th class="text-center">Aksi</th>
@@ -178,9 +169,12 @@
                                             'raw_id' => $item->id_sppg,
                                             'nama_pegawai' => $item->user->nama ?? '-',
                                             'email' => $item->user->email ?? '-',
+                                            'no_telepon' => $item->no_telepon ?? '-',
+                                            'staff_nama' => $item->staff->nama ?? '-',
+                                            'staff_email' => $item->staff->email ?? '-',
+                                            'staff_no_telepon' => $item->staff->no_telepon ?? '-',
                                             'nama_sppg' => $item->nama_sppg,
                                             'status' => $item->status,
-                                            'no_telepon' => $item->no_telepon ?? '-',
                                             'alamat_sppg' => $item->alamat_sppg ?? '-',
                                             'provinsi' => $item->provinsi ?? '-',
                                             'kabupaten_kota' => $item->kabupaten_kota ?? '-',
@@ -193,9 +187,9 @@
                                     @endphp
                                     <tr>
                                         <td class="font-medium text-dark">{{ $idFormatted }}</td>
-                                        <td class="font-medium text-dark">{{ $item->user->nama ?? '-' }}</td>
-                                        <td class="text-secondary">{{ $item->user->email ?? '-' }}</td>
                                         <td class="font-medium text-dark">{{ $item->nama_sppg }}</td>
+                                        <td class="font-medium text-dark">{{ $item->user->nama ?? '-' }}</td>
+                                        <td class="font-medium text-dark">{{ $item->staff->nama ?? '-' }}</td>
                                         <td>
                                             @if ($item->status === 'aktif')
                                                 <span class="badge-verif badge-terverifikasi">Terverifikasi</span>
@@ -252,7 +246,6 @@
                         </table>
                     </div>
 
-                    <!-- Pagination Footer -->
                     <div class="table-pagination-footer">
                         <div class="pagination-info">
                             Menampilkan {{ $sppgs->firstItem() ?? 0 }}-{{ $sppgs->lastItem() ?? 0 }} dari {{ $sppgs->total() }} data
@@ -266,7 +259,6 @@
         </div>
     </div>
 
-    <!-- Modal Detail SPPG -->
     <div id="modalDetail" class="modal-backdrop hidden">
         <div class="modal-dialog">
             <div class="modal-header">
@@ -300,7 +292,6 @@
         </div>
     </div>
 
-    <!-- Modal Verifikasi SPPG -->
     <div id="modalVerifikasi" class="modal-backdrop hidden">
         <div class="modal-dialog">
             <div class="modal-header">

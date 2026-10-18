@@ -16,7 +16,7 @@ body {
     flex-direction: column;
 
     background-color: #F1F5F9;
-    background-image: url('../../public/images/Background.png');
+    background-image: url('../../../public/images/Background.png');
     background-size: cover;
     background-position: center center;
     background-attachment: fixed;
@@ -106,15 +106,15 @@ body {
 
     height: 50px;
 
-    border: 1px solid #071E49;
+    border: 1px solid #0B2046;
     border-radius: 8px;
 
     background: #FFFFFF;
 
-    color: #071E49;
+    color: #0B2046;
 
     font-family: 'Poppins', sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
 
     cursor: pointer;
@@ -125,18 +125,19 @@ body {
     justify-content: center;
     align-items: center;
 
-    gap: 10px;
+    gap: 8px;
+    padding: 0 12px;
 }
 
 .role-button.active {
-    background: #071E49;
+    background: #0B2046;
+    border-color: #0B2046;
     color: #FFFFFF;
 }
 
-.role-button:hover {
-    background: #082F79;
-    border-color: #082F79;
-    color: #FFFFFF;
+.role-button:hover:not(.active) {
+    background: #F8FAFC;
+    border-color: #0B2046;
 }
 
 .form-group {

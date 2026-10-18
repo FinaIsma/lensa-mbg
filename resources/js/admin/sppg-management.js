@@ -1,19 +1,19 @@
-window.renderSppgModalContent = function (item) {
-    // Determine status badge styling
-    let statusLabel = 'Menunggu Verifikasi';
-    let statusClass = 'cr-status-menunggu';
-
-    if (item.status === 'aktif') {
-        statusLabel = 'Terverifikasi';
-        statusClass = 'cr-status-terverifikasi';
-    } else if (item.status === 'nonaktif' || item.status === 'ditolak') {
-        statusLabel = 'Ditolak';
-        statusClass = 'cr-status-ditolak';
+function getSppgInitials(name) {
+    if (!name || typeof name !== 'string') return 'SP';
+    const words = name.trim().split(/\s+/).filter(w => w.length > 0);
+    if (words.length >= 2) {
+        return (words[0][0] + words[1][0]).toUpperCase();
     }
+    if (words.length === 1) {
+        return words[0].substring(0, 2).toUpperCase();
+    }
+    return 'SP';
+}
 
+window.renderSppgModalContent = function (item) {
     const createdDate = item.created_at || '-';
+    const initials = getSppgInitials(item.nama_sppg);
 
-    // SVG icon paths matching reference design
     const icons = {
         user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
         email: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
@@ -21,13 +21,10 @@ window.renderSppgModalContent = function (item) {
         store: '<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="22" x2="9" y2="18"/><line x1="15" y1="22" x2="15" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="10" x2="16.01" y2="10"/><line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/>',
         id: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/>',
         pin: '<path d="M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
-        globe: '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
-        building: '<line x1="3" y1="21" x2="21" y2="21"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
         nav: '<polygon points="12 2 19 21 12 17 5 21 12 2"/>',
-        cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+        cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/>',
     };
 
-    // Determine preview media for Surat Resmi (PDF vs Image)
     const isSuratPdf = item.foto_surat_resmi && /\.pdf($|\?)/i.test(item.foto_surat_resmi);
     let suratMediaHtml = '';
     if (item.foto_surat_resmi) {
@@ -41,41 +38,36 @@ window.renderSppgModalContent = function (item) {
     }
 
     return `
-        <!-- Entity Summary Header -->
         <div class="cr-entity-header">
             <div class="cr-entity-left">
-                <div class="cr-entity-avatar" aria-hidden="true"></div>
+                <div class="cr-entity-avatar" aria-hidden="true">${initials}</div>
                 <div>
-                    <div class="cr-entity-title">${item.id_sppg || '-'}</div>
-                    <div class="cr-entity-subtitle">${item.id_sppg ? item.id_sppg + ' - ' : ''}${item.nama_sppg || '-'}</div>
+                    <div class="cr-entity-title">${item.nama_sppg || '-'}</div>
+                    <div class="cr-entity-subtitle">${item.id_sppg || '-'}</div>
                 </div>
             </div>
-            <span class="status-badge ${statusClass}">
-                ${statusLabel}
-            </span>
         </div>
 
-        <!-- Card 1: Informasi Admin SPPG -->
         <div class="cr-info-card">
-            <h3 class="cr-card-title">Informasi Admin SPPG</h3>
+            <h3 class="cr-card-title">Informasi Kepala SPPG</h3>
             <div class="cr-card-body">
                 <div class="cr-kv-row">
                     <span class="cr-kv-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.user}</svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.user}</svg>
                         Nama Lengkap
                     </span>
                     <span class="cr-kv-value">${item.nama_pegawai || '-'}</span>
                 </div>
                 <div class="cr-kv-row">
                     <span class="cr-kv-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.email}</svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.email}</svg>
                         Email
                     </span>
                     <span class="cr-kv-value">${item.email || '-'}</span>
                 </div>
                 <div class="cr-kv-row">
                     <span class="cr-kv-label">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.phone}</svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.phone}</svg>
                         No Telepon
                     </span>
                     <span class="cr-kv-value">${item.no_telepon || '-'}</span>
@@ -83,7 +75,33 @@ window.renderSppgModalContent = function (item) {
             </div>
         </div>
 
-        <!-- Card 2: Informasi SPPG -->
+        <div class="cr-info-card">
+            <h3 class="cr-card-title">Informasi Staff SPPG</h3>
+            <div class="cr-card-body">
+                <div class="cr-kv-row">
+                    <span class="cr-kv-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.user}</svg>
+                        Nama Lengkap
+                    </span>
+                    <span class="cr-kv-value">${item.staff_nama || '-'}</span>
+                </div>
+                <div class="cr-kv-row">
+                    <span class="cr-kv-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.email}</svg>
+                        Email
+                    </span>
+                    <span class="cr-kv-value">${item.staff_email || '-'}</span>
+                </div>
+                <div class="cr-kv-row">
+                    <span class="cr-kv-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.phone}</svg>
+                        No Telepon
+                    </span>
+                    <span class="cr-kv-value">${item.staff_no_telepon || '-'}</span>
+                </div>
+            </div>
+        </div>
+
         <div class="cr-info-card">
             <h3 class="cr-card-title">Informasi SPPG</h3>
             <div class="cr-card-body">
@@ -110,14 +128,14 @@ window.renderSppgModalContent = function (item) {
                 </div>
                 <div class="cr-kv-row">
                     <span class="cr-kv-label">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.globe}</svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.pin}</svg>
                         Provinsi
                     </span>
                     <span class="cr-kv-value">${item.provinsi || '-'}</span>
                 </div>
                 <div class="cr-kv-row">
                     <span class="cr-kv-label">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.building}</svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.pin}</svg>
                         Kota/Kabupaten
                     </span>
                     <span class="cr-kv-value">${item.kabupaten_kota || '-'}</span>
@@ -132,14 +150,13 @@ window.renderSppgModalContent = function (item) {
                 <div class="cr-kv-row">
                     <span class="cr-kv-label">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons.cal}</svg>
-                        Tanggal Dibuat
+                        Tanggal dibuat
                     </span>
                     <span class="cr-kv-value">${createdDate}</span>
                 </div>
             </div>
         </div>
 
-        <!-- Card 3: Dokumen -->
         <div class="cr-info-card">
             <h3 class="cr-card-title">Dokumen</h3>
             <div class="mv2-doc-grid">
@@ -165,7 +182,7 @@ window.renderSppgModalContent = function (item) {
                     <div class="mv2-doc-img-box">
                         ${suratMediaHtml}
                     </div>
-                    <span class="mv2-doc-label">Surat Resmi</span>
+                    <span class="mv2-doc-label">Foto Surat Resmi</span>
                     <a href="${item.foto_surat_resmi || '#'}" ${item.foto_surat_resmi ? 'target="_blank"' : ''}
                        class="btn-file-view ${!item.foto_surat_resmi ? 'mv2-btn-disabled' : ''}">Lihat</a>
                 </div>
@@ -174,7 +191,6 @@ window.renderSppgModalContent = function (item) {
     `;
 };
 
-/* ── PDF Page 1 Thumbnail Renderer ──────────────── */
 window.renderPdfPreview = function (container) {
     const root = container || document;
     const canvases = root.querySelectorAll('canvas[data-pdf]');
@@ -233,7 +249,6 @@ window.renderPdfPreview = function (container) {
     });
 };
 
-/* ── Modal openers ──────────────────────────────── */
 window.openDetailModal = function (item) {
     const content = document.getElementById('detailModalContent');
     if (!content) return;
@@ -313,14 +328,12 @@ window.closeModal = function (modalId) {
     if (modal) modal.classList.add('hidden');
 };
 
-// Dismiss modal when backdrop is clicked
 document.addEventListener('click', function (e) {
     if (e.target.classList && e.target.classList.contains('modal-backdrop')) {
         e.target.classList.add('hidden');
     }
 });
 
-// Dismiss modal on Escape key
 document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
         const detail = document.getElementById('modalDetail');

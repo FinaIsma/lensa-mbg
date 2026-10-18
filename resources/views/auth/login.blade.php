@@ -4,10 +4,10 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login - Lensa MBG</title>
-        @vite(['resources/css/login.css', 'resources/js/login.js'])
+        @vite(['resources/css/auth/login.css', 'resources/js/auth/login.js'])
     </head>
 
-    <body data-init-role="{{ old('role', request('tab', 'admin_sistem')) }}">
+    <body data-init-role="{{ old('role', request('tab', 'admin')) }}" style="background-image: url('{{ asset('images/Background.png') }}');">
         <header class="header">
             <div class="logo-left">
                 <img src="{{ asset('images/LogoLensa.png') }}" alt="Logo Lensa MBG">
@@ -29,28 +29,33 @@
                         <strong>Perhatian!</strong> {{ $message }}
                     </div>
                 @enderror
-                <h1 class="login-title">Masuk ke Lensa MBG</h1>
+                <h1 class="login-title">Masuk Ke Lensa MBG</h1>
                 <p class="login-subtitle">Pilih Role Anda Untuk Melanjutkan ke Sistem.</p>
                 @php
-                    $defaultRole = old('role', request('role', request('tab', session('success') ? 'admin_sppg' : 'admin_sistem')));
+                    $rawRole = old('role', request('role', request('tab', session('success') ? 'sppg' : 'admin')));
+                    $defaultRole = in_array($rawRole, ['sppg', 'kepala_sppg', 'staff'], true) ? 'sppg' : 'admin';
                 @endphp
                 <form action="{{ route('login.process') }}" method="POST">
+                    @error('role')
+                        <div class="error" style="margin-bottom: 12px; text-align: center;">{{ $message }}</div>
+                    @enderror
+
                     <div class="role-buttons">
-                        <button type="button" id="adminSistemButton" class="role-button {{ $defaultRole === 'admin_sistem' ? 'active' : '' }}" onclick="selectRole('admin_sistem')">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button type="button" id="adminButton" class="role-button {{ $defaultRole === 'admin' ? 'active' : '' }}" onclick="selectRole('admin')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                             </svg>
-                            <span>Admin Sistem</span>
+                            <span>Admin</span>
                         </button>
 
-                        <button type="button" id="adminSppgButton" class="role-button {{ $defaultRole === 'admin_sppg' ? 'active' : '' }}" onclick="selectRole('admin_sppg')">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <button type="button" id="sppgButton" class="role-button {{ $defaultRole === 'sppg' ? 'active' : '' }}" onclick="selectRole('sppg')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                             </svg>
-                            <span>Admin SPPG</span>
+                            <span>Kepala/Staff SPPG</span>
                         </button>
                     </div>
 
