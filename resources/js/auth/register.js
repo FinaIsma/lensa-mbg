@@ -1,7 +1,5 @@
-// Indonesian Region API & Fallback Data
 const REGION_API_BASE = 'https://emsifa.github.io/api-wilayah-indonesia/api';
 
-// Fallback provinces in case of offline/network issues
 const FALLBACK_PROVINCES = [
     { id: '11', name: 'ACEH' },
     { id: '12', name: 'SUMATERA UTARA' },
@@ -47,11 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initWilayahDropdowns();
     initFileUploads();
     initEmailLiveCheck();
+    initTermsAgreement();
     initAjaxFormSubmission();
     initInputClearErrorListeners();
 });
 
-// 1. Password Visibility Toggle
 window.toggleRegisterPassword = function (inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
@@ -72,7 +70,6 @@ window.toggleRegisterPassword = function (inputId, iconId) {
     }
 };
 
-// 2. Dynamic Region Cascading (Provinsi -> Kabupaten/Kota -> Kecamatan)
 function initWilayahDropdowns() {
     const provSelect = document.getElementById('provinsi');
     const kabSelect = document.getElementById('kabupaten_kota');
@@ -84,14 +81,12 @@ function initWilayahDropdowns() {
     const oldKab = kabSelect.dataset.old || '';
     const oldKec = kecSelect.dataset.old || '';
 
-    // 1. Load Provinces via local backend endpoint (zero CORS/blocking)
     provSelect.innerHTML = '<option value="">Memuat data provinsi...</option>';
     
     fetch('/api/wilayah/provinces')
         .then(res => res.json())
         .then(provinces => populateProvinces(provinces))
         .catch(() => {
-            // Backup direct fetch
             fetch('https://emsifa.github.io/api-wilayah-indonesia/api/provinces.json')
                 .then(res => res.json())
                 .then(provinces => populateProvinces(provinces))
@@ -201,7 +196,6 @@ function initWilayahDropdowns() {
         kecSelect.disabled = false;
         kecSelect.innerHTML = '<option value="">Memuat Kecamatan...</option>';
 
-        // 1. Try local API proxy
         fetch(`/api/wilayah/districts/${regencyId}`)
             .then(res => res.json())
             .then(districts => {
@@ -213,7 +207,6 @@ function initWilayahDropdowns() {
                 }
             })
             .catch(() => {
-                // 2. Direct fetch from primary CDN
                 fetch(`https://emsifa.github.io/api-wilayah-indonesia/api/districts/${regencyId}.json`)
                     .then(res => res.json())
                     .then(districts => {
@@ -225,7 +218,6 @@ function initWilayahDropdowns() {
                         }
                     })
                     .catch(() => {
-                        // 3. Direct fetch from backup CDN
                         fetch(`https://kanglerian.github.io/api-wilayah-indonesia/api/districts/${regencyId}.json`)
                             .then(res => res.json())
                             .then(districts => {
@@ -259,7 +251,6 @@ function initWilayahDropdowns() {
     }
 }
 
-// 3. Document Upload Handlers & Previews
 function initFileUploads() {
     const uploadCards = [
         { id: 'foto_ktp', dropzoneId: 'dropzone_ktp', previewId: 'preview_ktp' },
@@ -276,7 +267,6 @@ function initFileUploads() {
 
         dropzone.addEventListener('click', () => fileInput.click());
 
-        // Drag & drop
         ['dragenter', 'dragover'].forEach(eventName => {
             dropzone.addEventListener(eventName, (e) => {
                 e.preventDefault();
@@ -383,70 +373,87 @@ function initFileUploads() {
     }
 }
 
-// 4. Live Check Email Availability
 function initEmailLiveCheck() {
-    const emailInput = document.getElementById('email');
-    const emailError = document.getElementById('error_email');
-    if (!emailInput) return;
+    setupEmailCheck('email', 'error_email', 'staff_email');
+    setupEmailCheck('staff_email', 'error_staff_email', 'email');
 
-    let debounceTimer;
+    function setupEmailCheck(inputId, errorId, otherInputId) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        const otherInput = document.getElementById(otherInputId);
+        if (!input) return;
 
-    emailInput.addEventListener('blur', () => {
-        checkEmailUnique(emailInput.value.trim());
-    });
+        let debounceTimer;
 
-    emailInput.addEventListener('input', () => {
-        clearTimeout(debounceTimer);
-        // Clear immediate error style when user types
-        emailInput.classList.remove('is-invalid');
-        if (emailError && emailError.textContent.includes('terdaftar')) {
-            emailError.textContent = '';
-        }
+        input.addEventListener('blur', () => {
+            validateEmail(input.value.trim());
+        });
 
-        const val = emailInput.value.trim();
-        if (val.length > 5 && val.includes('@') && val.includes('.')) {
-            debounceTimer = setTimeout(() => {
-                checkEmailUnique(val);
-            }, 600);
-        }
-    });
-
-    async function checkEmailUnique(email) {
-        if (!email || !email.includes('@') || !email.includes('.')) return;
-
-        try {
-            const res = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
-            const data = await res.json();
-            if (!data.available) {
-                emailInput.classList.add('is-invalid');
-                if (emailError) {
-                    emailError.textContent = data.message || 'Email sudah terdaftar dalam sistem.';
-                }
-            } else {
-                emailInput.classList.remove('is-invalid');
-                if (emailError && emailError.textContent.includes('terdaftar')) {
-                    emailError.textContent = '';
-                }
+        input.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            input.classList.remove('is-invalid');
+            if (error && (error.textContent.includes('terdaftar') || error.textContent.includes('tidak boleh sama'))) {
+                error.textContent = '';
             }
-        } catch (err) {
-            console.warn('Could not verify email:', err);
+
+            const val = input.value.trim();
+            if (val.length > 5 && val.includes('@') && val.includes('.')) {
+                debounceTimer = setTimeout(() => {
+                    validateEmail(val);
+                }, 600);
+            }
+        });
+
+        async function validateEmail(email) {
+            if (!email || !email.includes('@') || !email.includes('.')) return;
+
+            if (otherInput && otherInput.value.trim().toLowerCase() === email.toLowerCase()) {
+                input.classList.add('is-invalid');
+                if (error) {
+                    error.textContent = 'Email tidak boleh sama antara Kepala SPPG dan Staff SPPG.';
+                }
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`);
+                const data = await res.json();
+                if (!data.available) {
+                    input.classList.add('is-invalid');
+                    if (error) {
+                        error.textContent = data.message || 'Email sudah terdaftar dalam sistem.';
+                    }
+                } else {
+                    input.classList.remove('is-invalid');
+                    if (error && error.textContent.includes('terdaftar')) {
+                        error.textContent = '';
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not verify email:', err);
+            }
         }
     }
 }
 
-// 5. AJAX Form Submission to prevent losing filled fields and uploaded files
 function initAjaxFormSubmission() {
     const form = document.getElementById('registerForm');
     const submitBtn = document.getElementById('submitBtn');
+    const termsCheckbox = document.getElementById('syarat_ketentuan');
     const emailInput = document.getElementById('email');
+    const staffEmailInput = document.getElementById('staff_email');
     const alertGeneral = document.getElementById('alert_general');
 
     if (!form || !submitBtn) return;
 
     form.addEventListener('submit', async (e) => {
+        if (termsCheckbox && !termsCheckbox.checked) {
+            e.preventDefault();
+            return;
+        }
+
         e.preventDefault();
 
-        // Clear all previous errors
         document.querySelectorAll('.error').forEach(el => el.textContent = '');
         document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
         if (alertGeneral) {
@@ -454,7 +461,6 @@ function initAjaxFormSubmission() {
             alertGeneral.textContent = '';
         }
 
-        // Button Loading State
         const originalBtnText = submitBtn.innerHTML;
         submitBtn.disabled = true;
         submitBtn.innerHTML = `
@@ -492,12 +498,17 @@ function initAjaxFormSubmission() {
                             if (!firstErrorElement) firstErrorElement = inputEl;
                         }
 
-                        // Specific requirement: reset only email input box while keeping all other inputs and uploaded files intact
-                        if (field === 'email' && emailInput) {
+                        if (field === 'email' && emailInput && messages[0].includes('terdaftar')) {
                             emailInput.value = '';
                             emailInput.classList.add('is-invalid');
                             emailInput.focus();
                             firstErrorElement = emailInput;
+                        }
+                        if (field === 'staff_email' && staffEmailInput && messages[0].includes('terdaftar')) {
+                            staffEmailInput.value = '';
+                            staffEmailInput.classList.add('is-invalid');
+                            staffEmailInput.focus();
+                            firstErrorElement = staffEmailInput;
                         }
                     }
 
@@ -512,12 +523,11 @@ function initAjaxFormSubmission() {
                     }
                 }
 
-                submitBtn.disabled = false;
+                submitBtn.disabled = termsCheckbox ? !termsCheckbox.checked : false;
                 submitBtn.innerHTML = originalBtnText;
                 return;
             }
 
-            // Registration Successful
             if (data.redirect) {
                 window.location.href = data.redirect;
             } else {
@@ -531,16 +541,29 @@ function initAjaxFormSubmission() {
                 alertGeneral.style.display = 'block';
                 alertGeneral.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            submitBtn.disabled = false;
+            submitBtn.disabled = termsCheckbox ? !termsCheckbox.checked : false;
             submitBtn.innerHTML = originalBtnText;
         }
     });
 }
 
-// Helper to clear error when user types or changes input
+function initTermsAgreement() {
+    const termsCheckbox = document.getElementById('syarat_ketentuan');
+    const submitBtn = document.getElementById('submitBtn');
+    if (!termsCheckbox || !submitBtn) return;
+
+    const updateSubmitState = () => {
+        submitBtn.disabled = !termsCheckbox.checked;
+    };
+
+    termsCheckbox.addEventListener('change', updateSubmitState);
+    updateSubmitState();
+}
+
 function initInputClearErrorListeners() {
     const fields = [
-        'nama_lengkap', 'no_telepon', 'password', 'password_confirmation',
+        'nama_lengkap', 'email', 'no_telepon', 'password', 'password_confirmation',
+        'staff_nama_lengkap', 'staff_email', 'staff_no_telepon', 'staff_password', 'staff_password_confirmation',
         'nama_sppg', 'alamat_sppg', 'provinsi', 'kabupaten_kota', 'kecamatan', 'syarat_ketentuan'
     ];
 

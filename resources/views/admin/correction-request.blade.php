@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    @vite(['resources/css/correction-request.css', 'resources/js/correction-request.js'])
+    @vite(['resources/css/admin/correction-request.css', 'resources/js/admin/correction-request.js'])
 </head>
 <body>
 @php
@@ -318,10 +318,15 @@
             $evidenceName = $firstEvidence ? basename($firstEvidence->file_path) : 'Bukti_koreksi_' . strtolower($row->jenis_data) . '.pdf';
         @endphp
         <template id="detail-{{ $row->id }}">
-            {{-- Entity Summary Header --}}
+            @php
+                $wordsCr = preg_split('/\s+/', trim($row->sppg->nama_sppg ?? 'SPPG'));
+                $inisialCr = count($wordsCr) >= 2
+                    ? mb_strtoupper(mb_substr($wordsCr[0], 0, 1) . mb_substr($wordsCr[1], 0, 1))
+                    : mb_strtoupper(mb_substr($wordsCr[0] ?? 'SP', 0, 2));
+            @endphp
             <div class="cr-entity-header">
                 <div class="cr-entity-left">
-                    <div class="cr-entity-avatar" aria-hidden="true"></div>
+                    <div class="cr-entity-avatar" aria-hidden="true">{{ $inisialCr }}</div>
                     <div>
                         <div class="cr-entity-title">{{ $row->kode_pengajuan }}</div>
                         <div class="cr-entity-subtitle">{{ $row->kode_sppg }} - {{ $row->sppg->nama_sppg ?? 'SPPG' }}</div>

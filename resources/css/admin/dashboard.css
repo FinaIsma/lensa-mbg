@@ -1,8 +1,3 @@
-/* ==========================================================================
-   DASHBOARD & ANALYTICS SPECIFIC STYLES
-   ========================================================================== */
-
-/* Dashboard Banner Alert */
 .dashboard-banner-alert {
     background-color: #FEF3C7;
     border: 1px solid #FDE68A;
@@ -39,14 +34,12 @@
     background-color: #B45309;
 }
 
-/* Chart Canvas Wrapper Smooth Transition */
 .chart-container-wrapper {
     position: relative;
     width: 100%;
     transition: opacity 0.2s ease;
 }
 
-/* Custom mini scrollbar for dashboard tables */
 .dashboard-table-scroll::-webkit-scrollbar {
     height: 4px;
 }

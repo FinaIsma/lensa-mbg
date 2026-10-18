@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use App\Support\Keys;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -38,47 +38,47 @@ class AuditTrail extends Model
 
     /** Nilai kolom `action` (sesuai enum di migration) => label tampilan. */
     public const AKTIVITAS = [
-        'confirm'            => 'Mengonfirmasi',
-        'void'               => 'Membatalkan (void)',
-        'cancel'             => 'Membatalkan',
+        'confirm' => 'Mengonfirmasi',
+        'void' => 'Membatalkan (void)',
+        'cancel' => 'Membatalkan',
         'correction_request' => 'Mengajukan koreksi',
         'correction_approve' => 'Menyetujui koreksi',
-        'correction_reject'  => 'Menolak koreksi',
-        'correction_apply'   => 'Menerapkan koreksi',
-        'sppg_verify'           => 'Memverifikasi SPPG',
-        'sppg_reject'           => 'Menolak pendaftaran SPPG',
-        'sppg_activate'         => 'Mengaktifkan SPPG',
-        'sppg_deactivate'       => 'Menonaktifkan SPPG',
-        'staff_replace'         => 'Mengganti staff',
+        'correction_reject' => 'Menolak koreksi',
+        'correction_apply' => 'Menerapkan koreksi',
+        'sppg_verify' => 'Memverifikasi SPPG',
+        'sppg_reject' => 'Menolak pendaftaran SPPG',
+        'sppg_activate' => 'Mengaktifkan SPPG',
+        'sppg_deactivate' => 'Menonaktifkan SPPG',
+        'staff_replace' => 'Mengganti staff',
         'kepala_change_request' => 'Mengajukan pergantian kepala',
         'kepala_change_approve' => 'Menyetujui pergantian kepala',
-        'kepala_change_reject'  => 'Menolak pergantian kepala',
+        'kepala_change_reject' => 'Menolak pergantian kepala',
     ];
 
     /** Nama tabel objek (auditable_type) => nama modul untuk tampilan dan filter. Tambahkan jika ada tabel baru. */
     public const MODUL = [
-        'purchases'                => 'Pembelian',
-        'purchase_items'           => 'Pembelian',
-        'receivings'               => 'Penerimaan Bahan',
-        'receiving_items'          => 'Penerimaan Bahan',
-        'material_lots'            => 'Stok',
-        'stock_movements'          => 'Stok',
-        'production_batches'       => 'Produksi',
-        'material_usages'          => 'Produksi',
-        'processing_steps'         => 'Produksi',
-        'pre_distribution_checks'  => 'Produksi',
-        'distributions'            => 'Distribusi',
-        'waste_surplus_records'    => 'Waste & Surplus',
-        'correction_requests'      => 'Koreksi',
-        'menus'                    => 'Menu',
-        'recipes'                  => 'Menu',
-        'recipe_items'             => 'Menu',
-        'suppliers'                => 'Pemasok',
-        'materials'                => 'Bahan',
+        'purchases' => 'Pembelian',
+        'purchase_items' => 'Pembelian',
+        'receivings' => 'Penerimaan Bahan',
+        'receiving_items' => 'Penerimaan Bahan',
+        'material_lots' => 'Stok',
+        'stock_movements' => 'Stok',
+        'production_batches' => 'Produksi',
+        'material_usages' => 'Produksi',
+        'processing_steps' => 'Produksi',
+        'pre_distribution_checks' => 'Produksi',
+        'distributions' => 'Distribusi',
+        'waste_surplus_records' => 'Waste & Surplus',
+        'correction_requests' => 'Koreksi',
+        'menus' => 'Menu',
+        'recipes' => 'Menu',
+        'recipe_items' => 'Menu',
+        'suppliers' => 'Pemasok',
+        'materials' => 'Bahan',
         'distribution_destinations' => 'Tujuan Distribusi',
-        'sppg'                     => 'SPPG',
-        'kepala_change_requests'   => 'SPPG',
-        'staff'                    => 'Staff',
+        'sppg' => 'SPPG',
+        'kepala_change_requests' => 'SPPG',
+        'staff' => 'Staff',
     ];
 
     protected static function booted(): void
@@ -92,11 +92,11 @@ class AuditTrail extends Model
     /**
      * Catat satu aktivitas. Pelaku selalu user yang sedang login (bukan dari input form).
      *
-     * @param string      $aksi        salah satu kunci AKTIVITAS
-     * @param Model       $objek       data yang terkena aksi (nama tabelnya jadi auditable_type)
-     * @param array|null  $lama        nilai sebelum (hanya kolom yang berubah)
-     * @param array|null  $baru        nilai sesudah
-     * @param int|null    $koreksiId   isi untuk aksi koreksi; jika $objek sendiri CorrectionRequest, otomatis terisi
+     * @param  string  $aksi  salah satu kunci AKTIVITAS
+     * @param  Model  $objek  data yang terkena aksi (nama tabelnya jadi auditable_type)
+     * @param  array|null  $lama  nilai sebelum (hanya kolom yang berubah)
+     * @param  array|null  $baru  nilai sesudah
+     * @param  int|null  $koreksiId  isi untuk aksi koreksi; jika $objek sendiri CorrectionRequest, otomatis terisi
      */
     public static function catat(string $aksi, Model $objek, ?array $lama = null, ?array $baru = null, ?int $koreksiId = null, ?int $idSppg = null): self
     {
@@ -118,7 +118,7 @@ class AuditTrail extends Model
      *   correction_request / correction_apply : [field_name => old_value] -> [field_name => new_value]
      *   correction_approve / correction_reject: status pending -> approved / rejected
      *
-     * @param Model $koreksi baris correction_requests
+     * @param  Model  $koreksi  baris correction_requests
      */
     public static function catatKoreksi(string $aksi, Model $koreksi, ?array $lama = null, ?array $baru = null): self
     {
@@ -129,8 +129,8 @@ class AuditTrail extends Model
         $f = $koreksi->field_name;
         [$lamaDefault, $baruDefault] = match ($aksi) {
             'correction_approve' => [['status' => 'pending'], ['status' => 'approved']],
-            'correction_reject'  => [['status' => 'pending'], ['status' => 'rejected']],
-            default              => [[$f => $koreksi->old_value], [$f => $koreksi->new_value]],
+            'correction_reject' => [['status' => 'pending'], ['status' => 'rejected']],
+            default => [[$f => $koreksi->old_value], [$f => $koreksi->new_value]],
         };
 
         return static::catatPada(
@@ -164,22 +164,22 @@ class AuditTrail extends Model
     private static function catatPada(string $aksi, string $tabel, int $id, ?array $lama, ?array $baru, ?int $koreksiId, ?int $idSppg): self
     {
         if (! array_key_exists($aksi, self::AKTIVITAS)) {
-            throw new InvalidArgumentException("Aksi audit '{$aksi}' tidak dikenal. Pilihan: " . implode(', ', array_keys(self::AKTIVITAS)));
+            throw new InvalidArgumentException("Aksi audit '{$aksi}' tidak dikenal. Pilihan: ".implode(', ', array_keys(self::AKTIVITAS)));
         }
 
         [$tipe, $aktorId, $aktorNama, $sppgPelaku] = self::pelaku();
 
         return static::create([
             'correction_request_id' => $koreksiId,
-            'actor_type'            => $tipe,
-            'actor_id'              => $aktorId,
-            'actor_nama'            => $aktorNama,     // salinan nama saat aksi, tidak berubah walau akun diganti
-            'id_sppg'               => $idSppg ?? $sppgPelaku,
-            'action'                => $aksi,
-            'auditable_type'        => $tabel,
-            'auditable_id'          => $id,
-            'old_values'            => $lama,
-            'new_values'            => $baru,
+            'actor_type' => $tipe,
+            'actor_id' => $aktorId,
+            'actor_nama' => $aktorNama,     // salinan nama saat aksi, tidak berubah walau akun diganti
+            'id_sppg' => $idSppg ?? $sppgPelaku,
+            'action' => $aksi,
+            'auditable_type' => $tabel,
+            'auditable_id' => $id,
+            'old_values' => $lama,
+            'new_values' => $baru,
         ]);
     }
 
@@ -189,8 +189,8 @@ class AuditTrail extends Model
     public function scopeDaftar(Builder $q): Builder
     {
         return $q
-            ->leftJoin(Keys::USER_TABLE . ' as u', function ($j) {
-                $j->on('u.' . Keys::USER_PK, '=', 'audit_trails.actor_id')->where('audit_trails.actor_type', '=', 'user');
+            ->leftJoin(Keys::USER_TABLE.' as u', function ($j) {
+                $j->on('u.'.Keys::USER_PK, '=', 'audit_trails.actor_id')->where('audit_trails.actor_type', '=', 'user');
             })
             ->select('audit_trails.*', 'u.role as pelaku_role');
     }
@@ -232,30 +232,40 @@ class AuditTrail extends Model
         if ($kata === '') {
             return $q;
         }
-        $like = '%' . $kata . '%';
+        $like = '%'.$kata.'%';
 
         return $q->where(function (Builder $w) use ($like) {
             $w->where('audit_trails.actor_nama', 'ilike', $like)
-              ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', Keys::SPPG_TABLE)
-                  ->whereRaw("'SPPG' || LPAD(audit_trails.auditable_id::text, 3, '0') ILIKE ?", [$like]))
-              ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'receivings')
-                  ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('id')->from('receivings')->where('receiving_no', 'ilike', $like)))
-              ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'receiving_items')
-                  ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('ri.id')->from('receiving_items as ri')
-                      ->join('receivings as r', 'r.id', '=', 'ri.receiving_id')->where('r.receiving_no', 'ilike', $like)))
-              ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'production_batches')
-                  ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('id')->from('production_batches')->where('batch_code', 'ilike', $like)))
-              ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'purchases')
-                  ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('id')->from('purchases')->where('purchase_no', 'ilike', $like)))
-              ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'purchase_items')
-                  ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('pi.id')->from('purchase_items as pi')
-                      ->join('purchases as p', 'p.id', '=', 'pi.purchase_id')->where('p.purchase_no', 'ilike', $like)))
-              ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'correction_requests')
-                  ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('id')->from('correction_requests')->where('request_no', 'ilike', $like)));
+                ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', Keys::SPPG_TABLE)
+                    ->whereRaw("'SPPG' || LPAD(audit_trails.auditable_id::text, 3, '0') ILIKE ?", [$like]))
+                ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'receivings')
+                    ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('id')->from('receivings')->where('receiving_no', 'ilike', $like)))
+                ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'receiving_items')
+                    ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('ri.id')->from('receiving_items as ri')
+                        ->join('receivings as r', 'r.id', '=', 'ri.receiving_id')->where('r.receiving_no', 'ilike', $like)))
+                ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'production_batches')
+                    ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('id')->from('production_batches')->where('batch_code', 'ilike', $like)))
+                ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'purchases')
+                    ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('id')->from('purchases')->where('purchase_no', 'ilike', $like)))
+                ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'purchase_items')
+                    ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('pi.id')->from('purchase_items as pi')
+                        ->join('purchases as p', 'p.id', '=', 'pi.purchase_id')->where('p.purchase_no', 'ilike', $like)))
+                ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'correction_requests')
+                    ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('id')->from('correction_requests')->where('request_no', 'ilike', $like)));
         });
     }
 
     // ------------------------------------------------------------------ tampilan (dihitung, tidak disimpan)
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'actor_id', Keys::USER_PK);
+    }
+
+    public function getAktivitasAttribute(): string
+    {
+        return $this->aktivitas_label;
+    }
 
     public static function daftarModul(): array
     {
@@ -275,7 +285,7 @@ class AuditTrail extends Model
     /** "AUD-0042": nomor tampilan, diturunkan dari id. */
     public function getKodeAuditAttribute(): string
     {
-        return 'AUD-' . str_pad((string) $this->id, 4, '0', STR_PAD_LEFT);
+        return 'AUD-'.str_pad((string) $this->id, 4, '0', STR_PAD_LEFT);
     }
 
     /** "Sana - Kepala SPPG", "Dewi - Staff", "Nanda - Admin". */
@@ -285,11 +295,11 @@ class AuditTrail extends Model
             ? 'Staff'
             : match ($this->pelaku_role ?? null) {
                 'kepala_sppg' => 'Kepala SPPG',
-                'admin'       => 'Admin',
-                default       => 'Pengguna',
+                'admin' => 'Admin',
+                default => 'Pengguna',
             };
 
-        return ($this->actor_nama ?: '(tanpa nama)') . ' - ' . $peran;
+        return ($this->actor_nama ?: '(tanpa nama)').' - '.$peran;
     }
 
     /** Warna lencana aktivitas: ok | bad | info. */
@@ -297,8 +307,8 @@ class AuditTrail extends Model
     {
         return match ($this->action) {
             'confirm', 'correction_approve', 'correction_apply', 'sppg_verify', 'sppg_activate', 'kepala_change_approve' => 'ok',
-            'void', 'cancel', 'correction_reject', 'sppg_reject', 'sppg_deactivate', 'kepala_change_reject'             => 'bad',
-            default                                             => 'info',
+            'void', 'cancel', 'correction_reject', 'sppg_reject', 'sppg_deactivate', 'kepala_change_reject' => 'bad',
+            default => 'info',
         };
     }
 
@@ -309,19 +319,19 @@ class AuditTrail extends Model
     public static function kodeUntuk(Collection $rows): array
     {
         $sumber = [
-            'receivings'          => fn ($ids) => DB::table('receivings')->whereIn('id', $ids)->select('id as k', 'receiving_no as v'),
-            'receiving_items'     => fn ($ids) => DB::table('receiving_items as ri')->join('receivings as r', 'r.id', '=', 'ri.receiving_id')
-                                        ->whereIn('ri.id', $ids)->select('ri.id as k', 'r.receiving_no as v'),
-            'production_batches'  => fn ($ids) => DB::table('production_batches')->whereIn('id', $ids)->select('id as k', 'batch_code as v'),
-            'purchases'           => fn ($ids) => DB::table('purchases')->whereIn('id', $ids)->select('id as k', 'purchase_no as v'),
-            'purchase_items'      => fn ($ids) => DB::table('purchase_items as pi')->join('purchases as p', 'p.id', '=', 'pi.purchase_id')
-                                        ->whereIn('pi.id', $ids)->select('pi.id as k', 'p.purchase_no as v'),
+            'receivings' => fn ($ids) => DB::table('receivings')->whereIn('id', $ids)->select('id as k', 'receiving_no as v'),
+            'receiving_items' => fn ($ids) => DB::table('receiving_items as ri')->join('receivings as r', 'r.id', '=', 'ri.receiving_id')
+                ->whereIn('ri.id', $ids)->select('ri.id as k', 'r.receiving_no as v'),
+            'production_batches' => fn ($ids) => DB::table('production_batches')->whereIn('id', $ids)->select('id as k', 'batch_code as v'),
+            'purchases' => fn ($ids) => DB::table('purchases')->whereIn('id', $ids)->select('id as k', 'purchase_no as v'),
+            'purchase_items' => fn ($ids) => DB::table('purchase_items as pi')->join('purchases as p', 'p.id', '=', 'pi.purchase_id')
+                ->whereIn('pi.id', $ids)->select('pi.id as k', 'p.purchase_no as v'),
             'correction_requests' => fn ($ids) => DB::table('correction_requests')->whereIn('id', $ids)->select('id as k', 'request_no as v'),
-            Keys::SPPG_TABLE      => fn ($ids) => DB::table(Keys::SPPG_TABLE)->whereIn(Keys::SPPG_PK, $ids)
-                                        ->select(Keys::SPPG_PK . ' as k', DB::raw("'SPPG' || LPAD(" . Keys::SPPG_PK . "::text, 3, '0') as v")),
-            'staff'               => fn ($ids) => DB::table('staff')->whereIn('id', $ids)->select('id as k', DB::raw("'STF' || LPAD(id::text, 3, '0') as v")),
+            Keys::SPPG_TABLE => fn ($ids) => DB::table(Keys::SPPG_TABLE)->whereIn(Keys::SPPG_PK, $ids)
+                ->select(Keys::SPPG_PK.' as k', DB::raw("'SPPG' || LPAD(".Keys::SPPG_PK."::text, 3, '0') as v")),
+            'staff' => fn ($ids) => DB::table('staff')->whereIn('id', $ids)->select('id as k', DB::raw("'STF' || LPAD(id::text, 3, '0') as v")),
             'kepala_change_requests' => fn ($ids) => DB::table('kepala_change_requests')->whereIn('id', $ids)
-                                        ->select('id as k', DB::raw("'KPL' || LPAD(id::text, 3, '0') as v")),
+                ->select('id as k', DB::raw("'KPL' || LPAD(id::text, 3, '0') as v")),
         ];
 
         $hasil = [];
@@ -330,7 +340,7 @@ class AuditTrail extends Model
                 continue;
             }
             foreach ($sumber[$tipe]($grup->pluck('auditable_id')->unique()->all())->get() as $baris) {
-                $hasil[$tipe . ':' . $baris->k] = $baris->v;
+                $hasil[$tipe.':'.$baris->k] = $baris->v;
             }
         }
 

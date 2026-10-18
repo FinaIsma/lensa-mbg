@@ -1,22 +1,24 @@
 function selectRole(role, resetFields = true) {
     const roleInput = document.getElementById('role');
-    const adminSistemButton = document.getElementById('adminSistemButton');
-    const adminSppgButton = document.getElementById('adminSppgButton');
+    const adminButton = document.getElementById('adminButton');
+    const sppgButton = document.getElementById('sppgButton');
     const registerSection = document.getElementById('registerSection');
 
-    roleInput.value = role;
+    const isSppg = role === 'sppg' || role === 'kepala_sppg' || role === 'staff';
+    const activeRole = isSppg ? 'sppg' : 'admin';
 
-    if (role === 'admin_sistem') {
-        adminSistemButton.classList.add('active');
-        adminSppgButton.classList.remove('active');
-        registerSection.classList.add('hidden');
+    if (roleInput) roleInput.value = activeRole;
+
+    if (activeRole === 'admin') {
+        if (adminButton) adminButton.classList.add('active');
+        if (sppgButton) sppgButton.classList.remove('active');
+        if (registerSection) registerSection.classList.add('hidden');
     } else {
-        adminSppgButton.classList.add('active');
-        adminSistemButton.classList.remove('active');
-        registerSection.classList.remove('hidden');
+        if (sppgButton) sppgButton.classList.add('active');
+        if (adminButton) adminButton.classList.remove('active');
+        if (registerSection) registerSection.classList.remove('hidden');
     }
 
-    // Reset form fields when manually switching role
     if (resetFields) {
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
@@ -24,7 +26,6 @@ function selectRole(role, resetFields = true) {
         if (emailInput) emailInput.value = '';
         if (passwordInput) passwordInput.value = '';
 
-        // Reset eye icon back to visible
         const eyeIcon = document.getElementById('eyeIcon');
         if (eyeIcon && passwordInput) {
             passwordInput.type = 'password';
@@ -34,14 +35,12 @@ function selectRole(role, resetFields = true) {
             `;
         }
 
-        // Sembunyikan semua alert banner (success & sppg_status)
         document.querySelectorAll('.login-card > div[style]').forEach(el => {
             if (el.querySelector('strong')) {
                 el.style.display = 'none';
             }
         });
 
-        // Sembunyikan error validasi inline (email/password tidak sesuai, dll)
         document.querySelectorAll('.error').forEach(el => {
             el.style.display = 'none';
         });
@@ -73,9 +72,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const roleInput = document.getElementById('role');
     const urlParams = new URLSearchParams(window.location.search);
     const roleFromUrl = urlParams.get('role') || urlParams.get('tab');
-    const initRole = roleFromUrl || document.body.dataset.initRole || (roleInput ? roleInput.value : 'admin_sistem') || 'admin_sistem';
+    const initRole = roleFromUrl || document.body.dataset.initRole || (roleInput ? roleInput.value : 'admin') || 'admin';
 
-    // Pass resetFields=false so we don't wipe old() email value or success alerts on load
     selectRole(initRole, false);
 });
 

@@ -31,4 +31,11 @@ class Sppg extends Model
     {
         return $this->belongsTo(User::class, 'id_user', 'id_user');
     }
+
+    public function staff()
+    {
+        return $this->hasOne(Staff::class, 'id_sppg', 'id_sppg')
+            ->orderByRaw("CASE WHEN status IN ('aktif', 'menunggu') THEN 0 ELSE 1 END")
+            ->latest('id');
+    }
 }

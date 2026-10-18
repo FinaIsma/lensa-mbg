@@ -333,7 +333,6 @@ button, input, select, textarea {
     color: #0F172A;
 }
 
-/* Table */
 .table-responsive {
     width: 100%;
     overflow-x: auto;
@@ -599,8 +598,16 @@ button, input, select, textarea {
     width: 54px;
     height: 54px;
     border-radius: 50%;
-    background-color: #D9D9D9;
+    background-color: var(--cr-primary);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     flex-shrink: 0;
+    user-select: none;
 }
 
 .cr-entity-title {
@@ -616,7 +623,6 @@ button, input, select, textarea {
     margin-top: 2px;
 }
 
-/* Detail Section Cards */
 .cr-section-title {
     font-size: 16px;
     font-weight: 700;
@@ -689,7 +695,6 @@ button, input, select, textarea {
     word-break: break-word;
 }
 
-/* File Attachment Card */
 .cr-file-box {
     display: flex;
     align-items: center;
@@ -778,7 +783,6 @@ button, input, select, textarea {
     background-color: #FEE2E2;
 }
 
-/* Decision Status Box (if already processed) */
 .cr-reviewed-notice {
     padding: 14px 18px;
     border-radius: var(--cr-radius-md);

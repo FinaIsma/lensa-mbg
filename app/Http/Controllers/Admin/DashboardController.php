@@ -101,19 +101,19 @@ class DashboardController extends Controller
 
         // 4. Preview Fitur Utama 3: Audit Trail (3 baris)
         $realAudit = Schema::hasTable('audit_trails')
-            ? AuditTrail::with('user')->latest('id')->take(3)->get()
+            ? AuditTrail::daftar()->latest('audit_trails.id')->take(3)->get()
             : collect();
 
         if ($realAudit->isNotEmpty()) {
             $auditPreview = $realAudit->map(function ($log) {
-                $userRole = $log->user && $log->user->role === 'admin_sistem' ? 'Admin' : 'SPPG';
-                $userName = $log->user->nama ?? 'Admin';
+                $userRole = ($log->pelaku_role === 'admin') ? 'Admin' : 'Kepala SPPG';
+                $userName = $log->actor_nama ?: ($log->user->nama ?? 'Admin');
 
                 return [
                     'waktu' => $log->created_at ? $log->created_at->format('d M, H:i') : '11 Okt, 10:15',
                     'pengguna' => "{$userName} ({$userRole})",
                     'modul' => $log->modul,
-                    'aktivitas' => $log->aktivitas,
+                    'aktivitas' => $log->aktivitas_label,
                 ];
             });
         } else {

@@ -1,4 +1,3 @@
-<!-- Sidebar Left -->
 <aside class="sidebar">
     <div class="sidebar-brand">
         <a href="{{ route('admin.dashboard') }}" class="brand-link">
@@ -24,7 +23,17 @@
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            <span>User Management</span>
+            <span>SPPG Management</span>
+        </a>
+
+        <a href="{{ route('admin.audit') }}" class="nav-item {{ request()->routeIs('admin.audit*') ? 'active' : '' }}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <polyline points="3 3 3 8 8 8"></polyline>
+                <line x1="12" y1="7" x2="12" y2="12"></line>
+                <line x1="12" y1="12" x2="16" y2="14"></line>
+            </svg>
+            <span>Audit Trail</span>
         </a>
     </nav>
 </aside>
