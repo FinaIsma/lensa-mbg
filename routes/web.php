@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\AuditTrailController;
-use App\Http\Controllers\Admin\CorrectionRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SppgManagementController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Sppg\DashboardController as SppgDashboardController;
+use App\Http\Controllers\KepalaSPPG\CorrectionRequestController as KepalaSPPGCorrectionController;
+use App\Http\Controllers\KepalaSPPG\DashboardController as KepalaSPPGDashboardController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
@@ -64,17 +64,20 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
         return redirect()->route('admin.dashboard')->with('info', 'Fitur Monitoring sedang dalam tahap pengembangan.');
     })->name('monitoring');
 
-    Route::get('/correction-requests', [CorrectionRequestController::class, 'index'])->name('correction-requests.index');
-    Route::get('/correction-request', [CorrectionRequestController::class, 'index'])->name('correction');
-    Route::post('/correction-request/{id}/approve', [CorrectionRequestController::class, 'approve'])->name('correction.approve');
-    Route::post('/correction-request/{id}/reject', [CorrectionRequestController::class, 'reject'])->name('correction.reject');
+    Route::redirect('/correction-requests', '/admin/dashboard')->name('correction-requests.index');
+    Route::redirect('/correction-request', '/admin/dashboard')->name('correction');
 
     Route::get('/audit-trail', [AuditTrailController::class, 'index'])->name('audit');
     Route::get('/audit', [AuditTrailController::class, 'index'])->name('audit-trail.index');
 });
 
 Route::middleware(['role:kepala_sppg'])->prefix('sppg')->name('sppg.')->group(function () {
-    Route::get('/dashboard', [SppgDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [KepalaSPPGDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/correction-requests', [KepalaSPPGCorrectionController::class, 'index'])->name('correction-requests.index');
+    Route::get('/correction-request', [KepalaSPPGCorrectionController::class, 'index'])->name('correction');
+    Route::post('/correction-request/{id}/approve', [KepalaSPPGCorrectionController::class, 'approve'])->name('correction.approve');
+    Route::post('/correction-request/{id}/reject', [KepalaSPPGCorrectionController::class, 'reject'])->name('correction.reject');
+    Route::get('/audit-trail', [KepalaSPPGDashboardController::class, 'auditIndex'])->name('audit');
 });
 
 Route::middleware(['role:staff'])->prefix('staff')->name('staff.')->group(function () {

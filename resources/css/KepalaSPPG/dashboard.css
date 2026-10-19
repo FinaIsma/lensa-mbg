@@ -1,0 +1,78 @@
+body {
+    font-family: 'Poppins', 'Plus Jakarta Sans', sans-serif;
+    background-color: #F8FAFC;
+    color: #0F172A;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
+.dashboard-banner-alert {
+    background-color: #FEF3C7;
+    border: 1px solid #FDE68A;
+    color: #92400E;
+    padding: 16px 20px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 16px;
+}
+
+.banner-text-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.btn-banner-action {
+    background-color: #D97706;
+    color: #FFFFFF;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-banner-action:hover {
+    background-color: #B45309;
+}
+
+.chart-container-wrapper {
+    position: relative;
+    width: 100%;
+    transition: opacity 0.2s ease;
+}
+
+.dashboard-table-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.dashboard-table-scroll::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+}
+
+.dashboard-heading {
+    color: #071E49;
+}

@@ -16,23 +16,23 @@ class CorrectionRequest extends Model
     protected $primaryKey = 'id';
 
     public const JENIS_DATA = [
-        'distributions'             => 'Distribusi',
+        'distributions' => 'Distribusi',
         'distribution_destinations' => 'Distribusi',
-        'production_batches'        => 'Produksi',
-        'materials'                 => 'Produksi',
-        'material_usages'           => 'Produksi',
-        'processing_steps'          => 'Produksi',
-        'pre_distribution_checks'   => 'Produksi',
-        'menus'                     => 'Menu',
-        'recipes'                   => 'Menu',
-        'recipe_items'              => 'Menu',
-        'receivings'                => 'Penerimaan',
-        'receiving_items'           => 'Penerimaan',
-        'purchases'                 => 'Pengadaan',
-        'purchase_items'            => 'Pengadaan',
-        'material_lots'             => 'Stok',
-        'stock_movements'           => 'Stok',
-        'waste_surplus_records'     => 'Waste & Surplus',
+        'production_batches' => 'Produksi',
+        'materials' => 'Produksi',
+        'material_usages' => 'Produksi',
+        'processing_steps' => 'Produksi',
+        'pre_distribution_checks' => 'Produksi',
+        'menus' => 'Menu',
+        'recipes' => 'Menu',
+        'recipe_items' => 'Menu',
+        'receivings' => 'Penerimaan',
+        'receiving_items' => 'Penerimaan',
+        'purchases' => 'Pengadaan',
+        'purchase_items' => 'Pengadaan',
+        'material_lots' => 'Stok',
+        'stock_movements' => 'Stok',
+        'waste_surplus_records' => 'Waste & Surplus',
     ];
 
     protected $fillable = [
@@ -66,7 +66,27 @@ class CorrectionRequest extends Model
 
     public function requester(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'requested_by', 'id_user');
+        return $this->belongsTo(Staff::class, 'requested_by', 'id');
+    }
+
+    public function staff(): BelongsTo
+    {
+        return $this->belongsTo(Staff::class, 'requested_by', 'id');
+    }
+
+    public function getRequesterNameAttribute(): string
+    {
+        if ($this->relationLoaded('requester') && $this->requester) {
+            return $this->requester->nama;
+        }
+
+        if ($this->requester) {
+            return $this->requester->nama;
+        }
+
+        $fallbackUser = User::find($this->requested_by);
+
+        return $fallbackUser?->nama ?? '-';
     }
 
     public function reviewer(): BelongsTo
@@ -92,14 +112,14 @@ class CorrectionRequest extends Model
         if ($kata === '') {
             return $q;
         }
-        $like = '%' . $kata . '%';
+        $like = '%'.$kata.'%';
 
         return $q->where(function (Builder $w) use ($like) {
             $w->where('request_no', 'ilike', $like)
-              ->orWhere('field_name', 'ilike', $like)
-              ->orWhere('reason', 'ilike', $like)
-              ->orWhereHas('sppg', fn ($sq) => $sq->where('nama_sppg', 'ilike', $like))
-              ->orWhereHas('requester', fn ($uq) => $uq->where('nama', 'ilike', $like));
+                ->orWhere('field_name', 'ilike', $like)
+                ->orWhere('reason', 'ilike', $like)
+                ->orWhereHas('sppg', fn ($sq) => $sq->where('nama_sppg', 'ilike', $like))
+                ->orWhereHas('requester', fn ($uq) => $uq->where('nama', 'ilike', $like));
         });
     }
 
@@ -108,6 +128,7 @@ class CorrectionRequest extends Model
         if (! $idSppg) {
             return $q;
         }
+
         return $q->where('id_sppg', $idSppg);
     }
 
@@ -117,6 +138,7 @@ class CorrectionRequest extends Model
             return $q;
         }
         $tables = array_keys(array_filter(self::JENIS_DATA, fn ($val) => strcasecmp($val, $jenis) === 0));
+
         return $q->whereIn('target_table', $tables ?: ['-']);
     }
 
@@ -128,9 +150,9 @@ class CorrectionRequest extends Model
 
         return match (strtolower($status)) {
             'pending', 'belum diverifikasi', 'menunggu review' => $q->where('status', 'pending'),
-            'approved', 'terverifikasi', 'disetujui'            => $q->whereIn('status', ['approved', 'applied']),
-            'rejected', 'ditolak'                               => $q->where('status', 'rejected'),
-            default                                             => $q->where('status', $status),
+            'approved', 'terverifikasi', 'disetujui' => $q->whereIn('status', ['approved', 'applied']),
+            'rejected', 'ditolak' => $q->where('status', 'rejected'),
+            default => $q->where('status', $status),
         };
     }
 
@@ -142,6 +164,7 @@ class CorrectionRequest extends Model
         if ($sampai) {
             $q->where('requested_at', '<=', Carbon::parse($sampai)->endOfDay());
         }
+
         return $q;
     }
 
@@ -151,12 +174,13 @@ class CorrectionRequest extends Model
         if ($this->request_no && str_starts_with($this->request_no, 'CR-')) {
             return $this->request_no;
         }
-        return 'CR-' . str_pad((string) $this->id, 3, '0', STR_PAD_LEFT);
+
+        return 'CR-'.str_pad((string) $this->id, 3, '0', STR_PAD_LEFT);
     }
 
     public function getKodeSppgAttribute(): string
     {
-        return 'SPPG' . str_pad((string) $this->id_sppg, 3, '0', STR_PAD_LEFT);
+        return 'SPPG'.str_pad((string) $this->id_sppg, 3, '0', STR_PAD_LEFT);
     }
 
     public function getJenisDataAttribute(): string
@@ -167,20 +191,20 @@ class CorrectionRequest extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            'pending'             => 'Belum Diverifikasi',
+            'pending' => 'Belum Diverifikasi',
             'approved', 'applied' => 'Terverifikasi',
-            'rejected'            => 'Ditolak',
-            default               => ucfirst($this->status),
+            'rejected' => 'Ditolak',
+            default => ucfirst($this->status),
         };
     }
 
     public function getStatusBadgeClassAttribute(): string
     {
         return match ($this->status) {
-            'pending'             => 'badge-pending',
+            'pending' => 'badge-pending',
             'approved', 'applied' => 'badge-approved',
-            'rejected'            => 'badge-rejected',
-            default               => 'badge-default',
+            'rejected' => 'badge-rejected',
+            default => 'badge-default',
         };
     }
 
@@ -214,12 +238,14 @@ class CorrectionRequest extends Model
                 $field = strtolower($this->field_name ?? '');
                 if (preg_match('/(nominal|harga|total|biaya|nilai|cost|price|budget|dana|porsi|portion)/i', $field)) {
                     if (str_contains($field, 'porsi') || str_contains($field, 'portion')) {
-                        return number_format($num, 0, ',', '.') . ' porsi';
+                        return number_format($num, 0, ',', '.').' porsi';
                     }
-                    return 'Rp ' . number_format($num, 0, ',', '.');
+
+                    return 'Rp '.number_format($num, 0, ',', '.');
                 }
             }
         }
+
         return (string) $val;
     }
 
@@ -261,7 +287,7 @@ class CorrectionRequest extends Model
                 }
 
                 foreach ($rows as $r) {
-                    $resolved[$table . ':' . $r->id] = $r->code;
+                    $resolved[$table.':'.$r->id] = $r->code;
                 }
             } catch (\Throwable) {
                 // Keep default
@@ -269,7 +295,7 @@ class CorrectionRequest extends Model
         }
 
         $items->each(function (CorrectionRequest $item) use ($resolved) {
-            $item->target_data_code = $resolved[$item->target_table . ':' . $item->target_id] ?? $item->kode_pengajuan;
+            $item->target_data_code = $resolved[$item->target_table.':'.$item->target_id] ?? $item->kode_pengajuan;
         });
     }
 }

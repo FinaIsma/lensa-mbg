@@ -1,20 +1,17 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Correction Request - Admin Sistem Lensa MBG</title>
+@extends('layouts.kepala-sppg')
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+@section('title', 'Correction Request')
 
-    @vite(['resources/css/admin/correction-request.css', 'resources/js/admin/correction-request.js'])
-</head>
-<body>
+@push('styles')
+    @vite('resources/css/KepalaSPPG/correction-request.css')
+@endpush
+
+@section('main-class', 'content-body')
+
+@section('content')
 @php
-    $namaUser = \Illuminate\Support\Facades\Auth::user()->nama ?? 'Nanda';
-    $inisial = mb_strtoupper(mb_substr(trim($namaUser), 0, 1)) ?: 'A';
+    $currentUser = auth('staff')->user() ?: auth()->user();
+    $namaUser = $currentUser->nama ?? 'Kepala SPPG';
     $tglPendek = fn ($ymd) => \Illuminate\Support\Carbon::parse($ymd)->locale('id')->translatedFormat('j M Y');
     $labelTanggal = match (true) {
         $dari && $sampai => $tglPendek($dari) . ' - ' . $tglPendek($sampai),
@@ -23,13 +20,6 @@
         default          => 'Pilih rentan tanggal',
     };
 @endphp
-    <div class="admin-container">
-        @include('admin.partials.sidebar')
-
-        <div class="main-wrapper">
-            @include('admin.partials.navbar')
-
-            <main class="content-body">
                 @if (session('success'))
                     <div class="alert alert-success">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -122,7 +112,7 @@
 
                 {{-- Table Card --}}
                 <div class="table-card">
-                    <form action="{{ route('admin.correction') }}" method="GET" class="filter-bar-form" id="filterForm">
+                    <form action="{{ route('sppg.correction') }}" method="GET" class="filter-bar-form" id="filterForm">
                         <div class="filter-controls-left">
                             {{-- Date Range Popover --}}
                             <div class="cr-date">
@@ -147,13 +137,13 @@
                                 </div>
                             </div>
 
-                            {{-- SPPG Filter --}}
+                            {{-- Staff Pemohon Filter --}}
                             <div class="select-dropdown-box">
-                                <select name="sppg" class="select-filter-input" onchange="this.form.submit()">
-                                    <option value="">Semua SPPG</option>
-                                    @foreach ($sppgs as $s)
-                                        <option value="{{ $s->id_sppg }}" {{ request('sppg') == $s->id_sppg ? 'selected' : '' }}>
-                                            SPPG{{ str_pad($s->id_sppg, 3, '0', STR_PAD_LEFT) }} - {{ $s->nama_sppg }}
+                                <select name="staff" class="select-filter-input" onchange="this.form.submit()">
+                                    <option value="">Semua Staff</option>
+                                    @foreach ($staffList as $st)
+                                        <option value="{{ $st->id }}" {{ request('staff') == $st->id ? 'selected' : '' }}>
+                                            {{ $st->nama }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -192,7 +182,7 @@
                         </div>
 
                         <div class="filter-controls-right">
-                            <a href="{{ route('admin.correction') }}" class="btn-reset-filter">
+                            <a href="{{ route('sppg.correction') }}" class="btn-reset-filter">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                                     <polyline points="3 3 3 8 8 8"></polyline>
@@ -208,7 +198,7 @@
                             <thead>
                                 <tr>
                                     <th>ID Pengajuan</th>
-                                    <th>ID SPPG</th>
+                                    <th>Staff Pemohon</th>
                                     <th>Jenis Data</th>
                                     <th>Status</th>
                                     <th>Tanggal Pengajuan</th>
@@ -219,7 +209,7 @@
                                 @forelse ($rows as $row)
                                     <tr>
                                         <td><strong>{{ $row->kode_pengajuan }}</strong></td>
-                                        <td>{{ $row->kode_sppg }}</td>
+                                        <td>{{ $row->requester->nama ?? $row->requester_name ?? '-' }}</td>
                                         <td>{{ $row->jenis_data }}</td>
                                         <td>
                                             <span class="status-badge {{ $row->status_badge_class }}">
@@ -258,9 +248,9 @@
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
-    </div>
+@endsection
+
+@section('modals')
 
     {{-- Detail Drawer Backdrop & Container --}}
     <div class="cr-backdrop" id="detailBackdrop"></div>
@@ -329,7 +319,7 @@
                     <div class="cr-entity-avatar" aria-hidden="true">{{ $inisialCr }}</div>
                     <div>
                         <div class="cr-entity-title">{{ $row->kode_pengajuan }}</div>
-                        <div class="cr-entity-subtitle">{{ $row->kode_sppg }} - {{ $row->sppg->nama_sppg ?? 'SPPG' }}</div>
+                        <div class="cr-entity-subtitle">{{ $row->requester->nama ?? $row->requester_name ?? 'Staff' }} &middot; {{ $row->sppg->nama_sppg ?? 'SPPG' }}</div>
                     </div>
                 </div>
                 <span class="status-badge {{ $row->status_badge_class }}">
@@ -384,7 +374,7 @@
                             </svg>
                             Pengaju
                         </span>
-                        <span class="cr-kv-value">{{ $row->requester->nama ?? 'Yu Ji-Min' }}</span>
+                        <span class="cr-kv-value">{{ $row->requester->nama ?? '-' }}</span>
                     </div>
                     <div class="cr-kv-row">
                         <span class="cr-kv-label">
@@ -419,7 +409,7 @@
                             </svg>
                             Nama SPPG
                         </span>
-                        <span class="cr-kv-value">{{ $row->sppg->nama_sppg ?? 'SPPG Malang 01' }}</span>
+                        <span class="cr-kv-value">{{ $row->sppg->nama_sppg ?? 'SPPG' }}</span>
                     </div>
                     <div class="cr-kv-row">
                         <span class="cr-kv-label">
@@ -441,7 +431,7 @@
                             </svg>
                             Alamat Lengkap
                         </span>
-                        <span class="cr-kv-value">{{ $row->sppg->alamat_sppg ?? 'Jl Bedali Lawang' }}</span>
+                        <span class="cr-kv-value">{{ $row->sppg->alamat_sppg ?? '-' }}</span>
                     </div>
                     <div class="cr-kv-row">
                         <span class="cr-kv-label">
@@ -452,7 +442,7 @@
                             </svg>
                             Provinsi
                         </span>
-                        <span class="cr-kv-value">{{ $row->sppg->provinsi ?? 'Jawa Timur' }}</span>
+                        <span class="cr-kv-value">{{ $row->sppg->provinsi ?? '-' }}</span>
                     </div>
                     <div class="cr-kv-row">
                         <span class="cr-kv-label">
@@ -463,7 +453,7 @@
                             </svg>
                             Kota/Kabupaten
                         </span>
-                        <span class="cr-kv-value">{{ $row->sppg->kabupaten_kota ?? 'Kabupaten Malang' }}</span>
+                        <span class="cr-kv-value">{{ $row->sppg->kabupaten_kota ?? '-' }}</span>
                     </div>
                     <div class="cr-kv-row">
                         <span class="cr-kv-label">
@@ -472,7 +462,7 @@
                             </svg>
                             Kecamatan
                         </span>
-                        <span class="cr-kv-value">{{ $row->sppg->kecamatan ?? 'Lawang' }}</span>
+                        <span class="cr-kv-value">{{ $row->sppg->kecamatan ?? '-' }}</span>
                     </div>
                 </div>
             </div>
@@ -528,7 +518,7 @@
 
             {{-- Card 4: Lampiran Bukti --}}
             <div class="cr-info-card">
-                <h3 class="cr-card-title">Detail Koreksi</h3>
+                <h3 class="cr-card-title">Lampiran Bukti</h3>
                 <div class="cr-file-box">
                     <div class="cr-file-left">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -547,7 +537,7 @@
             @if ($row->status === 'pending')
                 <div class="cr-drawer-footer">
                     <button type="button" class="btn-decision btn-decision-approve"
-                            data-action-approve="{{ route('admin.correction.approve', $row->id) }}"
+                            data-action-approve="{{ route('sppg.correction.approve', $row->id) }}"
                             data-code="{{ $row->kode_pengajuan }}">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -556,7 +546,7 @@
                         <span>Setuju</span>
                     </button>
                     <button type="button" class="btn-decision btn-decision-reject"
-                            data-action-reject="{{ route('admin.correction.reject', $row->id) }}"
+                            data-action-reject="{{ route('sppg.correction.reject', $row->id) }}"
                             data-code="{{ $row->kode_pengajuan }}">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -569,7 +559,7 @@
             @elseif ($row->status === 'approved' || $row->status === 'applied')
                 <div class="cr-reviewed-notice approved">
                     <strong>Telah Disetujui</strong>
-                    <div>Oleh: {{ $row->reviewer->nama ?? 'Admin Sistem' }} &middot; {{ $row->reviewed_at ? $row->reviewed_at->locale('id')->translatedFormat('j M Y, H.i') : '-' }} WIB</div>
+                    <div>Oleh: {{ $row->reviewer->nama ?? 'Kepala SPPG' }} &middot; {{ $row->reviewed_at ? $row->reviewed_at->locale('id')->translatedFormat('j M Y, H.i') : '-' }} WIB</div>
                     @if ($row->review_note)
                         <div style="margin-top: 4px; font-style: italic;">Catatan: {{ $row->review_note }}</div>
                     @endif
@@ -577,7 +567,7 @@
             @elseif ($row->status === 'rejected')
                 <div class="cr-reviewed-notice rejected">
                     <strong>Pengajuan Ditolak</strong>
-                    <div>Oleh: {{ $row->reviewer->nama ?? 'Admin Sistem' }} &middot; {{ $row->reviewed_at ? $row->reviewed_at->locale('id')->translatedFormat('j M Y, H.i') : '-' }} WIB</div>
+                    <div>Oleh: {{ $row->reviewer->nama ?? 'Kepala SPPG' }} &middot; {{ $row->reviewed_at ? $row->reviewed_at->locale('id')->translatedFormat('j M Y, H.i') : '-' }} WIB</div>
                     @if ($row->review_note)
                         <div style="margin-top: 4px; font-style: italic;">Alasan: {{ $row->review_note }}</div>
                     @endif
@@ -585,5 +575,8 @@
             @endif
         </template>
     @endforeach
-</body>
-</html>
+@endsection
+
+@push('scripts')
+    @vite('resources/js/KepalaSPPG/correction-request.js')
+@endpush

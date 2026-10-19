@@ -38,4 +38,9 @@ class Sppg extends Model
             ->orderByRaw("CASE WHEN status IN ('aktif', 'menunggu') THEN 0 ELSE 1 END")
             ->latest('id');
     }
+
+    public function staffs()
+    {
+        return $this->hasMany(Staff::class, 'id_sppg', 'id_sppg');
+    }
 }
