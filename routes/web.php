@@ -69,6 +69,8 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
 
     Route::get('/audit-trail', [AuditTrailController::class, 'index'])->name('audit');
     Route::get('/audit', [AuditTrailController::class, 'index'])->name('audit-trail.index');
+    Route::get('/audit-trail/export/csv', [AuditTrailController::class, 'exportCsv'])->name('audit.export.csv');
+    Route::get('/audit-trail/export/pdf', [AuditTrailController::class, 'exportPdf'])->name('audit.export.pdf');
 });
 
 Route::middleware(['role:kepala_sppg'])->prefix('sppg')->name('sppg.')->group(function () {
@@ -79,6 +81,8 @@ Route::middleware(['role:kepala_sppg'])->prefix('sppg')->name('sppg.')->group(fu
     Route::post('/correction-request/{id}/reject', [KepalaSPPGCorrectionController::class, 'reject'])->name('correction.reject');
     Route::get('/audit-trail', [AuditTrailController::class, 'index'])->name('audit');
     Route::get('/audit', [AuditTrailController::class, 'index'])->name('audit-trail.index');
+    Route::get('/audit-trail/export/csv', [AuditTrailController::class, 'exportCsv'])->name('audit.export.csv');
+    Route::get('/audit-trail/export/pdf', [AuditTrailController::class, 'exportPdf'])->name('audit.export.pdf');
 });
 
 Route::middleware(['role:staff'])->prefix('staff')->name('staff.')->group(function () {

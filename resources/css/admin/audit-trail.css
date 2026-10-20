@@ -276,6 +276,83 @@ textarea {
     color: #0F172A;
 }
 
+.dropdown-export-wrapper {
+    position: relative;
+}
+
+.btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid #0F172A;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: #0F172A;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-export:hover {
+    background-color: #1E293B;
+    border-color: #1E293B;
+}
+
+.chevron-export {
+    transition: transform 0.15s ease;
+}
+
+.dropdown-export-wrapper.open .chevron-export {
+    transform: rotate(180deg);
+}
+
+.dropdown-export-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 25;
+    min-width: 200px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.dropdown-export-wrapper.open .dropdown-export-menu {
+    display: block;
+}
+
+.dropdown-export-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.dropdown-export-item:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+}
+
+.dropdown-export-item svg {
+    color: #64748B;
+    flex-shrink: 0;
+}
+
+.dropdown-export-item:hover svg {
+    color: #0F172A;
+}
+
 .au-date {
     position: relative;
 }

@@ -88,10 +88,34 @@
         });
     }
 
+    var exportWrapper = document.getElementById('exportDropdownWrapper');
+    var exportBtn = document.getElementById('exportDropdownBtn');
+
+    function toggleExport(open) {
+        if (!exportWrapper) return;
+        var show = typeof open === 'boolean' ? open : !exportWrapper.classList.contains('open');
+        exportWrapper.classList.toggle('open', show);
+        if (exportBtn) exportBtn.setAttribute('aria-expanded', show ? 'true' : 'false');
+    }
+
+    if (exportBtn) {
+        exportBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggleExport();
+        });
+    }
+
+    document.addEventListener('click', function (e) {
+        if (exportWrapper && !exportWrapper.contains(e.target)) {
+            toggleExport(false);
+        }
+    });
+
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             closeDetail();
             toggleDate(false);
+            toggleExport(false);
         }
     });
 })();
