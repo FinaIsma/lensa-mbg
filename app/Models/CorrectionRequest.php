@@ -274,14 +274,55 @@ class CorrectionRequest extends Model
                         ->whereIn('ri.id', $ids)->select('ri.id', 'r.receiving_no as code')->get();
                 } elseif ($table === 'production_batches') {
                     $rows = DB::table('production_batches')->whereIn('id', $ids)->select('id', 'batch_code as code')->get();
+                } elseif ($table === 'material_usages') {
+                    $rows = DB::table('material_usages as mu')
+                        ->join('production_batches as pb', 'pb.id', '=', 'mu.production_batch_id')
+                        ->whereIn('mu.id', $ids)->select('mu.id', 'pb.batch_code as code')->get();
+                } elseif ($table === 'processing_steps') {
+                    $rows = DB::table('processing_steps as ps')
+                        ->join('production_batches as pb', 'pb.id', '=', 'ps.production_batch_id')
+                        ->whereIn('ps.id', $ids)->select('ps.id', 'pb.batch_code as code')->get();
+                } elseif ($table === 'pre_distribution_checks') {
+                    $rows = DB::table('pre_distribution_checks as pdc')
+                        ->join('production_batches as pb', 'pb.id', '=', 'pdc.production_batch_id')
+                        ->whereIn('pdc.id', $ids)->select('pdc.id', 'pb.batch_code as code')->get();
                 } elseif ($table === 'purchases') {
                     $rows = DB::table('purchases')->whereIn('id', $ids)->select('id', 'purchase_no as code')->get();
                 } elseif ($table === 'purchase_items') {
                     $rows = DB::table('purchase_items as pi')
                         ->join('purchases as p', 'p.id', '=', 'pi.purchase_id')
                         ->whereIn('pi.id', $ids)->select('pi.id', 'p.purchase_no as code')->get();
+                } elseif ($table === 'material_lots') {
+                    $rows = DB::table('material_lots')->whereIn('id', $ids)
+                        ->select('id', DB::raw("COALESCE(lot_number, barcode, 'LOT' || LPAD(id::text, 4, '0')) as code"))->get();
+                } elseif ($table === 'stock_movements') {
+                    $rows = DB::table('stock_movements')->whereIn('id', $ids)
+                        ->select('id', DB::raw("'MOV' || LPAD(id::text, 4, '0') as code"))->get();
                 } elseif ($table === 'distributions') {
-                    $rows = DB::table('distributions')->whereIn('id', $ids)->select('id', 'distribution_no as code')->get();
+                    $rows = DB::table('distributions')->whereIn('id', $ids)
+                        ->select('id', DB::raw("'DIS' || LPAD(id::text, 4, '0') as code"))->get();
+                } elseif ($table === 'distribution_destinations') {
+                    $rows = DB::table('distribution_destinations')->whereIn('id', $ids)
+                        ->select('id', DB::raw("'DST' || LPAD(id::text, 3, '0') as code"))->get();
+                } elseif ($table === 'waste_surplus_records') {
+                    $rows = DB::table('waste_surplus_records')->whereIn('id', $ids)
+                        ->select('id', DB::raw("'WST' || LPAD(id::text, 4, '0') as code"))->get();
+                } elseif ($table === 'menus') {
+                    $rows = DB::table('menus')->whereIn('id', $ids)
+                        ->select('id', DB::raw("'MNU' || LPAD(id::text, 3, '0') as code"))->get();
+                } elseif ($table === 'recipes') {
+                    $rows = DB::table('recipes')->whereIn('id', $ids)
+                        ->select('id', DB::raw("'RCP' || LPAD(id::text, 3, '0') as code"))->get();
+                } elseif ($table === 'recipe_items') {
+                    $rows = DB::table('recipe_items as ri')
+                        ->join('recipes as r', 'r.id', '=', 'ri.recipe_id')
+                        ->whereIn('ri.id', $ids)->select('ri.id', DB::raw("'RCP' || LPAD(r.id::text, 3, '0') as code"))->get();
+                } elseif ($table === 'materials') {
+                    $rows = DB::table('materials')->whereIn('id', $ids)
+                        ->select('id', DB::raw("COALESCE(kode, 'MAT' || LPAD(id::text, 3, '0')) as code"))->get();
+                } elseif ($table === 'suppliers') {
+                    $rows = DB::table('suppliers')->whereIn('id', $ids)
+                        ->select('id', DB::raw("'SUP' || LPAD(id::text, 3, '0') as code"))->get();
                 } else {
                     $rows = collect();
                 }
