@@ -180,19 +180,21 @@ class AuditTrail extends Model
             'auditable_id' => $id,
             'old_values' => $lama,
             'new_values' => $baru,
+            'created_at' => now(),
         ]);
     }
 
     // ------------------------------------------------------------------ query untuk halaman
 
-    /** Dasar query halaman: menambahkan peran pelaku bertipe user (admin / kepala_sppg) sebagai pelaku_role. */
+    /** Dasar query halaman: menambahkan peran pelaku bertipe user (admin / kepala_sppg) dan nama SPPG. */
     public function scopeDaftar(Builder $q): Builder
     {
         return $q
             ->leftJoin(Keys::USER_TABLE.' as u', function ($j) {
                 $j->on('u.'.Keys::USER_PK, '=', 'audit_trails.actor_id')->where('audit_trails.actor_type', '=', 'user');
             })
-            ->select('audit_trails.*', 'u.role as pelaku_role');
+            ->leftJoin(Keys::SPPG_TABLE.' as s', 's.'.Keys::SPPG_PK, '=', 'audit_trails.id_sppg')
+            ->select('audit_trails.*', 'u.role as pelaku_role', 's.nama_sppg');
     }
 
     /** Batasi ke satu SPPG (dipakai halaman kepala SPPG). */
@@ -238,6 +240,7 @@ class AuditTrail extends Model
             $w->where('audit_trails.actor_nama', 'ilike', $like)
                 ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', Keys::SPPG_TABLE)
                     ->whereRaw("'SPPG' || LPAD(audit_trails.auditable_id::text, 3, '0') ILIKE ?", [$like]))
+                ->orWhere(fn ($x) => $x->whereIn('audit_trails.id_sppg', fn ($s) => $s->select(Keys::SPPG_PK)->from(Keys::SPPG_TABLE)->where('nama_sppg', 'ilike', $like)))
                 ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'receivings')
                     ->whereIn('audit_trails.auditable_id', fn ($s) => $s->select('id')->from('receivings')->where('receiving_no', 'ilike', $like)))
                 ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', 'receiving_items')
@@ -260,6 +263,11 @@ class AuditTrail extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'actor_id', Keys::USER_PK);
+    }
+
+    public function sppgUnit()
+    {
+        return $this->belongsTo(Sppg::class, 'id_sppg', Keys::SPPG_PK);
     }
 
     public function getAktivitasAttribute(): string

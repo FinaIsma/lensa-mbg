@@ -29,7 +29,7 @@
         @include($sidebar)
 
         <div class="main-wrapper">
-            @include('admin.partials.navbar')
+            @include($navbar)
 
             <main class="content-body">
                 @if (session('success'))
@@ -147,6 +147,25 @@
                                 </svg>
                             </div>
 
+                            @if ($isAdmin)
+                                <div class="select-dropdown-box">
+                                    <select name="sppg" class="select-status-verif" onchange="this.form.submit()">
+                                        <option value="">Semua SPPG</option>
+                                        @foreach ($listSppg as $s)
+                                            @php
+                                                $sppgCode = 'SPPG' . str_pad((string) $s->id_sppg, 3, '0', STR_PAD_LEFT);
+                                            @endphp
+                                            <option value="{{ $s->id_sppg }}" {{ (string) request('sppg') === (string) $s->id_sppg ? 'selected' : '' }}>
+                                                {{ $sppgCode }} - {{ $s->nama_sppg }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+                            @endif
+
                             <a href="{{ route($routeName) }}" class="btn-reset-filter">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -175,7 +194,14 @@
                                     <tr>
                                         <td class="text-secondary">{{ $rows->firstItem() + $loop->index }}</td>
                                         <td class="text-secondary">{{ $row->created_at->locale('id')->translatedFormat('j M Y, H.i') }}</td>
-                                        <td class="font-medium text-dark">{{ $row->pelaku }}</td>
+                                        <td class="font-medium text-dark">
+                                            <div>{{ $row->pelaku }}</div>
+                                            @if ($isAdmin && $row->nama_sppg)
+                                                <div style="font-size: 11px; color: #64748B; font-weight: normal;">
+                                                    SPPG{{ str_pad((string) $row->id_sppg, 3, '0', STR_PAD_LEFT) }} - {{ $row->nama_sppg }}
+                                                </div>
+                                            @endif
+                                        </td>
                                         <td class="text-dark">{{ $row->modul }}</td>
                                         <td class="text-dark">{{ $row->aktivitas_label }}</td>
                                         <td class="font-medium text-dark">{{ $row->kode_data }}</td>
@@ -238,6 +264,9 @@
             <h3>Informasi Aktivitas</h3>
             <dl class="au-box">
                 <div class="au-kv"><dt>Pengguna</dt><dd>{{ $row->pelaku }}</dd></div>
+                @if ($row->nama_sppg)
+                    <div class="au-kv"><dt>SPPG</dt><dd>SPPG{{ str_pad((string) $row->id_sppg, 3, '0', STR_PAD_LEFT) }} - {{ $row->nama_sppg }}</dd></div>
+                @endif
                 <div class="au-kv"><dt>Waktu</dt><dd>{{ $row->created_at->locale('id')->translatedFormat('j M Y, H.i') }} WIB</dd></div>
                 <div class="au-kv"><dt>Modul</dt><dd>{{ $row->modul }}</dd></div>
             </dl>

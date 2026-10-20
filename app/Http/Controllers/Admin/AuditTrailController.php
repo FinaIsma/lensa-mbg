@@ -18,11 +18,8 @@ use Illuminate\Support\Facades\DB;
  */
 class AuditTrailController extends Controller
 {
-    /** Nama route halaman ini (dipakai form filter & tombol reset). */
+    /** Nama route default */
     public const ROUTE = 'admin.audit';
-
-    /** View sidebar kepala SPPG; jika belum ada, dipakai sidebar admin sementara. */
-    private const SIDEBAR = 'sppg.partials.sidebar';
 
     public function index(Request $request)
     {
@@ -31,9 +28,20 @@ class AuditTrailController extends Controller
         $idSppg = null;
 
         if (! $isAdmin) {
+            // Kepala SPPG: data strictly dibatasi ke SPPG miliknya sendiri
             $idSppg = DB::table(Keys::SPPG_TABLE)->where(Keys::SPPG_OWNER, Auth::id())->value(Keys::SPPG_PK);
             abort_unless($idSppg, 403, 'Akun ini tidak terhubung ke SPPG mana pun.');
             $idSppg = (int) $idSppg;
+            $listSppg = collect();
+        } else {
+            // Admin: bisa memilih SPPG tertentu atau melihat seluruh SPPG
+            $listSppg = DB::table(Keys::SPPG_TABLE)
+                ->orderBy(Keys::SPPG_PK)
+                ->get([Keys::SPPG_PK, 'nama_sppg']);
+
+            if ($request->filled('sppg')) {
+                $idSppg = (int) $request->query('sppg');
+            }
         }
 
         [$dari, $sampai] = $this->rentangTanggal($request);
@@ -68,15 +76,21 @@ class AuditTrailController extends Controller
                 ->whereIn('evidenceable_id', $idKoreksi)->orderBy('id')->get()->groupBy('evidenceable_id')
             : collect();
 
-        $countQuery = $idSppg ? AuditTrail::sppg($idSppg) : AuditTrail::query();
+        $countQuery = $idSppg ? AuditTrail::query()->sppg($idSppg) : AuditTrail::query();
 
         $namaSppg = $idSppg
-            ? DB::table(Keys::SPPG_TABLE)->where(Keys::SPPG_PK, $idSppg)->value('nama_sppg')
+            ? (DB::table(Keys::SPPG_TABLE)->where(Keys::SPPG_PK, $idSppg)->value('nama_sppg') ?? 'SPPG #'.$idSppg)
             : 'Seluruh SPPG';
 
         $sidebar = $isAdmin
             ? 'admin.partials.sidebar'
-            : (view()->exists(self::SIDEBAR) ? self::SIDEBAR : 'admin.partials.sidebar');
+            : (view()->exists('KepalaSPPG.partials.sidebar') ? 'KepalaSPPG.partials.sidebar' : 'admin.partials.sidebar');
+
+        $navbar = $isAdmin
+            ? 'admin.partials.navbar'
+            : (view()->exists('KepalaSPPG.partials.navbar') ? 'KepalaSPPG.partials.navbar' : 'admin.partials.navbar');
+
+        $routeName = ($request->routeIs('sppg.*') || ! $isAdmin) ? 'sppg.audit' : 'admin.audit';
 
         return view('admin.audit-trail', [
             'rows' => $rows,
@@ -90,8 +104,12 @@ class AuditTrailController extends Controller
             'totalPerubahan' => (clone $countQuery)->where(fn ($q) => $q->whereNotNull('old_values')->orWhereNotNull('new_values'))->count(),
             'namaUser' => $user->nama ?? ($isAdmin ? 'Admin' : 'Kepala SPPG'),
             'namaSppg' => $namaSppg,
-            'routeName' => self::ROUTE,
+            'isAdmin' => $isAdmin,
+            'listSppg' => $listSppg,
+            'selectedSppg' => $idSppg,
+            'routeName' => $routeName,
             'sidebar' => $sidebar,
+            'navbar' => $navbar,
         ]);
     }
 
