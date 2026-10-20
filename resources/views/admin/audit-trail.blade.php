@@ -29,7 +29,7 @@
         @include($sidebar)
 
         <div class="main-wrapper">
-            @include('admin.partials.navbar')
+            @include($navbar)
 
             <main class="content-body">
                 @if (session('success'))
@@ -147,6 +147,25 @@
                                 </svg>
                             </div>
 
+                            @if ($isAdmin)
+                                <div class="select-dropdown-box">
+                                    <select name="sppg" class="select-status-verif" onchange="this.form.submit()">
+                                        <option value="">Semua SPPG</option>
+                                        @foreach ($listSppg as $s)
+                                            @php
+                                                $sppgCode = 'SPPG' . str_pad((string) $s->id_sppg, 3, '0', STR_PAD_LEFT);
+                                            @endphp
+                                            <option value="{{ $s->id_sppg }}" {{ (string) request('sppg') === (string) $s->id_sppg ? 'selected' : '' }}>
+                                                {{ $sppgCode }} - {{ $s->nama_sppg }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+                            @endif
+
                             <a href="{{ route($routeName) }}" class="btn-reset-filter">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -154,6 +173,39 @@
                                 </svg>
                                 <span>Hapus Filter</span>
                             </a>
+
+                            <div class="dropdown-export-wrapper" id="exportDropdownWrapper">
+                                <button type="button" class="btn-export" id="exportDropdownBtn" aria-haspopup="true" aria-expanded="false">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    <span>Export</span>
+                                    <svg class="chevron-export" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <div class="dropdown-export-menu" id="exportDropdownMenu">
+                                    <a href="{{ route($exportCsvRoute, request()->query()) }}" class="dropdown-export-item">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="8" y1="13" x2="16" y2="13"></line>
+                                            <line x1="8" y1="17" x2="16" y2="17"></line>
+                                        </svg>
+                                        <span>Unduh Excel (CSV)</span>
+                                    </a>
+                                    <a href="{{ route($exportPdfRoute, request()->query()) }}" class="dropdown-export-item" target="_blank" rel="noopener">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                            <rect x="6" y="14" width="12" height="8"></rect>
+                                        </svg>
+                                        <span>Cetak Laporan (PDF)</span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </form>
 
@@ -175,7 +227,14 @@
                                     <tr>
                                         <td class="text-secondary">{{ $rows->firstItem() + $loop->index }}</td>
                                         <td class="text-secondary">{{ $row->created_at->locale('id')->translatedFormat('j M Y, H.i') }}</td>
-                                        <td class="font-medium text-dark">{{ $row->pelaku }}</td>
+                                        <td class="font-medium text-dark">
+                                            <div>{{ $row->pelaku }}</div>
+                                            @if ($isAdmin && $row->nama_sppg)
+                                                <div style="font-size: 11px; color: #64748B; font-weight: normal;">
+                                                    SPPG{{ str_pad((string) $row->id_sppg, 3, '0', STR_PAD_LEFT) }} - {{ $row->nama_sppg }}
+                                                </div>
+                                            @endif
+                                        </td>
                                         <td class="text-dark">{{ $row->modul }}</td>
                                         <td class="text-dark">{{ $row->aktivitas_label }}</td>
                                         <td class="font-medium text-dark">{{ $row->kode_data }}</td>
@@ -238,6 +297,9 @@
             <h3>Informasi Aktivitas</h3>
             <dl class="au-box">
                 <div class="au-kv"><dt>Pengguna</dt><dd>{{ $row->pelaku }}</dd></div>
+                @if ($row->nama_sppg)
+                    <div class="au-kv"><dt>SPPG</dt><dd>SPPG{{ str_pad((string) $row->id_sppg, 3, '0', STR_PAD_LEFT) }} - {{ $row->nama_sppg }}</dd></div>
+                @endif
                 <div class="au-kv"><dt>Waktu</dt><dd>{{ $row->created_at->locale('id')->translatedFormat('j M Y, H.i') }} WIB</dd></div>
                 <div class="au-kv"><dt>Modul</dt><dd>{{ $row->modul }}</dd></div>
             </dl>

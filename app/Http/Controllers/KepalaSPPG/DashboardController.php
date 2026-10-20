@@ -15,6 +15,6 @@ class DashboardController extends Controller
 
     public function auditIndex(): RedirectResponse
     {
-        return redirect()->route('sppg.dashboard');
+        return redirect()->route('sppg.audit');
     }
 }
