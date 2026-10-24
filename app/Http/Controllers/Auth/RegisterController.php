@@ -144,6 +144,7 @@ class RegisterController extends Controller
                     'email' => $validated['email'],
                     'password' => Hash::make($validated['password']),
                     'role' => 'kepala_sppg',
+                    'status' => 'menunggu_verifikasi',
                 ]);
 
                 // 3. Create SPPG Profile
@@ -158,7 +159,8 @@ class RegisterController extends Controller
                     'foto_ktp' => $fotoKtpUrl,
                     'foto_kantor_sppg' => $fotoKantorUrl,
                     'foto_surat_resmi' => $fotoSuratUrl,
-                    'status' => 'menunggu_verifikasi',
+                    'status' => 'nonaktif',
+                    'status_verifikasi' => 'menunggu_verifikasi',
                 ]);
 
                 // 4. Create Staff SPPG with FK id_sppg
@@ -168,7 +170,7 @@ class RegisterController extends Controller
                     'email' => $validated['staff_email'],
                     'password' => Hash::make($validated['staff_password']),
                     'no_telepon' => $validated['staff_no_telepon'],
-                    'status' => 'menunggu',
+                    'status' => 'menunggu_persetujuan',
                 ]);
             });
 

@@ -66,11 +66,23 @@ class LoginController extends Controller
         ], $request->boolean('remember'))) {
             $user = Auth::user();
 
+            if ($user->status !== 'aktif') {
+                Auth::logout();
+
+                $message = $user->status === 'menunggu_verifikasi'
+                    ? 'Akun Kepala SPPG Anda masih menunggu verifikasi Admin.'
+                    : 'Akun Anda sedang dinonaktifkan. Silakan hubungi Administrator.';
+
+                return back()->withErrors([
+                    'sppg_status' => $message,
+                ])->withInput();
+            }
+
             if ($user->sppg && $user->sppg->status !== 'aktif') {
                 Auth::logout();
 
                 return back()->withErrors([
-                    'sppg_status' => 'Akun SPPG masih menunggu verifikasi atau sudah dinonaktifkan.',
+                    'sppg_status' => 'Layanan SPPG Anda sedang dinonaktifkan.',
                 ])->withInput();
             }
 
@@ -93,8 +105,22 @@ class LoginController extends Controller
             if ($staff->status !== 'aktif') {
                 Auth::guard('staff')->logout();
 
+                $message = in_array($staff->status, ['menunggu', 'menunggu_persetujuan'])
+                    ? 'Akun Staff Anda sedang menunggu persetujuan Admin.'
+                    : ($staff->status === 'ditolak'
+                        ? 'Pengajuan akun Staff Anda ditolak oleh Admin.'
+                        : 'Akun Staff Anda sedang dinonaktifkan.');
+
                 return back()->withErrors([
-                    'sppg_status' => 'Akun Staff belum aktif atau sudah dinonaktifkan.',
+                    'sppg_status' => $message,
+                ])->withInput();
+            }
+
+            if ($staff->sppg && $staff->sppg->status !== 'aktif') {
+                Auth::guard('staff')->logout();
+
+                return back()->withErrors([
+                    'sppg_status' => 'Layanan SPPG tempat Anda bertugas sedang dinonaktifkan.',
                 ])->withInput();
             }
 
