@@ -25,6 +25,7 @@ class Sppg extends Model
         'foto_kantor_sppg',
         'foto_surat_resmi',
         'status',
+        'status_verifikasi',
     ];
 
     public function user()
@@ -35,12 +36,17 @@ class Sppg extends Model
     public function staff()
     {
         return $this->hasOne(Staff::class, 'id_sppg', 'id_sppg')
-            ->orderByRaw("CASE WHEN status IN ('aktif', 'menunggu') THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN status IN ('aktif', 'menunggu_persetujuan', 'menunggu') THEN 0 ELSE 1 END")
             ->latest('id');
     }
 
     public function staffs()
     {
         return $this->hasMany(Staff::class, 'id_sppg', 'id_sppg');
+    }
+
+    public function activeStaffs()
+    {
+        return $this->hasMany(Staff::class, 'id_sppg', 'id_sppg')->where('status', 'aktif');
     }
 }

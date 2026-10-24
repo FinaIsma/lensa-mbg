@@ -18,6 +18,7 @@ class Staff extends Authenticatable
         'password',
         'no_telepon',
         'status',
+        'catatan_admin',
         'nonaktif_at',
         'nonaktif_reason',
     ];

@@ -15,12 +15,12 @@ class SppgManagementController extends Controller
     {
         // Dynamic counts directly from existing sppg table
         $totalCount = Sppg::count();
-        $pendingCount = Sppg::where('status', 'menunggu_verifikasi')->count();
+        $pendingCount = Sppg::whereIn('status_verifikasi', ['menunggu_verifikasi', 'perubahan'])->count();
         $activeCount = Sppg::where('status', 'aktif')->count();
         $inactiveCount = Sppg::where('status', 'nonaktif')->count();
 
         // Query Builder using user and staff relationship
-        $query = Sppg::with(['user', 'staff']);
+        $query = Sppg::with(['user', 'staff', 'staffs']);
 
         // Search Filter (nama pegawai, email, sppg name, or address)
         if ($request->filled('search')) {
@@ -35,7 +35,7 @@ class SppgManagementController extends Controller
                         $userQuery->where('nama', 'like', "%{$search}%")
                             ->orWhere('email', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('staff', function ($staffQuery) use ($search) {
+                    ->orWhereHas('staffs', function ($staffQuery) use ($search) {
                         $staffQuery->where('nama', 'like', "%{$search}%")
                             ->orWhere('email', 'like', "%{$search}%");
                     });
@@ -46,11 +46,13 @@ class SppgManagementController extends Controller
         if ($request->filled('status_verif') && $request->input('status_verif') !== 'semua') {
             $statusVerif = $request->input('status_verif');
             if ($statusVerif === 'Terverifikasi') {
-                $query->where('status', 'aktif');
+                $query->where('status_verifikasi', 'terverifikasi');
             } elseif ($statusVerif === 'Belum Diverifikasi') {
-                $query->where('status', 'menunggu_verifikasi');
+                $query->where('status_verifikasi', 'menunggu_verifikasi');
+            } elseif ($statusVerif === 'Perubahan') {
+                $query->where('status_verifikasi', 'perubahan');
             } elseif ($statusVerif === 'Ditolak') {
-                $query->where('status', 'nonaktif');
+                $query->where('status_verifikasi', 'ditolak');
             }
         }
 
@@ -58,7 +60,7 @@ class SppgManagementController extends Controller
         if ($request->filled('card_filter')) {
             $card = $request->input('card_filter');
             if ($card === 'pending') {
-                $query->where('status', 'menunggu_verifikasi');
+                $query->whereIn('status_verifikasi', ['menunggu_verifikasi', 'perubahan']);
             } elseif ($card === 'aktif') {
                 $query->where('status', 'aktif');
             } elseif ($card === 'nonaktif') {
@@ -80,7 +82,7 @@ class SppgManagementController extends Controller
 
     public function show($id)
     {
-        $sppg = Sppg::with(['user', 'staff'])->findOrFail($id);
+        $sppg = Sppg::with(['user', 'staff', 'staffs'])->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -91,11 +93,22 @@ class SppgManagementController extends Controller
                 'nama_pegawai' => $sppg->user->nama ?? '-',
                 'email' => $sppg->user->email ?? '-',
                 'no_telepon' => $sppg->no_telepon ?? '-',
+                'user_status' => $sppg->user->status ?? 'aktif',
                 'staff_nama' => $sppg->staff->nama ?? '-',
                 'staff_email' => $sppg->staff->email ?? '-',
                 'staff_no_telepon' => $sppg->staff->no_telepon ?? '-',
+                'staff_status' => $sppg->staff->status ?? '-',
+                'staffs' => $sppg->staffs->map(fn ($st) => [
+                    'id' => $st->id,
+                    'nama' => $st->nama,
+                    'email' => $st->email,
+                    'no_telepon' => $st->no_telepon,
+                    'status' => $st->status,
+                    'catatan_admin' => $st->catatan_admin,
+                ]),
                 'nama_sppg' => $sppg->nama_sppg,
                 'status' => $sppg->status,
+                'status_verifikasi' => $sppg->status_verifikasi,
                 'alamat_sppg' => $sppg->alamat_sppg ?? '-',
                 'provinsi' => $sppg->provinsi ?? '-',
                 'kabupaten_kota' => $sppg->kabupaten_kota ?? '-',
@@ -114,47 +127,56 @@ class SppgManagementController extends Controller
             'status' => ['required', 'in:aktif,nonaktif,menunggu_verifikasi'],
         ]);
 
-        $sppg = Sppg::findOrFail($id);
+        $sppg = Sppg::with(['user', 'staffs'])->findOrFail($id);
         $oldStatus = $sppg->status;
         $newStatus = $validated['status'];
 
-        if ($oldStatus !== $newStatus) {
-            $aksi = match ($newStatus) {
-                'aktif' => ($oldStatus === 'menunggu_verifikasi') ? 'sppg_verify' : 'sppg_activate',
-                'nonaktif' => ($oldStatus === 'menunggu_verifikasi') ? 'sppg_reject' : 'sppg_deactivate',
-                default => 'sppg_deactivate',
-            };
+        if ($oldStatus !== $newStatus || $sppg->status_verifikasi === 'menunggu_verifikasi') {
+            DB::transaction(function () use ($sppg, $oldStatus, $newStatus) {
+                if ($newStatus === 'aktif') {
+                    $sppg->status = 'aktif';
+                    $sppg->status_verifikasi = 'terverifikasi';
+                    $sppg->save();
 
-            DB::transaction(function () use ($sppg, $oldStatus, $newStatus, $aksi) {
-                $sppg->status = $newStatus;
-                $sppg->save();
+                    if ($sppg->user) {
+                        $sppg->user->update(['status' => 'aktif']);
+                    }
 
-                // Sinkronisasi status staff SPPG
-                $staff = Staff::where('id_sppg', $sppg->id_sppg)
-                    ->orderByRaw("CASE WHEN status IN ('aktif', 'menunggu') THEN 0 ELSE 1 END")
-                    ->latest('id')
-                    ->first();
-
-                if ($staff) {
-                    if ($newStatus === 'aktif') {
-                        $staff->update([
+                    Staff::where('id_sppg', $sppg->id_sppg)
+                        ->whereIn('status', ['menunggu', 'menunggu_persetujuan'])
+                        ->update([
                             'status' => 'aktif',
                             'nonaktif_at' => null,
                             'nonaktif_reason' => null,
                         ]);
-                    } elseif ($newStatus === 'nonaktif') {
-                        $staff->update([
+
+                    $aksi = ($oldStatus === 'aktif') ? 'sppg_activate' : 'sppg_verify';
+                } elseif ($newStatus === 'nonaktif') {
+                    $sppg->status = 'nonaktif';
+                    if ($sppg->status_verifikasi === 'menunggu_verifikasi') {
+                        $sppg->status_verifikasi = 'ditolak';
+                        $aksi = 'sppg_reject';
+                    } else {
+                        $aksi = 'sppg_deactivate';
+                    }
+                    $sppg->save();
+
+                    if ($sppg->user) {
+                        $sppg->user->update(['status' => 'nonaktif']);
+                    }
+
+                    Staff::where('id_sppg', $sppg->id_sppg)
+                        ->where('status', 'aktif')
+                        ->update([
                             'status' => 'nonaktif',
                             'nonaktif_at' => now(),
                             'nonaktif_reason' => 'SPPG dinonaktifkan oleh Admin',
                         ]);
-                    } elseif ($newStatus === 'menunggu_verifikasi') {
-                        $staff->update([
-                            'status' => 'menunggu',
-                            'nonaktif_at' => null,
-                            'nonaktif_reason' => null,
-                        ]);
-                    }
+                } else {
+                    $sppg->status = 'nonaktif';
+                    $sppg->status_verifikasi = 'menunggu_verifikasi';
+                    $sppg->save();
+                    $aksi = 'sppg_deactivate';
                 }
 
                 AuditTrail::catat($aksi, $sppg, ['status' => $oldStatus], ['status' => $newStatus]);
