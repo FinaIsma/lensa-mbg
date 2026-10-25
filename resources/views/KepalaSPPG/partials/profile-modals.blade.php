@@ -44,9 +44,17 @@
     <div class="pm-dialog">
         {{-- Header Top --}}
         <div class="pm-header">
-            <h2 class="pm-title" id="modalProfilTitle">Profil SPPG</h2>
+            <div class="pm-header-left">
+                <button type="button" class="pm-btn-back" id="btnBackToView" onclick="setProfilMode('view')" title="Kembali ke Mode Tampilan" style="display: none;" aria-label="Kembali ke Mode Tampilan">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </button>
+                <h2 class="pm-title" id="modalProfilTitle">Profil SPPG</h2>
+            </div>
             <button type="button" class="pm-btn-close" onclick="closeProfilModal()" aria-label="Tutup Modal Profil">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -210,71 +218,65 @@
             </div>
 
             {{-- Card 3: Dokumen --}}
-            <div class="pm-card">
-                <h3 class="pm-card-title">Dokumen</h3>
-                <div class="pm-docs-grid">
-                    <div class="pm-doc-card">
-                        <div class="pm-doc-preview">
+            <div class="cr-info-card pm-card">
+                <h3 class="cr-card-title pm-card-title">Dokumen</h3>
+                <div class="mv2-doc-grid">
+                    {{-- Foto KTP --}}
+                    <div class="mv2-doc-item">
+                        <div class="mv2-doc-img-box">
                             @if ($fotoKtp)
                                 <img src="{{ $fotoKtp }}" alt="Foto KTP" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-                                <div class="pm-doc-empty" style="display: none;">
+                                <div class="mv2-doc-empty" style="display: none;">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                                 </div>
                             @else
-                                <div class="pm-doc-empty">
+                                <div class="mv2-doc-empty">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                                 </div>
                             @endif
                         </div>
-                        <div class="pm-doc-name">Foto KTP</div>
-                        <a href="{{ $fotoKtp ?: '#' }}" {{ $fotoKtp ? 'target="_blank"' : '' }} class="pm-btn-doc-view {{ !$fotoKtp ? 'pm-btn-disabled' : '' }}">Lihat</a>
+                        <span class="mv2-doc-label">Foto KTP</span>
+                        <a href="{{ $fotoKtp ?: '#' }}" {{ $fotoKtp ? 'target="_blank"' : '' }} class="btn-file-view {{ !$fotoKtp ? 'mv2-btn-disabled' : '' }}">Lihat</a>
                     </div>
 
-                    <div class="pm-doc-card">
-                        <div class="pm-doc-preview">
+                    {{-- Foto Kantor SPPG --}}
+                    <div class="mv2-doc-item">
+                        <div class="mv2-doc-img-box">
                             @if ($fotoKantor)
                                 <img src="{{ $fotoKantor }}" alt="Foto Kantor SPPG" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-                                <div class="pm-doc-empty" style="display: none;">
+                                <div class="mv2-doc-empty" style="display: none;">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                                 </div>
                             @else
-                                <div class="pm-doc-empty">
+                                <div class="mv2-doc-empty">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                                 </div>
                             @endif
                         </div>
-                        <div class="pm-doc-name">Foto Kantor SPPG</div>
-                        <a href="{{ $fotoKantor ?: '#' }}" {{ $fotoKantor ? 'target="_blank"' : '' }} class="pm-btn-doc-view {{ !$fotoKantor ? 'pm-btn-disabled' : '' }}">Lihat</a>
+                        <span class="mv2-doc-label">Foto Kantor SPPG</span>
+                        <a href="{{ $fotoKantor ?: '#' }}" {{ $fotoKantor ? 'target="_blank"' : '' }} class="btn-file-view {{ !$fotoKantor ? 'mv2-btn-disabled' : '' }}">Lihat</a>
                     </div>
 
-                    <div class="pm-doc-card">
-                        <div class="pm-doc-preview">
+                    {{-- Foto Surat Resmi --}}
+                    <div class="mv2-doc-item">
+                        <div class="mv2-doc-img-box">
                             @if ($fotoSurat)
-                                @if (str_ends_with(strtolower($fotoSurat), '.pdf'))
-                                    <canvas class="pm-pdf-canvas" data-pdf="{{ $fotoSurat }}"></canvas>
-                                    <div class="pm-doc-pdf-fallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 100%; height: 100%;">
-                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                            <polyline points="14 2 14 8 20 8"></polyline>
-                                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                                        </svg>
-                                        <span style="font-size: 10px; font-weight: 700; color: #DC2626;">PDF</span>
-                                    </div>
+                                @if (preg_match('/\.pdf($|\?)/i', $fotoSurat))
+                                    <canvas class="mv2-pdf-canvas" data-pdf="{{ $fotoSurat }}"></canvas>
                                 @else
                                     <img src="{{ $fotoSurat }}" alt="Foto Surat Resmi" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-                                    <div class="pm-doc-empty" style="display: none;">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    <div class="mv2-doc-empty" style="display: none;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                                     </div>
                                 @endif
                             @else
-                                <div class="pm-doc-empty">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                <div class="mv2-doc-empty">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                                 </div>
                             @endif
                         </div>
-                        <div class="pm-doc-name">Foto Surat Resmi</div>
-                        <a href="{{ $fotoSurat ?: '#' }}" {{ $fotoSurat ? 'target="_blank"' : '' }} class="pm-btn-doc-view {{ !$fotoSurat ? 'pm-btn-disabled' : '' }}">Lihat</a>
+                        <span class="mv2-doc-label">Foto Surat Resmi</span>
+                        <a href="{{ $fotoSurat ?: '#' }}" {{ $fotoSurat ? 'target="_blank"' : '' }} class="btn-file-view {{ !$fotoSurat ? 'mv2-btn-disabled' : '' }}">Lihat</a>
                     </div>
                 </div>
             </div>
@@ -453,89 +455,80 @@
                             </svg>
                             <span>Tanggal dibuat</span>
                         </div>
-                        <div class="pm-edit-input-wrapper" style="display:flex; align-items:center; justify-content:space-between;">
-                            <span style="font-size: 13.5px; color: #1E293B; font-weight: 500;">{{ $tglFormatted }}</span>
-                            <span class="pm-date-row-note">ID SPPG dan tanggal dibuat tidak dapat diubah.</span>
+                        <div class="pm-edit-input-wrapper">
+                            <input type="text" class="pm-input pm-input-disabled" value="{{ $tglFormatted }}" disabled>
+                            <svg class="pm-input-lock" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
                         </div>
                     </div>
                 </div>
 
                 {{-- Card 3: Dokumen --}}
-                <div class="pm-card">
-                    <h3 class="pm-card-title">Dokumen</h3>
+                <div class="cr-info-card pm-card">
+                    <h3 class="cr-card-title pm-card-title">Dokumen</h3>
                     <p class="pm-docs-subtitle">Ganti dokumen jika diperlukan. Format JPG, PNG, atau PDF, maksimal 5 MB per dokumen.</p>
-                    <div class="pm-docs-grid">
+                    <div class="mv2-doc-grid">
                         {{-- Foto KTP --}}
-                        <div class="pm-doc-card">
-                            <div class="pm-doc-preview" id="editKtpPreview">
+                        <div class="mv2-doc-item">
+                            <div class="mv2-doc-img-box" id="editKtpPreview">
                                 @if ($fotoKtp)
-                                    <img src="{{ $fotoKtp }}" alt="Foto KTP" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-                                    <div class="pm-doc-fallback" style="display: none; width: 100%; height: 100%; place-items: center;">
-                                        <svg class="pm-doc-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    <img src="{{ $fotoKtp }}" alt="Foto KTP" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                    <div class="mv2-doc-empty" style="display: none;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                                     </div>
                                 @else
-                                    <svg class="pm-doc-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    <div class="mv2-doc-empty">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    </div>
                                 @endif
                             </div>
+                            <span class="mv2-doc-label">Foto KTP</span>
                             <input type="file" name="foto_ktp" id="editFileKtp" accept="image/jpeg,image/png,application/pdf" style="display: none;" onchange="handleFileSelect(this, 'editKtpPreview')">
-                            <button type="button" class="pm-btn-doc-change" onclick="document.getElementById('editFileKtp').click()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                </svg>
-                                <span>Ganti Dokumen</span>
-                            </button>
+                            <button type="button" class="btn-file-view" onclick="document.getElementById('editFileKtp').click()">Ganti Dokumen</button>
                         </div>
 
                         {{-- Foto Kantor SPPG --}}
-                        <div class="pm-doc-card">
-                            <div class="pm-doc-preview" id="editKantorPreview">
+                        <div class="mv2-doc-item">
+                            <div class="mv2-doc-img-box" id="editKantorPreview">
                                 @if ($fotoKantor)
-                                    <img src="{{ $fotoKantor }}" alt="Foto Kantor SPPG" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-                                    <div class="pm-doc-fallback" style="display: none; width: 100%; height: 100%; place-items: center;">
-                                        <svg class="pm-doc-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    <img src="{{ $fotoKantor }}" alt="Foto Kantor SPPG" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                    <div class="mv2-doc-empty" style="display: none;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                                     </div>
                                 @else
-                                    <svg class="pm-doc-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    <div class="mv2-doc-empty">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    </div>
                                 @endif
                             </div>
+                            <span class="mv2-doc-label">Foto Kantor SPPG</span>
                             <input type="file" name="foto_kantor_sppg" id="editFileKantor" accept="image/jpeg,image/png,application/pdf" style="display: none;" onchange="handleFileSelect(this, 'editKantorPreview')">
-                            <button type="button" class="pm-btn-doc-change" onclick="document.getElementById('editFileKantor').click()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                </svg>
-                                <span>Ganti Dokumen</span>
-                            </button>
+                            <button type="button" class="btn-file-view" onclick="document.getElementById('editFileKantor').click()">Ganti Dokumen</button>
                         </div>
 
                         {{-- Foto Surat Resmi --}}
-                        <div class="pm-doc-card">
-                            <div class="pm-doc-preview" id="editSuratPreview">
+                        <div class="mv2-doc-item">
+                            <div class="mv2-doc-img-box" id="editSuratPreview">
                                 @if ($fotoSurat)
-                                    @if (str_ends_with(strtolower($fotoSurat), '.pdf'))
-                                        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:#DC2626;">
-                                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                            <span style="font-size:11px; font-weight:600;">PDF Dokumen</span>
-                                        </div>
+                                    @if (preg_match('/\.pdf($|\?)/i', $fotoSurat))
+                                        <canvas class="mv2-pdf-canvas" data-pdf="{{ $fotoSurat }}"></canvas>
                                     @else
-                                        <img src="{{ $fotoSurat }}" alt="Foto Surat Resmi">
+                                        <img src="{{ $fotoSurat }}" alt="Foto Surat Resmi" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                        <div class="mv2-doc-empty" style="display: none;">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                        </div>
                                     @endif
                                 @else
-                                    <svg class="pm-doc-placeholder-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    <div class="mv2-doc-empty">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                    </div>
                                 @endif
                             </div>
+                            <span class="mv2-doc-label">Foto Surat Resmi</span>
                             <input type="file" name="foto_surat_resmi" id="editFileSurat" accept="image/jpeg,image/png,application/pdf" style="display: none;" onchange="handleFileSelect(this, 'editSuratPreview')">
-                            <button type="button" class="pm-btn-doc-change" onclick="document.getElementById('editFileSurat').click()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                </svg>
-                                <span>Ganti Dokumen</span>
-                            </button>
+                            <button type="button" class="btn-file-view" onclick="document.getElementById('editFileSurat').click()">Ganti Dokumen</button>
                         </div>
                     </div>
                 </div>
@@ -549,7 +542,7 @@
                     <div class="pm-footer-actions">
                         <button type="button" class="pm-btn-cancel" onclick="setProfilMode('view')">Batal</button>
                         <button type="submit" class="pm-btn-submit-green">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                 <polyline points="17 21 17 13 7 13 7 21"></polyline>
                                 <polyline points="7 3 7 8 15 8"></polyline>
@@ -572,7 +565,7 @@
         <div class="pm-header">
             <h2 class="pm-title" id="modalPasswordTitle">Ubah Kata Sandi</h2>
             <button type="button" class="pm-btn-close" onclick="closePasswordModal()" aria-label="Tutup Modal Ubah Kata Sandi">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -651,7 +644,7 @@
                 <div class="pm-footer-actions">
                     <button type="button" class="pm-btn-cancel" onclick="closePasswordModal()">Batal</button>
                     <button type="submit" class="pm-btn-submit-green">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                             <polyline points="17 21 17 13 7 13 7 21"></polyline>
                             <polyline points="7 3 7 8 15 8"></polyline>
