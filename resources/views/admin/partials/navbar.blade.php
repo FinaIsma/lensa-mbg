@@ -13,12 +13,6 @@
 @endphp
 
 <header class="top-header">
-    @if(request()->routeIs('admin.dashboard'))
-        <div class="header-welcome-text">
-            <h2 class="text-base sm:text-lg font-bold text-slate-800 tracking-tight">Selamat datang, {{ $currentName }}</h2>
-        </div>
-    @endif
-
     <div class="header-profile-dropdown" id="profileDropdownWrapper">
         <button type="button" class="header-user-btn" id="profileDropdownBtn" aria-expanded="false" aria-haspopup="true">
             <div class="avatar-circle" aria-hidden="true">{{ $inisial }}</div>

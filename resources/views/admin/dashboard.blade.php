@@ -12,6 +12,7 @@
     {{-- Title & Subtitle --}}
     <div class="page-title-section">
         <h1 class="page-title">
+            Selamat datang {{ Auth::user()->nama ?? 'Admin' }} di<br>
             Dashboard & Analytics
         </h1>
         <p class="page-subtitle">
@@ -176,139 +177,135 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             
             {{-- Card 1: SPPG Management --}}
-            <div class="flex flex-col">
-                <div class="dashboard-card flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="dashboard-card-title">SPPG Management</h3>
-                            </div>
+            <div class="dashboard-card flex flex-col justify-between h-full">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
                         </div>
-                        <p class="dashboard-card-subtitle mb-5">
-                            Kelola akun pengguna SPPG, atur role dan status akses.
-                        </p>
+                        <div>
+                            <h3 class="dashboard-card-title">SPPG Management</h3>
+                        </div>
+                    </div>
+                    <p class="dashboard-card-subtitle mb-4">
+                        Kelola akun pengguna SPPG, atur role dan status akses.
+                    </p>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-700">
-                                        <th class="pb-3 pr-3 font-semibold text-slate-700">SPPG</th>
-                                        <th class="pb-3 pr-3 font-semibold text-slate-700">Kepala SPPG</th>
-                                        <th class="pb-3 pr-3 font-semibold text-slate-700">Staff SPPG</th>
-                                        <th class="pb-3 text-center font-semibold text-slate-700">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100/80">
-                                    @foreach($sppgPreview as $item)
-                                    <tr>
-                                        <td class="py-3.5 pr-3 font-medium text-slate-800 text-[11px] whitespace-nowrap">{{ $item['sppg'] }}</td>
-                                        <td class="py-3.5 pr-3 font-medium text-slate-700 text-[11px] whitespace-nowrap">{{ $item['kepala_sppg'] }}</td>
-                                        <td class="py-3.5 pr-3 font-medium text-slate-700 text-[11px] whitespace-nowrap">{{ $item['staff_sppg'] }}</td>
-                                        <td class="py-3.5 text-center whitespace-nowrap">
-                                            @if($item['is_verified'])
-                                                <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-semibold bg-[#DCFCE7] text-[#16A34A]">
-                                                    Terverifikasi
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-700">
+                                    <th class="pb-2.5 pr-3 font-semibold text-slate-700">SPPG</th>
+                                    <th class="pb-2.5 pr-3 font-semibold text-slate-700">Kepala SPPG</th>
+                                    <th class="pb-2.5 pr-3 font-semibold text-slate-700">Staff SPPG</th>
+                                    <th class="pb-2.5 text-center font-semibold text-slate-700">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100/80">
+                                @foreach($sppgPreview as $item)
+                                <tr class="preview-table-row">
+                                    <td class="pr-3 font-medium text-slate-800 text-[11px] whitespace-nowrap">{{ $item['sppg'] }}</td>
+                                    <td class="pr-3 font-medium text-slate-700 text-[11px] whitespace-nowrap">{{ $item['kepala_sppg'] }}</td>
+                                    <td class="pr-3 font-medium text-slate-700 text-[11px] whitespace-nowrap">{{ $item['staff_sppg'] }}</td>
+                                    <td class="text-center whitespace-nowrap">
+                                        @if($item['is_verified'])
+                                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#DCFCE7] text-[#16A34A]">
+                                                Terverifikasi
+                                            </span>
+                                        @else
+                                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#FEF3C7] text-[#D97706]">
+                                                Belum Diverifikasi
+                                            </span>
+                                        @endif
+                                        <div class="mt-0.5">
+                                            @if(strtolower($item['status_operasional']) === 'aktif')
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-[#DCFCE7] text-[#16A34A]">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
+                                                    Aktif
                                                 </span>
                                             @else
-                                                <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-semibold bg-[#FEF3C7] text-[#D97706]">
-                                                    Belum Diverifikasi
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-[#FEE2E2] text-[#DC2626]">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626]"></span>
+                                                    Nonaktif
                                                 </span>
                                             @endif
-                                            <div class="mt-1">
-                                                @if(strtolower($item['status_operasional']) === 'aktif')
-                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#DCFCE7] text-[#16A34A]">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
-                                                        Aktif
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#FEE2E2] text-[#DC2626]">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626]"></span>
-                                                        Nonaktif
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <div class="mt-5 pt-3">
-                        <a href="{{ route('admin.sppg.index') }}" class="btn-detail-link group">
-                            <span>Lihat Selengkapnya</span>
-                            <svg class="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                            </svg>
-                        </a>
-                    </div>
+                <div class="mt-5">
+                    <a href="{{ route('admin.sppg.index') }}" class="btn-detail-link group">
+                        <span>Lihat Selengkapnya</span>
+                        <svg class="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
 
             {{-- Card 2: Audit Trail --}}
-            <div class="flex flex-col">
-                <div class="dashboard-card flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                                    <path d="M3 3v5h5"></path>
-                                    <polyline points="12 7 12 12 15 15"></polyline>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="dashboard-card-title">Audit Trail</h3>
-                            </div>
-                        </div>
-                        <p class="dashboard-card-subtitle mb-5">
-                            Kelola akun pengguna SPPG, atur role dan status akses.
-                        </p>
-
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-700">
-                                        <th class="pb-3 pr-2 whitespace-nowrap font-semibold text-slate-700">Waktu</th>
-                                        <th class="pb-3 px-3 whitespace-nowrap font-semibold text-slate-700">Pengguna</th>
-                                        <th class="pb-3 px-3 whitespace-nowrap font-semibold text-slate-700">Modul</th>
-                                        <th class="pb-3 pl-2 whitespace-nowrap font-semibold text-slate-700">Aktivitas</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100/80">
-                                    @foreach($auditPreview as $log)
-                                    <tr>
-                                        <td class="py-3.5 pr-2 text-slate-600 text-[11px] whitespace-nowrap align-middle">{{ $log['waktu'] }}</td>
-                                        <td class="py-3.5 px-3 font-medium text-slate-700 text-[11px] leading-tight whitespace-nowrap align-middle">
-                                            <div class="font-semibold text-slate-800">{{ $log['pengguna'] }}</div>
-                                            <div class="text-[10px] text-slate-400">({{ $log['role'] }})</div>
-                                        </td>
-                                        <td class="py-3.5 px-3 text-slate-600 text-[11px] whitespace-nowrap font-medium align-middle">{{ $log['modul'] }}</td>
-                                        <td class="py-3.5 pl-2 text-slate-700 text-[11px] font-medium leading-tight whitespace-nowrap align-middle">{{ $log['aktivitas'] }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="mt-5 pt-3">
-                        <a href="{{ route('admin.audit') }}" class="btn-detail-link group">
-                            <span>Lihat Selengkapnya</span>
-                            <svg class="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            <div class="dashboard-card flex flex-col justify-between h-full">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                <path d="M3 3v5h5"></path>
+                                <polyline points="12 7 12 12 15 15"></polyline>
                             </svg>
-                        </a>
+                        </div>
+                        <div>
+                            <h3 class="dashboard-card-title">Audit Trail</h3>
+                        </div>
                     </div>
+                    <p class="dashboard-card-subtitle mb-4">
+                        Kelola akun pengguna SPPG, atur role dan status akses.
+                    </p>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-700">
+                                    <th class="pb-2.5 pr-2 whitespace-nowrap font-semibold text-slate-700">Waktu</th>
+                                    <th class="pb-2.5 px-3 whitespace-nowrap font-semibold text-slate-700">Pengguna</th>
+                                    <th class="pb-2.5 px-3 whitespace-nowrap font-semibold text-slate-700">Modul</th>
+                                    <th class="pb-2.5 pl-2 whitespace-nowrap font-semibold text-slate-700">Aktivitas</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100/80">
+                                @foreach($auditPreview as $log)
+                                <tr class="preview-table-row">
+                                    <td class="pr-2 text-slate-600 text-[11px] whitespace-nowrap align-middle">{{ $log['waktu'] }}</td>
+                                    <td class="px-3 font-medium text-slate-700 text-[11px] leading-tight whitespace-nowrap align-middle">
+                                        <div class="font-semibold text-slate-800">{{ $log['pengguna'] }}</div>
+                                        <div class="text-[10px] text-slate-400">({{ $log['role'] }})</div>
+                                    </td>
+                                    <td class="px-3 text-slate-600 text-[11px] whitespace-nowrap font-medium align-middle">{{ $log['modul'] }}</td>
+                                    <td class="pl-2 text-slate-700 text-[11px] font-medium leading-tight whitespace-nowrap align-middle">{{ $log['aktivitas'] }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <a href="{{ route('admin.audit') }}" class="btn-detail-link group">
+                        <span>Lihat Selengkapnya</span>
+                        <svg class="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
 

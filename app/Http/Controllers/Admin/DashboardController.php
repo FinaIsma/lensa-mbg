@@ -53,12 +53,11 @@ class DashboardController extends Controller
                 $monthlyCounts[] = $count;
             }
 
-            // Fallback sample data matching the design if DB has no historical data for the year
+            // Fallback sample data hanya untuk tahun 2026 jika DB sama sekali belum memiliki data
             if (array_sum($monthlyCounts) === 0 && $yr === '2026') {
                 $monthlyCounts = [1, 4, 3, 5, 2, 8, 3, 7, 8, 9, 8];
-            } elseif (array_sum($monthlyCounts) === 0) {
-                $monthlyCounts = [0, 1, 2, 2, 3, 4, 2, 5, 6, 6, 7];
             }
+            // Untuk tahun 2024 dan 2025: murni data asli dari database (0 jika belum ada yang mendaftar)
 
             $trenYearsData[$yr] = $monthlyCounts;
         }
@@ -93,8 +92,8 @@ class DashboardController extends Controller
             'colors' => ['#2563EB', '#F59E0B', '#EF4444'],
         ];
 
-        // 4. Preview Fitur Utama 1: SPPG Management (3 baris)
-        $realSppgs = Sppg::with(['user', 'staff', 'staffs'])->latest('id_sppg')->take(3)->get();
+        // 4. Preview Fitur Utama 1: SPPG Management (4 baris)
+        $realSppgs = Sppg::with(['user', 'staff', 'staffs'])->latest('id_sppg')->take(4)->get();
         if ($realSppgs->isNotEmpty()) {
             $sppgPreview = $realSppgs->map(function ($sppg) {
                 $isVerified = ($sppg->status_verifikasi ?? '') === 'terverifikasi'
@@ -135,12 +134,20 @@ class DashboardController extends Controller
                     'status_verifikasi' => 'Terverifikasi',
                     'status_operasional' => 'Aktif',
                 ],
+                [
+                    'sppg' => 'SPPG Sulfat',
+                    'kepala_sppg' => 'Ning Yizhuo',
+                    'staff_sppg' => 'Aeri Uchinaga',
+                    'is_verified' => true,
+                    'status_verifikasi' => 'Terverifikasi',
+                    'status_operasional' => 'Aktif',
+                ],
             ]);
         }
 
-        // 5. Preview Fitur Utama 2: Audit Trail (3 baris)
+        // 5. Preview Fitur Utama 2: Audit Trail (4 baris)
         $realAudit = Schema::hasTable('audit_trails')
-            ? AuditTrail::daftar()->latest('audit_trails.id')->take(3)->get()
+            ? AuditTrail::daftar()->latest('audit_trails.id')->take(4)->get()
             : collect();
 
         if ($realAudit->isNotEmpty()) {
@@ -178,6 +185,13 @@ class DashboardController extends Controller
                     'role' => 'Admin',
                     'modul' => 'User',
                     'aktivitas' => 'Mengubah role user',
+                ],
+                [
+                    'waktu' => '10 Okt, 14:30',
+                    'pengguna' => 'Nanda',
+                    'role' => 'Admin',
+                    'modul' => 'SPPG',
+                    'aktivitas' => 'Memverifikasi SPPG',
                 ],
             ]);
         }

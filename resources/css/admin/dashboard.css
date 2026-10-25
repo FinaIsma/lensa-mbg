@@ -7,6 +7,7 @@
     font-weight: 700;
     color: #071E49;
     letter-spacing: -0.02em;
+    line-height: 1.25;
 }
 
 .page-subtitle {
@@ -220,4 +221,12 @@
 .dashboard-table-scroll::-webkit-scrollbar-thumb {
     background: #CBD5E1;
     border-radius: 9999px;
+}
+
+.preview-table-row {
+    height: 56px;
+}
+
+.preview-table-row td {
+    vertical-align: middle;
 }
