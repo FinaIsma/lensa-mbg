@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\KepalaSPPG\CorrectionRequestController as KepalaSPPGCorrectionController;
 use App\Http\Controllers\KepalaSPPG\DashboardController as KepalaSPPGDashboardController;
+use App\Http\Controllers\KepalaSPPG\ProfileController;
 use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\WilayahController;
@@ -90,6 +91,11 @@ Route::middleware(['role:kepala_sppg'])->prefix('sppg')->name('sppg.')->group(fu
     Route::post('/staff', [StaffManagementController::class, 'store'])->name('staff.store');
     Route::get('/staff/{id}', [StaffManagementController::class, 'show'])->name('staff.show');
     Route::post('/staff/{id}/deactivate', [StaffManagementController::class, 'deactivate'])->name('staff.deactivate');
+
+    // Profil & Ubah Kata Sandi Kepala SPPG
+    Route::get('/profil', [ProfileController::class, 'getProfile'])->name('profile.show');
+    Route::post('/profil/ajukan-perubahan', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/ubah-kata-sandi', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
 Route::middleware(['role:staff'])->prefix('staff')->name('staff.')->group(function () {

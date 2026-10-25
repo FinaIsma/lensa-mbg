@@ -1,0 +1,683 @@
+@php
+    $currentUser = auth('staff')->user() ?: auth()->user();
+    $currentSppg = $currentUser?->sppg ?? \App\Models\Sppg::where('id_user', $currentUser?->id_user)->first();
+
+    $sppgIdRaw = $currentSppg?->id_sppg ?? 1;
+    $sppgIdFormatted = 'SPPG' . str_pad((string) $sppgIdRaw, 3, '0', STR_PAD_LEFT);
+    $sppgNama = $currentSppg->nama_sppg ?? 'SPPG Malang 1';
+    $inisialSppg = mb_strtoupper(mb_substr(trim($sppgNama), 0, 1)) ?: 'S';
+
+    $kepalaNama = $currentUser->nama ?? 'Yu Ji-Min';
+    $kepalaEmail = $currentUser->email ?? 'Katarinaa@gmail.com';
+    $kepalaTelepon = $currentSppg->no_telepon ?? '081726386138';
+
+    $sppgAlamat = $currentSppg->alamat_sppg ?? 'Jl Bedali Lawang';
+    $sppgProvinsi = $currentSppg->provinsi ?? 'Jawa Timur';
+    $sppgKabupaten = $currentSppg->kabupaten_kota ?? 'Kabupaten Malang';
+    $sppgKecamatan = $currentSppg->kecamatan ?? 'Lawang';
+
+    $bulanIndo = [1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    $tglCreated = $currentSppg?->created_at ? \Illuminate\Support\Carbon::parse($currentSppg->created_at) : now();
+    $tglFormatted = $tglCreated->format('d') . ' ' . ($bulanIndo[(int) $tglCreated->format('n')] ?? $tglCreated->format('F')) . ' ' . $tglCreated->format('Y');
+
+    $resolveDocUrl = function (?string $path): ?string {
+        if (! $path) {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        return asset($path);
+    };
+
+    $fotoKtp = $resolveDocUrl($currentSppg?->foto_ktp);
+    $fotoKantor = $resolveDocUrl($currentSppg?->foto_kantor_sppg);
+    $fotoSurat = $resolveDocUrl($currentSppg?->foto_surat_resmi);
+@endphp
+
+{{-- ========================================================= --}}
+{{-- 1. MODAL PROFIL SPPG (MODE TAMPILAN & MODE EDIT)          --}}
+{{-- ========================================================= --}}
+<div class="pm-backdrop hidden" id="profilModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalProfilTitle">
+    <div class="pm-dialog">
+        {{-- Header Top --}}
+        <div class="pm-header">
+            <h2 class="pm-title" id="modalProfilTitle">Profil SPPG</h2>
+            <button type="button" class="pm-btn-close" onclick="closeProfilModal()" aria-label="Tutup Modal Profil">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Entity Summary --}}
+        <div class="pm-entity-header">
+            <div class="pm-entity-left">
+                <div class="pm-entity-avatar">{{ $inisialSppg }}</div>
+                <div class="pm-entity-info">
+                    <span class="pm-entity-name">{{ $sppgNama }}</span>
+                    <span class="pm-entity-id">{{ $sppgIdFormatted }}</span>
+                </div>
+            </div>
+            <div class="pm-badge-aktif">
+                <span class="pm-badge-dot"></span>
+                <span>Aktif</span>
+            </div>
+        </div>
+
+        {{-- VIEW MODE CONTAINER --}}
+        <div id="profilViewContainer">
+            {{-- Banner Callout (Mode Tampilan) --}}
+            <div class="pm-banner-callout">
+                <div class="pm-banner-left">
+                    <svg class="pm-banner-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="pm-banner-text-view">Mode tampilan. Klik tombol untuk edit nama & data.</span>
+                </div>
+                <button type="button" class="pm-btn-edit-mode" onclick="setProfilMode('edit')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                    <span>Edit Data</span>
+                </button>
+            </div>
+
+            {{-- Card 1: Informasi Kepala SPPG --}}
+            <div class="pm-card">
+                <h3 class="pm-card-title">Informasi Kepala SPPG</h3>
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span>Nama Lengkap</span>
+                    </div>
+                    <div class="pm-view-val" id="viewNamaKepala">{{ $kepalaNama }}</div>
+                </div>
+
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                        </svg>
+                        <span>Email</span>
+                    </div>
+                    <div class="pm-view-val" id="viewEmailKepala">{{ $kepalaEmail }}</div>
+                </div>
+
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                        <span>No Telepon</span>
+                    </div>
+                    <div class="pm-view-val" id="viewTeleponKepala">{{ $kepalaTelepon }}</div>
+                </div>
+            </div>
+
+            {{-- Card 2: Informasi SPPG --}}
+            <div class="pm-card">
+                <h3 class="pm-card-title">Informasi SPPG</h3>
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        <span>Nama SPPG</span>
+                    </div>
+                    <div class="pm-view-val" id="viewNamaSppg">{{ $sppgNama }}</div>
+                </div>
+
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                            <circle cx="9" cy="10" r="2"></circle>
+                            <line x1="15" y1="8" x2="17" y2="8"></line>
+                            <line x1="15" y1="12" x2="17" y2="12"></line>
+                            <line x1="7" y1="16" x2="17" y2="16"></line>
+                        </svg>
+                        <span>ID SPPG</span>
+                    </div>
+                    <div class="pm-view-val" id="viewIdSppg">{{ $sppgIdFormatted }}</div>
+                </div>
+
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z"></path>
+                            <circle cx="12" cy="10" r="2.5"></circle>
+                        </svg>
+                        <span>Alamat Lengkap</span>
+                    </div>
+                    <div class="pm-view-val" id="viewAlamatSppg">{{ $sppgAlamat }}</div>
+                </div>
+
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z"></path>
+                            <circle cx="12" cy="10" r="2.5"></circle>
+                        </svg>
+                        <span>Provinsi</span>
+                    </div>
+                    <div class="pm-view-val" id="viewProvinsiSppg">{{ $sppgProvinsi }}</div>
+                </div>
+
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z"></path>
+                            <circle cx="12" cy="10" r="2.5"></circle>
+                        </svg>
+                        <span>Kota/Kabupaten</span>
+                    </div>
+                    <div class="pm-view-val" id="viewKabupatenSppg">{{ $sppgKabupaten }}</div>
+                </div>
+
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+                        </svg>
+                        <span>Kecamatan</span>
+                    </div>
+                    <div class="pm-view-val" id="viewKecamatanSppg">{{ $sppgKecamatan }}</div>
+                </div>
+
+                <div class="pm-view-row">
+                    <div class="pm-view-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span>Tanggal dibuat</span>
+                    </div>
+                    <div class="pm-view-val" id="viewTglSppg">{{ $tglFormatted }}</div>
+                </div>
+            </div>
+
+            {{-- Card 3: Dokumen --}}
+            <div class="pm-card">
+                <h3 class="pm-card-title">Dokumen</h3>
+                <div class="pm-docs-grid">
+                    <div class="pm-doc-card">
+                        <div class="pm-doc-preview">
+                            @if ($fotoKtp)
+                                <img src="{{ $fotoKtp }}" alt="Foto KTP" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                <div class="pm-doc-empty" style="display: none;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                </div>
+                            @else
+                                <div class="pm-doc-empty">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="pm-doc-name">Foto KTP</div>
+                        <a href="{{ $fotoKtp ?: '#' }}" {{ $fotoKtp ? 'target="_blank"' : '' }} class="pm-btn-doc-view {{ !$fotoKtp ? 'pm-btn-disabled' : '' }}">Lihat</a>
+                    </div>
+
+                    <div class="pm-doc-card">
+                        <div class="pm-doc-preview">
+                            @if ($fotoKantor)
+                                <img src="{{ $fotoKantor }}" alt="Foto Kantor SPPG" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                <div class="pm-doc-empty" style="display: none;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                </div>
+                            @else
+                                <div class="pm-doc-empty">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="pm-doc-name">Foto Kantor SPPG</div>
+                        <a href="{{ $fotoKantor ?: '#' }}" {{ $fotoKantor ? 'target="_blank"' : '' }} class="pm-btn-doc-view {{ !$fotoKantor ? 'pm-btn-disabled' : '' }}">Lihat</a>
+                    </div>
+
+                    <div class="pm-doc-card">
+                        <div class="pm-doc-preview">
+                            @if ($fotoSurat)
+                                @if (str_ends_with(strtolower($fotoSurat), '.pdf'))
+                                    <canvas class="pm-pdf-canvas" data-pdf="{{ $fotoSurat }}"></canvas>
+                                    <div class="pm-doc-pdf-fallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 100%; height: 100%;">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        </svg>
+                                        <span style="font-size: 10px; font-weight: 700; color: #DC2626;">PDF</span>
+                                    </div>
+                                @else
+                                    <img src="{{ $fotoSurat }}" alt="Foto Surat Resmi" onerror="this.onerror=null; this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                    <div class="pm-doc-empty" style="display: none;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    </div>
+                                @endif
+                            @else
+                                <div class="pm-doc-empty">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="pm-doc-name">Foto Surat Resmi</div>
+                        <a href="{{ $fotoSurat ?: '#' }}" {{ $fotoSurat ? 'target="_blank"' : '' }} class="pm-btn-doc-view {{ !$fotoSurat ? 'pm-btn-disabled' : '' }}">Lihat</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- EDIT MODE CONTAINER --}}
+        <div id="profilEditContainer" style="display: none;">
+            <form id="formEditProfil" action="{{ route('sppg.profile.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                {{-- Banner Callout (Mode Edit) --}}
+                <div class="pm-banner-callout">
+                    <div class="pm-banner-left">
+                        <svg class="pm-banner-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                        <div class="pm-banner-text-edit">
+                            <span class="pm-banner-edit-title">Mode edit data</span>
+                            <span class="pm-banner-edit-sub">Perbarui informasi dan dokumen SPPG, lalu klik Simpan Perubahan.</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 1: Informasi Kepala SPPG --}}
+                <div class="pm-card">
+                    <h3 class="pm-card-title">Informasi Kepala SPPG</h3>
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span>Nama Lengkap</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper">
+                            <input type="text" name="nama_lengkap" class="pm-input" value="{{ $kepalaNama }}" required>
+                        </div>
+                    </div>
+
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                            </svg>
+                            <span>Email</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper">
+                            <input type="email" name="email" class="pm-input" value="{{ $kepalaEmail }}" required>
+                        </div>
+                    </div>
+
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                            <span>No Telepon</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper">
+                            <input type="tel" name="no_telepon" class="pm-input" value="{{ $kepalaTelepon }}" required>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 2: Informasi SPPG --}}
+                <div class="pm-card">
+                    <h3 class="pm-card-title">Informasi SPPG</h3>
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span>Nama SPPG</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper">
+                            <input type="text" name="nama_sppg" class="pm-input" value="{{ $sppgNama }}" required>
+                        </div>
+                    </div>
+
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                <circle cx="9" cy="10" r="2"></circle>
+                                <line x1="15" y1="8" x2="17" y2="8"></line>
+                                <line x1="15" y1="12" x2="17" y2="12"></line>
+                                <line x1="7" y1="16" x2="17" y2="16"></line>
+                            </svg>
+                            <span>ID SPPG</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper">
+                            <input type="text" class="pm-input pm-input-disabled" value="{{ $sppgIdFormatted }}" disabled>
+                            <svg class="pm-input-lock" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z"></path>
+                                <circle cx="12" cy="10" r="2.5"></circle>
+                            </svg>
+                            <span>Alamat Lengkap</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper">
+                            <input type="text" name="alamat_sppg" class="pm-input" value="{{ $sppgAlamat }}" required>
+                        </div>
+                    </div>
+
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z"></path>
+                                <circle cx="12" cy="10" r="2.5"></circle>
+                            </svg>
+                            <span>Provinsi</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper">
+                            <select name="provinsi" id="editProvinsi" class="pm-select" data-current="{{ $sppgProvinsi }}" required>
+                                <option value="{{ $sppgProvinsi }}" selected>{{ $sppgProvinsi }}</option>
+                            </select>
+                            <svg class="pm-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z"></path>
+                                <circle cx="12" cy="10" r="2.5"></circle>
+                            </svg>
+                            <span>Kota/Kabupaten</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper">
+                            <select name="kabupaten_kota" id="editKabupaten" class="pm-select" data-current="{{ $sppgKabupaten }}" required>
+                                <option value="{{ $sppgKabupaten }}" selected>{{ $sppgKabupaten }}</option>
+                            </select>
+                            <svg class="pm-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+                            </svg>
+                            <span>Kecamatan</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper">
+                            <select name="kecamatan" id="editKecamatan" class="pm-select" data-current="{{ $sppgKecamatan }}" required>
+                                <option value="{{ $sppgKecamatan }}" selected>{{ $sppgKecamatan }}</option>
+                            </select>
+                            <svg class="pm-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="pm-edit-row">
+                        <div class="pm-edit-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span>Tanggal dibuat</span>
+                        </div>
+                        <div class="pm-edit-input-wrapper" style="display:flex; align-items:center; justify-content:space-between;">
+                            <span style="font-size: 13.5px; color: #1E293B; font-weight: 500;">{{ $tglFormatted }}</span>
+                            <span class="pm-date-row-note">ID SPPG dan tanggal dibuat tidak dapat diubah.</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 3: Dokumen --}}
+                <div class="pm-card">
+                    <h3 class="pm-card-title">Dokumen</h3>
+                    <p class="pm-docs-subtitle">Ganti dokumen jika diperlukan. Format JPG, PNG, atau PDF, maksimal 5 MB per dokumen.</p>
+                    <div class="pm-docs-grid">
+                        {{-- Foto KTP --}}
+                        <div class="pm-doc-card">
+                            <div class="pm-doc-preview" id="editKtpPreview">
+                                @if ($fotoKtp)
+                                    <img src="{{ $fotoKtp }}" alt="Foto KTP" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+                                    <div class="pm-doc-fallback" style="display: none; width: 100%; height: 100%; place-items: center;">
+                                        <svg class="pm-doc-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    </div>
+                                @else
+                                    <svg class="pm-doc-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                @endif
+                            </div>
+                            <input type="file" name="foto_ktp" id="editFileKtp" accept="image/jpeg,image/png,application/pdf" style="display: none;" onchange="handleFileSelect(this, 'editKtpPreview')">
+                            <button type="button" class="pm-btn-doc-change" onclick="document.getElementById('editFileKtp').click()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>Ganti Dokumen</span>
+                            </button>
+                        </div>
+
+                        {{-- Foto Kantor SPPG --}}
+                        <div class="pm-doc-card">
+                            <div class="pm-doc-preview" id="editKantorPreview">
+                                @if ($fotoKantor)
+                                    <img src="{{ $fotoKantor }}" alt="Foto Kantor SPPG" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+                                    <div class="pm-doc-fallback" style="display: none; width: 100%; height: 100%; place-items: center;">
+                                        <svg class="pm-doc-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    </div>
+                                @else
+                                    <svg class="pm-doc-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                @endif
+                            </div>
+                            <input type="file" name="foto_kantor_sppg" id="editFileKantor" accept="image/jpeg,image/png,application/pdf" style="display: none;" onchange="handleFileSelect(this, 'editKantorPreview')">
+                            <button type="button" class="pm-btn-doc-change" onclick="document.getElementById('editFileKantor').click()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>Ganti Dokumen</span>
+                            </button>
+                        </div>
+
+                        {{-- Foto Surat Resmi --}}
+                        <div class="pm-doc-card">
+                            <div class="pm-doc-preview" id="editSuratPreview">
+                                @if ($fotoSurat)
+                                    @if (str_ends_with(strtolower($fotoSurat), '.pdf'))
+                                        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:#DC2626;">
+                                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                            <span style="font-size:11px; font-weight:600;">PDF Dokumen</span>
+                                        </div>
+                                    @else
+                                        <img src="{{ $fotoSurat }}" alt="Foto Surat Resmi">
+                                    @endif
+                                @else
+                                    <svg class="pm-doc-placeholder-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                @endif
+                            </div>
+                            <input type="file" name="foto_surat_resmi" id="editFileSurat" accept="image/jpeg,image/png,application/pdf" style="display: none;" onchange="handleFileSelect(this, 'editSuratPreview')">
+                            <button type="button" class="pm-btn-doc-change" onclick="document.getElementById('editFileSurat').click()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>Ganti Dokumen</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer Bar (Mode Edit) --}}
+                <div class="pm-footer">
+                    <div class="pm-footer-left">
+                        <span class="pm-footer-title">Pastikan data sudah sesuai.</span>
+                        <span class="pm-footer-sub">Perubahan data akan diverifikasi oleh Admin Sistem sebelum diterapkan.</span>
+                    </div>
+                    <div class="pm-footer-actions">
+                        <button type="button" class="pm-btn-cancel" onclick="setProfilMode('view')">Batal</button>
+                        <button type="submit" class="pm-btn-submit-green">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            <span>Ajukan Perubahan</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- ========================================================= --}}
+{{-- 2. MODAL UBAH KATA SANDI                                  --}}
+{{-- ========================================================= --}}
+<div class="pm-backdrop hidden" id="passwordModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalPasswordTitle">
+    <div class="pm-dialog pm-dialog-password">
+        {{-- Header Top --}}
+        <div class="pm-header">
+            <h2 class="pm-title" id="modalPasswordTitle">Ubah Kata Sandi</h2>
+            <button type="button" class="pm-btn-close" onclick="closePasswordModal()" aria-label="Tutup Modal Ubah Kata Sandi">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Entity Summary --}}
+        <div class="pm-entity-header">
+            <div class="pm-entity-left">
+                <div class="pm-entity-avatar">{{ $inisialSppg }}</div>
+                <div class="pm-entity-info">
+                    <span class="pm-entity-name">{{ $sppgNama }}</span>
+                    <span class="pm-entity-id">{{ $sppgIdFormatted }}</span>
+                </div>
+            </div>
+            <div class="pm-badge-aktif">
+                <span class="pm-badge-dot"></span>
+                <span>Aktif</span>
+            </div>
+        </div>
+
+        <form id="formUbahPassword" action="{{ route('sppg.password.update') }}" method="POST">
+            @csrf
+
+            {{-- Card: Keamanan Akun --}}
+            <div class="pm-card">
+                <h3 class="pm-card-title">Keamanan Akun</h3>
+
+                <div class="pm-edit-row">
+                    <div class="pm-edit-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span>Password Lama</span>
+                    </div>
+                    <div class="pm-edit-input-wrapper">
+                        <input type="password" name="current_password" class="pm-input" placeholder="Masukkan password lama" required>
+                    </div>
+                </div>
+
+                <div class="pm-edit-row">
+                    <div class="pm-edit-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="7.5" cy="15.5" r="5.5"></circle>
+                            <path d="m21 2-9.6 9.6"></path>
+                            <path d="m15.5 7.5 3 3"></path>
+                        </svg>
+                        <span>Password Baru</span>
+                    </div>
+                    <div class="pm-edit-input-wrapper">
+                        <input type="password" name="new_password" class="pm-input" placeholder="Masukkan password baru" required>
+                    </div>
+                </div>
+
+                <div class="pm-edit-row">
+                    <div class="pm-edit-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            <polyline points="9 12 11 14 15 10"></polyline>
+                        </svg>
+                        <span>Konfirmasi Password</span>
+                    </div>
+                    <div class="pm-edit-input-wrapper">
+                        <input type="password" name="new_password_confirmation" class="pm-input" placeholder="Masukkan ulang password baru" required>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Footer Bar --}}
+            <div class="pm-footer">
+                <div class="pm-footer-left">
+                    <span class="pm-footer-title">Pastikan kata sandi baru sudah sesuai.</span>
+                    <span class="pm-footer-sub">Kata sandi akan diperbarui setelah disimpan.</span>
+                </div>
+                <div class="pm-footer-actions">
+                    <button type="button" class="pm-btn-cancel" onclick="closePasswordModal()">Batal</button>
+                    <button type="submit" class="pm-btn-submit-green">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        <span>Simpan Perubahan</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ========================================================= --}}
+{{-- 3. LIGHTBOX PREVIEW DOKUMEN                               --}}
+{{-- ========================================================= --}}
+<div class="pm-lightbox-backdrop hidden" id="docLightboxModal" style="display: none;">
+    <div class="pm-lightbox-dialog">
+        <div class="pm-lightbox-header">
+            <h4 style="font-size: 15px; font-weight: 700; color: #071E49;" id="lightboxTitle">Preview Dokumen</h4>
+            <button type="button" class="pm-btn-close" onclick="closeLightbox()" aria-label="Tutup Preview">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="pm-lightbox-body" id="lightboxContent"></div>
+    </div>
+</div>
