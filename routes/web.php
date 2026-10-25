@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\KepalaSPPG\CorrectionRequestController as KepalaSPPGCorrectionController;
 use App\Http\Controllers\KepalaSPPG\DashboardController as KepalaSPPGDashboardController;
+use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
@@ -83,6 +84,12 @@ Route::middleware(['role:kepala_sppg'])->prefix('sppg')->name('sppg.')->group(fu
     Route::get('/audit', [AuditTrailController::class, 'index'])->name('audit-trail.index');
     Route::get('/audit-trail/export/csv', [AuditTrailController::class, 'exportCsv'])->name('audit.export.csv');
     Route::get('/audit-trail/export/pdf', [AuditTrailController::class, 'exportPdf'])->name('audit.export.pdf');
+
+    // Staff Manajemen
+    Route::get('/staff', [StaffManagementController::class, 'index'])->name('staff.index');
+    Route::post('/staff', [StaffManagementController::class, 'store'])->name('staff.store');
+    Route::get('/staff/{id}', [StaffManagementController::class, 'show'])->name('staff.show');
+    Route::post('/staff/{id}/deactivate', [StaffManagementController::class, 'deactivate'])->name('staff.deactivate');
 });
 
 Route::middleware(['role:staff'])->prefix('staff')->name('staff.')->group(function () {
