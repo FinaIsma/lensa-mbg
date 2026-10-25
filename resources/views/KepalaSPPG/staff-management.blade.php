@@ -135,14 +135,6 @@
             </div>
 
             <div class="filter-actions-group">
-                <button type="button" class="btn-tambah-staff" onclick="openTambahStaffModal()">
-                    <span>Tambah Staff</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                </button>
-
                 <div class="select-dropdown-box">
                     <select name="status_verif" class="select-status-verif" onchange="this.form.submit()">
                         <option value="semua" {{ !request('status_verif') || request('status_verif') === 'semua' ? 'selected' : '' }}>Status Verif</option>
@@ -156,13 +148,13 @@
                     </svg>
                 </div>
 
-                <a href="{{ route('sppg.staff.index') }}" class="btn-reset-filter">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                        <polyline points="3 3 3 8 8 8"></polyline>
+                <button type="button" class="btn-tambah-staff" onclick="openTambahStaffModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
-                    <span>Hapus Filter</span>
-                </a>
+                    <span>Tambah Staff</span>
+                </button>
             </div>
         </form>
 
@@ -177,7 +169,7 @@
                         <th>No Telepon</th>
                         <th>Tanggal Dibuat</th>
                         <th>Status</th>
-                        <th class="text-right" style="text-align: right;">Aksi</th>
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -188,6 +180,9 @@
                             $bulanIndo = [1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
                             $tgl = $item->created_at ? \Illuminate\Support\Carbon::parse($item->created_at) : now();
                             $tglFormatted = $tgl->format('d') . ' ' . ($bulanIndo[(int) $tgl->format('n')] ?? $tgl->format('F')) . ' ' . $tgl->format('Y');
+
+                            $sppgTgl = ($sppg && $sppg->created_at) ? \Illuminate\Support\Carbon::parse($sppg->created_at) : null;
+                            $sppgTglFormatted = $sppgTgl ? ($sppgTgl->format('d') . ' ' . ($bulanIndo[(int) $sppgTgl->format('n')] ?? $sppgTgl->format('F')) . ' ' . $sppgTgl->format('Y')) : '-';
 
                             $itemDetailJson = json_encode([
                                 'id' => $item->id,
@@ -204,6 +199,7 @@
                                 'sppg_kabupaten' => $sppg->kabupaten_kota ?? '-',
                                 'sppg_kecamatan' => $sppg->kecamatan ?? '-',
                                 'tanggal_dibuat' => $tglFormatted,
+                                'sppg_tanggal_dibuat' => $sppgTglFormatted,
                                 'nama_kepala' => $sppg->user->nama ?? auth()->user()->nama ?? '-',
                             ]);
                         @endphp
@@ -463,6 +459,16 @@
                             No Telepon
                         </span>
                         <span class="cr-kv-value" id="detailInfoTelepon">-</span>
+                    </div>
+
+                    <div class="cr-kv-row">
+                        <span class="cr-kv-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/>
+                            </svg>
+                            Tanggal Dibuat
+                        </span>
+                        <span class="cr-kv-value" id="detailInfoTgl">-</span>
                     </div>
                 </div>
             </div>
