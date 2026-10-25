@@ -25,6 +25,25 @@
         </button>
 
         <div class="profile-dropdown-menu" id="profileDropdownMenu">
+            <button type="button" class="profile-dropdown-item" onclick="openProfilModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Profil SPPG</span>
+            </button>
+
+            <button type="button" class="profile-dropdown-item" onclick="openPasswordModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="7.5" cy="15.5" r="5.5"></circle>
+                    <path d="m21 2-9.6 9.6"></path>
+                    <path d="m15.5 7.5 3 3"></path>
+                </svg>
+                <span>Ubah Kata Sandi</span>
+            </button>
+
+            <div class="dropdown-divider"></div>
+
             <form action="{{ route('logout') }}" method="POST" class="dropdown-logout-form">
                 @csrf
                 <button type="submit" class="dropdown-logout-btn">
