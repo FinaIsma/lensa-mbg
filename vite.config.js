@@ -17,6 +17,7 @@ export default defineConfig({
                 'resources/css/KepalaSPPG/dashboard.css',
                 'resources/css/KepalaSPPG/sidebar-navbar.css',
                 'resources/css/KepalaSPPG/correction-request.css',
+                'resources/css/KepalaSPPG/staff-management.css',
                 'resources/js/app.js',
                 'resources/js/auth/login.js',
                 'resources/js/auth/register.js',
@@ -25,6 +26,7 @@ export default defineConfig({
                 'resources/js/admin/audit-trail.js',
                 'resources/js/KepalaSPPG/dashboard.js',
                 'resources/js/KepalaSPPG/correction-request.js',
+                'resources/js/KepalaSPPG/staff-management.js',
             ],
             refresh: true,
             fonts: [
