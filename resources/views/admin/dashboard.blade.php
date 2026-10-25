@@ -7,229 +7,192 @@
 @endpush
 
 @section('content')
-<div class="space-y-8 pb-12">
+<div class="space-y-7">
 
-    <div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+    {{-- Title & Subtitle --}}
+    <div class="page-title-section">
+        <h1 class="page-title">
             Dashboard & Analytics
         </h1>
-        <p class="text-sm text-slate-500 mt-1 font-normal">
+        <p class="page-subtitle">
             Ringkasan data dan aktivitas sistem Lensa MBG secara real-time.
         </p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        
-
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-[#EFF6FF] flex items-center justify-center shrink-0">
-                <svg class="w-7 h-7 text-[#3B82F6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+    {{-- 4 Stat Cards --}}
+    <div class="stat-cards-grid">
+        {{-- Total SPPG --}}
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-blue">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="2" width="16" height="20" rx="2"></rect>
                     <path d="M9 22v-4h6v4"></path>
-                    <path d="M8 6h.01"></path>
-                    <path d="M16 6h.01"></path>
-                    <path d="M8 10h.01"></path>
-                    <path d="M16 10h.01"></path>
-                    <path d="M8 14h.01"></path>
-                    <path d="M16 14h.01"></path>
+                    <rect x="8" y="6" width="2" height="2"></rect>
+                    <rect x="14" y="6" width="2" height="2"></rect>
+                    <rect x="8" y="11" width="2" height="2"></rect>
+                    <rect x="14" y="11" width="2" height="2"></rect>
                 </svg>
             </div>
-            <div>
-                <p class="text-xs font-semibold text-slate-600">Total SPPG</p>
-                <h3 class="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">{{ $stats['total_sppg'] ?? 128 }}</h3>
-                <p class="text-[11px] text-slate-400 font-medium">SPPG Terdaftar</p>
+            <div class="stat-content">
+                <span class="stat-label">Total SPPG</span>
+                <span class="stat-value">{{ $stats['total_sppg'] ?? 128 }}</span>
+                <span class="stat-subtext">SPPG Terdaftar</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-[#FFFBEB] flex items-center justify-center shrink-0">
-                <svg class="w-7 h-7 text-[#F59E0B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        {{-- Belum Verifikasi --}}
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-yellow">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
             </div>
-            <div>
-                <p class="text-xs font-semibold text-slate-600">Belum Verifikasi</p>
-                <h3 class="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">{{ $stats['belum_verifikasi'] ?? 128 }}</h3>
-                <p class="text-[11px] text-slate-400 font-medium">Menunggu Verifikasi</p>
+            <div class="stat-content">
+                <span class="stat-label">Belum Verifikasi</span>
+                <span class="stat-value">{{ $stats['belum_verifikasi'] ?? 128 }}</span>
+                <span class="stat-subtext">Menunggu Verifikasi</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-[#DCFCE7] flex items-center justify-center shrink-0">
-                <svg class="w-7 h-7 text-[#10B981]" viewBox="0 0 24 24" fill="currentColor">
+        {{-- Status Aktif --}}
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-green">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                     <path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" clip-rule="evenodd"/>
                 </svg>
             </div>
-            <div>
-                <p class="text-xs font-semibold text-slate-600">Status Aktif</p>
-                <h3 class="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">{{ $stats['status_aktif'] ?? 128 }}</h3>
-                <p class="text-[11px] text-slate-400 font-medium">SPPG Aktif</p>
+            <div class="stat-content">
+                <span class="stat-label">Status Aktif</span>
+                <span class="stat-value">{{ $stats['status_aktif'] ?? 128 }}</span>
+                <span class="stat-subtext">SPPG Aktif</span>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-[#FEE2E2] flex items-center justify-center shrink-0">
-                <svg class="w-7 h-7 text-[#EF4444]" viewBox="0 0 24 24" fill="currentColor">
+        {{-- Status Nonaktif --}}
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-red">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                     <path fill-rule="evenodd" d="M12 2C6.47 2 2 6.48 2 12s4.47 10 10 10 10-4.48 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" clip-rule="evenodd"/>
                 </svg>
             </div>
-            <div>
-                <p class="text-xs font-semibold text-slate-600">Status Nonaktif</p>
-                <h3 class="text-2xl font-bold text-slate-900 tracking-tight mt-0.5">{{ $stats['status_nonaktif'] ?? 128 }}</h3>
-                <p class="text-[11px] text-slate-400 font-medium">SPPG Nonaktif</p>
+            <div class="stat-content">
+                <span class="stat-label">Status Nonaktif</span>
+                <span class="stat-value">{{ $stats['status_nonaktif'] ?? 128 }}</span>
+                <span class="stat-subtext">SPPG Nonaktif</span>
+            </div>
+        </div>
+    </div>
+
+    {{-- Charts Section: 2 Columns (Tren Pendaftaran SPPG & Distribusi Status SPPG) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        
+        {{-- Visualisasi 1: Tren Pendaftaran SPPG --}}
+        <div class="dashboard-card flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="dashboard-card-title">
+                        Tren Pendaftaran SPPG
+                    </h2>
+                </div>
+
+                <div class="text-right">
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1 text-right">Periode</label>
+                    <div class="relative inline-block text-left">
+                        <select id="trenPeriodeFilter" class="select-filter-box">
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                        <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-64 sm:h-72 w-full relative">
+                <canvas id="trenSppgChart"></canvas>
+            </div>
+        </div>
+
+        {{-- Visualisasi 2 & 3: Distribusi Status SPPG (Switchable Donut & Bar) --}}
+        <div class="dashboard-card flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-4 mb-2">
+                <div>
+                    <h2 class="dashboard-card-title">
+                        Distribusi Status SPPG
+                    </h2>
+                </div>
+
+                <div class="text-right">
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1 text-right">Visualisasi</label>
+                    <div class="relative inline-block text-left">
+                        <select id="distribusiVisualisasiFilter" class="select-filter-box">
+                            <option value="donut" selected>Diagram Donat</option>
+                            <option value="bar">Diagram Batang</option>
+                        </select>
+                        <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-64 sm:h-72 w-full relative flex items-center justify-center">
+                <canvas id="distribusiStatusChart"></canvas>
+            </div>
+
+            {{-- Legend Warna Sesuai Keterangan --}}
+            <div class="flex items-center justify-center gap-7 mt-4 pt-4 border-t border-slate-100 text-xs font-semibold text-slate-700 flex-wrap">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#2563EB]"></span>
+                    <span>Aktif</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#F59E0B]"></span>
+                    <span>Menunggu Verifikasi</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#EF4444]"></span>
+                    <span>Nonaktif</span>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/70 shadow-sm">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div>
-                <h2 class="text-base sm:text-lg font-bold text-slate-900">
-                    Tren Pendaftaran SPPG
-                </h2>
-                <p class="text-xs text-slate-500 mt-0.5 font-normal">
-                    Jumlah pendaftaran berdasarkan status dalam periode tertentu.
-                </p>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode</label>
-                    <div class="relative">
-                        <select id="periodeFilter" class="appearance-none bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 py-1.5 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            <option value="current">1 Okt 2026 - 31 Okt 2026</option>
-                            <option value="last_month">1 Sep 2026 - 30 Sep 2026</option>
-                            <option value="year">Tahun 2026</option>
-                        </select>
-                        <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Status</label>
-                    <div class="relative">
-                        <select id="statusFilter" class="appearance-none bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 py-1.5 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            <option value="all">Semua Status</option>
-                            <option value="disetujui">Disetujui</option>
-                            <option value="menunggu">Menunggu</option>
-                            <option value="ditolak">Ditolak</option>
-                            <option value="koreksi">Koreksi</option>
-                        </select>
-                        <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="h-64 sm:h-72 w-full relative">
-            <canvas id="trenSppgChart"></canvas>
-        </div>
-
-        <div class="flex items-center gap-6 mt-4 pt-4 border-t border-slate-100 text-xs font-medium text-slate-700 flex-wrap">
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span>
-                <span>Disetujui</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></span>
-                <span>Menunggu</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-[#EF4444]"></span>
-                <span>Ditolak</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-[#F59E0B]"></span>
-                <span>Koreksi</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/70 shadow-sm">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div>
-                <h2 class="text-base sm:text-lg font-bold text-slate-900">
-                    Status Pengajuan Koreksi
-                </h2>
-                <p class="text-xs text-slate-500 mt-0.5 font-normal">
-                    Jumlah pengajuan koreksi berdasarkan status.
-                </p>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Periode</label>
-                    <div class="relative">
-                        <select id="koreksiPeriodeFilter" class="appearance-none bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 py-1.5 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            <option value="current">1 Okt 2026 - 31 Okt 2026</option>
-                            <option value="last_month">1 Sep 2026 - 30 Sep 2026</option>
-                            <option value="year">Tahun 2026</option>
-                        </select>
-                        <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">SPPG</label>
-                    <div class="relative">
-                        <select id="sppgFilter" class="appearance-none bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 py-1.5 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                            <option value="all">Semua SPPG</option>
-                            @foreach($sppgList as $sppg)
-                                <option value="{{ $sppg->id_sppg }}">{{ $sppg->nama_sppg }}</option>
-                            @endforeach
-                        </select>
-                        <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="h-60 w-full relative">
-            <canvas id="statusKoreksiChart"></canvas>
-        </div>
-    </div>
-
+    {{-- Section: Preview Fitur Utama (2 Cards: SPPG Management & Audit Trail) --}}
     <div>
         <div class="mb-5">
-            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+            <h2 class="text-xl sm:text-2xl font-bold text-[#071E49] tracking-tight">
                 Preview Fitur Utama
             </h2>
             <p class="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
-                Aktivitas LensaMBG (pengelolaan akun, pengajuan koreksi, dan riwayat aktivitas sistem)
+                Aktivitas LensaMBG (pengelolaan sppg, dan riwayat aktivitas sistem)
             </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             
-
+            {{-- Card 1: SPPG Management --}}
             <div class="flex flex-col">
-                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex-1 flex flex-col justify-between">
+                <div class="dashboard-card flex-1 flex flex-col justify-between">
                     <div>
-
-                        <div class="flex items-center gap-3 mb-3">
+                        <div class="flex items-center gap-3 mb-2">
                             <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
                                 <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                     <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-slate-900">SPPG Management</h3>
+                                <h3 class="dashboard-card-title">SPPG Management</h3>
                             </div>
                         </div>
-                        <p class="text-xs text-slate-500 font-normal mb-4 leading-relaxed">
+                        <p class="dashboard-card-subtitle mb-5">
                             Kelola akun pengguna SPPG, atur role dan status akses.
                         </p>
 
@@ -237,31 +200,40 @@
                             <table class="w-full text-left text-xs">
                                 <thead>
                                     <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-700">
-                                        <th class="pb-2.5 pr-3">Nama</th>
-                                        <th class="pb-2.5 pr-3">SPPG</th>
-                                        <th class="pb-2.5 text-right">Status</th>
+                                        <th class="pb-3 pr-3 font-semibold text-slate-700">SPPG</th>
+                                        <th class="pb-3 pr-3 font-semibold text-slate-700">Kepala SPPG</th>
+                                        <th class="pb-3 pr-3 font-semibold text-slate-700">Staff SPPG</th>
+                                        <th class="pb-3 text-center font-semibold text-slate-700">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100/70">
-                                    @foreach($userPreview as $item)
+                                <tbody class="divide-y divide-slate-100/80">
+                                    @foreach($sppgPreview as $item)
                                     <tr>
-                                        <td class="py-2.5 pr-3 font-medium text-slate-800 text-[11px] whitespace-nowrap">{{ $item['nama'] }}</td>
-                                        <td class="py-2.5 pr-3 text-slate-500 text-[11px] whitespace-nowrap">{{ $item['sppg'] }}</td>
-                                        <td class="py-2.5 text-right space-y-1 whitespace-nowrap">
+                                        <td class="py-3.5 pr-3 font-medium text-slate-800 text-[11px] whitespace-nowrap">{{ $item['sppg'] }}</td>
+                                        <td class="py-3.5 pr-3 font-medium text-slate-700 text-[11px] whitespace-nowrap">{{ $item['kepala_sppg'] }}</td>
+                                        <td class="py-3.5 pr-3 font-medium text-slate-700 text-[11px] whitespace-nowrap">{{ $item['staff_sppg'] }}</td>
+                                        <td class="py-3.5 text-center whitespace-nowrap">
                                             @if($item['is_verified'])
-                                                <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#CCFBF1] text-[#0F766E]">
+                                                <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-semibold bg-[#DCFCE7] text-[#16A34A]">
                                                     Terverifikasi
                                                 </span>
                                             @else
-                                                <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#FEF3C7] text-[#B45309]">
+                                                <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-semibold bg-[#FEF3C7] text-[#D97706]">
                                                     Belum Diverifikasi
                                                 </span>
                                             @endif
-                                            <div>
-                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#DCFCE7] text-[#15803D]">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-[#15803D]"></span>
-                                                    {{ $item['status_akun'] }}
-                                                </span>
+                                            <div class="mt-1">
+                                                @if(strtolower($item['status_operasional']) === 'aktif')
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#DCFCE7] text-[#16A34A]">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
+                                                        Aktif
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#FEE2E2] text-[#DC2626]">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626]"></span>
+                                                        Nonaktif
+                                                    </span>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -270,93 +242,23 @@
                             </table>
                         </div>
                     </div>
-                </div>
 
-                <div class="mt-4">
-                    <a href="{{ route('admin.sppg.index') }}"
-                       class="w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-4 text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors duration-150 shadow-sm group">
-                        <span>Lihat Selengkapnya</span>
-                        <svg class="w-4 h-4 text-slate-600 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-
-            <div class="flex flex-col">
-                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex-1 flex flex-col justify-between">
-                    <div>
-
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-900">Correction Request</h3>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-500 font-normal mb-4 leading-relaxed">
-                            Kelola akun pengguna SPPG, atur role dan status akses.
-                        </p>
-
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-700">
-                                        <th class="pb-2.5 pr-3">ID Pengajuan</th>
-                                        <th class="pb-2.5 pr-3">Jenis Data</th>
-                                        <th class="pb-2.5 text-right">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100/70">
-                                    @foreach($correctionPreview as $cr)
-                                    <tr>
-                                        <td class="py-2.5 pr-3 font-medium text-slate-700 text-[11px] whitespace-nowrap">{{ $cr['id'] }}</td>
-                                        <td class="py-2.5 pr-3 text-slate-500 text-[11px] whitespace-nowrap">{{ $cr['jenis_data'] }}</td>
-                                        <td class="py-2.5 text-right whitespace-nowrap">
-                                            @if($cr['status'] === 'Menunggu')
-                                                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-[#FEF3C7] text-[#D97706]">
-                                                    Menunggu
-                                                </span>
-                                            @elseif($cr['status'] === 'Disetujui')
-                                                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-[#DCFCE7] text-[#16A34A]">
-                                                    Disetujui
-                                                </span>
-                                            @else
-                                                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-[#FEE2E2] text-[#DC2626]">
-                                                    Ditolak
-                                                </span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="mt-5 pt-3">
+                        <a href="{{ route('admin.sppg.index') }}" class="btn-detail-link group">
+                            <span>Lihat Selengkapnya</span>
+                            <svg class="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
                     </div>
                 </div>
-
-                <div class="mt-4">
-                    <a href="{{ route('admin.correction-requests.index') }}"
-                       class="w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-4 text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors duration-150 shadow-sm group">
-                        <span>Lihat Selengkapnya</span>
-                        <svg class="w-4 h-4 text-slate-600 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </a>
-                </div>
             </div>
 
+            {{-- Card 2: Audit Trail --}}
             <div class="flex flex-col">
-                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex-1 flex flex-col justify-between">
+                <div class="dashboard-card flex-1 flex flex-col justify-between">
                     <div>
-
-                        <div class="flex items-center gap-3 mb-3">
+                        <div class="flex items-center gap-3 mb-2">
                             <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
                                 <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -365,10 +267,10 @@
                                 </svg>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-slate-900">Audit Trail</h3>
+                                <h3 class="dashboard-card-title">Audit Trail</h3>
                             </div>
                         </div>
-                        <p class="text-xs text-slate-500 font-normal mb-4 leading-relaxed">
+                        <p class="dashboard-card-subtitle mb-5">
                             Kelola akun pengguna SPPG, atur role dan status akses.
                         </p>
 
@@ -376,38 +278,37 @@
                             <table class="w-full text-left text-xs">
                                 <thead>
                                     <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-700">
-                                        <th class="pb-3 pr-2 whitespace-nowrap">Waktu</th>
-                                        <th class="pb-3 px-3 whitespace-nowrap">Pengguna</th>
-                                        <th class="pb-3 px-3 whitespace-nowrap">Modul</th>
-                                        <th class="pb-3 pl-2 whitespace-nowrap">Aktivitas</th>
+                                        <th class="pb-3 pr-2 whitespace-nowrap font-semibold text-slate-700">Waktu</th>
+                                        <th class="pb-3 px-3 whitespace-nowrap font-semibold text-slate-700">Pengguna</th>
+                                        <th class="pb-3 px-3 whitespace-nowrap font-semibold text-slate-700">Modul</th>
+                                        <th class="pb-3 pl-2 whitespace-nowrap font-semibold text-slate-700">Aktivitas</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100/70">
+                                <tbody class="divide-y divide-slate-100/80">
                                     @foreach($auditPreview as $log)
                                     <tr>
-                                        <td class="py-4 pr-2 text-slate-600 text-[11px] whitespace-nowrap align-middle">{{ $log['waktu'] }}</td>
-                                        <td class="py-4 px-3 font-medium text-slate-700 text-[11px] leading-tight whitespace-nowrap align-middle">
-                                            <div class="font-semibold text-slate-800">{{ explode(' ', $log['pengguna'])[0] }}</div>
-                                            <div class="text-[10px] text-slate-400">({{ str_contains($log['pengguna'], 'Admin') ? 'Admin' : 'SPPG' }})</div>
+                                        <td class="py-3.5 pr-2 text-slate-600 text-[11px] whitespace-nowrap align-middle">{{ $log['waktu'] }}</td>
+                                        <td class="py-3.5 px-3 font-medium text-slate-700 text-[11px] leading-tight whitespace-nowrap align-middle">
+                                            <div class="font-semibold text-slate-800">{{ $log['pengguna'] }}</div>
+                                            <div class="text-[10px] text-slate-400">({{ $log['role'] }})</div>
                                         </td>
-                                        <td class="py-4 px-3 text-slate-600 text-[11px] whitespace-nowrap font-medium align-middle">{{ $log['modul'] }}</td>
-                                        <td class="py-4 pl-2 text-slate-700 text-[11px] font-medium leading-tight whitespace-nowrap align-middle">{{ $log['aktivitas'] }}</td>
+                                        <td class="py-3.5 px-3 text-slate-600 text-[11px] whitespace-nowrap font-medium align-middle">{{ $log['modul'] }}</td>
+                                        <td class="py-3.5 pl-2 text-slate-700 text-[11px] font-medium leading-tight whitespace-nowrap align-middle">{{ $log['aktivitas'] }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
 
-                <div class="mt-4">
-                    <a href="{{ route('admin.audit-trail.index') }}"
-                       class="w-full bg-white hover:bg-slate-50 border border-slate-300 rounded-xl py-2.5 px-4 text-xs font-semibold text-slate-700 flex items-center justify-center gap-2 transition-colors duration-150 shadow-sm group">
-                        <span>Lihat Selengkapnya</span>
-                        <svg class="w-4 h-4 text-slate-600 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </a>
+                    <div class="mt-5 pt-3">
+                        <a href="{{ route('admin.audit') }}" class="btn-detail-link group">
+                            <span>Lihat Selengkapnya</span>
+                            <svg class="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -424,8 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof window.initDashboardCharts === 'function') {
         window.initDashboardCharts({
             trenChartData: @json($trenChartData),
-            sppgCrPeriodMap: @json($sppgCrPeriodMap),
-            koreksiChartData: @json($koreksiChartData)
+            distribusiStatusData: @json($distribusiStatusData)
         });
     }
 });

@@ -50,7 +50,7 @@
 
             @include('admin.partials.navbar')
 
-            <main class="flex-1 p-6 sm:p-10 max-w-[1400px] w-full mx-auto">
+            <main class="content-body">
                 @yield('content')
             </main>
         </div>

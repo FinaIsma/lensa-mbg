@@ -1,10 +1,11 @@
 @php
     $currentUser = \Illuminate\Support\Facades\Auth::user();
-    $currentName = $currentUser->nama ?? 'Nanda';
-    $inisial = mb_strtoupper(mb_substr(trim($currentName), 0, 1)) ?: 'A';
+    $currentName = $currentUser->nama ?? 'Nanda Ricco';
+    $firstName = explode(' ', trim($currentName))[0] ?: 'Nanda';
+    $inisial = mb_strtoupper(mb_substr(trim($firstName), 0, 1)) ?: 'N';
     $currentRole = $currentUser->role ?? 'admin';
     $roleLabel = match ($currentRole) {
-        'admin' => 'Admin',
+        'admin' => 'Admin Sistem',
         'kepala_sppg' => 'Kepala SPPG',
         'staff' => 'Staff',
         default => 'Administrator',
@@ -12,11 +13,17 @@
 @endphp
 
 <header class="top-header">
+    @if(request()->routeIs('admin.dashboard'))
+        <div class="header-welcome-text">
+            <h2 class="text-base sm:text-lg font-bold text-slate-800 tracking-tight">Selamat datang, {{ $currentName }}</h2>
+        </div>
+    @endif
+
     <div class="header-profile-dropdown" id="profileDropdownWrapper">
         <button type="button" class="header-user-btn" id="profileDropdownBtn" aria-expanded="false" aria-haspopup="true">
             <div class="avatar-circle" aria-hidden="true">{{ $inisial }}</div>
             <div class="user-info">
-                <span class="user-name">{{ $currentName }}</span>
+                <span class="user-name">{{ $firstName }}</span>
                 <span class="user-role">{{ $roleLabel }}</span>
             </div>
             <svg class="dropdown-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">

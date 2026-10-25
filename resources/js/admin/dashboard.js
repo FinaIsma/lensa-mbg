@@ -1,72 +1,45 @@
 window.initDashboardCharts = function (config) {
     if (!config) return;
 
-    const { trenChartData, sppgCrPeriodMap, koreksiChartData } = config;
+    const { trenChartData, distribusiStatusData } = config;
 
+    // 1. Chart 1: Tren Pendaftaran SPPG (Smooth Line Chart with Year Switcher)
     const trenCanvas = document.getElementById('trenSppgChart');
     if (trenCanvas && trenChartData && typeof Chart !== 'undefined') {
         const trenCtx = trenCanvas.getContext('2d');
-        const trenData = {
-            labels: trenChartData.labels,
-            datasets: [
-                {
-                    label: 'Disetujui',
-                    data: trenChartData.disetujui,
-                    borderColor: '#10B981',
-                    backgroundColor: '#10B981',
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: '#10B981',
-                    pointBorderColor: '#FFFFFF',
-                    pointBorderWidth: 1.5,
-                    tension: 0.35
-                },
-                {
-                    label: 'Menunggu',
-                    data: trenChartData.menunggu,
-                    borderColor: '#3B82F6',
-                    backgroundColor: '#3B82F6',
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: '#3B82F6',
-                    pointBorderColor: '#FFFFFF',
-                    pointBorderWidth: 1.5,
-                    tension: 0.35
-                },
-                {
-                    label: 'Ditolak',
-                    data: trenChartData.ditolak,
-                    borderColor: '#EF4444',
-                    backgroundColor: '#EF4444',
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: '#EF4444',
-                    pointBorderColor: '#FFFFFF',
-                    pointBorderWidth: 1.5,
-                    tension: 0.35
-                },
-                {
-                    label: 'Koreksi',
-                    data: trenChartData.koreksi,
-                    borderColor: '#F59E0B',
-                    backgroundColor: '#F59E0B',
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: '#F59E0B',
-                    pointBorderColor: '#FFFFFF',
-                    pointBorderWidth: 1.5,
-                    tension: 0.35
-                }
-            ]
-        };
+
+        // Linear gradient for fill under the line
+        const gradient = trenCtx.createLinearGradient(0, 0, 0, 260);
+        gradient.addColorStop(0, 'rgba(37, 99, 235, 0.28)');
+        gradient.addColorStop(0.7, 'rgba(37, 99, 235, 0.05)');
+        gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+
+        const currentYr = trenChartData.currentYear || '2026';
+        const initialCounts = (trenChartData.years && trenChartData.years[currentYr])
+            ? trenChartData.years[currentYr]
+            : [1, 4, 3, 5, 2, 8, 3, 7, 8, 9, 8];
 
         const trenChart = new Chart(trenCtx, {
             type: 'line',
-            data: trenData,
+            data: {
+                labels: trenChartData.labels,
+                datasets: [
+                    {
+                        label: 'Pendaftaran SPPG',
+                        data: initialCounts,
+                        borderColor: '#2563EB',
+                        backgroundColor: gradient,
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#2563EB',
+                        pointBorderColor: '#FFFFFF',
+                        pointBorderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -76,10 +49,16 @@ window.initDashboardCharts = function (config) {
                     },
                     tooltip: {
                         backgroundColor: '#0F172A',
-                        titleFont: { family: 'Plus Jakarta Sans', size: 12 },
+                        titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: 'bold' },
                         bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
                         padding: 10,
-                        cornerRadius: 8
+                        cornerRadius: 8,
+                        displayColors: false,
+                        callbacks: {
+                            label: function (ctx) {
+                                return ` Pendaftaran: ${ctx.parsed.y} SPPG`;
+                            }
+                        }
                     }
                 },
                 scales: {
@@ -89,16 +68,16 @@ window.initDashboardCharts = function (config) {
                         },
                         ticks: {
                             color: '#64748B',
-                            font: { family: 'Plus Jakarta Sans', size: 11 }
+                            font: { family: 'Plus Jakarta Sans', size: 11, weight: '500' }
                         }
                     },
                     y: {
                         min: 0,
-                        suggestedMax: 30,
+                        suggestedMax: 10,
                         ticks: {
-                            stepSize: 10,
+                            stepSize: 2,
                             color: '#64748B',
-                            font: { family: 'Plus Jakarta Sans', size: 11 }
+                            font: { family: 'Plus Jakarta Sans', size: 11, weight: '500' }
                         },
                         grid: {
                             color: '#F1F5F9',
@@ -109,162 +88,163 @@ window.initDashboardCharts = function (config) {
             }
         });
 
-        const statusFilter = document.getElementById('statusFilter');
-        const periodeFilter = document.getElementById('periodeFilter');
-
-        function applyStatusFilter() {
-            const val = statusFilter ? statusFilter.value.toLowerCase() : 'all';
-            trenChart.data.datasets.forEach(function (ds) {
-                if (val === 'all') {
-                    ds.hidden = false;
-                } else {
-                    ds.hidden = (ds.label.toLowerCase() !== val);
+        const trenPeriodeFilter = document.getElementById('trenPeriodeFilter');
+        if (trenPeriodeFilter) {
+            trenPeriodeFilter.addEventListener('change', function (e) {
+                const yr = e.target.value;
+                if (trenChartData.years && trenChartData.years[yr]) {
+                    trenChart.data.datasets[0].data = trenChartData.years[yr];
+                    const maxVal = Math.max(...trenChartData.years[yr], 5);
+                    trenChart.options.scales.y.suggestedMax = Math.ceil((maxVal + 2) / 2) * 2;
+                    trenChart.update();
                 }
-            });
-        }
-
-        if (periodeFilter) {
-            periodeFilter.addEventListener('change', function (e) {
-                const periodKey = e.target.value;
-                const periodData = (trenChartData.periods && trenChartData.periods[periodKey])
-                    ? trenChartData.periods[periodKey]
-                    : trenChartData;
-
-                trenChart.data.labels = periodData.labels;
-                trenChart.data.datasets[0].data = periodData.disetujui;
-                trenChart.data.datasets[1].data = periodData.menunggu;
-                trenChart.data.datasets[2].data = periodData.ditolak;
-                trenChart.data.datasets[3].data = periodData.koreksi;
-
-                applyStatusFilter();
-
-                const allNums = [
-                    ...periodData.disetujui,
-                    ...periodData.menunggu,
-                    ...periodData.ditolak,
-                    ...periodData.koreksi
-                ];
-                const maxVal = Math.max(...allNums, 5);
-                trenChart.options.scales.y.suggestedMax = Math.ceil((maxVal + 5) / 5) * 5;
-
-                trenChart.update();
-            });
-        }
-
-        if (statusFilter) {
-            statusFilter.addEventListener('change', function () {
-                applyStatusFilter();
-                trenChart.update();
             });
         }
     }
 
-    const koreksiCanvas = document.getElementById('statusKoreksiChart');
-    if (koreksiCanvas && koreksiChartData && sppgCrPeriodMap && typeof Chart !== 'undefined') {
-        const koreksiCtx = koreksiCanvas.getContext('2d');
+    // 2. Chart 2: Distribusi Status SPPG (Switchable Donut & Bar Chart)
+    const distCanvas = document.getElementById('distribusiStatusChart');
+    if (distCanvas && distribusiStatusData && typeof Chart !== 'undefined') {
+        let distribusiChart = null;
 
-        const topLabelsPlugin = {
-            id: 'topLabelsPlugin',
-            afterDatasetsDraw(chart) {
-                const { ctx } = chart;
-                chart.data.datasets.forEach((dataset, i) => {
-                    const meta = chart.getDatasetMeta(i);
-                    meta.data.forEach((bar, index) => {
-                        const value = dataset.data[index];
-                        ctx.save();
-                        ctx.fillStyle = '#0F172A';
-                        ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'bottom';
-                        ctx.fillText(value, bar.x, bar.y - 4);
-                        ctx.restore();
-                    });
+        const chartColors = distribusiStatusData.colors || ['#2563EB', '#F59E0B', '#EF4444'];
+        const chartLabels = distribusiStatusData.labels || ['Aktif', 'Menunggu Verifikasi', 'Nonaktif'];
+        const chartCounts = distribusiStatusData.counts || [104, 15, 9];
+
+        function renderDistribusiChart(mode) {
+            if (distribusiChart) {
+                distribusiChart.destroy();
+            }
+
+            const distCtx = distCanvas.getContext('2d');
+
+            if (mode === 'bar') {
+                distribusiChart = new Chart(distCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                data: chartCounts,
+                                backgroundColor: chartColors,
+                                borderRadius: {
+                                    topLeft: 8,
+                                    topRight: 8
+                                },
+                                borderSkipped: false,
+                                barPercentage: 0.45,
+                                categoryPercentage: 0.8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#0F172A',
+                                titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: 'bold' },
+                                bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
+                                padding: 10,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                callbacks: {
+                                    title: function (items) {
+                                        return items[0].label;
+                                    },
+                                    label: function (item) {
+                                        const val = item.raw;
+                                        const total = chartCounts.reduce((a, b) => a + b, 0);
+                                        const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                        return ` ${item.label}: ${val} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#64748B',
+                                    font: { family: 'Plus Jakarta Sans', size: 11, weight: '500' }
+                                }
+                            },
+                            y: {
+                                min: 0,
+                                ticks: {
+                                    color: '#64748B',
+                                    font: { family: 'Plus Jakarta Sans', size: 11, weight: '500' }
+                                },
+                                grid: {
+                                    color: '#F1F5F9',
+                                    drawBorder: false
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // Donut Chart Mode
+                distribusiChart = new Chart(distCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                data: chartCounts,
+                                backgroundColor: chartColors,
+                                borderColor: '#FFFFFF',
+                                borderWidth: 3,
+                                hoverOffset: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '68%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#0F172A',
+                                titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: 'bold' },
+                                bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
+                                padding: 10,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                callbacks: {
+                                    title: function (items) {
+                                        return items[0].label;
+                                    },
+                                    label: function (item) {
+                                        const val = item.raw;
+                                        const total = chartCounts.reduce((a, b) => a + b, 0);
+                                        const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                        return ` ${item.label}: ${val} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 });
             }
-        };
-
-        const statusKoreksiChart = new Chart(koreksiCtx, {
-            type: 'bar',
-            data: {
-                labels: koreksiChartData.labels,
-                datasets: [{
-                    data: koreksiChartData.counts,
-                    backgroundColor: koreksiChartData.colors,
-                    borderRadius: {
-                        topLeft: 6,
-                        topRight: 6
-                    },
-                    borderSkipped: false,
-                    barPercentage: 0.35,
-                    categoryPercentage: 0.8
-                }]
-            },
-            plugins: [topLabelsPlugin],
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: '#0F172A',
-                        titleFont: { family: 'Plus Jakarta Sans', size: 12 },
-                        bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
-                        padding: 10,
-                        cornerRadius: 8
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: '#64748B',
-                            font: { family: 'Plus Jakarta Sans', size: 11 }
-                        }
-                    },
-                    y: {
-                        min: 0,
-                        suggestedMax: 15,
-                        ticks: {
-                            stepSize: 5,
-                            color: '#64748B',
-                            font: { family: 'Plus Jakarta Sans', size: 11 }
-                        },
-                        grid: {
-                            color: '#F1F5F9',
-                            drawBorder: false
-                        }
-                    }
-                }
-            }
-        });
-
-        const koreksiPeriodeFilter = document.getElementById('koreksiPeriodeFilter');
-        const sppgFilter = document.getElementById('sppgFilter');
-
-        function updateStatusKoreksiChart() {
-            const period = koreksiPeriodeFilter ? koreksiPeriodeFilter.value : 'current';
-            const sppg = sppgFilter ? sppgFilter.value : 'all';
-
-            const periodData = sppgCrPeriodMap[period] || sppgCrPeriodMap['current'] || {};
-            const counts = periodData[sppg] || [0, 0, 0];
-
-            statusKoreksiChart.data.datasets[0].data = counts;
-
-            const maxVal = Math.max(...counts);
-            statusKoreksiChart.options.scales.y.suggestedMax = maxVal > 10 ? Math.ceil((maxVal + 4) / 5) * 5 : 15;
-            statusKoreksiChart.update();
         }
 
-        if (koreksiPeriodeFilter) {
-            koreksiPeriodeFilter.addEventListener('change', updateStatusKoreksiChart);
-        }
+        // Default to Donut
+        renderDistribusiChart('donut');
 
-        if (sppgFilter) {
-            sppgFilter.addEventListener('change', updateStatusKoreksiChart);
+        const visualisasiFilter = document.getElementById('distribusiVisualisasiFilter');
+        if (visualisasiFilter) {
+            visualisasiFilter.addEventListener('change', function (e) {
+                renderDistribusiChart(e.target.value);
+            });
         }
     }
 };

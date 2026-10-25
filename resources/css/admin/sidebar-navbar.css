@@ -113,11 +113,24 @@
     border-bottom: 1px solid #E2E8F0;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: 0 40px;
     position: sticky;
     top: 0;
     z-index: 30;
+}
+
+.content-body {
+    padding: 32px 40px 60px;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .content-body {
+        padding: 24px 20px 40px;
+    }
 }
 
 .header-user-section {
@@ -130,10 +143,10 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background-color: #042A70;
+    background-color: #CBD5E1;
     display: grid;
     place-items: center;
-    color: #FFFFFF;
+    color: #475569;
     font-weight: 600;
     font-size: 15px;
     line-height: 1;
@@ -153,13 +166,14 @@
 }
 
 .user-role {
-    font-size: 13px;
-    font-weight: 600;
-    color: #071E49;
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748B;
 }
 
 .header-profile-dropdown {
     position: relative;
+    margin-left: auto;
 }
 
 .header-user-btn {
