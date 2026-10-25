@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditTrail;
-use App\Models\CorrectionRequest;
 use App\Models\Sppg;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -23,7 +22,10 @@ class DashboardController extends Controller
 
         // 1. SPPG Statistics
         $dbTotalSppg = Sppg::count();
-        $dbPendingVerifikasi = Sppg::where('status', 'menunggu_verifikasi')->count();
+        $dbPendingVerifikasi = Sppg::where(function ($q) {
+            $q->whereIn('status_verifikasi', ['menunggu_verifikasi', 'perubahan'])
+                ->orWhere('status', 'menunggu_verifikasi');
+        })->count();
         $dbActiveSppg = Sppg::where('status', 'aktif')->count();
         $dbInactiveSppg = Sppg::where('status', 'nonaktif')->count();
 
@@ -34,84 +36,129 @@ class DashboardController extends Controller
             'status_nonaktif' => $dbTotalSppg > 0 ? $dbInactiveSppg : 128,
         ];
 
-        // 2. Preview Fitur Utama 1: User Management (3 baris sesuai desain awal)
-        $realUsers = Sppg::with('user')->latest()->take(3)->get();
-        if ($realUsers->isNotEmpty()) {
-            $userPreview = $realUsers->map(function ($sppg) {
+        // 2. Chart 1: Tren Pendaftaran SPPG (Per Bulan)
+        $monthsLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
+        $years = ['2026', '2025', '2024'];
+        $trenYearsData = [];
+
+        foreach ($years as $yr) {
+            $monthlyCounts = [];
+            for ($m = 1; $m <= 11; $m++) {
+                // Mapping: 1=Jan, 2=Feb, 3=Mar, 4=Apr, 5=Mei, 6=Jun, 8=Aug, 9=Sep, 10=Okt, 11=Nov, 12=Dec
+                $monthNum = ($m === 7) ? 8 : ($m === 8 ? 9 : ($m === 9 ? 10 : ($m === 10 ? 11 : ($m === 11 ? 12 : $m))));
+                $start = Carbon::create((int) $yr, $monthNum, 1, 0, 0, 0)->startOfMonth();
+                $end = Carbon::create((int) $yr, $monthNum, 1, 23, 59, 59)->endOfMonth();
+
+                $count = Sppg::whereBetween('created_at', [$start, $end])->count();
+                $monthlyCounts[] = $count;
+            }
+
+            // Fallback sample data hanya untuk tahun 2026 jika DB sama sekali belum memiliki data
+            if (array_sum($monthlyCounts) === 0 && $yr === '2026') {
+                $monthlyCounts = [1, 4, 3, 5, 2, 8, 3, 7, 8, 9, 8];
+            }
+            // Untuk tahun 2024 dan 2025: murni data asli dari database (0 jika belum ada yang mendaftar)
+
+            $trenYearsData[$yr] = $monthlyCounts;
+        }
+
+        $trenChartData = [
+            'labels' => $monthsLabels,
+            'years' => $trenYearsData,
+            'currentYear' => '2026',
+        ];
+
+        // 3. Chart 2: Distribusi Status SPPG (Aktif, Menunggu Verifikasi, Nonaktif)
+        $countAktif = $dbActiveSppg;
+        $countMenunggu = $dbPendingVerifikasi;
+        $countNonaktif = $dbInactiveSppg;
+
+        // Default mock if database has 0 records, matching design
+        if ($countAktif === 0 && $countMenunggu === 0 && $countNonaktif === 0) {
+            $countAktif = 104;
+            $countMenunggu = 15;
+            $countNonaktif = 9;
+        }
+
+        $totalDistribusi = $countAktif + $countMenunggu + $countNonaktif;
+        $pctAktif = $totalDistribusi > 0 ? (int) round(($countAktif / $totalDistribusi) * 100) : 81;
+        $pctMenunggu = $totalDistribusi > 0 ? (int) round(($countMenunggu / $totalDistribusi) * 100) : 12;
+        $pctNonaktif = $totalDistribusi > 0 ? max(0, 100 - $pctAktif - $pctMenunggu) : 7;
+
+        $distribusiStatusData = [
+            'labels' => ['Aktif', 'Menunggu Verifikasi', 'Nonaktif'],
+            'counts' => [$countAktif, $countMenunggu, $countNonaktif],
+            'percentages' => [$pctAktif, $pctMenunggu, $pctNonaktif],
+            'colors' => ['#2563EB', '#F59E0B', '#EF4444'],
+        ];
+
+        // 4. Preview Fitur Utama 1: SPPG Management (4 baris)
+        $realSppgs = Sppg::with(['user', 'staff', 'staffs'])->latest('id_sppg')->take(4)->get();
+        if ($realSppgs->isNotEmpty()) {
+            $sppgPreview = $realSppgs->map(function ($sppg) {
+                $isVerified = ($sppg->status_verifikasi ?? '') === 'terverifikasi'
+                    || ($sppg->status !== 'menunggu_verifikasi' && empty($sppg->status_verifikasi));
+
                 return [
-                    'nama' => $sppg->user->nama ?? $sppg->nama_pegawai ?? 'Pengguna SPPG',
                     'sppg' => $sppg->nama_sppg ?? 'SPPG Wilayah',
-                    'is_verified' => $sppg->status !== 'menunggu_verifikasi',
-                    'is_active' => $sppg->status === 'aktif',
-                    'status_verifikasi' => $sppg->status === 'menunggu_verifikasi' ? 'Belum Diverifikasi' : 'Terverifikasi',
-                    'status_akun' => $sppg->status === 'aktif' ? 'Aktif' : ($sppg->status === 'nonaktif' ? 'Nonaktif' : 'Menunggu'),
+                    'kepala_sppg' => $sppg->user->nama ?? '-',
+                    'staff_sppg' => $sppg->staff->nama ?? ($sppg->staffs->first()->nama ?? '-'),
+                    'is_verified' => $isVerified,
+                    'status_verifikasi' => $isVerified ? 'Terverifikasi' : 'Belum Diverifikasi',
+                    'status_operasional' => $sppg->status === 'aktif' ? 'Aktif' : 'Nonaktif',
                 ];
             });
         } else {
-            $userPreview = collect([
+            $sppgPreview = collect([
                 [
-                    'nama' => 'Yu Ji-min',
+                    'sppg' => 'SPPG Blimbing',
+                    'kepala_sppg' => 'Yu Ji-min',
+                    'staff_sppg' => 'Kim Min-jeong',
+                    'is_verified' => true,
+                    'status_verifikasi' => 'Terverifikasi',
+                    'status_operasional' => 'Aktif',
+                ],
+                [
                     'sppg' => 'SPPG Sawojajar',
-                    'is_verified' => true,
-                    'is_active' => true,
-                    'status_verifikasi' => 'Terverifikasi',
-                    'status_akun' => 'Aktif',
-                ],
-                [
-                    'nama' => 'Kim Je-eun',
-                    'sppg' => 'SPPG Batu',
+                    'kepala_sppg' => 'Kim Je-eun',
+                    'staff_sppg' => 'Roh Yu-na',
                     'is_verified' => false,
-                    'is_active' => true,
                     'status_verifikasi' => 'Belum Diverifikasi',
-                    'status_akun' => 'Aktif',
+                    'status_operasional' => 'Aktif',
                 ],
                 [
-                    'nama' => 'Chio Jiwoo',
-                    'sppg' => 'SPPG Sulfat',
+                    'sppg' => 'SPPG Batu',
+                    'kepala_sppg' => 'Chio Jiwoo',
+                    'staff_sppg' => 'Ayu Carmenita',
                     'is_verified' => true,
-                    'is_active' => true,
                     'status_verifikasi' => 'Terverifikasi',
-                    'status_akun' => 'Aktif',
+                    'status_operasional' => 'Aktif',
+                ],
+                [
+                    'sppg' => 'SPPG Sulfat',
+                    'kepala_sppg' => 'Ning Yizhuo',
+                    'staff_sppg' => 'Aeri Uchinaga',
+                    'is_verified' => true,
+                    'status_verifikasi' => 'Terverifikasi',
+                    'status_operasional' => 'Aktif',
                 ],
             ]);
         }
 
-        // 3. Preview Fitur Utama 2: Correction Request (5 baris)
-        $realCr = Schema::hasTable('correction_requests')
-            ? CorrectionRequest::latest()->take(5)->get()
-            : collect();
-
-        if ($realCr->isNotEmpty()) {
-            $correctionPreview = $realCr->map(function ($cr) {
-                return [
-                    'id' => $cr->request_no ?? 'CR-'.str_pad((string) $cr->id, 3, '0', STR_PAD_LEFT),
-                    'jenis_data' => $cr->jenis_data,
-                    'status' => $cr->status_label,
-                ];
-            });
-        } else {
-            $correctionPreview = collect([
-                ['id' => 'CR-001', 'jenis_data' => 'Distribusi', 'status' => 'Menunggu'],
-                ['id' => 'CR-002', 'jenis_data' => 'Produksi', 'status' => 'Disetujui'],
-                ['id' => 'CR-003', 'jenis_data' => 'Penerimaan', 'status' => 'Ditolak'],
-                ['id' => 'CR-004', 'jenis_data' => 'Produksi', 'status' => 'Disetujui'],
-                ['id' => 'CR-005', 'jenis_data' => 'Produksi', 'status' => 'Disetujui'],
-            ]);
-        }
-
-        // 4. Preview Fitur Utama 3: Audit Trail (3 baris)
+        // 5. Preview Fitur Utama 2: Audit Trail (4 baris)
         $realAudit = Schema::hasTable('audit_trails')
-            ? AuditTrail::daftar()->latest('audit_trails.id')->take(3)->get()
+            ? AuditTrail::daftar()->latest('audit_trails.id')->take(4)->get()
             : collect();
 
         if ($realAudit->isNotEmpty()) {
             $auditPreview = $realAudit->map(function ($log) {
                 $userRole = ($log->pelaku_role === 'admin') ? 'Admin' : 'Kepala SPPG';
-                $userName = $log->actor_nama ?: ($log->user->nama ?? 'Admin');
+                $userName = $log->actor_nama ?: ($log->user->nama ?? 'Nanda');
 
                 return [
                     'waktu' => $log->created_at ? $log->created_at->format('d M, H:i') : '11 Okt, 10:15',
-                    'pengguna' => "{$userName} ({$userRole})",
+                    'pengguna' => explode(' ', $userName)[0],
+                    'role' => $userRole,
                     'modul' => $log->modul,
                     'aktivitas' => $log->aktivitas_label,
                 ];
@@ -120,214 +167,42 @@ class DashboardController extends Controller
             $auditPreview = collect([
                 [
                     'waktu' => '11 Okt, 10:15',
-                    'pengguna' => 'Nanda (Admin)',
+                    'pengguna' => 'Nanda',
+                    'role' => 'Admin',
                     'modul' => 'Master Data',
                     'aktivitas' => 'Menambah SPPG',
                 ],
                 [
                     'waktu' => '11 Okt, 10:15',
-                    'pengguna' => 'Nanda (Admin)',
+                    'pengguna' => 'Nanda',
+                    'role' => 'Admin',
                     'modul' => 'Koreksi',
                     'aktivitas' => 'Mengajukan koreksi',
                 ],
                 [
                     'waktu' => '11 Okt, 10:15',
-                    'pengguna' => 'Nanda (Admin)',
+                    'pengguna' => 'Nanda',
+                    'role' => 'Admin',
                     'modul' => 'User',
                     'aktivitas' => 'Mengubah role user',
+                ],
+                [
+                    'waktu' => '10 Okt, 14:30',
+                    'pengguna' => 'Nanda',
+                    'role' => 'Admin',
+                    'modul' => 'SPPG',
+                    'aktivitas' => 'Memverifikasi SPPG',
                 ],
             ]);
         }
 
-        // 5. Chart 1: Tren Pendaftaran SPPG (Dinamis dari database SPPG dengan dukungan filter Periode)
-        $allSppg = Sppg::all();
-
-        // 5a. Periode: Bulan Berjalan (Oktober 2026)
-        $currentLabels = ['1 Okt', '4 Okt', '7 Okt', '10 Okt', '13 Okt', '16 Okt', '19 Okt', '22 Okt', '25 Okt', '28 Okt', '31 Okt'];
-        $currentRanges = [
-            ['2026-10-01 00:00:00', '2026-10-03 23:59:59'],
-            ['2026-10-04 00:00:00', '2026-10-06 23:59:59'],
-            ['2026-10-07 00:00:00', '2026-10-09 23:59:59'],
-            ['2026-10-10 00:00:00', '2026-10-12 23:59:59'],
-            ['2026-10-13 00:00:00', '2026-10-15 23:59:59'],
-            ['2026-10-16 00:00:00', '2026-10-18 23:59:59'],
-            ['2026-10-19 00:00:00', '2026-10-21 23:59:59'],
-            ['2026-10-22 00:00:00', '2026-10-24 23:59:59'],
-            ['2026-10-25 00:00:00', '2026-10-27 23:59:59'],
-            ['2026-10-28 00:00:00', '2026-10-30 23:59:59'],
-            ['2026-10-31 00:00:00', '2026-10-31 23:59:59'],
-        ];
-
-        $currentDisetujui = [];
-        $currentMenunggu = [];
-        $currentDitolak = [];
-        $currentKoreksi = [];
-
-        foreach ($currentRanges as $range) {
-            $start = Carbon::parse($range[0]);
-            $end = Carbon::parse($range[1]);
-
-            $bucket = $allSppg->filter(function ($s) use ($start, $end) {
-                return $s->created_at && Carbon::parse($s->created_at)->betweenIncluded($start, $end);
-            });
-
-            $currentDisetujui[] = $bucket->where('status', 'aktif')->count();
-            $currentMenunggu[] = $bucket->where('status', 'menunggu_verifikasi')->count();
-            $currentDitolak[] = $bucket->where('status', 'nonaktif')->count();
-            $currentKoreksi[] = 0;
-        }
-
-        // 5b. Periode: Bulan Lalu (September 2026)
-        $lastMonthLabels = ['1 Sep', '4 Sep', '7 Sep', '10 Sep', '13 Sep', '16 Sep', '19 Sep', '22 Sep', '25 Sep', '28 Sep', '30 Sep'];
-        $lastMonthRanges = [
-            ['2026-09-01 00:00:00', '2026-09-03 23:59:59'],
-            ['2026-09-04 00:00:00', '2026-09-06 23:59:59'],
-            ['2026-09-07 00:00:00', '2026-09-09 23:59:59'],
-            ['2026-09-10 00:00:00', '2026-09-12 23:59:59'],
-            ['2026-09-13 00:00:00', '2026-09-15 23:59:59'],
-            ['2026-09-16 00:00:00', '2026-09-18 23:59:59'],
-            ['2026-09-19 00:00:00', '2026-09-21 23:59:59'],
-            ['2026-09-22 00:00:00', '2026-09-24 23:59:59'],
-            ['2026-09-25 00:00:00', '2026-09-27 23:59:59'],
-            ['2026-09-28 00:00:00', '2026-09-30 23:59:59'],
-        ];
-
-        $lastMonthDisetujui = [];
-        $lastMonthMenunggu = [];
-        $lastMonthDitolak = [];
-        $lastMonthKoreksi = [];
-
-        foreach ($lastMonthRanges as $range) {
-            $start = Carbon::parse($range[0]);
-            $end = Carbon::parse($range[1]);
-
-            $bucket = $allSppg->filter(function ($s) use ($start, $end) {
-                return $s->created_at && Carbon::parse($s->created_at)->betweenIncluded($start, $end);
-            });
-
-            $lastMonthDisetujui[] = $bucket->where('status', 'aktif')->count();
-            $lastMonthMenunggu[] = $bucket->where('status', 'menunggu_verifikasi')->count();
-            $lastMonthDitolak[] = $bucket->where('status', 'nonaktif')->count();
-            $lastMonthKoreksi[] = 0;
-        }
-
-        // 5c. Periode: Tahun 2026 (Januari - Desember)
-        $yearLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        $yearDisetujui = [];
-        $yearMenunggu = [];
-        $yearDitolak = [];
-        $yearKoreksi = [];
-
-        for ($m = 1; $m <= 12; $m++) {
-            $start = Carbon::create(2026, $m, 1, 0, 0, 0)->startOfMonth();
-            $end = Carbon::create(2026, $m, 1, 23, 59, 59)->endOfMonth();
-
-            $bucket = $allSppg->filter(function ($s) use ($start, $end) {
-                return $s->created_at && Carbon::parse($s->created_at)->betweenIncluded($start, $end);
-            });
-
-            $yearDisetujui[] = $bucket->where('status', 'aktif')->count();
-            $yearMenunggu[] = $bucket->where('status', 'menunggu_verifikasi')->count();
-            $yearDitolak[] = $bucket->where('status', 'nonaktif')->count();
-            $yearKoreksi[] = 0;
-        }
-
-        $trenChartData = [
-            'labels' => $currentLabels,
-            'disetujui' => $currentDisetujui,
-            'menunggu' => $currentMenunggu,
-            'ditolak' => $currentDitolak,
-            'koreksi' => $currentKoreksi,
-            'periods' => [
-                'current' => [
-                    'labels' => $currentLabels,
-                    'disetujui' => $currentDisetujui,
-                    'menunggu' => $currentMenunggu,
-                    'ditolak' => $currentDitolak,
-                    'koreksi' => $currentKoreksi,
-                ],
-                'last_month' => [
-                    'labels' => $lastMonthLabels,
-                    'disetujui' => $lastMonthDisetujui,
-                    'menunggu' => $lastMonthMenunggu,
-                    'ditolak' => $lastMonthDitolak,
-                    'koreksi' => $lastMonthKoreksi,
-                ],
-                'year' => [
-                    'labels' => $yearLabels,
-                    'disetujui' => $yearDisetujui,
-                    'menunggu' => $yearMenunggu,
-                    'ditolak' => $yearDitolak,
-                    'koreksi' => $yearKoreksi,
-                ],
-            ],
-        ];
-
-        // 6. Chart 2: Status Pengajuan Koreksi (100% Dinamis dari Tabel correction_requests dengan dukungan Periode dan SPPG)
-        $sppgList = Sppg::select('id_sppg', 'nama_sppg')->distinct()->orderBy('nama_sppg')->get();
-
-        $allCrRecords = Schema::hasTable('correction_requests')
-            ? CorrectionRequest::all()
-            : collect();
-
-        // Hitung data per periode untuk Chart 2
-        $periodRanges = [
-            'current' => [Carbon::parse('2026-10-01 00:00:00'), Carbon::parse('2026-10-31 23:59:59')],
-            'last_month' => [Carbon::parse('2026-09-01 00:00:00'), Carbon::parse('2026-09-30 23:59:59')],
-            'year' => [Carbon::parse('2026-01-01 00:00:00'), Carbon::parse('2026-12-31 23:59:59')],
-        ];
-
-        $sppgCrPeriodMap = [];
-
-        foreach ($periodRanges as $pKey => $range) {
-            [$pStart, $pEnd] = $range;
-
-            $periodCrs = $allCrRecords->filter(function ($cr) use ($pStart, $pEnd) {
-                if (! $cr->created_at) {
-                    return false;
-                }
-
-                return Carbon::parse($cr->created_at)->betweenIncluded($pStart, $pEnd);
-            });
-
-            $pMenunggu = $periodCrs->whereIn('status', ['pending', 'waiting', 'Menunggu'])->count();
-            $pDisetujui = $periodCrs->whereIn('status', ['approved', 'applied', 'Disetujui'])->count();
-            $pDitolak = $periodCrs->whereIn('status', ['rejected', 'Ditolak'])->count();
-
-            $sppgCrPeriodMap[$pKey] = [
-                'all' => [$pMenunggu, $pDisetujui, $pDitolak],
-            ];
-
-            foreach ($sppgList as $sppgItem) {
-                $sCrs = $periodCrs->where('id_sppg', $sppgItem->id_sppg);
-                $sppgCrPeriodMap[$pKey][$sppgItem->id_sppg] = [
-                    $sCrs->whereIn('status', ['pending', 'waiting', 'Menunggu'])->count(),
-                    $sCrs->whereIn('status', ['approved', 'applied', 'Disetujui'])->count(),
-                    $sCrs->whereIn('status', ['rejected', 'Ditolak'])->count(),
-                ];
-            }
-        }
-
-        $sppgCrMap = $sppgCrPeriodMap['current'];
-
-        // Status awal
-        $koreksiChartData = [
-            'labels' => ['Menunggu', 'Disetujui', 'Ditolak'],
-            'counts' => $sppgCrPeriodMap['current']['all'],
-            'colors' => ['#F59E0B', '#34D399', '#F87171'],
-        ];
-
         return view('admin.dashboard', compact(
             'adminUser',
             'stats',
-            'userPreview',
-            'correctionPreview',
+            'sppgPreview',
             'auditPreview',
             'trenChartData',
-            'koreksiChartData',
-            'sppgList',
-            'sppgCrMap',
-            'sppgCrPeriodMap'
+            'distribusiStatusData'
         ));
     }
 }
