@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const infoNamaEl = document.getElementById('detailInfoNama');
         const infoEmailEl = document.getElementById('detailInfoEmail');
         const infoTeleponEl = document.getElementById('detailInfoTelepon');
+        const infoTglEl = document.getElementById('detailInfoTgl');
 
         const sppgNamaEl = document.getElementById('detailSppgNama');
         const sppgIdDetailEl = document.getElementById('detailSppgIdDetail');
@@ -68,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (infoNamaEl) infoNamaEl.textContent = staffData.nama || '-';
         if (infoEmailEl) infoEmailEl.textContent = staffData.email || '-';
         if (infoTeleponEl) infoTeleponEl.textContent = staffData.no_telepon || '-';
+        if (infoTglEl) infoTglEl.textContent = staffData.tanggal_dibuat || '-';
 
         if (sppgNamaEl) sppgNamaEl.textContent = staffData.sppg_nama || '-';
         if (sppgIdDetailEl) sppgIdDetailEl.textContent = staffData.sppg_id_formatted || '-';
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (sppgProvinsiEl) sppgProvinsiEl.textContent = staffData.sppg_provinsi || '-';
         if (sppgKabupatenEl) sppgKabupatenEl.textContent = staffData.sppg_kabupaten || '-';
         if (sppgKecamatanEl) sppgKecamatanEl.textContent = staffData.sppg_kecamatan || '-';
-        if (sppgTglEl) sppgTglEl.textContent = staffData.tanggal_dibuat || '-';
+        if (sppgTglEl) sppgTglEl.textContent = staffData.sppg_tanggal_dibuat || staffData.tanggal_dibuat || '-';
         if (sppgKepalaEl) sppgKepalaEl.textContent = staffData.nama_kepala || '-';
 
         // Show Nonaktifkan button if staff is active
