@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Close navbar dropdown if open
         const profileDropdownWrapper = document.getElementById('profileDropdownWrapper');
         if (profileDropdownWrapper) profileDropdownWrapper.classList.remove('open');
+
+        // Render PDF preview if canvas exists
+        renderPdfPreview(profilModal);
     };
 
     window.closeProfilModal = function () {
@@ -56,13 +59,18 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     window.setProfilMode = function (mode) {
+        const btnBackToView = document.getElementById('btnBackToView');
         if (mode === 'edit') {
             if (viewContainer) viewContainer.style.display = 'none';
             if (editContainer) editContainer.style.display = 'block';
+            if (btnBackToView) btnBackToView.style.display = 'grid';
             initWilayahDropdowns();
+            renderPdfPreview(editContainer);
         } else {
             if (editContainer) editContainer.style.display = 'none';
             if (viewContainer) viewContainer.style.display = 'block';
+            if (btnBackToView) btnBackToView.style.display = 'none';
+            renderPdfPreview(viewContainer);
         }
     };
 
@@ -126,6 +134,65 @@ document.addEventListener('DOMContentLoaded', function () {
         if (lightboxContent) lightboxContent.innerHTML = '';
     };
 
+    // PDF.js Preview Renderer (Exact Match with SPPG Management)
+    window.renderPdfPreview = function (container) {
+        const root = container || document;
+        const canvases = root.querySelectorAll('canvas[data-pdf]');
+
+        canvases.forEach(canvas => {
+            const url = canvas.getAttribute('data-pdf');
+            if (!url) return;
+
+            function doRender() {
+                if (typeof pdfjsLib === 'undefined') return;
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+                pdfjsLib.getDocument(url).promise.then(pdf => {
+                    return pdf.getPage(1);
+                }).then(page => {
+                    const parent = canvas.parentElement;
+                    const parentWidth = parent ? (parent.clientWidth || 100) : 100;
+                    const unscaledViewport = page.getViewport({ scale: 1 });
+                    const scale = (parentWidth * 1.5) / unscaledViewport.width;
+                    const viewport = page.getViewport({ scale: scale });
+
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    const renderContext = {
+                        canvasContext: canvas.getContext('2d'),
+                        viewport: viewport
+                    };
+                    return page.render(renderContext).promise;
+                }).catch(err => {
+                    console.warn('Gagal me-render preview halaman 1 PDF:', err);
+                    if (canvas.parentElement) {
+                        canvas.parentElement.innerHTML = `
+                            <div class="mv2-doc-pdf-fallback">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                </svg>
+                                <span class="mv2-doc-pdf-tag">PDF</span>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            if (typeof pdfjsLib === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
+                script.onload = doRender;
+                document.head.appendChild(script);
+            } else {
+                doRender();
+            }
+        });
+    };
+
     // File input change preview
     window.handleFileSelect = function (input, previewId) {
         const file = input.files[0];
@@ -143,14 +210,21 @@ document.addEventListener('DOMContentLoaded', function () {
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function (e) {
-                previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">`;
+                previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; display: block;">`;
             };
             reader.readAsDataURL(file);
         } else if (file.type === 'application/pdf') {
-            previewContainer.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:6px; color:#DC2626;">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                <span style="font-size:11px; font-weight:600; text-align:center;">${file.name}</span>
-            </div>`;
+            previewContainer.innerHTML = `
+                <div class="mv2-doc-pdf-fallback">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    <span class="mv2-doc-pdf-tag">PDF</span>
+                </div>
+            `;
         }
     };
 
