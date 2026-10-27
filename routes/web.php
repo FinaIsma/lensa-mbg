@@ -61,6 +61,7 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/sppg', [SppgManagementController::class, 'index'])->name('sppg.index');
     Route::get('/sppg/{id}', [SppgManagementController::class, 'show'])->name('sppg.show');
     Route::post('/sppg/{id}/status', [SppgManagementController::class, 'updateStatus'])->name('sppg.updateStatus');
+    Route::get('/sppg/{id}/status', fn () => redirect()->route('admin.sppg.index'));
 
     Route::get('/monitoring', function () {
         return redirect()->route('admin.dashboard')->with('info', 'Fitur Monitoring sedang dalam tahap pengembangan.');

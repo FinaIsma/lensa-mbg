@@ -80,6 +80,50 @@ document.addEventListener('DOMContentLoaded', function () {
         if (sppgTglEl) sppgTglEl.textContent = staffData.sppg_tanggal_dibuat || staffData.tanggal_dibuat || '-';
         if (sppgKepalaEl) sppgKepalaEl.textContent = staffData.nama_kepala || '-';
 
+        // Rejection Alert & Note logic
+        const rejectedAlertEl = document.getElementById('detailRejectedAlert');
+        const catatanAdminEl = document.getElementById('detailCatatanAdmin');
+        const badgeContainerEl = document.getElementById('detailStaffBadgeContainer');
+
+        if (badgeContainerEl) {
+            if (staffData.status === 'ditolak') {
+                badgeContainerEl.innerHTML = `
+                    <span class="badge-status badge-status-ditolak">
+                        <span class="status-dot"></span> Ditolak
+                    </span>
+                `;
+            } else if (staffData.status === 'aktif') {
+                badgeContainerEl.innerHTML = `
+                    <span class="badge-status badge-status-aktif">
+                        <span class="status-dot"></span> Aktif
+                    </span>
+                `;
+            } else if (staffData.status === 'menunggu_persetujuan' || staffData.status === 'menunggu') {
+                badgeContainerEl.innerHTML = `
+                    <span class="badge-status badge-status-belum">
+                        <span class="status-dot"></span> Belum Verifikasi
+                    </span>
+                `;
+            } else {
+                badgeContainerEl.innerHTML = `
+                    <span class="badge-status badge-status-nonaktif">
+                        <span class="status-dot"></span> Nonaktif
+                    </span>
+                `;
+            }
+        }
+
+        if (staffData.status === 'ditolak') {
+            const alasan = staffData.catatan_admin && staffData.catatan_admin.trim() !== ''
+                ? staffData.catatan_admin
+                : 'Tidak ada alasan penolakan spesifik yang dicantumkan oleh admin.';
+
+            if (rejectedAlertEl) rejectedAlertEl.style.display = 'flex';
+            if (catatanAdminEl) catatanAdminEl.textContent = alasan;
+        } else {
+            if (rejectedAlertEl) rejectedAlertEl.style.display = 'none';
+        }
+
         // Show Nonaktifkan button if staff is active
         if (footerEl) {
             if (staffData.status === 'aktif') {

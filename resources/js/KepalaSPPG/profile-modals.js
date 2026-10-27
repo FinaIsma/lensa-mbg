@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const profilModal = document.getElementById('profilModal');
     const passwordModal = document.getElementById('passwordModal');
     const lightboxModal = document.getElementById('docLightboxModal');
+    const alertModal = document.getElementById('pmAlertModal');
 
     const viewContainer = document.getElementById('profilViewContainer');
     const editContainer = document.getElementById('profilEditContainer');
@@ -60,13 +61,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.setProfilMode = function (mode) {
         const btnBackToView = document.getElementById('btnBackToView');
+        const modalTitle = document.getElementById('modalProfilTitle');
         if (mode === 'edit') {
+            const editBtn = document.querySelector('.pm-btn-edit-mode');
+            if (editBtn && editBtn.hasAttribute('disabled')) {
+                return;
+            }
+            if (modalTitle) modalTitle.textContent = 'Edit Profil & Informasi SPPG';
             if (viewContainer) viewContainer.style.display = 'none';
             if (editContainer) editContainer.style.display = 'block';
             if (btnBackToView) btnBackToView.style.display = 'grid';
             initWilayahDropdowns();
             renderPdfPreview(editContainer);
         } else {
+            if (modalTitle) modalTitle.textContent = 'Profil & Informasi SPPG';
             if (editContainer) editContainer.style.display = 'none';
             if (viewContainer) viewContainer.style.display = 'block';
             if (btnBackToView) btnBackToView.style.display = 'none';
@@ -75,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Close on backdrop click
-    [profilModal, passwordModal, lightboxModal].forEach(function (modal) {
+    [profilModal, passwordModal, lightboxModal, alertModal].forEach(function (modal) {
         if (!modal) return;
         modal.addEventListener('click', function (e) {
             if (e.target === modal) {
@@ -89,6 +97,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Close on Escape key
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
+            if (alertModal && !alertModal.classList.contains('hidden')) {
+                alertModal.classList.add('hidden');
+                alertModal.style.display = 'none';
+                return;
+            }
             if (lightboxModal && !lightboxModal.classList.contains('hidden')) {
                 closeLightbox();
                 return;
@@ -102,10 +115,55 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Custom Profile Notification Popup
+    window.showProfileAlert = function ({ title = '', message = '', type = 'success', onConfirm = null }) {
+        const modal = document.getElementById('pmAlertModal');
+        const iconContainer = document.getElementById('pmAlertIconContainer');
+        const iconSuccess = document.getElementById('pmAlertIconSuccess');
+        const iconError = document.getElementById('pmAlertIconError');
+        const iconWarning = document.getElementById('pmAlertIconWarning');
+        const titleEl = document.getElementById('pmAlertTitle');
+        const messageEl = document.getElementById('pmAlertMessage');
+        const btn = document.getElementById('pmAlertBtn');
+
+        if (!modal) {
+            alert(message);
+            if (onConfirm) onConfirm();
+            return;
+        }
+
+        if (titleEl) {
+            titleEl.textContent = title || (type === 'success' ? 'Berhasil' : (type === 'error' ? 'Terjadi Kesalahan' : 'Peringatan'));
+        }
+        if (messageEl) {
+            messageEl.textContent = message;
+        }
+
+        if (iconContainer) {
+            iconContainer.className = 'pm-alert-icon-container ' + type;
+        }
+        if (iconSuccess) iconSuccess.style.display = type === 'success' ? 'block' : 'none';
+        if (iconError) iconError.style.display = type === 'error' ? 'block' : 'none';
+        if (iconWarning) iconWarning.style.display = type === 'warning' ? 'block' : 'none';
+
+        if (btn) {
+            btn.className = 'pm-alert-btn ' + type;
+            btn.textContent = type === 'success' ? 'Mengerti' : 'Tutup';
+            btn.onclick = function () {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                if (onConfirm) onConfirm();
+            };
+        }
+
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    };
+
     // Lightbox for Document Preview
     window.previewDocument = function (title, url) {
         if (!url || url === '#' || url === 'null') {
-            alert('Dokumen belum diunggah atau tidak tersedia.');
+            window.showProfileAlert({ title: 'Dokumen Tidak Tersedia', message: 'Dokumen belum diunggah atau tidak tersedia.', type: 'warning' });
             return;
         }
 
@@ -199,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!file) return;
 
         if (file.size > 5 * 1024 * 1024) {
-            alert('Ukuran file maksimal 5 MB!');
+            window.showProfileAlert({ title: 'Ukuran Terlalu Besar', message: 'Ukuran file maksimal 5 MB!', type: 'error' });
             input.value = '';
             return;
         }
@@ -232,6 +290,11 @@ document.addEventListener('DOMContentLoaded', function () {
     let provincesData = [];
     async function initWilayahDropdowns() {
         if (!editProvinsi) return;
+        function toTitleCase(str) {
+            if (!str) return '';
+            return str.toLowerCase().replace(/(?:^|\s|\/|-)\S/g, function (a) { return a.toUpperCase(); });
+        }
+
         if (provincesData.length > 0) return; // already loaded
 
         try {
@@ -243,9 +306,10 @@ document.addEventListener('DOMContentLoaded', function () {
             provincesData.forEach((prov) => {
                 const isSelected = prov.name.toLowerCase() === currentProv.toLowerCase();
                 const opt = document.createElement('option');
-                opt.value = prov.name;
+                const titleName = toTitleCase(prov.name);
+                opt.value = isSelected ? currentProv : titleName;
                 opt.dataset.id = prov.id;
-                opt.textContent = prov.name;
+                opt.textContent = isSelected ? currentProv : titleName;
                 if (isSelected) opt.selected = true;
                 editProvinsi.appendChild(opt);
             });
@@ -253,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (currentProv) {
                 const selectedOpt = editProvinsi.options[editProvinsi.selectedIndex];
                 if (selectedOpt && selectedOpt.dataset.id) {
-                    await loadRegencies(selectedOpt.dataset.id);
+                    await loadRegencies(selectedOpt.dataset.id, false);
                 }
             }
         } catch (err) {
@@ -261,60 +325,131 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    async function loadRegencies(provId) {
+    async function loadRegencies(provId, isUserChange = false) {
         if (!editKabupaten) return;
-        editKabupaten.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
-        if (editKecamatan) editKecamatan.innerHTML = '<option value="">Pilih Kecamatan</option>';
+        const currentKab = editKabupaten.getAttribute('data-current') || '';
 
-        if (!provId) return;
+        if (!provId) {
+            editKabupaten.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+            if (editKecamatan) editKecamatan.innerHTML = '<option value="">Pilih Kecamatan</option>';
+            return;
+        }
+
+        if (isUserChange) {
+            editKabupaten.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+            if (editKecamatan) editKecamatan.innerHTML = '<option value="">Pilih Kecamatan</option>';
+        }
+
+        function toTitleCase(str) {
+            if (!str) return '';
+            return str.toLowerCase().replace(/(?:^|\s|\/|-)\S/g, function (a) { return a.toUpperCase(); });
+        }
 
         try {
             const res = await fetch(`/api/wilayah/regencies/${provId}`);
             const regencies = await res.json();
-            const currentKab = editKabupaten.getAttribute('data-current') || '';
+
+            editKabupaten.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+            let foundSelected = false;
 
             regencies.forEach((reg) => {
-                const isSelected = reg.name.toLowerCase() === currentKab.toLowerCase();
+                const titleName = toTitleCase(reg.name);
+                const isSelected = !isUserChange && currentKab && (
+                    reg.name.toLowerCase() === currentKab.toLowerCase() ||
+                    titleName.toLowerCase() === currentKab.toLowerCase() ||
+                    reg.name.toLowerCase().includes(currentKab.toLowerCase()) ||
+                    currentKab.toLowerCase().includes(titleName.toLowerCase())
+                );
                 const opt = document.createElement('option');
-                opt.value = reg.name;
+                opt.value = isSelected ? currentKab : titleName;
                 opt.dataset.id = reg.id;
-                opt.textContent = reg.name;
-                if (isSelected) opt.selected = true;
+                opt.textContent = isSelected ? currentKab : titleName;
+                if (isSelected) {
+                    opt.selected = true;
+                    foundSelected = true;
+                }
                 editKabupaten.appendChild(opt);
             });
 
-            if (currentKab) {
+            // Fallback: If currentKab exists but wasn't in API list, keep old option
+            if (!isUserChange && currentKab && !foundSelected) {
+                const fallbackOpt = document.createElement('option');
+                fallbackOpt.value = currentKab;
+                fallbackOpt.textContent = currentKab;
+                fallbackOpt.selected = true;
+                editKabupaten.insertBefore(fallbackOpt, editKabupaten.children[1] || null);
+            }
+
+            if (!isUserChange && currentKab) {
                 const selectedOpt = editKabupaten.options[editKabupaten.selectedIndex];
                 if (selectedOpt && selectedOpt.dataset.id) {
-                    await loadDistricts(selectedOpt.dataset.id);
+                    await loadDistricts(selectedOpt.dataset.id, false);
                 }
             }
         } catch (err) {
             console.error('Gagal memuat kota/kabupaten:', err);
+            if (!isUserChange && currentKab) {
+                editKabupaten.innerHTML = `<option value="${currentKab}" selected>${currentKab}</option>`;
+            }
         }
     }
 
-    async function loadDistricts(regId) {
+    async function loadDistricts(regId, isUserChange = false) {
         if (!editKecamatan) return;
-        editKecamatan.innerHTML = '<option value="">Pilih Kecamatan</option>';
+        const currentKec = editKecamatan.getAttribute('data-current') || '';
 
-        if (!regId) return;
+        if (!regId) {
+            editKecamatan.innerHTML = '<option value="">Pilih Kecamatan</option>';
+            return;
+        }
+
+        if (isUserChange) {
+            editKecamatan.innerHTML = '<option value="">Pilih Kecamatan</option>';
+        }
+
+        function toTitleCase(str) {
+            if (!str) return '';
+            return str.toLowerCase().replace(/(?:^|\s|\/|-)\S/g, function (a) { return a.toUpperCase(); });
+        }
 
         try {
             const res = await fetch(`/api/wilayah/districts/${regId}`);
             const districts = await res.json();
-            const currentKec = editKecamatan.getAttribute('data-current') || '';
+
+            editKecamatan.innerHTML = '<option value="">Pilih Kecamatan</option>';
+            let foundSelected = false;
 
             districts.forEach((dist) => {
-                const isSelected = dist.name.toLowerCase() === currentKec.toLowerCase();
+                const titleName = toTitleCase(dist.name);
+                const isSelected = !isUserChange && currentKec && (
+                    dist.name.toLowerCase() === currentKec.toLowerCase() ||
+                    titleName.toLowerCase() === currentKec.toLowerCase() ||
+                    dist.name.toLowerCase().includes(currentKec.toLowerCase()) ||
+                    currentKec.toLowerCase().includes(titleName.toLowerCase())
+                );
                 const opt = document.createElement('option');
-                opt.value = dist.name;
-                opt.textContent = dist.name;
-                if (isSelected) opt.selected = true;
+                opt.value = isSelected ? currentKec : titleName;
+                opt.textContent = isSelected ? currentKec : titleName;
+                if (isSelected) {
+                    opt.selected = true;
+                    foundSelected = true;
+                }
                 editKecamatan.appendChild(opt);
             });
+
+            // Fallback: If currentKec exists but wasn't in API list, keep old option
+            if (!isUserChange && currentKec && !foundSelected) {
+                const fallbackOpt = document.createElement('option');
+                fallbackOpt.value = currentKec;
+                fallbackOpt.textContent = currentKec;
+                fallbackOpt.selected = true;
+                editKecamatan.insertBefore(fallbackOpt, editKecamatan.children[1] || null);
+            }
         } catch (err) {
             console.error('Gagal memuat kecamatan:', err);
+            if (!isUserChange && currentKec) {
+                editKecamatan.innerHTML = `<option value="${currentKec}" selected>${currentKec}</option>`;
+            }
         }
     }
 
@@ -324,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const provId = selectedOpt ? selectedOpt.dataset.id : null;
             editKabupaten.setAttribute('data-current', '');
             if (editKecamatan) editKecamatan.setAttribute('data-current', '');
-            loadRegencies(provId);
+            loadRegencies(provId, true);
         });
     }
 
@@ -333,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const selectedOpt = this.options[this.selectedIndex];
             const regId = selectedOpt ? selectedOpt.dataset.id : null;
             if (editKecamatan) editKecamatan.setAttribute('data-current', '');
-            loadDistricts(regId);
+            loadDistricts(regId, true);
         });
     }
 
@@ -392,17 +527,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.errors) {
                         showFormErrors(formUbahPassword, data.errors);
                     } else {
-                        alert(data.message || 'Gagal mengubah kata sandi.');
+                        window.showProfileAlert({ title: 'Gagal', message: data.message || 'Gagal mengubah kata sandi.', type: 'error' });
                     }
                     return;
                 }
 
-                alert(data.message || 'Kata sandi berhasil diperbarui.');
+                window.showProfileAlert({ title: 'Kata Sandi Diperbarui', message: data.message || 'Kata sandi berhasil diperbarui.', type: 'success' });
                 formUbahPassword.reset();
                 closePasswordModal();
             } catch (err) {
                 console.error(err);
-                alert('Terjadi kesalahan jaringan.');
+                window.showProfileAlert({ title: 'Kesalahan Jaringan', message: 'Terjadi kesalahan jaringan.', type: 'error' });
             } finally {
                 if (submitBtn) {
                     submitBtn.disabled = false;
@@ -443,12 +578,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (result.errors) {
                         showFormErrors(formEditProfil, result.errors);
                     } else {
-                        alert(result.message || 'Gagal mengajukan perubahan data.');
+                        window.showProfileAlert({ title: 'Pengajuan Gagal', message: result.message || 'Gagal mengajukan perubahan data.', type: 'error' });
                     }
                     return;
                 }
 
-                alert(result.message || 'Pengajuan perubahan data berhasil dikirim!');
+                window.showProfileAlert({
+                    title: 'Pengajuan Berhasil Dikirim',
+                    message: result.message || 'Pengajuan perubahan data berhasil dikirim dan akan diverifikasi oleh Admin Sistem.',
+                    type: 'success',
+                    onConfirm: function () {
+                        window.location.reload();
+                    },
+                });
 
                 // Update View Mode values with new data
                 if (result.data) {
@@ -475,7 +617,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 setProfilMode('view');
             } catch (err) {
                 console.error(err);
-                alert('Terjadi kesalahan koneksi saat mengirim pengajuan.');
+                window.showProfileAlert({ title: 'Kesalahan Koneksi', message: 'Terjadi kesalahan koneksi saat mengirim pengajuan.', type: 'error' });
             } finally {
                 if (submitBtn) {
                     submitBtn.disabled = false;

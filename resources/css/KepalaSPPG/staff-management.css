@@ -960,3 +960,62 @@
 .btn-modal-action-deactivate:hover {
     background-color: #FEE2E2;
 }
+
+/* Rejected Staff Alert Box */
+.staff-rejected-alert {
+    background-color: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 12px;
+    padding: 13px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.04);
+}
+
+.staff-rejected-alert-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #FEE2E2;
+    color: #DC2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.staff-rejected-alert-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.staff-rejected-alert-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #991B1B;
+    line-height: 1.35;
+}
+
+.staff-rejected-alert-desc {
+    font-size: 13px;
+    line-height: 1.45;
+    color: #7F1D1D;
+    word-break: break-word;
+}
+
+.staff-rejected-alert-label {
+    font-weight: 700;
+    color: #B91C1C;
+    margin-right: 4px;
+}
+
+.staff-rejected-alert-text {
+    font-weight: 500;
+    color: #450A0A;
+}

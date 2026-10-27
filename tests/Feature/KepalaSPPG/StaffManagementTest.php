@@ -128,6 +128,8 @@ class StaffManagementTest extends TestCase
             'email' => $uniqueEmail,
             'status' => 'menunggu_persetujuan',
         ]);
+
+        $this->assertEquals('perubahan', $this->sppg->fresh()->status_verifikasi);
     }
 
     public function test_tambah_staff_validation_fails_on_duplicate_email(): void
@@ -237,5 +239,80 @@ class StaffManagementTest extends TestCase
         $response->assertSee('Staff Ditolak');
         $response->assertSee($rejectedEmail);
         $response->assertDontSee($activeEmail);
+    }
+
+    public function test_admin_can_approve_pending_staff_in_sppg_management(): void
+    {
+        $adminUser = User::create([
+            'nama' => 'Admin Sistem '.uniqid(),
+            'email' => 'admin_'.uniqid().'@sppg.id',
+            'password' => Hash::make('password123'),
+            'role' => 'admin',
+            'status' => 'aktif',
+        ]);
+
+        $pendingEmail = 'staff_pending_'.uniqid().'@example.com';
+        $pendingStaff = Staff::create([
+            'id_sppg' => $this->sppg->id_sppg,
+            'nama' => 'Staff Menunggu',
+            'email' => $pendingEmail,
+            'password' => Hash::make('password123'),
+            'no_telepon' => '081234567899',
+            'status' => 'menunggu_persetujuan',
+        ]);
+
+        $this->sppg->update(['status_verifikasi' => 'perubahan']);
+
+        // Admin checks SPPG index page
+        $response = $this->actingAs($adminUser)->get(route('admin.sppg.index'));
+        $response->assertStatus(200);
+        $response->assertSee('Perubahan');
+        $response->assertSee('Verifikasi');
+
+        // Admin approves (status = 'aktif')
+        $postResponse = $this->actingAs($adminUser)
+            ->post(route('admin.sppg.updateStatus', $this->sppg->id_sppg), [
+                'status' => 'aktif',
+            ]);
+
+        $postResponse->assertSessionHas('success');
+        $this->assertEquals('aktif', $pendingStaff->fresh()->status);
+        $this->assertEquals('terverifikasi', $this->sppg->fresh()->status_verifikasi);
+    }
+
+    public function test_admin_can_reject_pending_staff_in_sppg_management(): void
+    {
+        $adminUser = User::create([
+            'nama' => 'Admin Sistem '.uniqid(),
+            'email' => 'admin_'.uniqid().'@sppg.id',
+            'password' => Hash::make('password123'),
+            'role' => 'admin',
+            'status' => 'aktif',
+        ]);
+
+        $pendingEmail = 'staff_reject_'.uniqid().'@example.com';
+        $pendingStaff = Staff::create([
+            'id_sppg' => $this->sppg->id_sppg,
+            'nama' => 'Staff Bakal Ditolak',
+            'email' => $pendingEmail,
+            'password' => Hash::make('password123'),
+            'no_telepon' => '081234567899',
+            'status' => 'menunggu_persetujuan',
+        ]);
+
+        $this->sppg->update(['status_verifikasi' => 'perubahan']);
+
+        // Admin rejects (status = 'nonaktif')
+        $postResponse = $this->actingAs($adminUser)
+            ->post(route('admin.sppg.updateStatus', $this->sppg->id_sppg), [
+                'status' => 'nonaktif',
+                'review_note' => 'Dokumen tidak valid',
+            ]);
+
+        $postResponse->assertSessionHas('success');
+        $this->assertEquals('ditolak', $pendingStaff->fresh()->status);
+        $this->assertEquals('Dokumen tidak valid', $pendingStaff->fresh()->catatan_admin);
+        $this->assertEquals('terverifikasi', $this->sppg->fresh()->status_verifikasi);
+        $this->assertEquals('aktif', $this->sppg->fresh()->status);
     }
 }

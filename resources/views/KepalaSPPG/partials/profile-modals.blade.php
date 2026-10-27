@@ -35,6 +35,13 @@
     $fotoKtp = $resolveDocUrl($currentSppg?->foto_ktp);
     $fotoKantor = $resolveDocUrl($currentSppg?->foto_kantor_sppg);
     $fotoSurat = $resolveDocUrl($currentSppg?->foto_surat_resmi);
+
+    $lastChangeRequest = \Illuminate\Support\Facades\Schema::hasTable('kepala_change_requests') && $currentSppg
+        ? \Illuminate\Support\Facades\DB::table('kepala_change_requests')
+            ->where('id_sppg', $currentSppg->id_sppg)
+            ->latest('id')
+            ->first()
+        : null;
 @endphp
 
 {{-- ========================================================= --}}
@@ -51,7 +58,7 @@
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
                 </button>
-                <h2 class="pm-title" id="modalProfilTitle">Profil SPPG</h2>
+                <h2 class="pm-title" id="modalProfilTitle">Profil & Informasi SPPG</h2>
             </div>
             <button type="button" class="pm-btn-close" onclick="closeProfilModal()" aria-label="Tutup Modal Profil">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -78,23 +85,61 @@
 
         {{-- VIEW MODE CONTAINER --}}
         <div id="profilViewContainer">
-            {{-- Banner Callout (Mode Tampilan) --}}
-            <div class="pm-banner-callout">
-                <div class="pm-banner-left">
-                    <svg class="pm-banner-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    <span class="pm-banner-text-view">Mode tampilan. Klik tombol untuk edit nama & data.</span>
+            @if ($currentSppg?->status_verifikasi === 'perubahan')
+                {{-- Banner Callout (Dalam Proses Verifikasi / Terkunci) --}}
+                <div class="pm-banner-callout" style="background-color: #FEF3C7; border: 1.5px solid #F59E0B;">
+                    <div class="pm-banner-left">
+                        <svg class="pm-banner-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <span style="color: #92400E; font-weight: 500; font-size: 13px;">
+                            Pengajuan perubahan data Anda sedang dalam proses verifikasi oleh Admin Sistem.
+                        </span>
+                    </div>
+                    <button type="button" class="pm-btn-edit-mode" disabled style="opacity: 0.6; cursor: not-allowed; background-color: #9CA3AF;" title="Fitur edit dikunci sementara selama verifikasi">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span>Terkunci</span>
+                    </button>
                 </div>
-                <button type="button" class="pm-btn-edit-mode" onclick="setProfilMode('edit')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                    </svg>
-                    <span>Edit Data</span>
-                </button>
-            </div>
+            @else
+                @if ($lastChangeRequest && $lastChangeRequest->status === 'rejected' && !empty($lastChangeRequest->review_note))
+                    <div class="pm-banner-callout" style="background-color: #FEE2E2; border: 1.5px solid #EF4444; margin-bottom: 14px;">
+                        <div class="pm-banner-left">
+                            <svg class="pm-banner-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                            <span style="color: #991B1B; font-weight: 500; font-size: 13px;">
+                                Pengajuan perubahan sebelumnya ditolak: {{ $lastChangeRequest->review_note }}
+                            </span>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Banner Callout (Mode Tampilan Normal) --}}
+                <div class="pm-banner-callout">
+                    <div class="pm-banner-left">
+                        <svg class="pm-banner-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span class="pm-banner-text-view">Mode tampilan. Klik tombol untuk edit nama & data.</span>
+                    </div>
+                    <button type="button" class="pm-btn-edit-mode" onclick="setProfilMode('edit')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                        <span>Edit Data</span>
+                    </button>
+                </div>
+            @endif
 
             {{-- Card 1: Informasi Kepala SPPG --}}
             <div class="pm-card">
@@ -674,3 +719,35 @@
         <div class="pm-lightbox-body" id="lightboxContent"></div>
     </div>
 </div>
+
+{{-- ========================================================= --}}
+{{-- 4. CUSTOM NOTIFICATION POPUP MODAL                        --}}
+{{-- ========================================================= --}}
+<div class="pm-alert-backdrop hidden" id="pmAlertModal" style="display: none;">
+    <div class="pm-alert-card">
+        <div class="pm-alert-icon-container" id="pmAlertIconContainer">
+            <svg id="pmAlertIconSuccess" class="pm-alert-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <svg id="pmAlertIconError" class="pm-alert-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <svg id="pmAlertIconWarning" class="pm-alert-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+        </div>
+        <div class="pm-alert-content">
+            <h3 class="pm-alert-title" id="pmAlertTitle">Berhasil</h3>
+            <p class="pm-alert-message" id="pmAlertMessage">Pesan notifikasi di sini.</p>
+        </div>
+        <div class="pm-alert-actions">
+            <button type="button" class="pm-alert-btn success" id="pmAlertBtn">Mengerti</button>
+        </div>
+    </div>
+</div>
+

@@ -125,6 +125,12 @@ class StaffManagementController extends Controller
             'status' => 'menunggu_persetujuan',
         ]);
 
+        if ($sppg->status_verifikasi === 'terverifikasi' || $sppg->status === 'aktif') {
+            $sppg->update([
+                'status_verifikasi' => 'perubahan',
+            ]);
+        }
+
         return redirect()->route('sppg.staff.index')->with('success', 'Pengajuan penambahan staff berhasil dikirim dan menunggu verifikasi Admin Sistem.');
     }
 
