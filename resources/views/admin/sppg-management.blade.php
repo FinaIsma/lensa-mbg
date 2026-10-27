@@ -164,16 +164,24 @@
                                         $tgl = $item->created_at ? \Carbon\Carbon::parse($item->created_at) : now();
                                         $tglFormatted = $tgl->format('d') . ' ' . ($bulanIndo[(int)$tgl->format('n')] ?? $tgl->format('F')) . ' ' . $tgl->format('Y');
 
-                                        $hasChanges = !empty($item->proposed) || ($item->status_verifikasi === 'perubahan');
+                                        $pendingStaffs = $item->staffs ? $item->staffs->whereIn('status', ['menunggu', 'menunggu_persetujuan'])->values() : collect();
+                                        $pendingStaffCount = $pendingStaffs->count();
+                                        $hasPendingStaffs = $pendingStaffCount > 0;
+                                        $hasChanges = !empty($item->proposed) || ($item->status_verifikasi === 'perubahan') || $hasPendingStaffs;
+
+                                        $activeStaff = $item->staffs ? $item->staffs->where('status', 'aktif')->sortByDesc('id')->first() : null;
+                                        $staffLama = $activeStaff ?: $item->staff;
+
                                         $itemJson = json_encode([
                                             'id_sppg' => $idFormatted,
                                             'raw_id' => $item->id_sppg,
                                             'nama_pegawai' => $item->user->nama ?? '-',
                                             'email' => $item->user->email ?? '-',
                                             'no_telepon' => $item->no_telepon ?? '-',
-                                            'staff_nama' => $item->staff?->nama ?? '-',
-                                            'staff_email' => $item->staff?->email ?? '-',
-                                            'staff_no_telepon' => $item->staff?->no_telepon ?? '-',
+                                            'staff_nama' => $staffLama?->nama ?? '-',
+                                            'staff_email' => $staffLama?->email ?? '-',
+                                            'staff_no_telepon' => $staffLama?->no_telepon ?? '-',
+                                            'has_active_staff' => (bool) $activeStaff,
                                             'nama_sppg' => $item->nama_sppg,
                                             'status' => $item->status,
                                             'status_verifikasi' => $item->status_verifikasi ?? 'terverifikasi',
@@ -186,6 +194,22 @@
                                             'foto_kantor_sppg' => $item->foto_kantor_sppg ? (str_starts_with($item->foto_kantor_sppg, 'http') ? $item->foto_kantor_sppg : asset($item->foto_kantor_sppg)) : null,
                                             'foto_surat_resmi' => $item->foto_surat_resmi ? (str_starts_with($item->foto_surat_resmi, 'http') ? $item->foto_surat_resmi : asset($item->foto_surat_resmi)) : null,
                                             'has_changes' => $hasChanges,
+                                            'has_pending_staffs' => $hasPendingStaffs,
+                                            'pending_staffs' => $pendingStaffs->map(fn ($st) => [
+                                                'id' => $st->id,
+                                                'nama' => $st->nama,
+                                                'email' => $st->email,
+                                                'no_telepon' => $st->no_telepon ?? '-',
+                                                'created_at' => $st->created_at ? $st->created_at->locale('id')->translatedFormat('d F Y') : '-',
+                                            ])->all(),
+                                            'all_staffs' => $item->staffs ? $item->staffs->map(fn ($st) => [
+                                                'id' => $st->id,
+                                                'nama' => $st->nama,
+                                                'email' => $st->email,
+                                                'no_telepon' => $st->no_telepon ?? '-',
+                                                'status' => $st->status,
+                                                'catatan_admin' => $st->catatan_admin,
+                                            ])->all() : [],
                                             'proposed' => $item->proposed ?? null,
                                             'before_values' => $item->before_values ?? null,
                                         ]);
@@ -194,11 +218,21 @@
                                         <td class="font-medium text-dark">{{ $idFormatted }}</td>
                                         <td class="font-medium text-dark">{{ $item->nama_sppg }}</td>
                                         <td class="font-medium text-dark">{{ $item->user->nama ?? '-' }}</td>
-                                        <td class="font-medium text-dark">{{ $item->staff?->nama ?? '-' }}</td>
+                                        <td class="font-medium text-dark">
+                                            <div class="staff-cell-wrapper">
+                                                <span class="staff-cell-name">{{ $staffLama?->nama ?? '-' }}</span>
+                                                @if ($pendingStaffCount > 0)
+                                                    <span class="badge-staff-pending-count" title="{{ $pendingStaffCount }} staf baru menunggu verifikasi">
+                                                        <span class="badge-staff-dot"></span>
+                                                        <span>+{{ $pendingStaffCount }} baru</span>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </td>
                                         <td>
-                                            @if ($item->status_verifikasi === 'terverifikasi')
+                                            @if ($item->status_verifikasi === 'terverifikasi' && $pendingStaffCount === 0)
                                                 <span class="badge-verif badge-terverifikasi">Terverifikasi</span>
-                                            @elseif ($item->status_verifikasi === 'perubahan')
+                                            @elseif ($item->status_verifikasi === 'perubahan' || $pendingStaffCount > 0)
                                                 <span class="badge-verif badge-perubahan">Perubahan</span>
                                             @elseif ($item->status_verifikasi === 'menunggu_verifikasi')
                                                 <span class="badge-verif badge-belum">Belum Diverifikasi</span>
@@ -222,7 +256,7 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            @if ($item->status_verifikasi === 'menunggu_verifikasi' || $item->status_verifikasi === 'perubahan')
+                                            @if ($item->status_verifikasi === 'menunggu_verifikasi' || $item->status_verifikasi === 'perubahan' || $pendingStaffCount > 0)
                                                 <button type="button" class="btn-action btn-verifikasi" onclick='openVerifikasiModal({{ $itemJson }})'>
                                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>

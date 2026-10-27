@@ -208,6 +208,7 @@ class SppgManagementController extends Controller
                         ->whereIn('status', ['menunggu', 'menunggu_persetujuan'])
                         ->update([
                             'status' => 'aktif',
+                            'catatan_admin' => null,
                             'nonaktif_at' => null,
                             'nonaktif_reason' => null,
                         ]);
@@ -311,6 +312,14 @@ class SppgManagementController extends Controller
                         $sppg->status_verifikasi = 'terverifikasi';
                         $sppg->status = 'aktif';
                         $aksi = 'kepala_change_reject';
+
+                        $reviewNote = $request->input('review_note') ?: 'Pengajuan penambahan staff ditolak oleh Administrator.';
+                        Staff::where('id_sppg', $sppg->id_sppg)
+                            ->whereIn('status', ['menunggu', 'menunggu_persetujuan'])
+                            ->update([
+                                'status' => 'ditolak',
+                                'catatan_admin' => $reviewNote,
+                            ]);
 
                         if (Schema::hasTable('kepala_change_requests')) {
                             $pendingCr = DB::table('kepala_change_requests')

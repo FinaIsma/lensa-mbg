@@ -191,6 +191,7 @@
                                 'email' => $item->email,
                                 'no_telepon' => $item->no_telepon ?? '-',
                                 'status' => $item->status,
+                                'catatan_admin' => $item->catatan_admin ?? null,
                                 'sppg_nama' => $sppg->nama_sppg ?? '-',
                                 'sppg_id_formatted' => 'SPPG' . str_pad((string) ($sppg->id_sppg ?? 1), 3, '0', STR_PAD_LEFT),
                                 'alamat_sppg' => $sppg->alamat_sppg ?? '-',
@@ -413,6 +414,25 @@
                     <div>
                         <div class="cr-entity-title" id="detailStaffName">Kim Min-jeong</div>
                         <div class="cr-entity-subtitle" id="detailSppgId">SPPG001</div>
+                    </div>
+                </div>
+                <div id="detailStaffBadgeContainer"></div>
+            </div>
+
+            {{-- Alert Alasan Penolakan (Hanya muncul jika staff berstatus Ditolak) --}}
+            <div class="staff-rejected-alert" id="detailRejectedAlert" style="display: none;">
+                <div class="staff-rejected-alert-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+                <div class="staff-rejected-alert-content">
+                    <div class="staff-rejected-alert-title">Pengajuan Staff Ditolak</div>
+                    <div class="staff-rejected-alert-desc">
+                        <span class="staff-rejected-alert-label">Alasan:</span>
+                        <span class="staff-rejected-alert-text" id="detailCatatanAdmin">-</span>
                     </div>
                 </div>
             </div>

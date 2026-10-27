@@ -4,11 +4,13 @@ window.renderSppgModalContent = function (item) {
         typeof item.proposed === 'object' &&
         Object.keys(item.proposed).length > 0
     );
-    const hasChanges = Boolean(item.has_changes || hasProposed || item.status_verifikasi === 'perubahan');
+    const pendingStaffs = Array.isArray(item.pending_staffs) ? item.pending_staffs : [];
+    const hasPendingStaffs = pendingStaffs.length > 0;
+    const hasChanges = Boolean(item.has_changes || hasProposed || item.status_verifikasi === 'perubahan' || hasPendingStaffs);
 
     // Update modal dialog width class dynamically
     document.querySelectorAll('.modal-dialog').forEach(dialog => {
-        if (hasChanges) {
+        if (hasProposed) {
             dialog.classList.add('modal-dialog-diff');
         } else {
             dialog.classList.remove('modal-dialog-diff');
@@ -18,11 +20,23 @@ window.renderSppgModalContent = function (item) {
     // Update modal title dynamically
     const detailTitle = document.querySelector('#modalDetail .modal-title');
     if (detailTitle) {
-        detailTitle.textContent = hasChanges ? 'Detail Perubahan SPPG' : 'Detail SPPG';
+        if (hasPendingStaffs && !hasProposed) {
+            detailTitle.textContent = 'Detail SPPG & Staff';
+        } else if (hasChanges) {
+            detailTitle.textContent = 'Detail Perubahan SPPG';
+        } else {
+            detailTitle.textContent = 'Detail SPPG';
+        }
     }
     const verifTitle = document.querySelector('#modalVerifikasi .modal-title');
     if (verifTitle) {
-        verifTitle.textContent = hasChanges ? 'Verifikasi Perubahan SPPG' : 'Verifikasi SPPG';
+        if (hasPendingStaffs && !hasProposed) {
+            verifTitle.textContent = 'Verifikasi Penambahan Staff';
+        } else if (hasChanges) {
+            verifTitle.textContent = 'Verifikasi Perubahan SPPG';
+        } else {
+            verifTitle.textContent = 'Verifikasi SPPG';
+        }
     }
 
     // SVG icon paths matching reference design
@@ -86,11 +100,78 @@ window.renderSppgModalContent = function (item) {
         `;
     }
 
-    // ── KONDISI 1: TIDAK ADA PERUBAHAN (1 KOLOM BERSIH) ────────────────
-    if (!hasChanges) {
+    // ── KONDISI 1: TIDAK ADA PERUBAHAN PROFIL (1 KOLOM BERSIH) ────────────────
+    if (!hasProposed) {
         const staffNama = item.staff_nama || '-';
         const staffEmail = item.staff_email || '-';
         const staffTelp = item.staff_no_telepon || '-';
+
+        let staffSectionHtml = '';
+
+        // 1. Informasi Staff Lama (jika ada staff aktif/lama dan bukan staff yang sedang pending)
+        const hasStaffLama = staffNama && staffNama !== '-' && !pendingStaffs.some(st => st.nama === staffNama || st.email === staffEmail);
+
+        if (hasStaffLama) {
+            staffSectionHtml += `
+                <!-- Section 2A: Informasi Staff SPPG (Lama) -->
+                <div class="cr-info-card">
+                    <div class="cr-card-header">
+                        <h3 class="cr-card-title">Informasi Staff SPPG</h3>
+                        <span class="cr-badge-aktif-tag">
+                            <span class="cr-badge-aktif-dot"></span>
+                            <span>Aktif</span>
+                        </span>
+                    </div>
+                    <div class="cr-card-body">
+                        ${renderRow(icons.user, 'Nama Lengkap', staffNama)}
+                        ${renderRow(icons.email, 'Email', staffEmail)}
+                        ${renderRow(icons.phone, 'No Telepon', staffTelp)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 2. Informasi Staff Baru yang Butuh Verifikasi (Tepat di bawahnya, desain persis sama)
+        if (hasPendingStaffs) {
+            staffSectionHtml += pendingStaffs.map((st, idx) => {
+                const title = hasStaffLama
+                    ? (pendingStaffs.length > 1 ? `Informasi Staff SPPG (Staff Baru #${idx + 1})` : 'Informasi Staff SPPG (Staff Baru)')
+                    : (pendingStaffs.length > 1 ? `Informasi Staff SPPG (${idx + 1})` : 'Informasi Staff SPPG');
+
+                return `
+                    <!-- Section 2B: Informasi Staff SPPG (Staff Baru yang butuh verifikasi) -->
+                    <div class="cr-info-card is-pending-card">
+                        <div class="cr-card-header">
+                            <h3 class="cr-card-title">${title}</h3>
+                            <span class="cr-badge-verifikasi-tag">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                                <span>Perlu Verifikasi</span>
+                            </span>
+                        </div>
+                        <div class="cr-card-body">
+                            ${renderRow(icons.user, 'Nama Lengkap', st.nama)}
+                            ${renderRow(icons.email, 'Email', st.email)}
+                            ${renderRow(icons.phone, 'No Telepon', st.no_telepon || '-')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else if (!hasStaffLama) {
+            staffSectionHtml = `
+                <div class="cr-info-card">
+                    <h3 class="cr-card-title">Informasi Staff SPPG</h3>
+                    <div class="cr-card-body">
+                        ${renderRow(icons.user, 'Nama Lengkap', staffNama)}
+                        ${renderRow(icons.email, 'Email', staffEmail)}
+                        ${renderRow(icons.phone, 'No Telepon', staffTelp)}
+                    </div>
+                </div>
+            `;
+        }
 
         return `
             <!-- Entity Profile Header -->
@@ -115,15 +196,8 @@ window.renderSppgModalContent = function (item) {
                     </div>
                 </div>
 
-                <!-- Section 2: Informasi Staff SPPG -->
-                <div class="cr-info-card">
-                    <h3 class="cr-card-title">Informasi Staff SPPG</h3>
-                    <div class="cr-card-body">
-                        ${renderRow(icons.user, 'Nama Lengkap', staffNama)}
-                        ${renderRow(icons.email, 'Email', staffEmail)}
-                        ${renderRow(icons.phone, 'No Telepon', staffTelp)}
-                    </div>
-                </div>
+                <!-- Section 2: Informasi Staff SPPG (Lama & Baru di bawahnya) -->
+                ${staffSectionHtml}
 
                 <!-- Section 3: Informasi SPPG -->
                 <div class="cr-info-card">
