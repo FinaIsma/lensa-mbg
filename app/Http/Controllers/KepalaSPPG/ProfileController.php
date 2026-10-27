@@ -4,7 +4,6 @@ namespace App\Http\Controllers\KepalaSPPG;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sppg;
-use App\Models\User;
 use App\Services\SupabaseStorageService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -35,6 +34,14 @@ class ProfileController extends Controller
         $tglCreated = $sppg?->created_at ? Carbon::parse($sppg->created_at) : now();
         $tglFormatted = $tglCreated->format('d').' '.($bulanIndo[(int) $tglCreated->format('n')] ?? $tglCreated->format('F')).' '.$tglCreated->format('Y');
 
+        $latestChangeRequest = null;
+        if (Schema::hasTable('kepala_change_requests') && $sppg) {
+            $latestChangeRequest = DB::table('kepala_change_requests')
+                ->where('id_sppg', $sppg->id_sppg)
+                ->latest('id')
+                ->first();
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -55,6 +62,11 @@ class ProfileController extends Controller
                 'foto_ktp' => $this->resolveUrl($sppg?->foto_ktp),
                 'foto_kantor_sppg' => $this->resolveUrl($sppg?->foto_kantor_sppg),
                 'foto_surat_resmi' => $this->resolveUrl($sppg?->foto_surat_resmi),
+                'change_request' => $latestChangeRequest ? [
+                    'status' => $latestChangeRequest->status,
+                    'review_note' => $latestChangeRequest->review_note,
+                    'requested_at' => $latestChangeRequest->requested_at,
+                ] : null,
             ],
         ]);
     }
@@ -128,6 +140,28 @@ class ProfileController extends Controller
         $sppg = $user->sppg ?? Sppg::where('id_user', $user->id_user)->first();
         if (! $sppg) {
             return response()->json(['success' => false, 'message' => 'Data SPPG tidak ditemukan.'], 404);
+        }
+
+        if ($sppg->status_verifikasi === 'perubahan' || (Schema::hasTable('kepala_change_requests') && DB::table('kepala_change_requests')->where('id_sppg', $sppg->id_sppg)->where('status', 'pending')->exists())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengajuan perubahan data Anda sedang dalam proses verifikasi oleh Admin Sistem. Anda belum dapat melakukan perubahan baru.',
+            ], 422);
+        }
+
+        // Cek jika email baru sedang dalam antrean verifikasi oleh SPPG lain
+        if (Schema::hasTable('kepala_change_requests') && DB::table('kepala_change_requests')
+            ->where('id_sppg', '!=', $sppg->id_sppg)
+            ->where('status', 'pending')
+            ->where('email_baru', $request->input('email'))
+            ->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email ini sedang dalam proses verifikasi perubahan oleh akun SPPG lain.',
+                'errors' => [
+                    'email' => ['Email ini sedang dalam proses verifikasi perubahan oleh akun SPPG lain.'],
+                ],
+            ], 422);
         }
 
         $validated = $request->validate([
@@ -205,6 +239,18 @@ class ProfileController extends Controller
                 }
             }
 
+            $provinsi = strcasecmp($validated['provinsi'], $sppg->provinsi ?? '') === 0
+                ? $sppg->provinsi
+                : Str::title(mb_strtolower($validated['provinsi']));
+
+            $kabupaten = strcasecmp($validated['kabupaten_kota'], $sppg->kabupaten_kota ?? '') === 0
+                ? $sppg->kabupaten_kota
+                : Str::title(mb_strtolower($validated['kabupaten_kota']));
+
+            $kecamatan = strcasecmp($validated['kecamatan'], $sppg->kecamatan ?? '') === 0
+                ? $sppg->kecamatan
+                : Str::title(mb_strtolower($validated['kecamatan']));
+
             // Simpan riwayat perubahan jika ada tabel kepala_change_requests
             if (Schema::hasTable('kepala_change_requests')) {
                 DB::table('kepala_change_requests')->insert([
@@ -225,6 +271,22 @@ class ProfileController extends Controller
                         'provinsi' => $sppg->provinsi,
                         'kabupaten_kota' => $sppg->kabupaten_kota,
                         'kecamatan' => $sppg->kecamatan,
+                        'foto_ktp' => $sppg->foto_ktp,
+                        'foto_kantor_sppg' => $sppg->foto_kantor_sppg,
+                        'foto_surat_resmi' => $sppg->foto_surat_resmi,
+                        'proposed' => [
+                            'nama' => $validated['nama_lengkap'],
+                            'email' => $validated['email'],
+                            'no_telepon' => $validated['no_telepon'],
+                            'nama_sppg' => $validated['nama_sppg'],
+                            'alamat_sppg' => $validated['alamat_sppg'],
+                            'provinsi' => $provinsi,
+                            'kabupaten_kota' => $kabupaten,
+                            'kecamatan' => $kecamatan,
+                            'foto_ktp' => $fotoKtpUrl,
+                            'foto_kantor_sppg' => $fotoKantorUrl,
+                            'foto_surat_resmi' => $fotoSuratUrl,
+                        ],
                     ]),
                     'status' => 'pending',
                     'requested_at' => now(),
@@ -233,22 +295,10 @@ class ProfileController extends Controller
                 ]);
             }
 
-            // Update user & SPPG
-            $user->update([
-                'nama' => $validated['nama_lengkap'],
-                'email' => $validated['email'],
-            ]);
-
+            // STAGING PATTERN:
+            // Data utama pada tabel users dan sppg TIDAK diubah sekarang!
+            // Hanya status_verifikasi yang diubah menjadi 'perubahan' agar terkunci dan masuk ke antrean verifikasi Admin.
             $sppg->update([
-                'nama_sppg' => $validated['nama_sppg'],
-                'no_telepon' => $validated['no_telepon'],
-                'alamat_sppg' => $validated['alamat_sppg'],
-                'provinsi' => $validated['provinsi'],
-                'kabupaten_kota' => $validated['kabupaten_kota'],
-                'kecamatan' => $validated['kecamatan'],
-                'foto_ktp' => $fotoKtpUrl,
-                'foto_kantor_sppg' => $fotoKantorUrl,
-                'foto_surat_resmi' => $fotoSuratUrl,
                 'status_verifikasi' => 'perubahan',
             ]);
 
@@ -258,17 +308,17 @@ class ProfileController extends Controller
                 'success' => true,
                 'message' => 'Pengajuan perubahan data berhasil dikirim dan akan diverifikasi oleh Admin Sistem.',
                 'data' => [
-                    'nama_lengkap' => $user->nama,
-                    'email' => $user->email,
-                    'no_telepon' => $sppg->no_telepon,
-                    'nama_sppg' => $sppg->nama_sppg,
-                    'alamat_sppg' => $sppg->alamat_sppg,
-                    'provinsi' => $sppg->provinsi,
-                    'kabupaten_kota' => $sppg->kabupaten_kota,
-                    'kecamatan' => $sppg->kecamatan,
-                    'foto_ktp' => $sppg->foto_ktp,
-                    'foto_kantor_sppg' => $sppg->foto_kantor_sppg,
-                    'foto_surat_resmi' => $sppg->foto_surat_resmi,
+                    'nama_lengkap' => $validated['nama_lengkap'],
+                    'email' => $validated['email'],
+                    'no_telepon' => $validated['no_telepon'],
+                    'nama_sppg' => $validated['nama_sppg'],
+                    'alamat_sppg' => $validated['alamat_sppg'],
+                    'provinsi' => $provinsi,
+                    'kabupaten_kota' => $kabupaten,
+                    'kecamatan' => $kecamatan,
+                    'foto_ktp' => $fotoKtpUrl,
+                    'foto_kantor_sppg' => $fotoKantorUrl,
+                    'foto_surat_resmi' => $fotoSuratUrl,
                 ],
             ]);
         } catch (Exception $e) {

@@ -164,17 +164,19 @@
                                         $tgl = $item->created_at ? \Carbon\Carbon::parse($item->created_at) : now();
                                         $tglFormatted = $tgl->format('d') . ' ' . ($bulanIndo[(int)$tgl->format('n')] ?? $tgl->format('F')) . ' ' . $tgl->format('Y');
 
+                                        $hasChanges = !empty($item->proposed) || ($item->status_verifikasi === 'perubahan');
                                         $itemJson = json_encode([
                                             'id_sppg' => $idFormatted,
                                             'raw_id' => $item->id_sppg,
                                             'nama_pegawai' => $item->user->nama ?? '-',
                                             'email' => $item->user->email ?? '-',
                                             'no_telepon' => $item->no_telepon ?? '-',
-                                            'staff_nama' => $item->staff->nama ?? '-',
-                                            'staff_email' => $item->staff->email ?? '-',
-                                            'staff_no_telepon' => $item->staff->no_telepon ?? '-',
+                                            'staff_nama' => $item->staff?->nama ?? '-',
+                                            'staff_email' => $item->staff?->email ?? '-',
+                                            'staff_no_telepon' => $item->staff?->no_telepon ?? '-',
                                             'nama_sppg' => $item->nama_sppg,
                                             'status' => $item->status,
+                                            'status_verifikasi' => $item->status_verifikasi ?? 'terverifikasi',
                                             'alamat_sppg' => $item->alamat_sppg ?? '-',
                                             'provinsi' => $item->provinsi ?? '-',
                                             'kabupaten_kota' => $item->kabupaten_kota ?? '-',
@@ -183,17 +185,22 @@
                                             'foto_ktp' => $item->foto_ktp ? (str_starts_with($item->foto_ktp, 'http') ? $item->foto_ktp : asset($item->foto_ktp)) : null,
                                             'foto_kantor_sppg' => $item->foto_kantor_sppg ? (str_starts_with($item->foto_kantor_sppg, 'http') ? $item->foto_kantor_sppg : asset($item->foto_kantor_sppg)) : null,
                                             'foto_surat_resmi' => $item->foto_surat_resmi ? (str_starts_with($item->foto_surat_resmi, 'http') ? $item->foto_surat_resmi : asset($item->foto_surat_resmi)) : null,
+                                            'has_changes' => $hasChanges,
+                                            'proposed' => $item->proposed ?? null,
+                                            'before_values' => $item->before_values ?? null,
                                         ]);
                                     @endphp
                                     <tr>
                                         <td class="font-medium text-dark">{{ $idFormatted }}</td>
                                         <td class="font-medium text-dark">{{ $item->nama_sppg }}</td>
                                         <td class="font-medium text-dark">{{ $item->user->nama ?? '-' }}</td>
-                                        <td class="font-medium text-dark">{{ $item->staff->nama ?? '-' }}</td>
+                                        <td class="font-medium text-dark">{{ $item->staff?->nama ?? '-' }}</td>
                                         <td>
-                                            @if ($item->status === 'aktif')
+                                            @if ($item->status_verifikasi === 'terverifikasi')
                                                 <span class="badge-verif badge-terverifikasi">Terverifikasi</span>
-                                            @elseif ($item->status === 'menunggu_verifikasi')
+                                            @elseif ($item->status_verifikasi === 'perubahan')
+                                                <span class="badge-verif badge-perubahan">Perubahan</span>
+                                            @elseif ($item->status_verifikasi === 'menunggu_verifikasi')
                                                 <span class="badge-verif badge-belum">Belum Diverifikasi</span>
                                             @else
                                                 <span class="badge-verif badge-ditolak">Ditolak</span>
@@ -204,7 +211,7 @@
                                                 <span class="badge-status badge-status-aktif">
                                                      <span class="status-dot"></span> Aktif
                                                 </span>
-                                            @elseif ($item->status === 'menunggu_verifikasi')
+                                            @elseif ($item->status_verifikasi === 'menunggu_verifikasi' || $item->status === 'menunggu_verifikasi')
                                                 <span class="badge-status badge-status-belum">
                                                      <span class="status-dot"></span> Belum Aktif
                                                 </span>
@@ -215,7 +222,7 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            @if ($item->status === 'menunggu_verifikasi')
+                                            @if ($item->status_verifikasi === 'menunggu_verifikasi' || $item->status_verifikasi === 'perubahan')
                                                 <button type="button" class="btn-action btn-verifikasi" onclick='openVerifikasiModal({{ $itemJson }})'>
                                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -306,6 +313,7 @@
             <form id="formVerifikasi" action="" method="POST">
                 @csrf
                 <input type="hidden" name="status" id="inputStatusVal" value="aktif">
+                <input type="hidden" name="review_note" id="inputReviewNote" value="">
 
                 <div class="modal-body" id="verifikasiModalContent">
                 </div>
@@ -330,6 +338,40 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    {{-- Modal Konfirmasi / Catatan Tolak Verifikasi --}}
+    <div id="modalRejectSppg" class="sppg-confirm-backdrop hidden">
+        <div class="sppg-confirm-card">
+            <div class="sppg-confirm-header">
+                <div class="sppg-confirm-icon-danger">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="sppg-confirm-title">Tolak Verifikasi SPPG</h3>
+                    <p class="sppg-confirm-desc">Masukkan catatan atau alasan penolakan untuk pihak Kepala SPPG (opsional):</p>
+                </div>
+            </div>
+
+            <div class="sppg-confirm-body">
+                <textarea id="rejectReasonTextarea" class="sppg-confirm-textarea" placeholder="Tulis catatan atau alasan penolakan di sini (contoh: Dokumen SK/KTP buram, silakan upload ulang)..." rows="3"></textarea>
+            </div>
+
+            <div class="sppg-confirm-actions">
+                <button type="button" class="btn-confirm-cancel" onclick="closeRejectModal()">Batal</button>
+                <button type="button" class="btn-confirm-reject" onclick="confirmRejectVerifikasi()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    <span>Tolak Verifikasi</span>
+                </button>
+            </div>
         </div>
     </div>
 </body>
