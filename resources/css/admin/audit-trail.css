@@ -92,6 +92,10 @@ textarea {
     .stat-cards-grid {
         grid-template-columns: 1fr;
     }
+
+    .search-input-box {
+        width: 100%;
+    }
 }
 
 .stat-card {
@@ -182,13 +186,13 @@ textarea {
 
 .search-input-box {
     position: relative;
-    width: 380px;
+    width: 250px;
     max-width: 100%;
 }
 
 .search-icon {
     position: absolute;
-    left: 14px;
+    left: 12px;
     top: 50%;
     transform: translateY(-50%);
     color: #94A3B8;
@@ -197,10 +201,10 @@ textarea {
 
 .input-search {
     width: 100%;
-    padding: 10px 14px 10px 42px;
+    padding: 9px 12px 9px 38px;
     border: 1px solid #E2E8F0;
     border-radius: 10px;
-    font-size: 13.5px;
+    font-size: 13px;
     color: #0F172A;
     outline: none;
     background-color: #FFFFFF;

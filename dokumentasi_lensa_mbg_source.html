@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dokumentasi Modul dan Database LENSA MBG</title>
+<style>
+    @page {
+        size: A4;
+        margin: 18mm 16mm 20mm 16mm;
+        @bottom-right {
+            content: "Halaman " counter(page);
+            font-size: 9pt;
+            color: #64748b;
+        }
+        @bottom-left {
+            content: "LENSA MBG - Dokumentasi Sistem & Spesifikasi Database";
+            font-size: 9pt;
+            color: #64748b;
+        }
+    }
+    
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: #1e293b;
+        line-height: 1.55;
+        font-size: 10.5pt;
+        background-color: #ffffff;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Cover / Header Section */
+    .header-box {
+        border-bottom: 3px solid #1e3a8a;
+        padding-bottom: 18px;
+        margin-bottom: 25px;
+    }
+    
+    .doc-badge {
+        display: inline-block;
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        font-size: 8.5pt;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 4px;
+        border: 1px solid #bfdbfe;
+        margin-bottom: 10px;
+    }
+
+    h1 {
+        font-size: 22pt;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 8px 0;
+        line-height: 1.2;
+    }
+
+    .doc-subtitle {
+        font-size: 12pt;
+        color: #475569;
+        margin: 0 0 15px 0;
+        font-weight: 500;
+    }
+
+    .meta-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 9pt;
+    }
+
+    .meta-item {
+        display: flex;
+        gap: 6px;
+    }
+    .meta-label {
+        font-weight: 600;
+        color: #64748b;
+    }
+    .meta-val {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    /* Section Headings */
+    h2 {
+        font-size: 14pt;
+        font-weight: 700;
+        color: #1e3a8a;
+        border-left: 4px solid #2563eb;
+        padding-left: 10px;
+        margin-top: 28px;
+        margin-bottom: 14px;
+        page-break-after: avoid;
+    }
+
+    h3 {
+        font-size: 11.5pt;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 18px;
+        margin-bottom: 8px;
+        page-break-after: avoid;
+    }
+
+    p {
+        margin: 0 0 10px 0;
+    }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0 16px 0;
+        font-size: 9pt;
+        page-break-inside: avoid;
+    }
+
+    th {
+        background-color: #f1f5f9;
+        color: #0f172a;
+        font-weight: 700;
+        text-align: left;
+        padding: 7px 10px;
+        border: 1px solid #cbd5e1;
+    }
+
+    td {
+        padding: 7px 10px;
+        border: 1px solid #e2e8f0;
+        vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+        background-color: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-block;
+        font-size: 7.5pt;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .badge-pk { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .badge-fk { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    .badge-admin { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .badge-kepala { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .badge-staff { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .badge-active { background: #dcfce7; color: #15803d; }
+    .badge-pending { background: #fef3c7; color: #b45309; }
+    .badge-rejected { background: #fee2e2; color: #b91c1c; }
+
+    /* Cards & Callouts */
+    .callout {
+        background-color: #f0fdf4;
+        border-left: 4px solid #16a34a;
+        padding: 10px 14px;
+        margin: 12px 0 16px 0;
+        border-radius: 0 6px 6px 0;
+        font-size: 9.5pt;
+        page-break-inside: avoid;
+    }
+    .callout-info {
+        background-color: #eff6ff;
+        border-left-color: #2563eb;
+    }
+    .callout-warning {
+        background-color: #fffbeb;
+        border-left-color: #d97706;
+    }
+    .callout-title {
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    /* Lists */
+    ul, ol {
+        margin: 0 0 12px 0;
+        padding-left: 20px;
+    }
+    li {
+        margin-bottom: 4px;
+    }
+
+    /* Code block */
+    code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 8.5pt;
+        background-color: #f1f5f9;
+        color: #0f172a;
+        padding: 1px 5px;
+        border-radius: 3px;
+    }
+
+    .page-break {
+        page-break-before: always;
+    }
+
+    /* Diagram simulation */
+    .flow-step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 9.5pt;
+        page-break-inside: avoid;
+    }
+    .flow-number {
+        background: #2563eb;
+        color: #ffffff;
+        font-weight: 700;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 9pt;
+    }
+</style>
+</head>
+<body>
+
+    <!-- Header / Cover -->
+    <div class="header-box">
+        <div class="doc-badge">Dokumentasi Arsitektur Sistem & Spesifikasi Database</div>
+        <h1>LENSA MBG</h1>
+        <div class="doc-subtitle">Layanan Elektronik Nutrisi dan Sanitasi Andal — Program Makan Bergizi Gratis</div>
+        
+        <div class="meta-grid">
+            <div class="meta-item"><span class="meta-label">Aplikasi:</span> <span class="meta-val">LENSA MBG (Laravel 12 / PHP 8.4)</span></div>
+            <div class="meta-item"><span class="meta-label">Basis Data:</span> <span class="meta-val">PostgreSQL / Supabase</span></div>
+            <div class="meta-item"><span class="meta-label">Tanggal Terbit:</span> <span class="meta-val">28 Oktober 2026</span></div>
+            <div class="meta-item"><span class="meta-label">Status Dokumen:</span> <span class="meta-val">Resmi (Sesuai Implementasi Kode Aktif)</span></div>
+        </div>
+    </div>
+
+    <!-- Ringkasan Eksekutif -->
+    <div class="callout callout-info">
+        <div class="callout-title">Tentang Dokumen Ini</div>
+        Dokumen ini merangkum seluruh struktur database, peran pengguna (*roles*), relasi kunci primer & asing (PK & FK), alur kerja fungsional, dan mekanisme keamanan pada 6 modul inti aplikasi: <strong>User & Staff SPPG, SPPG, Dashboard Admin, Correction Request, Audit Trail, serta Login & Register</strong>.
+    </div>
+
+    <!-- 1. MODUL USER & STAFF SPPG -->
+    <h2>1. Modul User & Staff SPPG</h2>
+    <p>Aplikasi LENSA MBG memisahkan data pengguna ke dalam 2 tabel fisik dan 2 <em>authentication guard</em> Laravel (<code>web</code> dan <code>staff</code>) dengan hierarki 3 peran utama:</p>
+
+    <ul>
+        <li><span class="badge badge-admin">admin</span> <strong>Admin Sistem:</strong> Administrator utama nasional yang bertugas memvalidasi pendaftaran SPPG, mengaktifkan/menonaktifkan operasional SPPG, meninjau penambahan staff baru, dan mengawasi seluruh riwayat audit global.</li>
+        <li><span class="badge badge-kepala">kepala_sppg</span> <strong>Kepala SPPG:</strong> Penanggung jawab unit kerja SPPG lokal. Berwenang mendaftarkan staff di unitnya, meninjau dan menyetujui/menolak pengajuan koreksi data operasional dari staff, serta memantau audit trail khusus unitnya.</li>
+        <li><span class="badge badge-staff">staff</span> <strong>Staff SPPG:</strong> Petugas lapangan yang mencatat kegiatan harian (penerimaan bahan, produksi masak, uji kelayakan, distribusi) dan berhak mengajukan koreksi data (<em>Correction Request</em>) bila terjadi salah input.</li>
+    </ul>
+
+    <h3>A. Spesifikasi Struktur Tabel <code>users</code> (Admin & Kepala SPPG)</h3>
+    <p><em>Model:</em> <code>App\Models\User</code> | <em>Guard:</em> <code>web</code></p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">Nama Kolom</th>
+                <th style="width: 18%;">Tipe Data</th>
+                <th style="width: 15%;">Atribut Kunci</th>
+                <th>Keterangan & Tempat Penggunaan Sebagai FK</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>id_user</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-pk">PRIMARY KEY</span></td>
+                <td>
+                    Digunakan sebagai Foreign Key pada:
+                    <ul>
+                        <li><code>sppg.id_user</code> (Relasi 1-to-1 dengan unit SPPG).</li>
+                        <li><code>correction_requests.reviewed_by</code> (Kepala peninjau koreksi).</li>
+                        <li><code>kepala_change_requests.requested_by / reviewed_by</code>.</li>
+                        <li><code>audit_trails.actor_id</code> (Jika <code>actor_type = 'user'</code>).</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td><code>nama</code></td>
+                <td>Varchar(100)</td>
+                <td>-</td>
+                <td>Nama lengkap pengguna.</td>
+            </tr>
+            <tr>
+                <td><code>email</code></td>
+                <td>Varchar(255)</td>
+                <td>UNIQUE</td>
+                <td>Email aktif untuk kredensial login.</td>
+            </tr>
+            <tr>
+                <td><code>password</code></td>
+                <td>Varchar(255)</td>
+                <td>-</td>
+                <td>Hash password (Bcrypt).</td>
+            </tr>
+            <tr>
+                <td><code>role</code></td>
+                <td>Check Constraint</td>
+                <td>-</td>
+                <td>Nilai valid: <code>'admin'</code>, <code>'kepala_sppg'</code>.</td>
+            </tr>
+            <tr>
+                <td><code>status</code></td>
+                <td>Check Constraint</td>
+                <td>-</td>
+                <td>Status akun: <code>'menunggu_verifikasi'</code>, <code>'aktif'</code>, <code>'nonaktif'</code>.</td>
+            </tr>
+            <tr>
+                <td><code>timestamps</code></td>
+                <td>Timestamp</td>
+                <td>-</td>
+                <td>Waktu pembuatan dan update data.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>B. Spesifikasi Struktur Tabel <code>staff</code> (Staff Lapangan SPPG)</h3>
+    <p><em>Model:</em> <code>App\Models\Staff</code> & <code>App\Models\StaffManagement</code> | <em>Guard:</em> <code>staff</code></p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">Nama Kolom</th>
+                <th style="width: 18%;">Tipe Data</th>
+                <th style="width: 15%;">Atribut Kunci</th>
+                <th>Keterangan & Tempat Penggunaan Sebagai FK</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>id</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-pk">PRIMARY KEY</span></td>
+                <td>
+                    Digunakan sebagai Foreign Key pada:
+                    <ul>
+                        <li><code>correction_requests.requested_by</code> (Pemohon koreksi data).</li>
+                        <li>Pelaku operasional: <code>purchases.created_by</code>, <code>receivings.received_by</code>, <code>stock_movements.created_by</code>, <code>production_batches.created_by</code>, <code>processing_steps.recorded_by</code>, <code>pre_distribution_checks.checked_by</code>, <code>distributions.recorded_by</code>, <code>waste_surplus_records.recorded_by</code>, <code>evidences.uploaded_by</code>.</li>
+                        <li><code>audit_trails.actor_id</code> (Jika <code>actor_type = 'staff'</code>).</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td><code>id_sppg</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-fk">FOREIGN KEY</span></td>
+                <td>Merujuk ke <code>sppg.id_sppg</code> (Restrict on Delete). Menautkan staff ke unit SPPG.</td>
+            </tr>
+            <tr>
+                <td><code>nama</code></td>
+                <td>Varchar(150)</td>
+                <td>-</td>
+                <td>Nama lengkap tenaga staff operasional.</td>
+            </tr>
+            <tr>
+                <td><code>email</code></td>
+                <td>Varchar(150)</td>
+                <td>UNIQUE</td>
+                <td>Email aktif untuk kredensial login staff.</td>
+            </tr>
+            <tr>
+                <td><code>password</code></td>
+                <td>Varchar(255)</td>
+                <td>-</td>
+                <td>Hash password (Bcrypt).</td>
+            </tr>
+            <tr>
+                <td><code>no_telepon</code></td>
+                <td>Varchar(30)</td>
+                <td>-</td>
+                <td>Nomor kontak handphone/WhatsApp staff.</td>
+            </tr>
+            <tr>
+                <td><code>status</code></td>
+                <td>Check Constraint</td>
+                <td>-</td>
+                <td>Status: <code>'menunggu'</code>, <code>'menunggu_persetujuan'</code>, <code>'aktif'</code>, <code>'nonaktif'</code>, <code>'ditolak'</code>.</td>
+            </tr>
+            <tr>
+                <td><code>catatan_admin</code></td>
+                <td>Text (Nullable)</td>
+                <td>-</td>
+                <td>Catatan evaluasi/alasan penolakan oleh Administrator Sistem.</td>
+            </tr>
+            <tr>
+                <td><code>nonaktif_at / reason</code></td>
+                <td>Timestamp / Text</td>
+                <td>-</td>
+                <td>Waktu dan alasan akun dinonaktifkan oleh Kepala SPPG.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout">
+        <div class="callout-title">Mekanisme Relasi Staff SPPG dari Kepala SPPG</div>
+        Kepala SPPG menempati tabel <code>users</code>. Setiap Kepala SPPG memiliki tepat 1 unit SPPG di tabel <code>sppg</code> melalui relasi <code>sppg.id_user = users.id_user</code>. Selanjutnya, tabel <code>staff</code> menunjuk ke unit tersebut melalui <code>staff.id_sppg = sppg.id_sppg</code>.<br>
+        <strong>Rantai Hierarki:</strong> <code>users (Kepala SPPG)</code> &rarr; <code>sppg (Unit SPPG)</code> &rarr; <code>staff (Staff SPPG)</code>.<br>
+        Dengan struktur ini, satu Kepala SPPG dapat memimpin dan mengawasi banyak staff (*One-to-Many*) di dalam unit SPPG miliknya.
+    </div>
+
+    <!-- 2. MODUL SPPG -->
+    <div class="page-break"></div>
+    <h2>2. Modul SPPG (Satuan Pelayanan Program Gizi)</h2>
+    <p>Modul SPPG mengelola profil kelembagaan dapur pelayanan gizi di tingkat kecamatan/wilayah, mencakup verifikasi berkas hukum, lokasi administratif, serta status operasional layanan.</p>
+
+    <h3>A. Spesifikasi Struktur Tabel <code>sppg</code></h3>
+    <p><em>Model:</em> <code>App\Models\Sppg</code></p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">Nama Kolom</th>
+                <th style="width: 18%;">Tipe Data</th>
+                <th style="width: 15%;">Atribut Kunci</th>
+                <th>Keterangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>id_sppg</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-pk">PRIMARY KEY</span></td>
+                <td>Nomor identifikasi unik SPPG (ditampilkan format: <code>SPPG001</code>).</td>
+            </tr>
+            <tr>
+                <td><code>id_user</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-fk">FOREIGN KEY</span> (UNIQUE)</td>
+                <td>Merujuk ke <code>users.id_user</code> (Kepala SPPG penanggung jawab). Cascade on Delete/Update.</td>
+            </tr>
+            <tr>
+                <td><code>nama_sppg</code></td>
+                <td>Varchar(255)</td>
+                <td>-</td>
+                <td>Nama resmi unit SPPG (contoh: "SPPG Blimbing", "SPPG Sawojajar").</td>
+            </tr>
+            <tr>
+                <td><code>no_telepon</code></td>
+                <td>Varchar(255)</td>
+                <td>-</td>
+                <td>Nomor kantor resmi SPPG.</td>
+            </tr>
+            <tr>
+                <td><code>alamat_sppg</code></td>
+                <td>Text</td>
+                <td>-</td>
+                <td>Alamat lengkap domisili operasional dapur SPPG.</td>
+            </tr>
+            <tr>
+                <td><code>provinsi / kab / kec</code></td>
+                <td>Varchar(100)</td>
+                <td>-</td>
+                <td>Data administratif wilayah Indonesia (terintegrasi API Wilayah).</td>
+            </tr>
+            <tr>
+                <td><code>foto_ktp</code></td>
+                <td>Varchar / Text</td>
+                <td>-</td>
+                <td>URL dokumen KTP Kepala SPPG di Supabase Storage bucket <code>register</code>.</td>
+            </tr>
+            <tr>
+                <td><code>foto_kantor_sppg</code></td>
+                <td>Varchar / Text</td>
+                <td>-</td>
+                <td>URL foto fisik bangunan dapur/kantor SPPG di Supabase Storage.</td>
+            </tr>
+            <tr>
+                <td><code>foto_surat_resmi</code></td>
+                <td>Varchar / Text</td>
+                <td>-</td>
+                <td>URL berkas SK/Surat Tugas Pendirian resmi (PDF/Gambar).</td>
+            </tr>
+            <tr>
+                <td><code>status</code></td>
+                <td>Check Constraint</td>
+                <td>-</td>
+                <td>Status operasional layanan: <code>'aktif'</code> atau <code>'nonaktif'</code>.</td>
+            </tr>
+            <tr>
+                <td><code>status_verifikasi</code></td>
+                <td>Check Constraint</td>
+                <td>-</td>
+                <td>Status legalitas: <code>'menunggu_verifikasi'</code>, <code>'terverifikasi'</code>, <code>'perubahan'</code>, <code>'ditolak'</code>.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>B. Alur dan Siklus Hidup SPPG</h3>
+    <div class="flow-step">
+        <div class="flow-number">1</div>
+        <div><strong>Pendaftaran:</strong> Terbuat otomatis saat registrasi dengan status <code>status = 'nonaktif'</code> dan <code>status_verifikasi = 'menunggu_verifikasi'</code>.</div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-number">2</div>
+        <div><strong>Verifikasi Dokumen oleh Admin Sistem:</strong> Admin memeriksa keaslian KTP, foto kantor, dan SK resmi via menu <code>/admin/sppg</code>.</div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-number">3</div>
+        <div><strong>Keputusan Verifikasi:</strong>
+            <br>&bull; <em>Disetujui:</em> <code>status_verifikasi &rarr; 'terverifikasi'</code>, <code>status &rarr; 'aktif'</code>. Akun Kepala dan Staff otomatis aktif. Dicatat di Audit Trail (<code>sppg_verify</code>).
+            <br>&bull; <em>Ditolak:</em> <code>status_verifikasi &rarr; 'ditolak'</code>, akun tetap dinonaktifkan. Dicatat di Audit Trail (<code>sppg_reject</code>).
+        </div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-number">4</div>
+        <div><strong>Pengajuan Perubahan Data (Profil / Tambah Staff):</strong> Bila Kepala SPPG mengajukan pergantian data atau menambah staff, status verifikasi beralih menjadi <code>'perubahan'</code> hingga disetujui kembali oleh Admin.</div>
+    </div>
+
+    <!-- 3. MODUL DASHBOARD ADMIN -->
+    <h2>3. Modul Dashboard Admin</h2>
+    <p>Rute: <code>/admin/dashboard</code> | <em>Controller:</em> <code>App\Http\Controllers\Admin\DashboardController</code></p>
+    <p>Dashboard Admin berfungsi sebagai <em>Command & Control Center</em> tingkat nasional bagi Administrator Sistem untuk memantau performa dan kepatuhan unit SPPG.</p>
+
+    <h3>Komponen Utama Dashboard:</h3>
+    <ol>
+        <li><strong>Statistik Utama (4 Stat Cards):</strong>
+            <ul>
+                <li><em>Total SPPG:</em> Jumlah akumulatif seluruh SPPG terdaftar dalam sistem.</li>
+                <li><em>Belum Diverifikasi:</em> Jumlah SPPG berstatus <code>menunggu_verifikasi</code> atau dalam pengajuan <code>perubahan</code> data.</li>
+                <li><em>Status Aktif:</em> Jumlah unit SPPG yang beroperasi aktif menyalurkan gizi.</li>
+                <li><em>Status Nonaktif:</em> Jumlah SPPG yang dihentikan sementara atau ditolak.</li>
+            </ul>
+        </li>
+        <li><strong>Grafik Visualisasi Interaktif:</strong>
+            <ul>
+                <li><em>Tren Pendaftaran SPPG:</em> Grafik garis per bulan (Jan–Des) untuk tahun 2024, 2025, dan 2026 yang memperlihatkan laju ekspansi pendaftaran dapur gizi.</li>
+                <li><em>Distribusi Status SPPG:</em> Diagram donat rasio persentase SPPG Aktif, Menunggu Verifikasi, dan Nonaktif.</li>
+            </ul>
+        </li>
+        <li><strong>Tabel Preview Cepat:</strong>
+            <ul>
+                <li><em>Cuplikan Manajemen SPPG:</em> Menampilkan 4 unit SPPG terbaru (nama SPPG, kepala, staff, status verifikasi, dan tombol pintas verifikasi).</li>
+                <li><em>Cuplikan Audit Trail:</em> Menampilkan 4 log kejadian sistem terkini (waktu, user, peran, modul, dan aksi yang baru saja terjadi).</li>
+            </ul>
+        </li>
+    </ol>
+
+    <!-- 4. MODUL CORRECTION REQUEST -->
+    <div class="page-break"></div>
+    <h2>4. Modul Correction Request (Pengajuan Koreksi Data)</h2>
+    <p>Rute: <code>/sppg/correction-requests</code> | <em>Model:</em> <code>App\Models\CorrectionRequest</code></p>
+    <p>Sistem LENSA MBG menerapkan prinsip <strong>Data Integrity</strong>: data operasional harian yang telah dikonfirmasi (<em>confirmed/locked</em>) tidak boleh diubah langsung oleh petugas di lapangan. Setiap kesalahan pencatatan harus melalui mekanisme pengajuan koreksi formal.</p>
+
+    <h3>A. Spesifikasi Struktur Tabel <code>correction_requests</code></h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">Nama Kolom</th>
+                <th style="width: 18%;">Tipe Data</th>
+                <th style="width: 15%;">Atribut Kunci</th>
+                <th>Keterangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>id</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-pk">PRIMARY KEY</span></td>
+                <td>ID unik permohonan.</td>
+            </tr>
+            <tr>
+                <td><code>id_sppg</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-fk">FOREIGN KEY</span></td>
+                <td>FK ke <code>sppg.id_sppg</code> (Unit SPPG tempat transaksi dibuat).</td>
+            </tr>
+            <tr>
+                <td><code>requested_by</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-fk">FOREIGN KEY</span></td>
+                <td>FK ke <code>staff.id</code> (Petugas lapangan yang mengajukan koreksi).</td>
+            </tr>
+            <tr>
+                <td><code>reviewed_by</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-fk">FOREIGN KEY</span></td>
+                <td>FK ke <code>users.id_user</code> (Kepala SPPG yang mereview/menyetujui). Nullable.</td>
+            </tr>
+            <tr>
+                <td><code>request_no</code></td>
+                <td>Varchar(40)</td>
+                <td>UNIQUE</td>
+                <td>Kode unik berkas permohonan (contoh: <code>CR-001</code>).</td>
+            </tr>
+            <tr>
+                <td><code>target_table / id</code></td>
+                <td>Varchar(100) / BigInt</td>
+                <td>-</td>
+                <td>Nama tabel dan ID baris data yang ingin dikoreksi (misal tabel <code>receivings</code>, <code>purchases</code>, <code>production_batches</code>, <code>distributions</code>).</td>
+            </tr>
+            <tr>
+                <td><code>field_name</code></td>
+                <td>Varchar(100)</td>
+                <td>-</td>
+                <td>Nama kolom yang salah input (misal: <code>qty_received</code>, <code>portion_count</code>).</td>
+            </tr>
+            <tr>
+                <td><code>old_value / new_value</code></td>
+                <td>Text</td>
+                <td>-</td>
+                <td>Nilai data awal vs nilai data baru yang diajukan perbaikan.</td>
+            </tr>
+            <tr>
+                <td><code>reason</code></td>
+                <td>Text</td>
+                <td>-</td>
+                <td>Alasan mengapa data perlu diperbaiki (wajib diisi, dicek DB constraint).</td>
+            </tr>
+            <tr>
+                <td><code>status</code></td>
+                <td>Check Constraint</td>
+                <td>-</td>
+                <td>Nilai: <code>'pending'</code>, <code>'approved'</code>, <code>'rejected'</code>, <code>'applied'</code>, <code>'cancelled'</code>.</td>
+            </tr>
+            <tr>
+                <td><code>reviewed_at / review_note</code></td>
+                <td>Timestamp / Text</td>
+                <td>-</td>
+                <td>Waktu dan catatan putusan dari Kepala SPPG.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>B. Alur Kerja & Mekanisme Pengajuan Koreksi:</h3>
+    <ol>
+        <li><strong>Pembuatan Pengajuan:</strong> Staff lapangan yang mendapati kekeliruan data membuat formulir koreksi, mengunggah foto bukti fisik (nota timbangan, surat jalan) yang tersimpan di tabel <code>evidences</code>.</li>
+        <li><strong>Isolasi Hak Review:</strong> Kepala SPPG login ke menu Pengajuan Koreksi. Sistem secara ketat hanya menyajikan data yang memiliki <code>id_sppg</code> sama dengan unit pimpinan Kepala SPPG tersebut.</li>
+        <li><strong>Persetujuan (Approve):</strong>
+            <ul>
+                <li>Kepala SPPG mengklik <em>Setujui</em>.</li>
+                <li>Status koreksi diperbarui menjadi <code>'approved'</code> / <code>'applied'</code>.</li>
+                <li>Sistem otomatis membuat entri log baru di tabel <code>audit_trails</code> dengan aksi <code>correction_approve</code>.</li>
+            </ul>
+        </li>
+        <li><strong>Penolakan (Reject):</strong>
+            <ul>
+                <li>Kepala SPPG mengklik <em>Tolak</em> dan wajib memasukkan catatan evaluasi.</li>
+                <li>Status menjadi <code>'rejected'</code>, dan tercatat di <code>audit_trails</code> dengan aksi <code>correction_reject</code>.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <!-- 5. MODUL AUDIT TRAIL -->
+    <div class="page-break"></div>
+    <h2>5. Modul Audit Trail</h2>
+    <p>Rute: <code>/admin/audit-trail</code> (Admin) & <code>/sppg/audit-trail</code> (Kepala SPPG) | <em>Model:</em> <code>App\Models\AuditTrail</code></p>
+    <p>Audit Trail adalah sistem pencatatan forensik otomatis. Tabel ini berprinsip <strong>Append-Only</strong> dan <strong>Immutable</strong> (tidak ada operasi <em>UPDATE</em> atau <em>DELETE</em> yang diizinkan; jika dicoba akan melempar <code>LogicException</code>).</p>
+
+    <h3>A. Spesifikasi Struktur Tabel <code>audit_trails</code></h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">Nama Kolom</th>
+                <th style="width: 18%;">Tipe Data</th>
+                <th style="width: 15%;">Atribut Kunci</th>
+                <th>Keterangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>id</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-pk">PRIMARY KEY</span></td>
+                <td>Nomor urut pencatatan audit (format tampilan: <code>AUD-0001</code>).</td>
+            </tr>
+            <tr>
+                <td><code>id_sppg</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-fk">FOREIGN KEY</span></td>
+                <td>FK ke <code>sppg.id_sppg</code> (Unit SPPG lokasi terjadinya aksi). Nullable.</td>
+            </tr>
+            <tr>
+                <td><code>actor_type</code></td>
+                <td>Check Constraint</td>
+                <td>-</td>
+                <td>Tipe tabel pelaku: <code>'user'</code> (Admin / Kepala) atau <code>'staff'</code> (Staff SPPG).</td>
+            </tr>
+            <tr>
+                <td><code>actor_id</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td>-</td>
+                <td>ID dari pelaku (merujuk ke <code>users.id_user</code> atau <code>staff.id</code>).</td>
+            </tr>
+            <tr>
+                <td><code>actor_nama</code></td>
+                <td>Varchar(150)</td>
+                <td>-</td>
+                <td><em>Snapshot</em> nama pelaku saat kejadian (kebal terhadap perubahan nama di kemudian hari).</td>
+            </tr>
+            <tr>
+                <td><code>action</code></td>
+                <td>Check Constraint</td>
+                <td>-</td>
+                <td>Aksi tercatat: <code>confirm</code>, <code>void</code>, <code>cancel</code>, <code>correction_request</code>, <code>correction_approve</code>, <code>correction_reject</code>, <code>sppg_verify</code>, <code>sppg_reject</code>, <code>sppg_activate</code>, dll.</td>
+            </tr>
+            <tr>
+                <td><code>auditable_type / id</code></td>
+                <td>Varchar(100) / BigInt</td>
+                <td>-</td>
+                <td>Tabel dan ID data yang terkena dampak aktivitas.</td>
+            </tr>
+            <tr>
+                <td><code>old_values / new_values</code></td>
+                <td>Jsonb / Array</td>
+                <td>-</td>
+                <td>Rekaman nilai sebelum vs sesudah perubahan format JSON.</td>
+            </tr>
+            <tr>
+                <td><code>correction_request_id</code></td>
+                <td>BigInt (Unsigned)</td>
+                <td><span class="badge badge-fk">FOREIGN KEY</span></td>
+                <td>FK ke <code>correction_requests.id</code> (jika aksi terkait koreksi). Nullable.</td>
+            </tr>
+            <tr>
+                <td><code>created_at</code></td>
+                <td>Timestamp</td>
+                <td>-</td>
+                <td>Waktu akurat saat aksi terjadi.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>B. Matriks Hak Akses & Perbedaan Perilaku Berdasarkan Role:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">Fitur / Kemampuan</th>
+                <th style="width: 25%;">Admin Sistem</th>
+                <th style="width: 25%;">Kepala SPPG</th>
+                <th style="width: 25%;">Staff SPPG</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Akses Menu Halaman</strong></td>
+                <td>Dapat diakses di <code>/admin/audit-trail</code></td>
+                <td>Dapat diakses di <code>/sppg/audit-trail</code></td>
+                <td>Tidak memiliki akses laman audit</td>
+            </tr>
+            <tr>
+                <td><strong>Cakupan Data (Scope)</strong></td>
+                <td><strong>Global Seluruh SPPG</strong>. Bebas memilih SPPG manapun atau melihat seluruh Indonesia.</td>
+                <td><strong>Terisolasi (Tenant Scoped)</strong>. Hanya dapat melihat log aktivitas di unit SPPG miliknya.</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><strong>Filter & Pencarian</strong></td>
+                <td>Filter Modul, Rentang Tanggal, Dropdown Unit SPPG, Pencarian Kode & Nama.</td>
+                <td>Filter Modul, Rentang Tanggal, Pencarian Kode & Nama Staff di unitnya.</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><strong>Ekspor Laporan</strong></td>
+                <td>Ekspor file CSV (UTF-8 Excel) & Cetak Laporan Resmi PDF.</td>
+                <td>Ekspor file CSV & Cetak PDF khusus untuk unit SPPG-nya.</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><strong>Pencatatan Aktivitas</strong></td>
+                <td>Aktivitas verifikasi SPPG, aktivasi, dan persetujuan profil tercatat otomatis.</td>
+                <td>Aktivitas persetujuan/penolakan koreksi data tercatat otomatis.</td>
+                <td>Seluruh transaksi operasional (masak, terima bahan, distribusi) tercatat otomatis.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 6. MEKANISME LOGIN DAN REGISTER -->
+    <div class="page-break"></div>
+    <h2>6. Mekanisme Login dan Register</h2>
+
+    <h3>A. Mekanisme Register (Pendaftaran Akun SPPG Baru)</h3>
+    <p>Rute: <code>/register</code> | <em>Controller:</em> <code>App\Http\Controllers\Auth\RegisterController</code></p>
+    <p>Pendaftaran SPPG menggunakan arsitektur <strong>Atomic Database Transaction</strong> (<code>DB::transaction</code>) di mana satu formulir pendaftaran langsung menciptakan 3 entitas database sekaligus secara utuh:</p>
+
+    <ol>
+        <li><strong>Entitas Kepala SPPG (Tabel <code>users</code>):</strong>
+            <ul>
+                <li><em>Data:</em> Nama lengkap, email, nomor telepon, password (min 8 karakter + konfirmasi).</li>
+                <li><em>Status Awal:</em> <code>role = 'kepala_sppg'</code> dan <code>status = 'menunggu_verifikasi'</code>.</li>
+            </ul>
+        </li>
+        <li><strong>Entitas Unit SPPG (Tabel <code>sppg</code>):</strong>
+            <ul>
+                <li><em>Data:</em> Nama SPPG, alamat kantor, provinsi, kabupaten/kota, kecamatan.</li>
+                <li><em>Dokumen (Diunggah ke Supabase Storage):</em> Foto KTP Kepala, Foto Kantor Dapur, dan Foto Surat Keputusan (SK) resmi pendirian.</li>
+                <li><em>Status Awal:</em> <code>status = 'nonaktif'</code> dan <code>status_verifikasi = 'menunggu_verifikasi'</code>.</li>
+            </ul>
+        </li>
+        <li><strong>Entitas Staff SPPG Perdana (Tabel <code>staff</code>):</strong>
+            <ul>
+                <li><em>Data:</em> Nama lengkap staff, email staff (wajib beda dengan email kepala), no. telepon staff, password staff.</li>
+                <li><em>Status Awal:</em> Terhubung via FK <code>id_sppg</code>, dengan status <code>'menunggu_persetujuan'</code>.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <div class="callout callout-warning">
+        <div class="callout-title">Validasi Real-time API</div>
+        Formulir registrasi dilengkapi endpoint AJAX <code>/api/check-email</code> yang secara langsung memverifikasi apakah email yang dimasukkan sudah pernah terdaftar pada tabel <code>users</code> maupun tabel <code>staff</code> untuk mencegah duplikasi sebelum tombol submit ditekan.
+    </div>
+
+    <h3>B. Mekanisme Login Multi-Guard & Auto-Detection</h3>
+    <p>Rute: <code>/login</code> | <em>Controller:</em> <code>App\Http\Controllers\Auth\LoginController</code></p>
+    <p>Pengguna memasukkan <code>email</code>, <code>password</code>, dan memilih tab login (<code>Admin</code> atau <code>SPPG</code>):</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">Tab Dipilih</th>
+                <th style="width: 35%;">Alur Pengecekan Sistem</th>
+                <th>Hasil & Rute Tujuan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Tab Admin</strong></td>
+                <td>
+                    Sistem mengecek guard <code>web</code> pada tabel <code>users</code> dengan syarat <code>role = 'admin'</code>.
+                </td>
+                <td>
+                    Jika password cocok &rarr; Masuk ke <code>/admin/dashboard</code>.<br>
+                    Jika salah &rarr; Pesan error "Email atau password Admin tidak sesuai."
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2"><strong>Tab SPPG</strong><br><small>(Kepala & Staff)</small></td>
+                <td>
+                    <strong>Tahap 1 (Cek Kepala SPPG):</strong><br>
+                    Sistem mencoba autentikasi ke tabel <code>users</code> dengan <code>role = 'kepala_sppg'</code>.
+                    <ul>
+                        <li>Jika status user <code>'menunggu_verifikasi'</code> &rarr; Ditolak ("Akun masih menunggu verifikasi Admin").</li>
+                        <li>Jika status user atau unit SPPG <code>'nonaktif'</code> &rarr; Ditolak ("Akun / Layanan dinonaktifkan").</li>
+                    </ul>
+                </td>
+                <td>
+                    Jika akun & SPPG berstatus aktif &rarr; Masuk ke <code>/sppg/dashboard</code>.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Tahap 2 (Cek Staff SPPG):</strong><br>
+                    Jika tidak ditemukan di tabel <code>users</code>, sistem otomatis mencoba autentikasi ke guard <code>staff</code> pada tabel <code>staff</code>.
+                    <ul>
+                        <li>Jika status <code>'menunggu'</code> / <code>'menunggu_persetujuan'</code> &rarr; Ditolak ("Menunggu persetujuan Admin").</li>
+                        <li>Jika status <code>'ditolak'</code> &rarr; Ditolak ("Pengajuan akun ditolak").</li>
+                        <li>Jika status <code>'nonaktif'</code> &rarr; Ditolak ("Akun dinonaktifkan").</li>
+                        <li>Jika unit SPPG tempatnya bertugas nonaktif &rarr; Ditolak.</li>
+                    </ul>
+                </td>
+                <td>
+                    Jika akun staff & unit SPPG aktif &rarr; Masuk ke <code>/staff/dashboard</code>.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 40px; padding-top: 15px; border-top: 1px solid #cbd5e1; text-align: center; font-size: 8.5pt; color: #64748b;">
+        Dokumen ini dibuat otomatis sebagai spesifikasi teknis dan dokumentasi basis data resmi aplikasi LENSA MBG.
+    </div>
+
+</body>
+</html>

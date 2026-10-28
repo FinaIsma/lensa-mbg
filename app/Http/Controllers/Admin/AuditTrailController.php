@@ -42,7 +42,16 @@ class AuditTrailController extends Controller
                 ->whereIn('evidenceable_id', $idKoreksi)->orderBy('id')->get()->groupBy('evidenceable_id')
             : collect();
 
-        $countQuery = $idSppg ? AuditTrail::query()->sppg($idSppg) : AuditTrail::query();
+        $countQuery = $isAdmin
+            ? AuditTrail::query()
+            : AuditTrail::query()->untukKepalaSppg($idSppg);
+
+        if ($isAdmin && $idSppg) {
+            $countQuery->sppg($idSppg);
+        }
+        if ($isAdmin && $request->filled('role')) {
+            $countQuery->peran($request->query('role'));
+        }
 
         $sidebar = $isAdmin
             ? 'admin.partials.sidebar'
@@ -72,6 +81,7 @@ class AuditTrailController extends Controller
             'isAdmin' => $isAdmin,
             'listSppg' => $listSppg,
             'selectedSppg' => $idSppg,
+            'selectedRole' => $request->query('role'),
             'routeName' => $routeName,
             'exportCsvRoute' => $exportCsvRoute,
             'exportPdfRoute' => $exportPdfRoute,
@@ -201,7 +211,16 @@ class AuditTrailController extends Controller
             ? DB::table('correction_requests')->whereIn('id', $idKoreksi)->get()->keyBy('id')
             : collect();
 
-        $countQuery = $idSppg ? AuditTrail::query()->sppg($idSppg) : AuditTrail::query();
+        $countQuery = $isAdmin
+            ? AuditTrail::query()
+            : AuditTrail::query()->untukKepalaSppg($idSppg);
+
+        if ($isAdmin && $idSppg) {
+            $countQuery->sppg($idSppg);
+        }
+        if ($isAdmin && $request->filled('role')) {
+            $countQuery->peran($request->query('role'));
+        }
 
         return view('admin.audit-trail-print', [
             'rows' => $rows,
@@ -211,6 +230,7 @@ class AuditTrailController extends Controller
             'sampai' => $sampai,
             'modul' => $request->query('modul'),
             'q' => $request->query('q'),
+            'selectedRole' => $request->query('role'),
             'totalSemua' => (clone $countQuery)->count(),
             'totalPerubahan' => (clone $countQuery)->where(fn ($q) => $q->whereNotNull('old_values')->orWhereNotNull('new_values'))->count(),
             'dicetakOleh' => $user->nama ?? ($isAdmin ? 'Admin Sistem' : 'Kepala SPPG'),
@@ -252,8 +272,15 @@ class AuditTrailController extends Controller
             ->rentang($dari, $sampai)
             ->modul($request->query('modul'));
 
-        if ($idSppg) {
-            $query->sppg($idSppg);
+        if (! $isAdmin) {
+            $query->untukKepalaSppg($idSppg);
+        } else {
+            if ($idSppg) {
+                $query->sppg($idSppg);
+            }
+            if ($request->filled('role')) {
+                $query->peran($request->query('role'));
+            }
         }
 
         $namaSppg = $idSppg

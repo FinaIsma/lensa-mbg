@@ -203,6 +203,63 @@ class AuditTrail extends Model
         return $q->where('audit_trails.id_sppg', $idSppg);
     }
 
+    /** Khusus Kepala SPPG: strictly batasi ke SPPG miliknya DAN sembunyikan semua aktivitas Admin Sistem. */
+    public function scopeUntukKepalaSppg(Builder $q, int $idSppg): Builder
+    {
+        return $q->where('audit_trails.id_sppg', $idSppg)
+            ->where(function (Builder $w) {
+                $w->where('audit_trails.actor_type', 'staff')
+                    ->orWhere(function (Builder $w2) {
+                        $w2->where('audit_trails.actor_type', 'user')
+                            ->whereNotExists(function ($sub) {
+                                $sub->selectRaw('1')
+                                    ->from(Keys::USER_TABLE)
+                                    ->whereColumn(Keys::USER_TABLE.'.'.Keys::USER_PK, 'audit_trails.actor_id')
+                                    ->whereIn(Keys::USER_TABLE.'.role', ['admin', 'admin_sistem']);
+                            });
+                    });
+            });
+    }
+
+    /** Filter berdasarkan peran aktor (admin sistem, sppg / semua tim sppg, kepala sppg, staff). */
+    public function scopePeran(Builder $q, ?string $role): Builder
+    {
+        if (! $role) {
+            return $q;
+        }
+
+        return match ($role) {
+            'admin' => $q->where('audit_trails.actor_type', 'user')
+                ->whereExists(function ($sub) {
+                    $sub->selectRaw('1')
+                        ->from(Keys::USER_TABLE)
+                        ->whereColumn(Keys::USER_TABLE.'.'.Keys::USER_PK, 'audit_trails.actor_id')
+                        ->whereIn(Keys::USER_TABLE.'.role', ['admin', 'admin_sistem']);
+                }),
+            'sppg' => $q->where(function (Builder $w) {
+                $w->where('audit_trails.actor_type', 'staff')
+                    ->orWhere(function (Builder $w2) {
+                        $w2->where('audit_trails.actor_type', 'user')
+                            ->whereExists(function ($sub) {
+                                $sub->selectRaw('1')
+                                    ->from(Keys::USER_TABLE)
+                                    ->whereColumn(Keys::USER_TABLE.'.'.Keys::USER_PK, 'audit_trails.actor_id')
+                                    ->where(Keys::USER_TABLE.'.role', 'kepala_sppg');
+                            });
+                    });
+            }),
+            'kepala_sppg' => $q->where('audit_trails.actor_type', 'user')
+                ->whereExists(function ($sub) {
+                    $sub->selectRaw('1')
+                        ->from(Keys::USER_TABLE)
+                        ->whereColumn(Keys::USER_TABLE.'.'.Keys::USER_PK, 'audit_trails.actor_id')
+                        ->where(Keys::USER_TABLE.'.role', 'kepala_sppg');
+                }),
+            'staff' => $q->where('audit_trails.actor_type', 'staff'),
+            default => $q,
+        };
+    }
+
     /** Filter modul: 'Produksi' mencakup beberapa tabel sekaligus. */
     public function scopeModul(Builder $q, ?string $modul): Builder
     {

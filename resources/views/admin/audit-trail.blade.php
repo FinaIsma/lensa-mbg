@@ -149,6 +149,19 @@
 
                             @if ($isAdmin)
                                 <div class="select-dropdown-box">
+                                    <select name="role" class="select-status-verif" onchange="this.form.submit()">
+                                        <option value="">Semua Peran</option>
+                                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Sistem</option>
+                                        <option value="sppg" {{ request('role') === 'sppg' ? 'selected' : '' }}>SPPG</option>
+                                        <option value="kepala_sppg" {{ request('role') === 'kepala_sppg' ? 'selected' : '' }}>Kepala SPPG</option>
+                                        <option value="staff" {{ request('role') === 'staff' ? 'selected' : '' }}>Staff</option>
+                                    </select>
+                                    <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+
+                                <div class="select-dropdown-box">
                                     <select name="sppg" class="select-status-verif" onchange="this.form.submit()">
                                         <option value="">Semua SPPG</option>
                                         @foreach ($listSppg as $s)
