@@ -10,6 +10,7 @@ use App\Http\Controllers\KepalaSPPG\DashboardController as KepalaSPPGDashboardCo
 use App\Http\Controllers\KepalaSPPG\ProfileController;
 use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Staff\MenuResepController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
 
@@ -99,6 +100,21 @@ Route::middleware(['role:kepala_sppg'])->prefix('sppg')->name('sppg.')->group(fu
     Route::post('/ubah-kata-sandi', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
-Route::middleware(['role:staff'])->prefix('staff')->name('staff.')->group(function () {
+Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->group(function () {
     Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+
+    // Data Master - Menu & Resep
+    Route::get('/menu-resep', [MenuResepController::class, 'index'])->name('menu-resep.index');
+    Route::get('/menu', [MenuResepController::class, 'menus'])->name('menus.index');
+    Route::post('/menu', [MenuResepController::class, 'storeMenu'])->name('menus.store');
+    Route::put('/menu/{id}', [MenuResepController::class, 'updateMenu'])->name('menus.update');
+    Route::post('/menu/{id}/toggle-status', [MenuResepController::class, 'toggleMenuStatus'])->name('menus.toggle');
+
+    Route::get('/resep', [MenuResepController::class, 'recipes'])->name('recipes.index');
+    Route::post('/resep', [MenuResepController::class, 'storeRecipe'])->name('recipes.store');
+    Route::get('/resep/{id}', [MenuResepController::class, 'showRecipe'])->name('recipes.show');
+    Route::put('/resep/{id}', [MenuResepController::class, 'updateRecipe'])->name('recipes.update');
+    Route::post('/resep/{id}/version', [MenuResepController::class, 'createVersion'])->name('recipes.createVersion');
+    Route::post('/resep/{id}/toggle-status', [MenuResepController::class, 'toggleRecipeStatus'])->name('recipes.toggle');
+    Route::post('/nutrition-types', [MenuResepController::class, 'storeNutritionType'])->name('nutrition-types.store');
 });
