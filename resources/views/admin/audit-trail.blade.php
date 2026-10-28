@@ -118,7 +118,7 @@
                 </div>
 
                 <div class="table-card">
-                    <form action="{{ route($routeName) }}" method="GET" class="filter-bar-form" id="filterForm">
+                    <form action="{{ route($routeName) }}" method="GET" class="filter-bar-form {{ $isAdmin ? 'is-admin-view' : 'is-sppg-view' }}" id="filterForm">
                         <div class="search-input-box">
                             <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
@@ -147,7 +147,7 @@
                             </div>
 
                             <div class="select-dropdown-box">
-                                <select name="modul" class="select-status-verif" onchange="this.form.submit()">
+                                <select name="modul" class="select-status-verif select-modul-filter" onchange="this.form.submit()">
                                     <option value="">Semua Modul</option>
                                     @foreach ($daftarModul as $nama)
                                         <option value="{{ $nama }}" {{ request('modul') === $nama ? 'selected' : '' }}>{{ $nama }}</option>
@@ -160,7 +160,7 @@
 
                             @if ($isAdmin)
                                 <div class="select-dropdown-box">
-                                    <select name="role" class="select-status-verif" onchange="this.form.submit()">
+                                    <select name="role" class="select-status-verif select-role-filter" onchange="this.form.submit()">
                                         <option value="">Semua Peran</option>
                                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Sistem</option>
                                         <option value="sppg" {{ request('role') === 'sppg' ? 'selected' : '' }}>SPPG</option>
@@ -173,14 +173,16 @@
                                 </div>
 
                                 <div class="select-dropdown-box">
-                                    <select name="sppg" class="select-status-verif" onchange="this.form.submit()">
+                                    <select name="sppg" class="select-status-verif select-sppg-filter" onchange="this.form.submit()">
                                         <option value="">Semua SPPG</option>
                                         @foreach ($listSppg as $s)
                                             @php
                                                 $sppgCode = 'SPPG' . str_pad((string) $s->id_sppg, 3, '0', STR_PAD_LEFT);
+                                                $fullName = $sppgCode . ' - ' . $s->nama_sppg;
+                                                $shortName = $sppgCode . ' - ' . \Illuminate\Support\Str::limit($s->nama_sppg, 15, '...');
                                             @endphp
-                                            <option value="{{ $s->id_sppg }}" {{ (string) request('sppg') === (string) $s->id_sppg ? 'selected' : '' }}>
-                                                {{ $sppgCode }} - {{ $s->nama_sppg }}
+                                            <option value="{{ $s->id_sppg }}" {{ (string) request('sppg') === (string) $s->id_sppg ? 'selected' : '' }} title="{{ $fullName }}">
+                                                {{ $shortName }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -199,14 +201,14 @@
                             </a>
 
                             <div class="dropdown-export-wrapper" id="exportDropdownWrapper">
-                                <button type="button" class="btn-export" id="exportDropdownBtn" aria-haspopup="true" aria-expanded="false">
+                                <button type="button" class="btn-export" id="exportDropdownBtn" aria-haspopup="true" aria-expanded="false" title="Export Data" aria-label="Export Data">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                         <polyline points="7 10 12 15 17 10"></polyline>
                                         <line x1="12" y1="15" x2="12" y2="3"></line>
                                     </svg>
                                     <span>Export</span>
-                                    <svg class="chevron-export" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <svg class="chevron-export" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                         <polyline points="6 9 12 15 18 9"></polyline>
                                     </svg>
                                 </button>

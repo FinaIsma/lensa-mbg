@@ -126,6 +126,7 @@
                                     <option value="semua" {{ !request('status_verif') || request('status_verif') == 'semua' ? 'selected' : '' }}>Status Verif</option>
                                     <option value="Terverifikasi" {{ request('status_verif') == 'Terverifikasi' ? 'selected' : '' }}>Terverifikasi</option>
                                     <option value="Belum Diverifikasi" {{ request('status_verif') == 'Belum Diverifikasi' ? 'selected' : '' }}>Belum Diverifikasi</option>
+                                    <option value="Perubahan" {{ request('status_verif') == 'Perubahan' ? 'selected' : '' }}>Perubahan</option>
                                     <option value="Ditolak" {{ request('status_verif') == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
                                 </select>
                                 <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

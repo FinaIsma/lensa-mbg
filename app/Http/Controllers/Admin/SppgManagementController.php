@@ -49,11 +49,35 @@ class SppgManagementController extends Controller
         if ($request->filled('status_verif') && $request->input('status_verif') !== 'semua') {
             $statusVerif = $request->input('status_verif');
             if ($statusVerif === 'Terverifikasi') {
-                $query->where('status_verifikasi', 'terverifikasi');
+                $query->where('status_verifikasi', 'terverifikasi')
+                    ->whereDoesntHave('staffs', function ($sq) {
+                        $sq->whereIn('status', ['menunggu', 'menunggu_persetujuan']);
+                    });
+                if (Schema::hasTable('kepala_change_requests')) {
+                    $query->whereNotExists(function ($sub) {
+                        $sub->selectRaw('1')
+                            ->from('kepala_change_requests')
+                            ->whereColumn('kepala_change_requests.id_sppg', 'sppg.id_sppg')
+                            ->where('kepala_change_requests.status', 'pending');
+                    });
+                }
             } elseif ($statusVerif === 'Belum Diverifikasi') {
                 $query->where('status_verifikasi', 'menunggu_verifikasi');
             } elseif ($statusVerif === 'Perubahan') {
-                $query->where('status_verifikasi', 'perubahan');
+                $query->where(function ($q) {
+                    $q->where('status_verifikasi', 'perubahan')
+                        ->orWhereHas('staffs', function ($sq) {
+                            $sq->whereIn('status', ['menunggu', 'menunggu_persetujuan']);
+                        });
+                    if (Schema::hasTable('kepala_change_requests')) {
+                        $q->orWhereExists(function ($sub) {
+                            $sub->selectRaw('1')
+                                ->from('kepala_change_requests')
+                                ->whereColumn('kepala_change_requests.id_sppg', 'sppg.id_sppg')
+                                ->where('kepala_change_requests.status', 'pending');
+                        });
+                    }
+                });
             } elseif ($statusVerif === 'Ditolak') {
                 $query->where('status_verifikasi', 'ditolak');
             }
@@ -72,8 +96,20 @@ class SppgManagementController extends Controller
             }
         }
 
-        // Paginate 7 items per page (ordered newest first)
-        $sppgs = $query->orderByDesc('id_sppg')->paginate(7)->withQueryString();
+        // Prioritize SPPGs with pending changes or awaiting verification on top
+        $hasChangeReqTable = Schema::hasTable('kepala_change_requests');
+        $changeReqSql = $hasChangeReqTable
+            ? "WHEN EXISTS (SELECT 1 FROM kepala_change_requests WHERE kepala_change_requests.id_sppg = sppg.id_sppg AND kepala_change_requests.status = 'pending') THEN 0"
+            : '';
+
+        $sppgs = $query->orderByRaw("
+            CASE 
+                WHEN status_verifikasi IN ('perubahan', 'menunggu_verifikasi') THEN 0
+                {$changeReqSql}
+                WHEN EXISTS (SELECT 1 FROM staff WHERE staff.id_sppg = sppg.id_sppg AND staff.status IN ('menunggu', 'menunggu_persetujuan')) THEN 0
+                ELSE 1 
+            END ASC
+        ")->orderByDesc('id_sppg')->paginate(7)->withQueryString();
 
         if (Schema::hasTable('kepala_change_requests')) {
             $sppgIds = $sppgs->pluck('id_sppg');
@@ -204,6 +240,10 @@ class SppgManagementController extends Controller
                         $sppg->user->update(['status' => 'aktif']);
                     }
 
+                    $pendingStaffs = Staff::where('id_sppg', $sppg->id_sppg)
+                        ->whereIn('status', ['menunggu', 'menunggu_persetujuan'])
+                        ->get();
+
                     Staff::where('id_sppg', $sppg->id_sppg)
                         ->whereIn('status', ['menunggu', 'menunggu_persetujuan'])
                         ->update([
@@ -212,6 +252,10 @@ class SppgManagementController extends Controller
                             'nonaktif_at' => null,
                             'nonaktif_reason' => null,
                         ]);
+
+                    foreach ($pendingStaffs as $st) {
+                        AuditTrail::catat('toggle_status', $st, ['status' => $st->status], ['status' => 'aktif'], null, $sppg->id_sppg);
+                    }
 
                     if ($isPerubahan && Schema::hasTable('kepala_change_requests')) {
                         $pendingCr = DB::table('kepala_change_requests')
@@ -308,18 +352,42 @@ class SppgManagementController extends Controller
                     if ($sppg->status_verifikasi === 'menunggu_verifikasi') {
                         $sppg->status_verifikasi = 'ditolak';
                         $aksi = 'sppg_reject';
-                    } elseif ($sppg->status_verifikasi === 'perubahan') {
-                        $sppg->status_verifikasi = 'terverifikasi';
-                        $sppg->status = 'aktif';
-                        $aksi = 'kepala_change_reject';
 
-                        $reviewNote = $request->input('review_note') ?: 'Pengajuan penambahan staff ditolak oleh Administrator.';
+                        $reviewNote = $request->input('review_note') ?: 'Pendaftaran SPPG ditolak oleh Administrator.';
+                        $pendingStaffs = Staff::where('id_sppg', $sppg->id_sppg)
+                            ->whereIn('status', ['menunggu', 'menunggu_persetujuan'])
+                            ->get();
+
                         Staff::where('id_sppg', $sppg->id_sppg)
                             ->whereIn('status', ['menunggu', 'menunggu_persetujuan'])
                             ->update([
                                 'status' => 'ditolak',
                                 'catatan_admin' => $reviewNote,
                             ]);
+
+                        foreach ($pendingStaffs as $st) {
+                            AuditTrail::catat('toggle_status', $st, ['status' => $st->status], ['status' => 'ditolak', 'catatan_admin' => $reviewNote], null, $sppg->id_sppg);
+                        }
+                    } elseif ($sppg->status_verifikasi === 'perubahan') {
+                        $sppg->status_verifikasi = 'terverifikasi';
+                        $sppg->status = 'aktif';
+                        $aksi = 'kepala_change_reject';
+
+                        $reviewNote = $request->input('review_note') ?: 'Pengajuan penambahan staff ditolak oleh Administrator.';
+                        $pendingStaffs = Staff::where('id_sppg', $sppg->id_sppg)
+                            ->whereIn('status', ['menunggu', 'menunggu_persetujuan'])
+                            ->get();
+
+                        Staff::where('id_sppg', $sppg->id_sppg)
+                            ->whereIn('status', ['menunggu', 'menunggu_persetujuan'])
+                            ->update([
+                                'status' => 'ditolak',
+                                'catatan_admin' => $reviewNote,
+                            ]);
+
+                        foreach ($pendingStaffs as $st) {
+                            AuditTrail::catat('toggle_status', $st, ['status' => $st->status], ['status' => 'ditolak', 'catatan_admin' => $reviewNote], null, $sppg->id_sppg);
+                        }
 
                         if (Schema::hasTable('kepala_change_requests')) {
                             $pendingCr = DB::table('kepala_change_requests')
