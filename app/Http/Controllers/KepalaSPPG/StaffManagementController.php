@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\KepalaSPPG;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditTrail;
 use App\Models\Sppg;
 use App\Models\StaffManagement;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
@@ -116,20 +118,31 @@ class StaffManagementController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        StaffManagement::create([
-            'id_sppg' => $sppg->id_sppg,
-            'nama' => $validated['nama'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'no_telepon' => $validated['no_telepon'],
-            'status' => 'menunggu_persetujuan',
-        ]);
-
-        if ($sppg->status_verifikasi === 'terverifikasi' || $sppg->status === 'aktif') {
-            $sppg->update([
-                'status_verifikasi' => 'perubahan',
+        $staff = DB::transaction(function () use ($sppg, $validated) {
+            $staff = StaffManagement::create([
+                'id_sppg' => $sppg->id_sppg,
+                'nama' => $validated['nama'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'no_telepon' => $validated['no_telepon'],
+                'status' => 'menunggu_persetujuan',
             ]);
-        }
+
+            if ($sppg->status_verifikasi === 'terverifikasi' || $sppg->status === 'aktif') {
+                $sppg->update([
+                    'status_verifikasi' => 'perubahan',
+                ]);
+            }
+
+            AuditTrail::catat('create', $staff, null, [
+                'nama' => $staff->nama,
+                'email' => $staff->email,
+                'no_telepon' => $staff->no_telepon,
+                'status' => 'menunggu_persetujuan',
+            ], null, $sppg->id_sppg);
+
+            return $staff;
+        });
 
         return redirect()->route('sppg.staff.index')->with('success', 'Pengajuan penambahan staff berhasil dikirim dan menunggu verifikasi Admin Sistem.');
     }
@@ -202,12 +215,17 @@ class StaffManagementController extends Controller
         }
 
         $reason = $request->input('reason', 'Dinonaktifkan oleh Kepala SPPG');
+        $oldStatus = $staff->status;
 
-        $staff->update([
-            'status' => 'nonaktif',
-            'nonaktif_at' => now(),
-            'nonaktif_reason' => $reason,
-        ]);
+        DB::transaction(function () use ($staff, $reason, $oldStatus, $sppg) {
+            $staff->update([
+                'status' => 'nonaktif',
+                'nonaktif_at' => now(),
+                'nonaktif_reason' => $reason,
+            ]);
+
+            AuditTrail::catat('toggle_status', $staff, ['status' => $oldStatus], ['status' => 'nonaktif', 'alasan' => $reason], null, $sppg->id_sppg);
+        });
 
         return redirect()->route('sppg.staff.index')->with('success', "Akun staff {$staff->nama} berhasil dinonaktifkan.");
     }

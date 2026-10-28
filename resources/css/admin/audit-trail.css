@@ -181,38 +181,43 @@ textarea {
     align-items: center;
     gap: 16px;
     margin-bottom: 24px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .search-input-box {
     position: relative;
-    width: 250px;
+    width: 360px;
     max-width: 100%;
 }
 
 .search-icon {
     position: absolute;
-    left: 12px;
+    left: 11px;
     top: 50%;
     transform: translateY(-50%);
     color: #94A3B8;
     pointer-events: none;
+    width: 16px;
+    height: 16px;
 }
 
 .input-search {
     width: 100%;
-    padding: 9px 12px 9px 38px;
+    height: 38px;
+    box-sizing: border-box;
+    padding: 0 12px 0 34px;
     border: 1px solid #E2E8F0;
-    border-radius: 10px;
+    border-radius: 9px;
     font-size: 13px;
     color: #0F172A;
     outline: none;
     background-color: #FFFFFF;
-    transition: border-color 0.15s ease;
+    transition: all 0.2s ease;
 }
 
 .input-search:focus {
-    border-color: #3B82F6;
+    border-color: #071E49;
+    box-shadow: 0 0 0 3px rgba(7, 30, 73, 0.08);
 }
 
 .input-search::placeholder {
@@ -222,81 +227,183 @@ textarea {
 .filter-actions-group {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 10px;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+}
+
+/* Kepala SPPG View: Spacious, aligned with other Kepala SPPG pages */
+.filter-bar-form.is-sppg-view {
+    gap: 16px;
+}
+
+.filter-bar-form.is-sppg-view .search-input-box {
+    width: 360px;
+    max-width: 100%;
+    flex: none;
+}
+
+.filter-bar-form.is-sppg-view .filter-actions-group {
+    gap: 10px;
+}
+
+.filter-bar-form.is-sppg-view .au-date-btn {
+    min-width: 135px;
+    max-width: 180px;
+}
+
+.filter-bar-form.is-sppg-view .select-modul-filter {
+    min-width: 135px;
+    max-width: 175px;
+}
+
+/* Admin View: Fits all 7 controls neatly in one horizontal row */
+.filter-bar-form.is-admin-view {
+    gap: 8px;
+}
+
+.filter-bar-form.is-admin-view .search-input-box {
+    position: relative;
+    flex: 1 1 200px;
+    min-width: 170px;
+    max-width: 280px;
+}
+
+.filter-bar-form.is-admin-view .filter-actions-group {
+    gap: 8px;
+}
+
+.filter-bar-form.is-admin-view .select-sppg-filter {
+    width: 145px;
+    max-width: 145px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.filter-bar-form.is-admin-view .select-modul-filter {
+    min-width: 125px;
+    max-width: 135px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.filter-bar-form.is-admin-view .select-role-filter {
+    min-width: 125px;
+    max-width: 135px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .select-dropdown-box {
     position: relative;
+    flex-shrink: 0;
 }
 
 .select-status-verif {
     appearance: none;
     -webkit-appearance: none;
-    padding: 10px 38px 10px 16px;
+    height: 38px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 26px 0 11px;
     border: 1px solid #E2E8F0;
-    border-radius: 10px;
-    font-size: 13px;
+    border-radius: 9px;
+    font-size: 12.5px;
     font-weight: 500;
     color: #1E293B;
     background-color: #FFFFFF;
     cursor: pointer;
     outline: none;
     transition: border-color 0.15s ease;
+    white-space: nowrap;
 }
 
 .select-status-verif:focus {
-    border-color: #3B82F6;
+    border-color: #071E49;
 }
 
 .chevron-icon {
     position: absolute;
-    right: 12px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     color: #64748B;
     pointer-events: none;
+    width: 14px;
+    height: 14px;
 }
 
 .btn-reset-filter {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: 1px solid #E2E8F0;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #475569;
-    background-color: #FFFFFF;
+    justify-content: center;
+    height: 38px;
+    box-sizing: border-box;
+    gap: 6px;
+    padding: 0 12px;
+    border: 1px solid #071E49;
+    border-radius: 9px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: #071E49;
     text-decoration: none;
     cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(7, 30, 73, 0.12);
     transition: all 0.15s ease;
 }
 
+.btn-reset-filter svg {
+    width: 14px;
+    height: 14px;
+}
+
 .btn-reset-filter:hover {
-    background-color: #F8FAFC;
-    border-color: #CBD5E1;
-    color: #0F172A;
+    background-color: #042A70;
+    border-color: #042A70;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(7, 30, 73, 0.2);
+}
+
+.btn-reset-filter:active {
+    transform: scale(0.98);
 }
 
 .dropdown-export-wrapper {
     position: relative;
+    flex-shrink: 0;
 }
 
 .btn-export {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
+    justify-content: center;
+    height: 38px;
+    box-sizing: border-box;
+    gap: 6px;
+    padding: 0 12px;
     border: 1px solid #0F172A;
-    border-radius: 10px;
-    font-size: 13px;
+    border-radius: 9px;
+    font-size: 12.5px;
     font-weight: 600;
     color: #FFFFFF;
     background-color: #0F172A;
     cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
     transition: all 0.15s ease;
+}
+
+.btn-export svg:first-child {
+    width: 14px;
+    height: 14px;
 }
 
 .btn-export:hover {
@@ -306,10 +413,37 @@ textarea {
 
 .chevron-export {
     transition: transform 0.15s ease;
+    width: 10px;
+    height: 10px;
 }
 
 .dropdown-export-wrapper.open .chevron-export {
     transform: rotate(180deg);
+}
+
+@media (max-width: 1100px) {
+    .filter-bar-form.is-admin-view {
+        overflow-x: auto;
+        padding-bottom: 6px;
+    }
+}
+
+@media (max-width: 900px) {
+    .filter-bar-form.is-sppg-view {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .filter-bar-form.is-sppg-view .search-input-box {
+        width: 100%;
+    }
+
+    .filter-bar-form.is-sppg-view .filter-actions-group {
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: flex-start;
+    }
 }
 
 .dropdown-export-menu {
@@ -364,7 +498,11 @@ textarea {
 .au-date-btn {
     text-align: left;
     cursor: pointer;
-    min-width: 190px;
+    min-width: 125px;
+    max-width: 150px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .au-datepop {

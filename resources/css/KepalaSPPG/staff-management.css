@@ -257,21 +257,28 @@
     align-items: center;
     gap: 6px;
     padding: 10px 16px;
-    border: 1px solid #E2E8F0;
+    border: 1px solid #071E49;
     border-radius: 10px;
     font-size: 14px;
-    font-weight: 500;
-    color: #475569;
-    background: #FFFFFF;
+    font-weight: 600;
+    color: #FFFFFF;
+    background: #071E49;
     cursor: pointer;
     text-decoration: none;
+    box-shadow: 0 2px 6px rgba(7, 30, 73, 0.12);
     transition: all 0.2s;
 }
 
 .btn-reset-filter:hover {
-    background-color: #F8FAFC;
-    color: #0F172A;
-    border-color: #CBD5E1;
+    background-color: #042A70;
+    color: #FFFFFF;
+    border-color: #042A70;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(7, 30, 73, 0.2);
+}
+
+.btn-reset-filter:active {
+    transform: scale(0.98);
 }
 
 /* Table */
