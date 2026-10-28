@@ -353,6 +353,13 @@
                 (bool) $sampai   => 'Sampai ' . $formatTanggal($sampai),
                 default          => 'Semua Periode',
             };
+            $labelPeran = match ($selectedRole ?? null) {
+                'admin' => 'Admin Sistem',
+                'sppg' => 'SPPG',
+                'kepala_sppg' => 'Kepala SPPG',
+                'staff' => 'Staff',
+                default => null,
+            };
         @endphp
 
         <div class="meta-grid">
@@ -365,8 +372,14 @@
                 <dd>{{ $periodeText }}</dd>
             </div>
             <div class="meta-item">
-                <dt>Modul / Kata Kunci</dt>
-                <dd>{{ $modul ?: 'Semua Modul' }} {{ $q ? "(\"{$q}\")" : '' }}</dd>
+                <dt>Filter &amp; Modul</dt>
+                <dd>
+                    {{ $modul ?: 'Semua Modul' }}
+                    @if ($isAdmin && $labelPeran)
+                        &bull; {{ $labelPeran }}
+                    @endif
+                    {{ $q ? "(\"{$q}\")" : '' }}
+                </dd>
             </div>
             <div class="meta-item">
                 <dt>Dicetak Oleh</dt>

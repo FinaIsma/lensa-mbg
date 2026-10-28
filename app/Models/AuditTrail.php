@@ -38,6 +38,10 @@ class AuditTrail extends Model
 
     /** Nilai kolom `action` (sesuai enum di migration) => label tampilan. */
     public const AKTIVITAS = [
+        'create' => 'Menambah data',
+        'update' => 'Mengubah data',
+        'toggle_status' => 'Mengubah status',
+        'create_version' => 'Membuat versi baru',
         'confirm' => 'Mengonfirmasi',
         'void' => 'Membatalkan (void)',
         'cancel' => 'Membatalkan',
@@ -203,6 +207,63 @@ class AuditTrail extends Model
         return $q->where('audit_trails.id_sppg', $idSppg);
     }
 
+    /** Khusus Kepala SPPG: strictly batasi ke SPPG miliknya DAN sembunyikan semua aktivitas Admin Sistem. */
+    public function scopeUntukKepalaSppg(Builder $q, int $idSppg): Builder
+    {
+        return $q->where('audit_trails.id_sppg', $idSppg)
+            ->where(function (Builder $w) {
+                $w->where('audit_trails.actor_type', 'staff')
+                    ->orWhere(function (Builder $w2) {
+                        $w2->where('audit_trails.actor_type', 'user')
+                            ->whereNotExists(function ($sub) {
+                                $sub->selectRaw('1')
+                                    ->from(Keys::USER_TABLE)
+                                    ->whereColumn(Keys::USER_TABLE.'.'.Keys::USER_PK, 'audit_trails.actor_id')
+                                    ->whereIn(Keys::USER_TABLE.'.role', ['admin', 'admin_sistem']);
+                            });
+                    });
+            });
+    }
+
+    /** Filter berdasarkan peran aktor (admin sistem, sppg / semua tim sppg, kepala sppg, staff). */
+    public function scopePeran(Builder $q, ?string $role): Builder
+    {
+        if (! $role) {
+            return $q;
+        }
+
+        return match ($role) {
+            'admin' => $q->where('audit_trails.actor_type', 'user')
+                ->whereExists(function ($sub) {
+                    $sub->selectRaw('1')
+                        ->from(Keys::USER_TABLE)
+                        ->whereColumn(Keys::USER_TABLE.'.'.Keys::USER_PK, 'audit_trails.actor_id')
+                        ->whereIn(Keys::USER_TABLE.'.role', ['admin', 'admin_sistem']);
+                }),
+            'sppg' => $q->where(function (Builder $w) {
+                $w->where('audit_trails.actor_type', 'staff')
+                    ->orWhere(function (Builder $w2) {
+                        $w2->where('audit_trails.actor_type', 'user')
+                            ->whereExists(function ($sub) {
+                                $sub->selectRaw('1')
+                                    ->from(Keys::USER_TABLE)
+                                    ->whereColumn(Keys::USER_TABLE.'.'.Keys::USER_PK, 'audit_trails.actor_id')
+                                    ->where(Keys::USER_TABLE.'.role', 'kepala_sppg');
+                            });
+                    });
+            }),
+            'kepala_sppg' => $q->where('audit_trails.actor_type', 'user')
+                ->whereExists(function ($sub) {
+                    $sub->selectRaw('1')
+                        ->from(Keys::USER_TABLE)
+                        ->whereColumn(Keys::USER_TABLE.'.'.Keys::USER_PK, 'audit_trails.actor_id')
+                        ->where(Keys::USER_TABLE.'.role', 'kepala_sppg');
+                }),
+            'staff' => $q->where('audit_trails.actor_type', 'staff'),
+            default => $q,
+        };
+    }
+
     /** Filter modul: 'Produksi' mencakup beberapa tabel sekaligus. */
     public function scopeModul(Builder $q, ?string $modul): Builder
     {
@@ -363,7 +424,7 @@ class AuditTrail extends Model
     public function getNadaAttribute(): string
     {
         return match ($this->action) {
-            'confirm', 'correction_approve', 'correction_apply', 'sppg_verify', 'sppg_activate', 'kepala_change_approve' => 'ok',
+            'create', 'create_version', 'confirm', 'correction_approve', 'correction_apply', 'sppg_verify', 'sppg_activate', 'kepala_change_approve' => 'ok',
             'void', 'cancel', 'correction_reject', 'sppg_reject', 'sppg_deactivate', 'kepala_change_reject' => 'bad',
             default => 'info',
         };
@@ -416,11 +477,11 @@ class AuditTrail extends Model
 
             // Menu & Resep
             'menus' => fn ($ids) => DB::table('menus')->whereIn('id', $ids)
-                ->select('id as k', DB::raw("'MNU' || LPAD(id::text, 3, '0') as v")),
+                ->select('id as k', DB::raw("'MN' || LPAD(id::text, 2, '0') as v")),
             'recipes' => fn ($ids) => DB::table('recipes')->whereIn('id', $ids)
-                ->select('id as k', DB::raw("'RCP' || LPAD(id::text, 3, '0') as v")),
+                ->select('id as k', DB::raw("'RS' || LPAD(id::text, 2, '0') as v")),
             'recipe_items' => fn ($ids) => DB::table('recipe_items as ri')->join('recipes as r', 'r.id', '=', 'ri.recipe_id')
-                ->whereIn('ri.id', $ids)->select('ri.id as k', DB::raw("'RCP' || LPAD(r.id::text, 3, '0') as v")),
+                ->whereIn('ri.id', $ids)->select('ri.id as k', DB::raw("'RS' || LPAD(r.id::text, 2, '0') as v")),
 
             // Master Data (Pemasok & Bahan)
             'suppliers' => fn ($ids) => DB::table('suppliers')->whereIn('id', $ids)

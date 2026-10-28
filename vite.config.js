@@ -19,6 +19,8 @@ export default defineConfig({
                 'resources/css/KepalaSPPG/correction-request.css',
                 'resources/css/KepalaSPPG/staff-management.css',
                 'resources/css/KepalaSPPG/profile-modals.css',
+                'resources/css/staff/sidebar-navbar.css',
+                'resources/css/staff/menu-resep.css',
                 'resources/js/app.js',
                 'resources/js/auth/login.js',
                 'resources/js/auth/register.js',
@@ -29,6 +31,7 @@ export default defineConfig({
                 'resources/js/KepalaSPPG/correction-request.js',
                 'resources/js/KepalaSPPG/staff-management.js',
                 'resources/js/KepalaSPPG/profile-modals.js',
+                'resources/js/staff/menu-resep.js',
             ],
             refresh: true,
             fonts: [

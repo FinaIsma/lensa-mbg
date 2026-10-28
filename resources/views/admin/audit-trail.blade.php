@@ -7,7 +7,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite(['resources/css/admin/audit-trail.css', 'resources/js/admin/audit-trail.js'])
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    @if ($isAdmin)
+        @vite(['resources/css/admin/sidebar-navbar.css', 'resources/css/admin/audit-trail.css', 'resources/js/admin/audit-trail.js'])
+    @else
+        @vite([
+            'resources/css/KepalaSPPG/sidebar-navbar.css',
+            'resources/css/KepalaSPPG/profile-modals.css',
+            'resources/css/admin/audit-trail.css',
+            'resources/js/admin/audit-trail.js',
+            'resources/js/KepalaSPPG/profile-modals.js',
+        ])
+    @endif
 </head>
 <body>
 @php
@@ -148,6 +159,19 @@
                             </div>
 
                             @if ($isAdmin)
+                                <div class="select-dropdown-box">
+                                    <select name="role" class="select-status-verif" onchange="this.form.submit()">
+                                        <option value="">Semua Peran</option>
+                                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Sistem</option>
+                                        <option value="sppg" {{ request('role') === 'sppg' ? 'selected' : '' }}>SPPG</option>
+                                        <option value="kepala_sppg" {{ request('role') === 'kepala_sppg' ? 'selected' : '' }}>Kepala SPPG</option>
+                                        <option value="staff" {{ request('role') === 'staff' ? 'selected' : '' }}>Staff</option>
+                                    </select>
+                                    <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </div>
+
                                 <div class="select-dropdown-box">
                                     <select name="sppg" class="select-status-verif" onchange="this.form.submit()">
                                         <option value="">Semua SPPG</option>
@@ -347,6 +371,10 @@
         </template>
     @endforeach
 
+
+    @if (!$isAdmin && view()->exists('KepalaSPPG.partials.profile-modals'))
+        @include('KepalaSPPG.partials.profile-modals')
+    @endif
 
 </body>
 </html>
