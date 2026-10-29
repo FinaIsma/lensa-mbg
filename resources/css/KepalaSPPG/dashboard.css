@@ -1,78 +1,721 @@
-body {
-    font-family: 'Poppins', 'Plus Jakarta Sans', sans-serif;
-    background-color: #F8FAFC;
-    color: #0F172A;
+/* ==========================================================================
+   Dashboard Kepala SPPG Styles - Lensa MBG
+   Sesuai style dan grid halaman Correction Request & Staff Management
+   ========================================================================== */
+
+:root {
+    --primary-navy: #071E49;
+    --primary-hover: #042A70;
+    --navy-light: #E8E9F2;
+    --bg-page: #F8FAFC;
+    --card-border: #F1F5F9;
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+.content-body {
+    padding: 32px 40px 60px;
+    flex: 1;
+    width: 100%;
 }
 
-::-webkit-scrollbar-track {
-    background: #F1F5F9;
+@media (max-width: 768px) {
+    .content-body {
+        padding: 20px 16px 40px;
+    }
 }
 
-::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
-}
-
-.dashboard-banner-alert {
-    background-color: #FEF3C7;
-    border: 1px solid #FDE68A;
-    color: #92400E;
-    padding: 16px 20px;
-    border-radius: 14px;
+.dashboard-page-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Header */
+.dashboard-header-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.dashboard-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--primary-navy);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.25;
+}
+
+.dashboard-subtitle {
+    font-size: 14px;
+    color: #64748B;
+    margin: 0;
+    display: flex;
     align-items: center;
-    margin-bottom: 24px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.bullet-divider {
+    color: #CBD5E1;
+}
+
+/* Section Wrapper */
+.dashboard-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.section-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #64748B;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* Card Container */
+.dashboard-card {
+    background-color: #FFFFFF;
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dashboard-card:hover {
+    border-color: #E2E8F0;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+}
+
+.section-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.dashboard-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-navy);
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.card-header-date,
+.card-header-tag {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748B;
+    background-color: #F8FAFC;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    border: 1px solid #F1F5F9;
+}
+
+/* ==========================================================================
+   1. PERLU TINDAKAN (Action Cards)
+   ========================================================================== */
+.action-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
 }
 
-.banner-text-content {
+@media (max-width: 1024px) {
+    .action-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.action-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(7, 30, 73, 0.06);
+    border-color: #CBD5E1;
+}
+
+.action-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.action-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748B;
+}
+
+.action-card-value {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    margin: 2px 0;
+}
+
+.action-card-desc {
+    font-size: 12.5px;
+    color: #475569;
+    line-height: 1.45;
+    margin: 0;
+    min-height: 36px;
+}
+
+.action-card-footer {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-action-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--primary-navy);
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-action-primary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-action-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #F8FAFC;
+    color: var(--primary-navy);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-action-secondary:hover {
+    background-color: #F1F5F9;
+    border-color: #CBD5E1;
+    color: var(--primary-hover);
+}
+
+.badge-status-aktif {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    width: fit-content;
+}
+
+/* ==========================================================================
+   2. RINGKASAN HARI INI (Stat Cards)
+   ========================================================================== */
+.stat-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 1100px) {
+    .stat-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .stat-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card {
+    background-color: #FFFFFF;
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     gap: 14px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.btn-banner-action {
-    background-color: #D97706;
+.stat-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.icon-blue {
+    background-color: #EBF2FE;
+    color: #2563EB;
+}
+
+.icon-yellow {
+    background-color: #FEF7EC;
+    color: #D97706;
+}
+
+.icon-green {
+    background-color: #E8F9EE;
+    color: #16A34A;
+}
+
+.icon-red {
+    background-color: #FEEEEE;
+    color: #DC2626;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #64748B;
+    line-height: 1.2;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-navy);
+    line-height: 1.25;
+    margin: 2px 0;
+}
+
+.stat-subtext {
+    font-size: 11.5px;
+    color: #94A3B8;
+}
+
+/* ==========================================================================
+   3. ALUR PROSES HARI INI (Stepper)
+   ========================================================================== */
+.process-flow-container {
+    position: relative;
+    padding: 8px 6px 2px;
+}
+
+.process-flow-track {
+    position: absolute;
+    top: 32px;
+    left: 8%;
+    right: 8%;
+    height: 2px;
+    background-color: #E2E8F0;
+    z-index: 1;
+}
+
+.process-flow-steps {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    z-index: 2;
+}
+
+@media (max-width: 768px) {
+    .process-flow-steps {
+        flex-direction: column;
+        gap: 16px;
+    }
+    .process-flow-track {
+        display: none;
+    }
+}
+
+.process-step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+    flex: 1;
+    min-width: 90px;
+}
+
+.step-node-bubble {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 0 0 1px #E2E8F0;
+}
+
+.process-step-item.completed .step-node-bubble {
+    background-color: var(--primary-navy);
     color: #FFFFFF;
-    padding: 8px 18px;
-    border-radius: 10px;
-    font-size: 13px;
+    box-shadow: 0 0 0 2px var(--primary-navy);
+}
+
+.process-step-item.active .step-node-bubble {
+    background-color: var(--primary-navy);
+    color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(7, 30, 73, 0.25);
+    animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(7, 30, 73, 0.35);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(7, 30, 73, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(7, 30, 73, 0);
+    }
+}
+
+.process-step-item.pending .step-node-bubble {
+    background-color: #F1F5F9;
+    color: #94A3B8;
+    box-shadow: 0 0 0 1px #E2E8F0;
+}
+
+.step-title {
+    font-size: 13.5px;
     font-weight: 600;
-    white-space: nowrap;
+    color: var(--primary-navy);
+    margin-top: 2px;
+}
+
+.process-step-item.pending .step-title {
+    color: #94A3B8;
+}
+
+.step-desc {
+    font-size: 11.5px;
+    color: #64748B;
+    max-width: 130px;
+    line-height: 1.35;
+}
+
+/* ==========================================================================
+   4 & 5. TABLES (Batch & Distribusi)
+   ========================================================================== */
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.dashboard-table th {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94A3B8;
+    letter-spacing: 0.05em;
+    padding: 8px 10px;
+    border-bottom: 1px solid #F1F5F9;
+    text-align: left;
+}
+
+.dashboard-table td {
+    padding: 11px 10px;
+    border-bottom: 1px solid #F8FAFC;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.dashboard-table tbody tr {
     transition: background-color 0.15s ease;
-    text-decoration: none;
+}
+
+.dashboard-table tbody tr:hover {
+    background-color: #F8FAFC;
+}
+
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.badge-pill-amber {
+    background-color: #FEF7EC;
+    color: #D97706;
+    border: 1px solid #FDE68A;
+}
+
+.badge-pill-blue {
+    background-color: #EBF2FE;
+    color: #2563EB;
+    border: 1px solid #BFDBFE;
+}
+
+.badge-pill-green {
+    background-color: #E8F9EE;
+    color: #16A34A;
+    border: 1px solid #BBF7D0;
+}
+
+.badge-pill-danger {
+    background-color: #FEEEEE;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+}
+
+.badge-pill-slate {
+    background-color: #F1F5F9;
+    color: #64748B;
+    border: 1px solid #E2E8F0;
+}
+
+.card-footnote-alert {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #F8FAFC;
+    border-radius: 8px;
+    font-size: 11.5px;
+    color: #64748B;
+    border: 1px solid #F1F5F9;
+}
+
+/* ==========================================================================
+   6. STOK PERLU PERHATIAN
+   ========================================================================== */
+.stock-alert-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background-color: #F8FAFC;
+    border: 1px solid #F1F5F9;
+    transition: all 0.15s ease;
+}
+
+.stock-alert-item:hover {
+    background-color: #FFFFFF;
+    border-color: #E2E8F0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.stock-alert-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stock-alert-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stock-item-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--primary-navy);
+}
+
+.stock-item-code {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #64748B;
+}
+
+.stock-item-subtext {
+    font-size: 11.5px;
+    color: #64748B;
+}
+
+/* ==========================================================================
+   7. GRAFIK 7 HARI
+   ========================================================================== */
+.chart-footer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #F1F5F9;
+}
+
+.chart-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #64748B;
+}
+
+.chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-color-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
     display: inline-block;
 }
 
-.btn-banner-action:hover {
-    background-color: #B45309;
+.dot-produksi {
+    background-color: var(--primary-navy);
 }
 
-.chart-container-wrapper {
-    position: relative;
-    width: 100%;
-    transition: opacity 0.2s ease;
+.dot-terkirim {
+    background-color: #38BDF8;
 }
 
-.dashboard-table-scroll::-webkit-scrollbar {
-    height: 4px;
+.chart-summary-text {
+    font-size: 11.5px;
+    color: #94A3B8;
+    margin: 0;
 }
 
-.dashboard-table-scroll::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 9999px;
+/* ==========================================================================
+   8. AKTIVITAS TERBARU (Audit Trail Feed)
+   ========================================================================== */
+.audit-timeline-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.dashboard-heading {
-    color: #071E49;
+.audit-timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background-color: #F8FAFC;
+    border: 1px solid #F1F5F9;
+    transition: all 0.15s ease;
+}
+
+.audit-timeline-item:hover {
+    background-color: #FFFFFF;
+    border-color: #E2E8F0;
+}
+
+.audit-item-marker {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--primary-navy);
+    flex-shrink: 0;
+}
+
+.audit-item-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    flex-wrap: wrap;
+}
+
+.audit-actor-name {
+    font-weight: 700;
+    color: var(--primary-navy);
+}
+
+.audit-action-text {
+    color: #475569;
+}
+
+.audit-code-badge {
+    font-weight: 600;
+    color: #2563EB;
+    background-color: #EBF2FE;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11.5px;
+}
+
+.audit-time-text {
+    color: #94A3B8;
+    font-size: 11.5px;
+}
+
+.btn-audit-trail {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #F8FAFC;
+    color: var(--primary-navy);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-audit-trail:hover {
+    background-color: #F1F5F9;
+    border-color: #CBD5E1;
+    color: var(--primary-hover);
+    transform: translateX(2px);
 }
