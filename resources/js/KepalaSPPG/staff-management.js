@@ -6,9 +6,66 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let currentDetailStaff = null;
 
+    function resetStaffPasswordToggles() {
+        const fields = [
+            { inputId: 'inputPasswordStaff', iconId: 'eyeStaffPassword' },
+            { inputId: 'inputPasswordConfirmationStaff', iconId: 'eyeStaffConfirm' },
+        ];
+
+        fields.forEach(({ inputId, iconId }) => {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input) input.type = 'password';
+            if (icon) {
+                icon.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                `;
+                const btn = icon.closest('button');
+                if (btn) {
+                    btn.setAttribute('aria-label', 'Tampilkan password');
+                    btn.title = 'Tampilkan password';
+                }
+            }
+        });
+    }
+
+    window.toggleStaffPassword = function (inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (!input || !icon) return;
+
+        const btn = icon.closest('button');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.innerHTML = `
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            `;
+            if (btn) {
+                btn.setAttribute('aria-label', 'Sembunyikan password');
+                btn.title = 'Sembunyikan password';
+            }
+        } else {
+            input.type = 'password';
+            icon.innerHTML = `
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+            `;
+            if (btn) {
+                btn.setAttribute('aria-label', 'Tampilkan password');
+                btn.title = 'Tampilkan password';
+            }
+        }
+    };
+
+    window.resetStaffPasswordToggles = resetStaffPasswordToggles;
+
     // Open Tambah Staff Modal
     window.openTambahStaffModal = function () {
         if (!tambahModal) return;
+        resetStaffPasswordToggles();
         const form = tambahModal.querySelector('form');
         if (form) {
             form.reset();
@@ -25,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.closeTambahStaffModal = function () {
         if (!tambahModal) return;
+        resetStaffPasswordToggles();
         tambahModal.classList.remove('show');
         document.body.style.overflow = '';
     };
