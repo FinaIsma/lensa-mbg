@@ -12,8 +12,7 @@
     {{-- Title & Subtitle --}}
     <div class="page-title-section">
         <h1 class="page-title">
-            Selamat datang {{ Auth::user()->nama ?? 'Admin' }} di<br>
-            Dashboard & Analytics
+            Selamat datang {{ Auth::user()->nama ?? 'Admin' }} di Dashboard & Analytics
         </h1>
         <p class="page-subtitle">
             Ringkasan data dan aktivitas sistem Lensa MBG secara real-time.

@@ -1,6 +1,6 @@
 @extends('layouts.kepala-sppg')
 
-@section('title', 'Dashboard - Kepala SPPG')
+@section('title', 'Dashboard Operasional - Kepala SPPG')
 
 @push('styles')
     @vite('resources/css/KepalaSPPG/dashboard.css')
@@ -9,426 +9,324 @@
 @section('main-class', 'content-body')
 
 @section('content')
-<div class="dashboard-page-container">
+<div class="space-y-7 pb-8">
 
-    {{-- Page Header --}}
-    <div class="dashboard-header-section">
-        <div>
-            <h1 class="dashboard-title">Dashboard</h1>
-            <p class="dashboard-subtitle">
-                <span>{{ $todayStr }}</span>
-                <span class="bullet-divider">•</span>
-                <span class="font-medium text-slate-700">{{ $sppg->nama_sppg ?? 'SPPG Melati Sukorejo' }} ({{ 'SPPG' . str_pad($sppg->id_sppg ?? 1, 3, '0', STR_PAD_LEFT) }})</span>
-            </p>
-        </div>
+    {{-- Title & Subtitle Section --}}
+    <div class="page-title-section">
+        <h1 class="page-title">
+            Selamat datang, {{ $user->nama ?? 'Kepala SPPG' }} di Dashboard Operasional SPPG
+        </h1>
+        <p class="page-subtitle">
+            Ringkasan data dan aktivitas operasional SPPG secara real-time.
+        </p>
     </div>
 
-    {{-- 1. PERLU TINDAKAN (Action Required Cards) --}}
-    <section class="dashboard-section">
-        <h2 class="section-label">1. PERLU TINDAKAN</h2>
-        <div class="action-cards-grid">
-            {{-- Card 1: Koreksi Menunggu --}}
-            <div class="action-card card-koreksi">
-                <div class="action-card-header">
-                    <span class="action-card-title">Pengajuan koreksi menunggu</span>
-                </div>
-                <div class="action-card-value text-[#071E49]">{{ $pendingCorrectionsCount }}</div>
-                <p class="action-card-desc">{{ $correctionSummary }}</p>
-                <div class="action-card-footer">
-                    <a href="{{ route('sppg.correction') }}" class="btn-action-primary">
-                        <span>Tinjau koreksi</span>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </a>
-                </div>
+    {{-- 4 Stat Cards --}}
+    <div class="stat-cards-grid">
+        {{-- Card 1: Porsi Siap / Target --}}
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-blue">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 14"></polyline>
+                </svg>
             </div>
-
-            {{-- Card 2: Bahan Perlu Perhatian --}}
-            <div class="action-card card-bahan">
-                <div class="action-card-header">
-                    <span class="action-card-title">Bahan perlu perhatian</span>
-                </div>
-                <div class="action-card-value text-[#071E49]">{{ $criticalMaterialsCount }}</div>
-                <p class="action-card-desc">{{ $criticalMaterialsSummary }}</p>
-                <div class="action-card-footer">
-                    <a href="#section-stok-perhatian" class="btn-action-secondary">
-                        <span>Lihat di bawah</span>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-
-            {{-- Card 3: Status SPPG --}}
-            <div class="action-card card-status">
-                <div class="action-card-header">
-                    <span class="action-card-title">Status SPPG</span>
-                </div>
-                <div class="action-card-badge-wrap">
-                    <span class="badge-status-aktif">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span>{{ $sppgStatusLabel }}</span>
-                    </span>
-                </div>
-                <p class="action-card-desc">{{ $sppgInfoText }}</p>
-                <div class="action-card-footer">
-                    <button type="button" class="btn-action-secondary" onclick="openProfilModal()">
-                        <span>Data kepala</span>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                    </button>
-                    <a href="{{ route('sppg.staff.index') }}" class="btn-action-primary">
-                        <span>Kelola staff</span>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- 2. RINGKASAN HARI INI (4 Stat Cards Khas Lensa MBG) --}}
-    <section class="dashboard-section">
-        <h2 class="section-label">2. RINGKASAN HARI INI</h2>
-        <div class="stat-cards-grid">
-            {{-- Card 1: Batch Hari Ini --}}
-            <div class="stat-card">
-                <div class="stat-icon-wrapper icon-blue">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"></path>
-                        <line x1="6" y1="17" x2="18" y2="17"></line>
-                    </svg>
-                </div>
-                <div class="stat-content">
-                    <span class="stat-label">Batch hari ini</span>
-                    <span class="stat-value">{{ $ringkasan['batch_count'] }}</span>
-                    <span class="stat-subtext">{{ $ringkasan['batch_diproses'] }} diproses</span>
-                </div>
-            </div>
-
-            {{-- Card 2: Porsi Siap / Target --}}
-            <div class="stat-card">
-                <div class="stat-icon-wrapper icon-yellow">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 14 14"></polyline>
-                    </svg>
-                </div>
-                <div class="stat-content">
-                    <span class="stat-label">Porsi siap / target</span>
-                    <span class="stat-value">{{ $ringkasan['porsi_siap'] }} / {{ $ringkasan['porsi_target'] }}</span>
-                    <span class="stat-subtext">Batch belum selesai</span>
-                </div>
-            </div>
-
-            {{-- Card 3: Porsi Terkirim Kemarin --}}
-            <div class="stat-card">
-                <div class="stat-icon-wrapper icon-green">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="1" y="3" width="15" height="13"></rect>
-                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                    </svg>
-                </div>
-                <div class="stat-content">
-                    <span class="stat-label">Porsi terkirim kemarin</span>
-                    <span class="stat-value">{{ $ringkasan['porsi_terkirim_kemarin'] }}</span>
-                    <span class="stat-subtext">dari {{ $ringkasan['porsi_target_kemarin'] }} porsi</span>
-                </div>
-            </div>
-
-            {{-- Card 4: Stok Kritis --}}
-            <div class="stat-card">
-                <div class="stat-icon-wrapper icon-red">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                        <line x1="12" y1="9" x2="12" y2="13"></line>
-                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                </div>
-                <div class="stat-content">
-                    <span class="stat-label">Stok kritis</span>
-                    <span class="stat-value">{{ $ringkasan['stok_kritis_count'] }} bahan</span>
-                    <span class="stat-subtext">{{ $ringkasan['stok_kritis_detail'] }}</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- 3. ALUR PROSES HARI INI (Pipeline Stepper) --}}
-    <section class="dashboard-section">
-        <div class="dashboard-card p-5">
-            <div class="section-card-header">
-                <h3 class="dashboard-card-title">3. Alur proses hari ini</h3>
-                <span class="card-header-date">{{ Carbon\Carbon::now()->locale('id')->translatedFormat('d M Y') }}</span>
-            </div>
-
-            <div class="process-flow-container">
-                <div class="process-flow-track" aria-hidden="true"></div>
-
-                <div class="process-flow-steps">
-                    @foreach($alurProses as $step)
-                        <div class="process-step-item {{ $step['state'] }}">
-                            <div class="step-node-bubble">
-                                @if($step['state'] === 'completed')
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
-                                @else
-                                    <span>{{ $step['step'] }}</span>
-                                @endif
-                            </div>
-                            <span class="step-title">{{ $step['name'] }}</span>
-                            <span class="step-desc">{{ $step['desc'] }}</span>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- ROW: 4. BATCH TERBARU & 5. DISTRIBUSI TERBARU --}}
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
-        {{-- 4. Batch Terbaru (7 cols) --}}
-        <div class="lg:col-span-7 flex">
-            <div class="dashboard-card p-5 flex flex-col justify-between w-full">
-                <div>
-                    <div class="section-card-header">
-                        <h3 class="dashboard-card-title">4. Batch terbaru</h3>
-                        <span class="card-header-tag">3 terakhir</span>
-                    </div>
-
-                    <div class="overflow-x-auto custom-scrollbar">
-                        <table class="dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>KODE</th>
-                                    <th>MENU</th>
-                                    <th class="text-center">TARGET / HASIL</th>
-                                    <th class="text-right">STATUS</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($batchTerbaru as $batch)
-                                    <tr>
-                                        <td class="font-semibold text-[#071E49] whitespace-nowrap">{{ $batch['kode'] }}</td>
-                                        <td class="text-slate-700 min-w-[160px]">{{ $batch['menu'] }}</td>
-                                        <td class="text-center text-slate-600 whitespace-nowrap">{{ $batch['target_porsi'] }} / {{ $batch['actual_porsi'] }}</td>
-                                        <td class="text-right whitespace-nowrap">
-                                            @php
-                                                $st = strtolower($batch['status']);
-                                                $badgeClass = match(true) {
-                                                    str_contains($st, 'masak') || str_contains($st, 'cook') => 'badge-pill-amber',
-                                                    str_contains($st, 'distribusi') => 'badge-pill-blue',
-                                                    str_contains($st, 'selesai') => 'badge-pill-green',
-                                                    default => 'badge-pill-slate',
-                                                };
-                                            @endphp
-                                            <span class="badge-pill {{ $badgeClass }}">{{ $batch['status'] }}</span>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center py-6 text-slate-400">Belum ada batch produksi tercatat.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="stat-content">
+                <span class="stat-label">Porsi Siap / Target</span>
+                <span class="stat-value">{{ $stats['porsi_siap'] }} / {{ $stats['porsi_target'] }}</span>
+                <span class="stat-subtext">{{ $stats['batch_count'] }} Batch Terjadwal</span>
             </div>
         </div>
 
-        {{-- 5. Distribusi Terbaru (5 cols) --}}
-        <div class="lg:col-span-5 flex">
-            <div class="dashboard-card p-5 flex flex-col justify-between w-full">
-                <div>
-                    <div class="section-card-header">
-                        <h3 class="dashboard-card-title">5. Distribusi terbaru</h3>
-                        <span class="card-header-tag">{{ Carbon\Carbon::now()->subDay()->translatedFormat('d M') }}</span>
-                    </div>
-
-                    <div class="overflow-x-auto custom-scrollbar">
-                        <table class="dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>TUJUAN</th>
-                                    <th class="text-center">PORSI</th>
-                                    <th class="text-right">STATUS</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($distribusiTerbaru as $dist)
-                                    <tr>
-                                        <td class="font-medium text-[#071E49]">{{ $dist['tujuan'] }}</td>
-                                        <td class="text-center font-semibold text-slate-700">{{ $dist['porsi'] }}</td>
-                                        <td class="text-right whitespace-nowrap">
-                                            @php
-                                                $dSt = strtolower($dist['status']);
-                                                $distClass = match(true) {
-                                                    str_contains($dSt, 'terkirim') => 'badge-pill-green',
-                                                    str_contains($dSt, 'rencana') => 'badge-pill-slate',
-                                                    default => 'badge-pill-blue',
-                                                };
-                                            @endphp
-                                            <span class="badge-pill {{ $distClass }}">{{ $dist['status'] }}</span>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="3" class="text-center py-6 text-slate-400">Belum ada catatan distribusi.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="card-footnote-alert">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                    <span>{{ $distribusiFooter }}</span>
-                </div>
+        {{-- Card 2: Porsi Terdistribusi --}}
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-green">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="3" width="15" height="13"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon>
+                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
             </div>
-        </div>
-    </div>
-
-    {{-- ROW: 6. STOK PERLU PERHATIAN & 7. GRAFIK 7 HARI --}}
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch" id="section-stok-perhatian">
-        {{-- 6. Stok Perlu Perhatian (6 cols) --}}
-        <div class="lg:col-span-6 flex">
-            <div class="dashboard-card p-5 flex flex-col justify-between w-full">
-                <div>
-                    <div class="section-card-header">
-                        <h3 class="dashboard-card-title">6. Stok perlu perhatian</h3>
-                        <span class="card-header-tag">{{ count($stokPerhatian) }} bahan</span>
-                    </div>
-
-                    <div class="space-y-2.5">
-                        @foreach($stokPerhatian as $item)
-                            <div class="stock-alert-item">
-                                <div class="stock-alert-info">
-                                    <div class="stock-alert-header">
-                                        <span class="stock-item-name">{{ $item['nama'] }}</span>
-                                        <span class="stock-item-code">{{ $item['kode'] }}</span>
-                                    </div>
-                                    <div class="stock-item-subtext">
-                                        Sisa {{ $item['sisa'] }} <span class="bullet-divider">•</span> minimum {{ $item['minimum'] }} <span class="bullet-divider">•</span> exp {{ $item['exp'] }}
-                                    </div>
-                                </div>
-                                <div class="stock-alert-badge-wrap">
-                                    @if($item['status_type'] === 'danger')
-                                        <span class="badge-pill badge-pill-danger">{{ $item['status_label'] }}</span>
-                                    @else
-                                        <span class="badge-pill badge-pill-amber">{{ $item['status_label'] }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+            <div class="stat-content">
+                <span class="stat-label">Porsi Terdistribusi</span>
+                <span class="stat-value">{{ $stats['porsi_terdistribusi'] }}</span>
+                <span class="stat-subtext">Tingkat Capaian {{ $stats['distribusi_pct'] }}%</span>
             </div>
         </div>
 
-        {{-- 7. Grafik 7 Hari (6 cols) --}}
-        <div class="lg:col-span-6 flex">
-            <div class="dashboard-card p-5 flex flex-col justify-between w-full">
-                <div class="section-card-header">
-                    <h3 class="dashboard-card-title">7. Grafik 7 hari</h3>
-                    <span class="card-header-tag">{{ $chartDateRange }}</span>
-                </div>
-
-                {{-- Chart container --}}
-                <div class="chart-container-wrapper relative w-full h-[160px] my-auto">
-                    <canvas id="dashboard7HariChart"></canvas>
-                </div>
-
-                {{-- Legend & Summary Footnote --}}
-                <div class="chart-footer-meta">
-                    <div class="chart-legend-row">
-                        <div class="chart-legend-item">
-                            <span class="legend-color-dot dot-produksi"></span>
-                            <span>Porsi diproduksi</span>
-                        </div>
-                        <div class="chart-legend-item">
-                            <span class="legend-color-dot dot-terkirim"></span>
-                            <span>Porsi terkirim</span>
-                        </div>
-                    </div>
-                    <p class="chart-summary-text">{{ $chartSusutLimbahText }}</p>
-                </div>
+        {{-- Card 3: Koreksi Menunggu --}}
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-yellow">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
             </div>
-        </div>
-    </div>
-
-    {{-- 8. AKTIVITAS TERBARU (Audit Trail 5 Terakhir) --}}
-    <section class="dashboard-section">
-        <div class="dashboard-card p-5">
-            <div class="section-card-header">
-                <h3 class="dashboard-card-title">8. Aktivitas terbaru</h3>
-                <span class="card-header-tag">dari audit trail</span>
-            </div>
-
-            <div class="audit-timeline-feed">
-                @forelse($aktivitasTerbaru as $log)
-                    <div class="audit-timeline-item">
-                        <div class="audit-item-marker"></div>
-                        <div class="audit-item-content">
-                            <span class="audit-actor-name">{{ $log['aktor'] }}</span>
-                            <span class="audit-action-text">{{ $log['aksi'] }}</span>
-                            <span class="audit-code-badge">{{ $log['kode'] }}</span>
-                            <span class="audit-time-text">• {{ $log['waktu'] }}</span>
-                        </div>
-                    </div>
-                @empty
-                    <div class="py-6 text-center text-slate-400">Belum ada riwayat aktivitas terbaru.</div>
-                @endforelse
-            </div>
-
-            <div class="audit-footer-action mt-5 pt-4 border-t border-slate-100 flex justify-start">
-                <a href="{{ route('sppg.audit') }}" class="btn-audit-trail">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    <span>Lihat semua audit trail</span>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
+            <div class="stat-content">
+                <span class="stat-label">Koreksi Menunggu</span>
+                <span class="stat-value">{{ $stats['koreksi_menunggu'] }}</span>
+                <a href="{{ route('sppg.correction') }}" class="stat-subtext hover:text-amber-700 hover:underline inline-flex items-center gap-1 font-semibold">
+                    <span>Tinjau Sekarang</span>
+                    <span>&rarr;</span>
                 </a>
             </div>
         </div>
-    </section>
+
+        {{-- Card 4: Stok Kritis --}}
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-red">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Stok Perlu Perhatian</span>
+                <span class="stat-value">{{ $stats['stok_kritis'] }} Bahan</span>
+                <span class="stat-subtext">Di Bawah Batas Min / Exp</span>
+            </div>
+        </div>
+    </div>
+
+    {{-- Charts Section: 2 Columns (Tren Produksi & Distribusi vs Kesehatan Stok) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        
+        {{-- Visualisasi 1: Tren Produksi & Distribusi (Smooth Line Chart with Area Gradient) --}}
+        <div class="dashboard-card flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-4 mb-3">
+                <div>
+                    <h2 class="dashboard-card-title">Tren Produksi & Distribusi</h2>
+                    <p class="dashboard-card-subtitle">Perbandingan volume masak dan porsi sukses terkirim</p>
+                </div>
+
+                <div class="text-right">
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1 text-right">Periode</label>
+                    <div class="relative inline-block text-left">
+                        <select id="trenPeriodeFilter" class="select-filter-box">
+                            <option value="7hari" selected>7 Hari Terakhir</option>
+                            <option value="30hari">30 Hari Terakhir</option>
+                            <option value="2026">Tahun 2026</option>
+                        </select>
+                        <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-64 sm:h-72 w-full relative">
+                <canvas id="trenProduksiDistribusiChart"></canvas>
+            </div>
+
+            {{-- Legend Warna --}}
+            <div class="flex items-center justify-center gap-7 mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-700 flex-wrap">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#071E49]"></span>
+                    <span>Porsi Diproduksi</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#2563EB]"></span>
+                    <span>Porsi Terdistribusi</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Visualisasi 2: Kondisi Kesehatan Stok Bahan (Donut & Bar) --}}
+        <div class="dashboard-card flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-4 mb-3">
+                <div>
+                    <h2 class="dashboard-card-title">Kondisi Kesehatan Stok Bahan</h2>
+                    <p class="dashboard-card-subtitle">Pemetaan rasio kecukupan inventaris bahan baku</p>
+                </div>
+
+                <div class="text-right">
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1 text-right">Visualisasi</label>
+                    <div class="relative inline-block text-left">
+                        <select id="stokVisualisasiFilter" class="select-filter-box">
+                            <option value="donut" selected>Diagram Donat</option>
+                            <option value="bar">Diagram Batang</option>
+                        </select>
+                        <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-64 sm:h-72 w-full relative flex items-center justify-center">
+                <canvas id="kesehatanStokChart"></canvas>
+            </div>
+
+            {{-- Legend Warna --}}
+            <div class="flex items-center justify-center gap-6 mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-700 flex-wrap">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#16A34A]"></span>
+                    <span>Stok Aman</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#F59E0B]"></span>
+                    <span>Mendekati Minimum</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-[#EF4444]"></span>
+                    <span>Kritis / Expired</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {{-- Row 3: Alur Operasional Dapur (1 Card Memanjang Full Width) --}}
+    <div class="dashboard-card p-5 w-full">
+        <div class="flex items-center justify-between gap-4 mb-3">
+            <div>
+                <h3 class="dashboard-card-title">Alur Operasional Dapur</h3>
+                <p class="dashboard-card-subtitle">Tahapan produksi makanan bergizi hari ini</p>
+            </div>
+            <span class="text-xs font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
+                {{ Carbon\Carbon::now()->locale('id')->translatedFormat('d M Y') }}
+            </span>
+        </div>
+
+        <div class="process-flow-container my-auto py-2">
+            <div class="process-flow-track" aria-hidden="true"></div>
+
+            <div class="process-flow-steps">
+                @foreach($alurProses as $step)
+                    <div class="process-step-item {{ $step['state'] }}">
+                        <div class="step-node-bubble">
+                            @if($step['state'] === 'completed')
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            @else
+                                <span>{{ $step['step'] }}</span>
+                            @endif
+                        </div>
+                        <span class="step-title">{{ $step['name'] }}</span>
+                        <span class="step-desc">{{ $step['desc'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    {{-- Row 4: Batch Terbaru & Distribusi Terbaru (Formasi 2 Kolom Berdampingan) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        {{-- Card Kiri: Batch Terbaru --}}
+        <div class="dashboard-card p-5 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between gap-4 mb-3">
+                    <div>
+                        <h3 class="dashboard-card-title">Batch Terbaru</h3>
+                        <p class="dashboard-card-subtitle">3 batch terakhir diproses di dapur</p>
+                    </div>
+                    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                        Produksi
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-700">
+                                <th class="pb-2 font-semibold">Kode & Menu</th>
+                                <th class="pb-2 text-center font-semibold">Target / Hasil</th>
+                                <th class="pb-2 text-right font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100/80">
+                            @foreach($batchTerbaru as $b)
+                            <tr class="h-10">
+                                <td class="pr-2 align-middle">
+                                    <div class="font-bold text-[#071E49] text-[11.5px]">{{ $b['kode'] }}</div>
+                                    <div class="text-[10.5px] text-slate-500 truncate max-w-[190px]">{{ $b['menu'] }}</div>
+                                </td>
+                                <td class="text-center font-semibold text-slate-700 text-[11.5px] align-middle whitespace-nowrap">
+                                    {{ $b['hasil'] }} / {{ $b['target'] }} porsi
+                                </td>
+                                <td class="text-right align-middle whitespace-nowrap">
+                                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $b['status_badge'] }}">
+                                        {{ $b['status'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="mt-2 pt-2 border-t border-slate-100 text-[11px] text-slate-400">
+                Satu batch = satu menu = satu ukuran porsi
+            </div>
+        </div>
+
+        {{-- Card Kanan: Distribusi Terbaru --}}
+        <div class="dashboard-card p-5 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between gap-4 mb-2">
+                    <div>
+                        <h3 class="dashboard-card-title">Distribusi Terbaru</h3>
+                        <p class="dashboard-card-subtitle">Penyaluran porsi ke sekolah & posyandu</p>
+                    </div>
+                    <span class="text-xs font-medium text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
+                        Hari Ini
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-700">
+                                <th class="pb-2 font-semibold">Tujuan</th>
+                                <th class="pb-2 text-center font-semibold">Porsi</th>
+                                <th class="pb-2 text-right font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100/80">
+                            @foreach($distribusiTerbaru as $dist)
+                            <tr class="h-10">
+                                <td class="pr-2 font-medium text-slate-800 text-[11.5px] whitespace-nowrap">{{ $dist['tujuan'] }}</td>
+                                <td class="text-center font-bold text-[#071E49] text-[11.5px] whitespace-nowrap">{{ $dist['porsi'] }}</td>
+                                <td class="text-right whitespace-nowrap">
+                                    @php
+                                        $st = strtolower($dist['status']);
+                                        $dBadge = match(true) {
+                                            str_contains($st, 'terkirim') => 'bg-[#DCFCE7] text-[#16A34A]',
+                                            str_contains($st, 'rencana') => 'bg-slate-100 text-slate-600',
+                                            default => 'bg-[#EBF2FE] text-[#2563EB]',
+                                        };
+                                    @endphp
+                                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold {{ $dBadge }}">
+                                        {{ $dist['status'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-2 pt-2 border-t border-slate-100 flex items-center gap-2 text-[11px] text-slate-500">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                <span>{{ $distribusiFooter }}</span>
+            </div>
+        </div>
+    </div>
 
 </div>
 @endsection
 
 @push('scripts')
-    {{-- Chart.js for 7-day Bar Chart --}}
+    {{-- Chart.js CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         window.dashboardChartConfig = {
-            labels: @json($chartDays),
-            produksi: @json($chartProduksi),
-            terkirim: @json($chartTerkirim)
+            trenChartData: @json($trenChartData),
+            stokChartData: @json($stokChartData)
         };
     </script>
     @vite('resources/js/KepalaSPPG/dashboard.js')

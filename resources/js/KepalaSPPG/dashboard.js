@@ -1,62 +1,89 @@
 /**
  * Dashboard Kepala SPPG - Lensa MBG
- * Handles 7-day Production & Distribution Bar Chart
+ * Visualisasi Grafik Tren & Kesehatan Stok (Ala Dashboard Sistem)
  */
 (function () {
     'use strict';
 
+    let trenChart = null;
+    let stokChart = null;
+
     document.addEventListener('DOMContentLoaded', function () {
-        init7HariChart();
-    });
-
-    function init7HariChart() {
-        const canvas = document.getElementById('dashboard7HariChart');
-        if (!canvas) return;
-
         if (typeof Chart === 'undefined') {
-            console.warn('Chart.js is not loaded.');
+            console.warn('Chart.js belum dimuat.');
             return;
         }
 
-        const config = window.dashboardChartConfig || {
-            labels: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
-            produksi: [0, 0, 0, 0, 300, 250, 0],
-            terkirim: [0, 0, 0, 0, 288, 210, 0]
-        };
+        const config = window.dashboardChartConfig || {};
+        initTrenProduksiDistribusi(config.trenChartData);
+        initKesehatanStok(config.stokChartData);
+    });
+
+    // 1. Grafik 1: Tren Produksi & Distribusi (Smooth Area Line Chart)
+    function initTrenProduksiDistribusi(data) {
+        const canvas = document.getElementById('trenProduksiDistribusiChart');
+        if (!canvas || !data) return;
 
         const ctx = canvas.getContext('2d');
 
-        new Chart(ctx, {
-            type: 'bar',
+        const gradientProduksi = ctx.createLinearGradient(0, 0, 0, 260);
+        gradientProduksi.addColorStop(0, 'rgba(7, 30, 73, 0.22)');
+        gradientProduksi.addColorStop(0.7, 'rgba(7, 30, 73, 0.04)');
+        gradientProduksi.addColorStop(1, 'rgba(7, 30, 73, 0.0)');
+
+        const gradientDistribusi = ctx.createLinearGradient(0, 0, 0, 260);
+        gradientDistribusi.addColorStop(0, 'rgba(37, 99, 235, 0.20)');
+        gradientDistribusi.addColorStop(0.7, 'rgba(37, 99, 235, 0.03)');
+        gradientDistribusi.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+
+        let currentPeriod = data.currentPeriod || '7hari';
+        let currentPeriodData = data.periods[currentPeriod] || data.periods['7hari'];
+
+        trenChart = new Chart(ctx, {
+            type: 'line',
             data: {
-                labels: config.labels,
+                labels: currentPeriodData.labels,
                 datasets: [
                     {
-                        label: 'Porsi diproduksi',
-                        data: config.produksi,
-                        backgroundColor: '#071E49',
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        barPercentage: 0.7,
-                        categoryPercentage: 0.6
+                        label: 'Porsi Diproduksi',
+                        data: currentPeriodData.produksi,
+                        borderColor: '#071E49',
+                        backgroundColor: gradientProduksi,
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#071E49',
+                        pointBorderColor: '#FFFFFF',
+                        pointBorderWidth: 2,
+                        tension: 0.4,
+                        fill: true
                     },
                     {
-                        label: 'Porsi terkirim',
-                        data: config.terkirim,
-                        backgroundColor: '#38BDF8',
-                        borderRadius: 6,
-                        borderSkipped: false,
-                        barPercentage: 0.7,
-                        categoryPercentage: 0.6
+                        label: 'Porsi Terdistribusi',
+                        data: currentPeriodData.distribusi,
+                        borderColor: '#2563EB',
+                        backgroundColor: gradientDistribusi,
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#2563EB',
+                        pointBorderColor: '#FFFFFF',
+                        pointBorderWidth: 2,
+                        tension: 0.4,
+                        fill: true
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 plugins: {
                     legend: {
-                        display: false // Using custom HTML legend below canvas
+                        display: false
                     },
                     tooltip: {
                         backgroundColor: '#071E49',
@@ -66,7 +93,7 @@
                         cornerRadius: 8,
                         callbacks: {
                             label: function (ctx) {
-                                return ` ${ctx.dataset.label}: ${ctx.raw} porsi`;
+                                return ` ${ctx.dataset.label}: ${ctx.parsed.y} porsi`;
                             }
                         }
                     }
@@ -78,24 +105,161 @@
                         },
                         ticks: {
                             color: '#64748B',
-                            font: { family: 'Poppins, Plus Jakarta Sans, sans-serif', size: 11, weight: '600' }
+                            font: { family: 'Poppins, Plus Jakarta Sans, sans-serif', size: 11, weight: '500' }
                         }
                     },
                     y: {
                         beginAtZero: true,
-                        suggestedMax: 350,
+                        ticks: {
+                            color: '#64748B',
+                            font: { family: 'Poppins, Plus Jakarta Sans, sans-serif', size: 11, weight: '500' }
+                        },
                         grid: {
                             color: '#F1F5F9',
                             drawBorder: false
-                        },
-                        ticks: {
-                            stepSize: 100,
-                            color: '#94A3B8',
-                            font: { family: 'Poppins, Plus Jakarta Sans, sans-serif', size: 11 }
                         }
                     }
                 }
             }
         });
+
+        // Filter Periode Listener
+        const filterSelect = document.getElementById('trenPeriodeFilter');
+        if (filterSelect) {
+            filterSelect.addEventListener('change', function (e) {
+                const selected = e.target.value;
+                const newData = data.periods[selected];
+                if (newData && trenChart) {
+                    trenChart.data.labels = newData.labels;
+                    trenChart.data.datasets[0].data = newData.produksi;
+                    trenChart.data.datasets[1].data = newData.distribusi;
+                    trenChart.update();
+                }
+            });
+        }
+    }
+
+    // 2. Grafik 2: Kondisi Kesehatan Stok Bahan (Donut & Bar Switcher)
+    function initKesehatanStok(data) {
+        const canvas = document.getElementById('kesehatanStokChart');
+        if (!canvas || !data) return;
+
+        const ctx = canvas.getContext('2d');
+        const chartLabels = data.labels || ['Stok Aman', 'Mendekati Minimum', 'Kritis / Expired'];
+        const chartCounts = data.counts || [24, 6, 3];
+        const chartColors = data.colors || ['#16A34A', '#F59E0B', '#EF4444'];
+
+        function renderChart(type) {
+            if (stokChart) {
+                stokChart.destroy();
+            }
+
+            if (type === 'bar') {
+                stokChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                data: chartCounts,
+                                backgroundColor: chartColors,
+                                borderRadius: 8,
+                                barPercentage: 0.55
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#071E49',
+                                callbacks: {
+                                    label: function (ctx) {
+                                        return ` ${ctx.label}: ${ctx.raw} bahan`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#64748B',
+                                    font: { family: 'Poppins, Plus Jakarta Sans, sans-serif', size: 11, weight: '500' }
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 5,
+                                    color: '#64748B',
+                                    font: { family: 'Poppins, Plus Jakarta Sans, sans-serif', size: 11, weight: '500' }
+                                },
+                                grid: {
+                                    color: '#F1F5F9',
+                                    drawBorder: false
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                stokChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                data: chartCounts,
+                                backgroundColor: chartColors,
+                                borderColor: '#FFFFFF',
+                                borderWidth: 3,
+                                hoverOffset: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '68%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#071E49',
+                                titleFont: { family: 'Poppins, Plus Jakarta Sans, sans-serif', size: 12, weight: 'bold' },
+                                bodyFont: { family: 'Poppins, Plus Jakarta Sans, sans-serif', size: 12 },
+                                padding: 10,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function (item) {
+                                        const val = item.raw;
+                                        const total = chartCounts.reduce((a, b) => a + b, 0);
+                                        const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                        return ` ${item.label}: ${val} bahan (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        renderChart('donut');
+
+        const modeFilter = document.getElementById('stokVisualisasiFilter');
+        if (modeFilter) {
+            modeFilter.addEventListener('change', function (e) {
+                renderChart(e.target.value);
+            });
+        }
     }
 })();
