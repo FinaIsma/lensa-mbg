@@ -17,11 +17,11 @@
             <span>Dashboard</span>
         </a>
 
-        {{-- 2. Data Master (Collapsible Accordion) --}}
+        {{-- 2. Master (Dropdown) --}}
         @php
             $isMasterActive = request()->routeIs('staff.menu-resep.*') || request()->routeIs('staff.menus.*') || request()->routeIs('staff.recipes.*');
         @endphp
-        <div class="nav-group {{ $isMasterActive ? 'open' : 'open' }}">
+        <div class="nav-group {{ $isMasterActive ? 'open' : '' }}">
             <button type="button" class="nav-group-header {{ $isMasterActive ? 'parent-active' : '' }}" onclick="this.parentElement.classList.toggle('open')">
                 <div class="nav-group-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -29,7 +29,7 @@
                         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
                         <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
                     </svg>
-                    <span>Data Master</span>
+                    <span>Master</span>
                 </div>
                 <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 12 15 18 9"></polyline>
@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        {{-- 3. Pengadaan --}}
+        {{-- 3. Pengadaan (Dropdown) --}}
         <div class="nav-group">
             <button type="button" class="nav-group-header" onclick="this.parentElement.classList.toggle('open')">
                 <div class="nav-group-title">
@@ -73,7 +73,7 @@
             </div>
         </div>
 
-        {{-- 4. Stok --}}
+        {{-- 4. Stok (Dropdown) --}}
         <div class="nav-group">
             <button type="button" class="nav-group-header" onclick="this.parentElement.classList.toggle('open')">
                 <div class="nav-group-title">
@@ -89,12 +89,12 @@
                 </svg>
             </button>
             <div class="nav-subitems">
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Stok Bahan</span></a>
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Pergerakan Stok</span></a>
+                <a href="#" class="nav-subitem" onclick="return false;"><span>Lot Bahan</span></a>
+                <a href="#" class="nav-subitem" onclick="return false;"><span>Riwayat Stok</span></a>
             </div>
         </div>
 
-        {{-- 5. Produksi --}}
+        {{-- 5. Produksi (Dropdown) --}}
         <div class="nav-group">
             <button type="button" class="nav-group-header" onclick="this.parentElement.classList.toggle('open')">
                 <div class="nav-group-title">
@@ -112,12 +112,13 @@
                 </svg>
             </button>
             <div class="nav-subitems">
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Batch Produksi</span></a>
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Uji Kelayakan</span></a>
+                <a href="#" class="nav-subitem" onclick="return false;"><span>Batch</span></a>
+                <a href="#" class="nav-subitem" onclick="return false;"><span>Pengolahan</span></a>
+                <a href="#" class="nav-subitem" onclick="return false;"><span>Hasil</span></a>
             </div>
         </div>
 
-        {{-- 6. Distribusi --}}
+        {{-- 6. Distribusi (Dropdown) --}}
         <div class="nav-group">
             <button type="button" class="nav-group-header" onclick="this.parentElement.classList.toggle('open')">
                 <div class="nav-group-title">
@@ -134,8 +135,8 @@
                 </svg>
             </button>
             <div class="nav-subitems">
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Jadwal Pengiriman</span></a>
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Penerima Manfaat</span></a>
+                <a href="#" class="nav-subitem" onclick="return false;"><span>Pengiriman</span></a>
+                <a href="#" class="nav-subitem" onclick="return false;"><span>Limbah</span></a>
             </div>
         </div>
     </nav>

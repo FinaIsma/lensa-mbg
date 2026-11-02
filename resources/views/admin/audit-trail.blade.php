@@ -1,26 +1,15 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Trail - Lensa MBG</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+@extends($isAdmin ? 'layouts.admin' : 'layouts.kepala-sppg')
+
+@section('title', 'Audit Trail - Lensa MBG')
+
+@push('styles')
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-    @if ($isAdmin)
-        @vite(['resources/css/admin/sidebar-navbar.css', 'resources/css/admin/audit-trail.css', 'resources/js/admin/audit-trail.js'])
-    @else
-        @vite([
-            'resources/css/KepalaSPPG/sidebar-navbar.css',
-            'resources/css/KepalaSPPG/profile-modals.css',
-            'resources/css/admin/audit-trail.css',
-            'resources/js/admin/audit-trail.js',
-            'resources/js/KepalaSPPG/profile-modals.js',
-        ])
-    @endif
-</head>
-<body>
+    @vite(['resources/css/admin/audit-trail.css'])
+@endpush
+
+@section('main-class', 'content-body')
+
+@section('content')
 @php
     $tampil = function ($v) {
         if (is_null($v)) return '-';
@@ -36,268 +25,262 @@
         default          => 'Semua Tanggal',
     };
 @endphp
-    <div class="admin-container">
-        @include($sidebar)
 
-        <div class="main-wrapper">
-            @include($navbar)
+    @if (session('success'))
+        <div class="alert alert-success">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
 
-            <main class="content-body">
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                        </svg>
-                        <span>{{ session('success') }}</span>
-                    </div>
-                @endif
+    @if (session('info'))
+        <div class="alert alert-info">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>{{ session('info') }}</span>
+        </div>
+    @endif
 
-                @if (session('info'))
-                    <div class="alert alert-info">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                        </svg>
-                        <span>{{ session('info') }}</span>
-                    </div>
-                @endif
+    <div class="page-title-section">
+        <h1 class="page-title">Audit Trail</h1>
+        <p class="page-subtitle">Riwayat perubahan dan penelusuran data {{ $namaSppg }}</p>
+    </div>
 
-                <div class="page-title-section">
-                    <h1 class="page-title">Audit Trail</h1>
-                    <p class="page-subtitle">Riwayat perubahan dan penelusuran data {{ $namaSppg }}</p>
-                </div>
+    <div class="stat-cards-grid">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-blue">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Total Aktivitas</span>
+                <span class="stat-value">{{ number_format($totalSemua, 0, ',', '.') }}</span>
+                <span class="stat-subtext">Aktivitas Tercatat</span>
+            </div>
+        </div>
 
-                <div class="stat-cards-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon-wrapper icon-blue">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                            </svg>
-                        </div>
-                        <div class="stat-content">
-                            <span class="stat-label">Total Aktivitas</span>
-                            <span class="stat-value">{{ number_format($totalSemua, 0, ',', '.') }}</span>
-                            <span class="stat-subtext">Aktivitas Tercatat</span>
-                        </div>
-                    </div>
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-yellow">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Hari Ini</span>
+                <span class="stat-value">{{ number_format($totalHariIni, 0, ',', '.') }}</span>
+                <span class="stat-subtext">Aktivitas Hari Ini</span>
+            </div>
+        </div>
 
-                    <div class="stat-card">
-                        <div class="stat-icon-wrapper icon-yellow">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                                <polyline points="3 3 3 8 8 8"></polyline>
-                                <line x1="12" y1="7" x2="12" y2="12"></line>
-                                <line x1="12" y1="12" x2="16" y2="14"></line>
-                            </svg>
-                        </div>
-                        <div class="stat-content">
-                            <span class="stat-label">Hari Ini</span>
-                            <span class="stat-value">{{ number_format($totalHariIni, 0, ',', '.') }}</span>
-                            <span class="stat-subtext">Aktivitas Hari Ini</span>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon-wrapper icon-green">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                        </div>
-                        <div class="stat-content">
-                            <span class="stat-label">Perubahan Data</span>
-                            <span class="stat-value">{{ number_format($totalPerubahan, 0, ',', '.') }}</span>
-                            <span class="stat-subtext">Perubahan Tercatat</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <form action="{{ route($routeName) }}" method="GET" class="filter-bar-form {{ $isAdmin ? 'is-admin-view' : 'is-sppg-view' }}" id="filterForm">
-                        <div class="search-input-box">
-                            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari Pengguna atau ID Data" class="input-search">
-                        </div>
-
-                        <div class="filter-actions-group">
-
-                            <div class="select-dropdown-box au-date">
-                                <button type="button" class="select-status-verif au-date-btn" id="dateBtn" aria-haspopup="true" aria-expanded="false">{{ $labelTanggal }}</button>
-                                <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                                <div class="au-datepop" id="datePop">
-                                    <label for="dari">Dari tanggal</label>
-                                    <input type="date" id="dari" name="dari" value="{{ $dari }}">
-                                    <label for="sampai">Sampai tanggal</label>
-                                    <input type="date" id="sampai" name="sampai" value="{{ $sampai }}">
-                                    <div class="act">
-                                        <button type="button" class="au-btn" id="dateClear">Kosongkan</button>
-                                        <button type="submit" class="au-btn main">Terapkan</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="select-dropdown-box">
-                                <select name="modul" class="select-status-verif select-modul-filter" onchange="this.form.submit()">
-                                    <option value="">Semua Modul</option>
-                                    @foreach ($daftarModul as $nama)
-                                        <option value="{{ $nama }}" {{ request('modul') === $nama ? 'selected' : '' }}>{{ $nama }}</option>
-                                    @endforeach
-                                </select>
-                                <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </div>
-
-                            @if ($isAdmin)
-                                <div class="select-dropdown-box">
-                                    <select name="role" class="select-status-verif select-role-filter" onchange="this.form.submit()">
-                                        <option value="">Semua Peran</option>
-                                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin Sistem</option>
-                                        <option value="sppg" {{ request('role') === 'sppg' ? 'selected' : '' }}>SPPG</option>
-                                        <option value="kepala_sppg" {{ request('role') === 'kepala_sppg' ? 'selected' : '' }}>Kepala SPPG</option>
-                                        <option value="staff" {{ request('role') === 'staff' ? 'selected' : '' }}>Staff</option>
-                                    </select>
-                                    <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
-                                </div>
-
-                                <div class="select-dropdown-box">
-                                    <select name="sppg" class="select-status-verif select-sppg-filter" onchange="this.form.submit()">
-                                        <option value="">Semua SPPG</option>
-                                        @foreach ($listSppg as $s)
-                                            @php
-                                                $sppgCode = 'SPPG' . str_pad((string) $s->id_sppg, 3, '0', STR_PAD_LEFT);
-                                                $fullName = $sppgCode . ' - ' . $s->nama_sppg;
-                                                $shortName = $sppgCode . ' - ' . \Illuminate\Support\Str::limit($s->nama_sppg, 15, '...');
-                                            @endphp
-                                            <option value="{{ $s->id_sppg }}" {{ (string) request('sppg') === (string) $s->id_sppg ? 'selected' : '' }} title="{{ $fullName }}">
-                                                {{ $shortName }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
-                                </div>
-                            @endif
-
-                            <a href="{{ route($routeName) }}" class="btn-reset-filter">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                                    <polyline points="3 3 3 8 8 8"></polyline>
-                                </svg>
-                                <span>Hapus Filter</span>
-                            </a>
-
-                            <div class="dropdown-export-wrapper" id="exportDropdownWrapper">
-                                <button type="button" class="btn-export" id="exportDropdownBtn" aria-haspopup="true" aria-expanded="false" title="Export Data" aria-label="Export Data">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="7 10 12 15 17 10"></polyline>
-                                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                                    </svg>
-                                    <span>Export</span>
-                                    <svg class="chevron-export" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
-                                </button>
-                                <div class="dropdown-export-menu" id="exportDropdownMenu">
-                                    <a href="{{ route($exportCsvRoute, request()->query()) }}" class="dropdown-export-item">
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                            <polyline points="14 2 14 8 20 8"></polyline>
-                                            <line x1="8" y1="13" x2="16" y2="13"></line>
-                                            <line x1="8" y1="17" x2="16" y2="17"></line>
-                                        </svg>
-                                        <span>Unduh Excel (CSV)</span>
-                                    </a>
-                                    <a href="{{ route($exportPdfRoute, request()->query()) }}" class="dropdown-export-item" target="_blank" rel="noopener">
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                                            <rect x="6" y="14" width="12" height="8"></rect>
-                                        </svg>
-                                        <span>Cetak Laporan (PDF)</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-
-                    <div class="table-responsive">
-                        <table class="sppg-table">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Waktu</th>
-                                    <th>Pengguna</th>
-                                    <th>Modul</th>
-                                    <th>Aktivitas</th>
-                                    <th>Data</th>
-                                    <th class="text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($rows as $row)
-                                    <tr>
-                                        <td class="text-secondary">{{ $rows->firstItem() + $loop->index }}</td>
-                                        <td class="text-secondary">{{ $row->created_at->locale('id')->translatedFormat('j M Y, H.i') }}</td>
-                                        <td class="font-medium text-dark">
-                                            <div>{{ $row->pelaku }}</div>
-                                            @if ($isAdmin && $row->nama_sppg)
-                                                <div style="font-size: 11px; color: #64748B; font-weight: normal;">
-                                                    SPPG{{ str_pad((string) $row->id_sppg, 3, '0', STR_PAD_LEFT) }} - {{ $row->nama_sppg }}
-                                                </div>
-                                            @endif
-                                        </td>
-                                        <td class="text-dark">{{ $row->modul }}</td>
-                                        <td class="text-dark">{{ $row->aktivitas_label }}</td>
-                                        <td class="font-medium text-dark">{{ $row->kode_data }}</td>
-                                        <td class="text-center">
-                                            <button type="button" class="btn-action btn-detail" data-detail="{{ $row->id }}">
-                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
-                                                    <circle cx="12" cy="12" r="3"></circle>
-                                                </svg>
-                                                <span>Detail</span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="empty-state">
-                                            Tidak ada aktivitas yang sesuai dengan kriteria filter.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="table-pagination-footer">
-                        <div class="pagination-info">
-                            Menampilkan {{ $rows->firstItem() ?? 0 }}-{{ $rows->lastItem() ?? 0 }} dari {{ $rows->total() }} data
-                        </div>
-                        <div class="pagination-links">
-                            {{ $rows->onEachSide(1)->links('pagination::bootstrap-4') }}
-                        </div>
-                    </div>
-                </div>
-            </main>
+        <div class="stat-card">
+            <div class="stat-icon-wrapper icon-green">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <span class="stat-label">Perubahan Data</span>
+                <span class="stat-value">{{ number_format($totalPerubahan, 0, ',', '.') }}</span>
+                <span class="stat-subtext">Perubahan Tercatat</span>
+            </div>
         </div>
     </div>
 
+    {{-- Filter & Data Table Dalam Satu Card Container --}}
+    <div class="table-card">
+        <form action="{{ route($routeName) }}" method="GET" class="filter-bar-form {{ $isAdmin ? 'is-admin-view' : 'is-sppg-view' }}" id="filterForm">
+            <div class="search-input-box">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari Pengguna atau ID Data" class="input-search">
+            </div>
+
+            <div class="filter-actions-group">
+                <div class="select-dropdown-box au-date">
+                    <button type="button" class="select-status-verif au-date-btn" id="dateBtn" aria-haspopup="true" aria-expanded="false">{{ $labelTanggal }}</button>
+                    <input type="hidden" name="dari" id="inputDari" value="{{ $dari }}">
+                    <input type="hidden" name="sampai" id="inputSampai" value="{{ $sampai }}">
+                    <div class="au-popover" id="datePopover" role="dialog" aria-label="Pilih Rentang Tanggal" style="display:none">
+                        <div class="au-pop-head">Rentang Tanggal</div>
+                        <div class="au-pop-presets">
+                            <button type="button" data-preset="hari-ini">Hari Ini</button>
+                            <button type="button" data-preset="7-hari">7 Hari Terakhir</button>
+                            <button type="button" data-preset="30-hari">30 Hari Terakhir</button>
+                            <button type="button" data-preset="bulan-ini">Bulan Ini</button>
+                            <button type="button" data-preset="semua">Semua</button>
+                        </div>
+                        <div class="au-pop-inputs">
+                            <label>Dari <input type="date" id="popDari" value="{{ $dari }}"></label>
+                            <label>Sampai <input type="date" id="popSampai" value="{{ $sampai }}"></label>
+                        </div>
+                        <div class="au-pop-foot">
+                            <button type="button" class="btn-pop-batal" id="popBatal">Batal</button>
+                            <button type="button" class="btn-pop-terapkan" id="popTerapkan">Terapkan</button>
+                        </div>
+                    </div>
+                </div>
+
+                @if ($isAdmin)
+                    <div class="select-dropdown-box">
+                        <select name="sppg" class="select-status-verif" onchange="this.form.submit()">
+                            <option value="">Semua SPPG</option>
+                            @foreach ($listSppg as $s)
+                                <option value="{{ $s->id_sppg }}" {{ (string) $selectedSppg === (string) $s->id_sppg ? 'selected' : '' }}>
+                                    SPPG{{ str_pad((string) $s->id_sppg, 3, '0', STR_PAD_LEFT) }} - {{ $s->nama_sppg }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+
+                    <div class="select-dropdown-box">
+                        <select name="role" class="select-status-verif" onchange="this.form.submit()">
+                            <option value="">Semua Peran</option>
+                            <option value="admin" {{ $selectedRole === 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="kepala_sppg" {{ $selectedRole === 'kepala_sppg' ? 'selected' : '' }}>Kepala SPPG</option>
+                            <option value="staff" {{ $selectedRole === 'staff' ? 'selected' : '' }}>Staff</option>
+                        </select>
+                        <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                @endif
+
+                <div class="select-dropdown-box">
+                    <select name="modul" class="select-status-verif" onchange="this.form.submit()">
+                        <option value="">Semua Modul</option>
+                        @foreach ($daftarModul as $m)
+                            <option value="{{ $m }}" {{ request('modul') === $m ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
+                    </select>
+                    <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+
+                @if(request()->hasAny(['q', 'modul', 'dari', 'sampai', 'sppg', 'role']))
+                    <a href="{{ route($routeName) }}" class="btn-reset-filter" title="Reset filter">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        <span>Reset</span>
+                    </a>
+                @endif
+
+                <div class="dropdown-export-wrapper select-dropdown-box" id="exportDropdownWrapper">
+                    <button type="button" class="btn-export" id="exportDropdownBtn" aria-haspopup="true" aria-expanded="false">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Export</span>
+                        <svg class="chevron-export" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="dropdown-export-menu" id="exportMenu">
+                        <a href="{{ route($exportCsvRoute, request()->query()) }}" class="dropdown-export-item">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="8" y1="13" x2="16" y2="13"></line>
+                                <line x1="8" y1="17" x2="16" y2="17"></line>
+                            </svg>
+                            <span>Unduh Excel (CSV)</span>
+                        </a>
+                        <a href="{{ route($exportPdfRoute, request()->query()) }}" class="dropdown-export-item" target="_blank" rel="noopener">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
+                            <span>Cetak Laporan (PDF)</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="sppg-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Waktu</th>
+                        <th>Pengguna</th>
+                        <th>Modul</th>
+                        <th>Aktivitas</th>
+                        <th>Data</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($rows as $row)
+                        <tr>
+                            <td class="text-secondary">{{ $rows->firstItem() + $loop->index }}</td>
+                            <td class="text-secondary">{{ $row->created_at->locale('id')->translatedFormat('j M Y, H.i') }}</td>
+                            <td class="font-medium text-dark">
+                                <div>{{ $row->pelaku }}</div>
+                                @if ($isAdmin && $row->nama_sppg)
+                                    <div style="font-size: 11px; color: #64748B; font-weight: normal;">
+                                        SPPG{{ str_pad((string) $row->id_sppg, 3, '0', STR_PAD_LEFT) }} - {{ $row->nama_sppg }}
+                                    </div>
+                                @endif
+                            </td>
+                            <td class="text-dark">{{ $row->modul }}</td>
+                            <td class="text-dark">{{ $row->aktivitas_label }}</td>
+                            <td class="font-medium text-dark">{{ $row->kode_data }}</td>
+                            <td class="text-center">
+                                <button type="button" class="btn-action btn-detail" data-detail="{{ $row->id }}">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                    <span>Detail</span>
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                Tidak ada aktivitas yang sesuai dengan kriteria filter.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-pagination-footer">
+            <div class="pagination-info">
+                Menampilkan {{ $rows->firstItem() ?? 0 }}-{{ $rows->lastItem() ?? 0 }} dari {{ $rows->total() }} data
+            </div>
+            <div class="pagination-links">
+                {{ $rows->onEachSide(1)->links('pagination::bootstrap-4') }}
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('modals')
     <div class="au-backdrop" id="detailBackdrop"></div>
     <aside class="au-drawer" id="detailDrawer" role="dialog" aria-modal="true" aria-label="Detail Audit Trail" aria-hidden="true" tabindex="-1">
         <div class="au-head">
@@ -372,11 +355,8 @@
             @endif
         </template>
     @endforeach
+@endsection
 
-
-    @if (!$isAdmin && view()->exists('KepalaSPPG.partials.profile-modals'))
-        @include('KepalaSPPG.partials.profile-modals')
-    @endif
-
-</body>
-</html>
+@push('scripts')
+    @vite(['resources/js/admin/audit-trail.js'])
+@endpush

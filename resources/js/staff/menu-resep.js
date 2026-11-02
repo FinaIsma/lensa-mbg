@@ -351,7 +351,8 @@ window.openAddRecipeModal = function () {
     // Header & Info
     document.getElementById('recipeModalTitle').textContent = 'Tambah Data Resep';
     document.getElementById('recipeModalSubtitle').textContent = 'Lengkapi formulir komposisi bahan dan nilai gizi resep';
-    document.getElementById('recipeFormIdDisplay').value = 'Otomatis';
+    const nextId = (window.RECIPE_CONFIG && window.RECIPE_CONFIG.nextRecipeId) ? window.RECIPE_CONFIG.nextRecipeId : 'RS01';
+    document.getElementById('recipeFormIdDisplay').value = nextId;
     document.getElementById('recipeBatchWarning').style.display = 'none';
 
     // Defaults

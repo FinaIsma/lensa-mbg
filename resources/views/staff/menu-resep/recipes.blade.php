@@ -17,53 +17,67 @@
                 <p class="page-subtitle" style="margin: 2px 0 0; font-size: 13px; color: #64748B;">Kelola data resep untuk SPPG ini</p>
             </div>
         </div>
-        <button type="button" class="btn-primary" onclick="openAddRecipeModal()" style="display: inline-flex; align-items: center; gap: 8px; background-color: #071E49; border-radius: 10px; padding: 10px 18px; font-weight: 600; cursor: pointer;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>Tambah Resep</span>
-        </button>
     </div>
 
-    {{-- Filter Bar --}}
-    <div class="section-card" style="padding: 16px 20px; margin-bottom: 22px;">
-        <form method="GET" action="{{ route('staff.recipes.index') }}" style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
-            <div style="flex: 1; min-width: 220px; position: relative;">
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama resep atau bahan..." class="form-input" style="padding-left: 38px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+    {{-- Table Card: Filter Bar & Data Table Bersatu (Sesuai Gaya Tabel Lainnya) --}}
+    <div class="table-card">
+        <form method="GET" action="{{ route('staff.recipes.index') }}" class="filter-bar-form">
+            <div class="search-input-box">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama resep, menu, atau bahan..." class="input-search">
             </div>
-            <div style="width: 170px;">
-                <select name="porsi" class="form-select" onchange="this.form.submit()">
-                    <option value="">Semua Porsi</option>
-                    <option value="kecil" {{ request('porsi') === 'kecil' ? 'selected' : '' }}>Porsi Kecil</option>
-                    <option value="besar" {{ request('porsi') === 'besar' ? 'selected' : '' }}>Porsi Besar</option>
-                </select>
-            </div>
-            <div style="width: 170px;">
-                <select name="status" class="form-select" onchange="this.form.submit()">
-                    <option value="">Semua Status</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>Archived</option>
-                </select>
-            </div>
-            <button type="submit" class="btn-primary" style="padding: 10px 18px; border-radius: 9px;">Cari</button>
-            @if(request()->hasAny(['q', 'porsi', 'status']))
-                <a href="{{ route('staff.recipes.index') }}" class="btn-secondary" style="padding: 10px 14px; border-radius: 9px; text-decoration: none;">Reset</a>
-            @endif
-        </form>
-    </div>
 
-    {{-- Tabel Data Resep (Panel 1) --}}
-    <div class="section-card">
+            <div class="filter-actions-group">
+                <div class="select-dropdown-box">
+                    <select name="porsi" class="select-status-verif" onchange="this.form.submit()">
+                        <option value="">Semua Porsi</option>
+                        <option value="kecil" {{ request('porsi') === 'kecil' ? 'selected' : '' }}>Porsi Kecil</option>
+                        <option value="besar" {{ request('porsi') === 'besar' ? 'selected' : '' }}>Porsi Besar</option>
+                    </select>
+                    <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+
+                <div class="select-dropdown-box">
+                    <select name="status" class="select-status-verif" onchange="this.form.submit()">
+                        <option value="">Semua Status</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>Archived</option>
+                    </select>
+                    <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+
+                <button type="button" class="btn-tambah-staff" onclick="openAddRecipeModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Tambah Resep</span>
+                </button>
+
+                @if(request()->hasAny(['q', 'porsi', 'status']))
+                    <a href="{{ route('staff.recipes.index') }}" class="btn-reset-filter" title="Reset filter">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        <span>Reset</span>
+                    </a>
+                @endif
+            </div>
+        </form>
+
         <div class="table-responsive">
-            <table class="data-table">
+            <table class="staff-table data-table">
                 <thead>
                     <tr>
                         <th class="col-id" style="width: 85px;">ID</th>
                         <th style="min-width: 180px;">Nama Resep</th>
                         <th style="width: 110px;">Porsi</th>
-                        <th style="width: 90px;">Version</th>
+                        <th style="width: 90px;">Versi</th>
                         <th>Bahan</th>
                         <th style="width: 110px;">Status</th>
                         <th class="text-center" style="width: 130px;">Aksi</th>
@@ -131,8 +145,14 @@
             </table>
         </div>
 
-        <div style="margin-top: 22px;">
-            {{ $recipes->links() }}
+        {{-- Pagination Footer Sesuai Mockup --}}
+        <div class="table-pagination-footer">
+            <span class="pagination-info-text">
+                Menampilkan {{ $recipes->firstItem() ?? 0 }}-{{ $recipes->lastItem() ?? 0 }} dari {{ $recipes->total() }} data
+            </span>
+            <div>
+                {{ $recipes->links() }}
+            </div>
         </div>
     </div>
 </div>
@@ -268,7 +288,7 @@
                     <div class="form-grid-2">
                         <div class="form-group">
                             <label class="form-label">ID Resep</label>
-                            <input type="text" id="recipeFormIdDisplay" class="form-input form-input-readonly" value="Otomatis" readonly>
+                            <input type="text" id="recipeFormIdDisplay" class="form-input form-input-readonly" value="{{ $nextRecipeId ?? 'RS01' }}" readonly>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="recipeFormMenuId">Menu Masakan <span class="text-danger">*</span></label>
@@ -422,6 +442,7 @@
         storeUrl: "{{ route('staff.recipes.store') }}",
         nutritionTypeStoreUrl: "{{ route('staff.nutrition-types.store') }}",
         csrfToken: "{{ csrf_token() }}",
+        nextRecipeId: "{{ $nextRecipeId ?? 'RS01' }}",
     };
 </script>
 @endpush
