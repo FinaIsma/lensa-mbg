@@ -617,22 +617,42 @@
             </button>
         </div>
 
+        @php
+            $isStaffUser = (isset($currentUser->role) && $currentUser->role === 'staff') || auth('staff')->check() || request()->routeIs('staff.*');
+            $staffNama = $currentUser->nama ?? 'Staff';
+            $staffInisial = mb_strtoupper(mb_substr(trim($staffNama), 0, 1)) ?: 'S';
+            $staffIdFormatted = !empty($currentUser->id) ? 'STF' . str_pad((string) $currentUser->id, 3, '0', STR_PAD_LEFT) : ($currentUser->email ?? 'Staff');
+        @endphp
+
         {{-- Entity Summary --}}
         <div class="pm-entity-header">
             <div class="pm-entity-left">
-                <div class="pm-entity-avatar">{{ $inisialSppg }}</div>
-                <div class="pm-entity-info">
-                    <span class="pm-entity-name">{{ $sppgNama }}</span>
-                    <span class="pm-entity-id">{{ $sppgIdFormatted }}</span>
-                </div>
+                @if ($isStaffUser)
+                    <div class="pm-entity-avatar" style="background-color: #042A70; color: #FFFFFF; font-weight: 700;">{{ $staffInisial }}</div>
+                    <div class="pm-entity-info">
+                        <span class="pm-entity-name">{{ $staffNama }}</span>
+                        <span class="pm-entity-id">{{ $staffIdFormatted }}</span>
+                    </div>
+                @else
+                    <div class="pm-entity-avatar">{{ $inisialSppg }}</div>
+                    <div class="pm-entity-info">
+                        <span class="pm-entity-name">{{ $sppgNama }}</span>
+                        <span class="pm-entity-id">{{ $sppgIdFormatted }}</span>
+                    </div>
+                @endif
             </div>
             <div class="pm-badge-aktif">
                 <span class="pm-badge-dot"></span>
-                <span>Aktif</span>
+                <span>{{ $isStaffUser ? 'Staff Aktif' : 'Aktif' }}</span>
             </div>
         </div>
 
-        <form id="formUbahPassword" action="{{ route('sppg.password.update') }}" method="POST">
+        @php
+            $passwordUpdateAction = (request()->routeIs('staff.*') || auth('staff')->check()) && Route::has('staff.password.update')
+                ? route('staff.password.update')
+                : route('sppg.password.update');
+        @endphp
+        <form id="formUbahPassword" action="{{ $passwordUpdateAction }}" method="POST">
             @csrf
 
             {{-- Card: Keamanan Akun --}}

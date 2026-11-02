@@ -38,13 +38,15 @@
 
 <header class="top-header">
     <div class="header-user-section">
-        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold {{ $badgeClass }} border whitespace-nowrap">
-            <span class="w-2 h-2 rounded-full {{ $dotClass }} {{ $isAktif ? 'animate-pulse' : '' }}"></span>
-            Unit SPPG {{ $sppgStatus }}
-        </span>
+        @if ($currentRole !== 'staff' && !request()->routeIs('staff.*'))
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold {{ $badgeClass }} border whitespace-nowrap">
+                <span class="w-2 h-2 rounded-full {{ $dotClass }} {{ $isAktif ? 'animate-pulse' : '' }}"></span>
+                Unit SPPG {{ $sppgStatus }}
+            </span>
+        @endif
 
         {{-- Info Tanggal & Nama SPPG di tengah status dan foto profil --}}
-        <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 font-medium px-3.5 py-1 border-l border-r border-slate-200 whitespace-nowrap">
+        <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 font-medium px-3.5 py-1 @if($currentRole !== 'staff' && !request()->routeIs('staff.*')) border-l @endif border-r border-slate-200 whitespace-nowrap">
             <span>{{ $todayNavStr }}</span>
             <span class="text-slate-300">&bull;</span>
             <span class="font-semibold text-slate-700">{{ $sppgNamaNav }}</span>
@@ -64,6 +66,7 @@
             </button>
 
         <div class="profile-dropdown-menu" id="profileDropdownMenu">
+            @if ($currentRole !== 'staff')
             <button type="button" class="profile-dropdown-item" onclick="openProfilModal()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -71,6 +74,7 @@
                 </svg>
                 <span>Profil & Informasi SPPG</span>
             </button>
+            @endif
 
             <button type="button" class="profile-dropdown-item" onclick="openPasswordModal()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

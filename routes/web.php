@@ -117,4 +117,7 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::post('/resep/{id}/version', [MenuResepController::class, 'createVersion'])->name('recipes.createVersion');
     Route::post('/resep/{id}/toggle-status', [MenuResepController::class, 'toggleRecipeStatus'])->name('recipes.toggle');
     Route::post('/nutrition-types', [MenuResepController::class, 'storeNutritionType'])->name('nutrition-types.store');
+
+    // Ubah Kata Sandi Staff
+    Route::post('/ubah-kata-sandi', [ProfileController::class, 'updatePassword'])->name('password.update');
 });

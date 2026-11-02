@@ -89,7 +89,7 @@ class ProfileController extends Controller
      */
     public function updatePassword(Request $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = auth('staff')->user() ?: Auth::user();
         if (! $user) {
             return response()->json(['success' => false, 'message' => 'Pengguna belum terautentikasi.'], 401);
         }

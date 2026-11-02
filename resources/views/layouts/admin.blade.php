@@ -56,6 +56,8 @@
         </div>
     </div>
 
+    @yield('modals')
+
     @stack('scripts')
 </body>
 </html>

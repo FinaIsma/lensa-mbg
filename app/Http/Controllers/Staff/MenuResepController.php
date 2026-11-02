@@ -45,6 +45,9 @@ class MenuResepController extends Controller
         $allMenus = Menu::where('id_sppg', $idSppg)->where('is_active', true)->orderBy('nama')->get();
         $allNutritionTypes = NutritionType::orderBy('id')->get();
 
+        $nextMenuId = 'MN'.str_pad((string) ((Menu::max('id') ?? 0) + 1), 2, '0', STR_PAD_LEFT);
+        $nextRecipeId = 'RS'.str_pad((string) ((Recipe::max('id') ?? 0) + 1), 2, '0', STR_PAD_LEFT);
+
         return view('staff.menu-resep.index', compact(
             'totalMenuActive',
             'totalMenuInactive',
@@ -54,7 +57,9 @@ class MenuResepController extends Controller
             'recipes',
             'allMaterials',
             'allMenus',
-            'allNutritionTypes'
+            'allNutritionTypes',
+            'nextMenuId',
+            'nextRecipeId'
         ));
     }
 
@@ -94,13 +99,16 @@ class MenuResepController extends Controller
         $totalRecipeActive = Recipe::whereHas('menu', fn ($q) => $q->where('id_sppg', $idSppg))->where('status', 'active')->count();
         $totalRecipeInactive = Recipe::whereHas('menu', fn ($q) => $q->where('id_sppg', $idSppg))->where('status', '!=', 'active')->count();
 
+        $nextRecipeId = 'RS'.str_pad((string) ((Recipe::max('id') ?? 0) + 1), 2, '0', STR_PAD_LEFT);
+
         return view('staff.menu-resep.recipes', compact(
             'recipes',
             'allMaterials',
             'allMenus',
             'allNutritionTypes',
             'totalRecipeActive',
-            'totalRecipeInactive'
+            'totalRecipeInactive',
+            'nextRecipeId'
         ));
     }
 
@@ -386,7 +394,7 @@ class MenuResepController extends Controller
             ], null, $idSppg);
         });
 
-        return back()->with('success', "Versi baru resep (v" . ($oldRecipe->version + 1) . ") berhasil dibuat dan diaktifkan.");
+        return back()->with('success', 'Versi baru resep (v'.($oldRecipe->version + 1).') berhasil dibuat dan diaktifkan.');
     }
 
     /**
@@ -491,7 +499,9 @@ class MenuResepController extends Controller
         $totalMenuActive = Menu::where('id_sppg', $idSppg)->where('is_active', true)->count();
         $totalMenuInactive = Menu::where('id_sppg', $idSppg)->where('is_active', false)->count();
 
-        return view('staff.menu-resep.menus', compact('menus', 'totalMenuActive', 'totalMenuInactive'));
+        $nextMenuId = 'MN'.str_pad((string) ((Menu::max('id') ?? 0) + 1), 2, '0', STR_PAD_LEFT);
+
+        return view('staff.menu-resep.menus', compact('menus', 'totalMenuActive', 'totalMenuInactive', 'nextMenuId'));
     }
 
     /**

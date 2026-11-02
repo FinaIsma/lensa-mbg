@@ -72,13 +72,6 @@
         <div class="section-card-header">
             <h2 class="section-card-title">Data Menu</h2>
             <div class="header-actions">
-                <button type="button" class="btn-outline-primary" onclick="openModal('modalAddMenu')">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    <span>Tambah Menu</span>
-                </button>
                 <a href="{{ route('staff.menus.index') }}" class="btn-dark">
                     <span>Lihat Selengkapnya</span>
                 </a>
@@ -154,13 +147,6 @@
         <div class="section-card-header">
             <h2 class="section-card-title">Data Resep</h2>
             <div class="header-actions">
-                <button type="button" class="btn-outline-primary" onclick="openModal('modalAddRecipe')">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    <span>Tambah Resep</span>
-                </button>
                 <a href="{{ route('staff.recipes.index') }}" class="btn-dark">
                     <span>Lihat Selengkapnya</span>
                 </a>
@@ -174,7 +160,7 @@
                         <th class="col-id">ID</th>
                         <th>Nama Resep</th>
                         <th>Porsi</th>
-                        <th>Version</th>
+                        <th>Versi</th>
                         <th>Bahan</th>
                         <th>Status</th>
                         <th class="text-center">Aksi</th>
