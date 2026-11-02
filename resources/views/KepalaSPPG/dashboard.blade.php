@@ -11,14 +11,29 @@
 @section('content')
 <div class="space-y-7 pb-8">
 
-    {{-- Title & Subtitle Section --}}
-    <div class="page-title-section">
-        <h1 class="page-title">
-            Selamat datang, {{ $user->nama ?? 'Kepala SPPG' }} di Dashboard Operasional SPPG
-        </h1>
-        <p class="page-subtitle">
-            Ringkasan data dan aktivitas operasional SPPG secara real-time.
-        </p>
+    {{-- Title & Subtitle + Tanggal & Nama SPPG --}}
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="page-title">
+                Selamat datang, {{ $user->nama ?? 'Kepala SPPG' }} di Dashboard Operasional SPPG
+            </h1>
+            <p class="page-subtitle">
+                Ringkasan data dan aktivitas operasional SPPG secara real-time.
+            </p>
+        </div>
+
+        {{-- Tanggal & Nama SPPG di Kanan Atas --}}
+        <div class="inline-flex items-center gap-2.5 text-xs sm:text-sm text-slate-600 bg-white px-4 py-2 rounded-xl border border-slate-200/90 shadow-xs shrink-0 self-start md:self-auto">
+            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span class="font-medium text-slate-600">{{ $todayStr }}</span>
+            <span class="text-slate-300">•</span>
+            <span class="font-bold text-[#071E49]">{{ $sppg->nama_sppg ?? 'SPPG Sawojajar 2' }}</span>
+        </div>
     </div>
 
     {{-- 4 Stat Cards --}}
@@ -238,7 +253,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100/80">
-                            @foreach($batchTerbaru as $b)
+                            @forelse($batchTerbaru as $b)
                             <tr class="h-10">
                                 <td class="pr-2 align-middle">
                                     <div class="font-bold text-[#071E49] text-[11.5px]">{{ $b['kode'] }}</div>
@@ -253,7 +268,11 @@
                                     </span>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="3" class="py-6 text-center text-xs text-slate-400">Belum ada batch produksi tercatat</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -286,7 +305,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100/80">
-                            @foreach($distribusiTerbaru as $dist)
+                            @forelse($distribusiTerbaru as $dist)
                             <tr class="h-10">
                                 <td class="pr-2 font-medium text-slate-800 text-[11.5px] whitespace-nowrap">{{ $dist['tujuan'] }}</td>
                                 <td class="text-center font-bold text-[#071E49] text-[11.5px] whitespace-nowrap">{{ $dist['porsi'] }}</td>
@@ -304,7 +323,11 @@
                                     </span>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="3" class="py-6 text-center text-xs text-slate-400">Belum ada distribusi tercatat</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

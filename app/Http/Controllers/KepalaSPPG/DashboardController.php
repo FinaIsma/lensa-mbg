@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\KepalaSPPG;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditTrail;
 use App\Models\CorrectionRequest;
 use App\Models\Sppg;
-use App\Models\StaffManagement;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -17,7 +15,7 @@ use Illuminate\View\View;
 class DashboardController extends Controller
 {
     /**
-     * Tampilkan Dashboard Kepala SPPG dengan tata letak visual kaya grafik & metrik.
+     * Tampilkan Dashboard Kepala SPPG dengan metrik dan visualisasi riil dari database.
      */
     public function index(Request $request): View
     {
@@ -29,106 +27,252 @@ class DashboardController extends Controller
         $todayStr = $now->translatedFormat('l, d F Y');
 
         // ==========================================
-        // 1. STAT CARDS UTAMA (KPI Operasional)
+        // 1. STAT CARDS UTAMA (KPI Operasional Riil)
         // ==========================================
-        $batchesTodayCount = DB::table('production_batches')
+
+        // Card 1: Porsi Siap & Target Hari Ini (atau batch operasional terkini)
+        $batchesToday = DB::table('production_batches')
             ->where('id_sppg', $idSppg)
             ->whereDate('production_date', Carbon::today())
-            ->count();
+            ->get();
 
-        $portionsToday = DB::table('production_batches')
-            ->where('id_sppg', $idSppg)
-            ->whereDate('production_date', Carbon::today())
-            ->selectRaw('SUM(COALESCE(actual_porsi, 0)) as ready, SUM(COALESCE(target_porsi, 0)) as target')
-            ->first();
+        if ($batchesToday->isNotEmpty()) {
+            $porsiSiap = (int) $batchesToday->sum(fn ($b) => $b->actual_porsi ?? 0);
+            $porsiTarget = (int) $batchesToday->sum('target_porsi');
+            $batchCount = $batchesToday->count();
+        } else {
+            // Ambil data batch operasional terkini di database
+            $latestBatchDate = DB::table('production_batches')
+                ->where('id_sppg', $idSppg)
+                ->orderByDesc('production_date')
+                ->value('production_date');
 
-        $porsiSiap = (int) ($portionsToday?->ready ?? 0);
-        $porsiTarget = (int) ($portionsToday?->target ?? 0);
+            if ($latestBatchDate) {
+                $batchesLatest = DB::table('production_batches')
+                    ->where('id_sppg', $idSppg)
+                    ->whereDate('production_date', $latestBatchDate)
+                    ->get();
+                $porsiSiap = (int) $batchesLatest->sum(fn ($b) => $b->actual_porsi ?? 0);
+                $porsiTarget = (int) $batchesLatest->sum('target_porsi');
+                $batchCount = $batchesLatest->count();
+            } else {
+                $porsiSiap = 0;
+                $porsiTarget = 0;
+                $batchCount = 0;
+            }
+        }
 
-        $yesterdaySent = (int) DB::table('distributions')
+        // Card 2: Porsi Terdistribusi & Tingkat Capaian
+        $distributionsToday = (int) DB::table('distributions')
             ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
             ->where('production_batches.id_sppg', $idSppg)
-            ->whereDate('distributions.distributed_at', Carbon::yesterday())
+            ->whereDate('distributions.distributed_at', Carbon::today())
             ->sum('distributions.portions_sent');
 
+        if ($distributionsToday > 0) {
+            $porsiTerdistribusi = $distributionsToday;
+            $distribusiPct = $porsiTarget > 0 ? min(100, (int) round(($porsiTerdistribusi / $porsiTarget) * 100)) : 100;
+        } else {
+            // Cek distribusi terkini di database
+            $latestDist = DB::table('distributions')
+                ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
+                ->where('production_batches.id_sppg', $idSppg)
+                ->orderByDesc('distributions.distributed_at')
+                ->first(['distributions.distributed_at']);
+
+            if ($latestDist) {
+                $latestDate = Carbon::parse($latestDist->distributed_at)->toDateString();
+                $porsiTerdistribusi = (int) DB::table('distributions')
+                    ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
+                    ->where('production_batches.id_sppg', $idSppg)
+                    ->whereDate('distributions.distributed_at', $latestDate)
+                    ->sum('distributions.portions_sent');
+
+                $targetOnDate = (int) DB::table('production_batches')
+                    ->where('id_sppg', $idSppg)
+                    ->whereDate('production_date', $latestDate)
+                    ->sum('target_porsi');
+
+                $distribusiPct = $targetOnDate > 0 ? min(100, (int) round(($porsiTerdistribusi / $targetOnDate) * 100)) : 100;
+            } else {
+                $porsiTerdistribusi = 0;
+                $distribusiPct = 0;
+            }
+        }
+
+        // Card 3 & Donut Chart: Kondisi Kesehatan Stok Bahan
+        $materialStats = DB::table('materials')
+            ->leftJoin('material_lots', function ($join) use ($idSppg) {
+                $join->on('materials.id', '=', 'material_lots.material_id')
+                    ->where('material_lots.id_sppg', '=', $idSppg);
+            })
+            ->where('materials.id_sppg', $idSppg)
+            ->where('materials.is_active', true)
+            ->select(
+                'materials.id',
+                'materials.min_stock',
+                DB::raw('COALESCE(SUM(material_lots.current_qty), 0) as total_qty'),
+                DB::raw("MAX(CASE WHEN material_lots.expiry_date <= CURRENT_DATE + INTERVAL '7 days' AND material_lots.current_qty > 0 THEN 1 ELSE 0 END) as has_expiring")
+            )
+            ->groupBy('materials.id', 'materials.min_stock')
+            ->get();
+
+        $countKritis = 0;
+        $countMenipis = 0;
+        $countAman = 0;
+
+        foreach ($materialStats as $m) {
+            $min = (float) ($m->min_stock ?? 0);
+            $qty = (float) $m->total_qty;
+            $hasExpiring = (int) $m->has_expiring === 1;
+
+            if ($qty <= $min || $hasExpiring) {
+                $countKritis++;
+            } elseif ($qty <= ($min * 1.5)) {
+                $countMenipis++;
+            } else {
+                $countAman++;
+            }
+        }
+
+        $criticalMaterialsCount = $countKritis;
+
+        // Card 4: Perlu Koreksi
         $pendingCorrectionsCount = CorrectionRequest::where('id_sppg', $idSppg)
             ->where('status', 'pending')
             ->count();
 
-        $materialsBelowMin = DB::table('materials')
-            ->where('id_sppg', $idSppg)
-            ->where('is_active', true)
-            ->whereNotNull('min_stock')
-            ->where('min_stock', '>', 0)
-            ->get();
-
-        $expiringLots = DB::table('material_lots')
-            ->join('materials', 'materials.id', '=', 'material_lots.material_id')
-            ->where('material_lots.id_sppg', $idSppg)
-            ->where('material_lots.current_qty', '>', 0)
-            ->whereDate('material_lots.expiry_date', '<=', Carbon::today()->addDays(7))
-            ->get();
-
-        $criticalMaterialsCount = $materialsBelowMin->count() + $expiringLots->count();
-        if ($criticalMaterialsCount === 0) {
-            $criticalMaterialsCount = 3;
-        }
-
-        $destinationsQuery = DB::table('distribution_destinations')
-            ->where('id_sppg', $idSppg);
-
+        $destinationsQuery = DB::table('distribution_destinations')->where('id_sppg', $idSppg);
         $totalDestinasi = (clone $destinationsQuery)->count();
         $totalPenerima = (clone $destinationsQuery)->sum('jumlah_penerima');
-
-        if ($totalDestinasi === 0) {
-            $totalDestinasi = 4;
-            $totalPenerima = 740;
-        }
 
         $stats = [
             'sasaran_penerima' => $totalDestinasi,
             'total_penerima' => $totalPenerima,
-            'porsi_siap' => $porsiSiap > 0 ? $porsiSiap : 0,
-            'porsi_target' => $porsiTarget > 0 ? $porsiTarget : 120,
-            'batch_count' => $batchesTodayCount > 0 ? $batchesTodayCount : 1,
-            'porsi_terdistribusi' => $yesterdaySent > 0 ? $yesterdaySent : 288,
-            'distribusi_pct' => 96,
-            'koreksi_menunggu' => $pendingCorrectionsCount > 0 ? $pendingCorrectionsCount : 1,
+            'porsi_siap' => $porsiSiap,
+            'porsi_target' => $porsiTarget,
+            'batch_count' => $batchCount,
+            'porsi_terdistribusi' => $porsiTerdistribusi,
+            'distribusi_pct' => $distribusiPct,
+            'koreksi_menunggu' => $pendingCorrectionsCount,
             'stok_kritis' => $criticalMaterialsCount,
         ];
 
         // ==========================================
-        // 2. GRAFIK 1: TREN PRODUKSI & DISTRIBUSI (Line Chart)
+        // 2. GRAFIK 1: TREN PRODUKSI & DISTRIBUSI (Line Chart Murni Database)
         // ==========================================
+        $hasRecentBatch = DB::table('production_batches')
+            ->where('id_sppg', $idSppg)
+            ->whereDate('production_date', '>=', Carbon::today()->subDays(6))
+            ->exists();
+
+        $anchorDate = $hasRecentBatch
+            ? Carbon::today()
+            : (DB::table('production_batches')->where('id_sppg', $idSppg)->max('production_date')
+                ? Carbon::parse(DB::table('production_batches')->where('id_sppg', $idSppg)->max('production_date'))
+                : Carbon::today());
+
+        // A. 7 Hari Terakhir
+        $days7 = collect(range(6, 0))->map(fn ($ago) => (clone $anchorDate)->subDays($ago));
+        $hariMap = ['Sun' => 'Min', 'Mon' => 'Sen', 'Tue' => 'Sel', 'Wed' => 'Rab', 'Thu' => 'Kam', 'Fri' => 'Jum', 'Sat' => 'Sab'];
+        $labels7Hari = $days7->map(fn ($d) => $hariMap[$d->format('D')] ?? $d->format('D'))->values()->all();
+        $start7 = $days7->first()->toDateString();
+        $end7 = $days7->last()->toDateString();
+
+        $prod7 = DB::table('production_batches')
+            ->where('id_sppg', $idSppg)
+            ->whereBetween('production_date', [$start7, $end7])
+            ->selectRaw('production_date, SUM(COALESCE(actual_porsi, target_porsi, 0)) as total')
+            ->groupBy('production_date')
+            ->pluck('total', 'production_date');
+
+        $dist7 = DB::table('distributions')
+            ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
+            ->where('production_batches.id_sppg', $idSppg)
+            ->whereDate('distributions.distributed_at', '>=', $start7)
+            ->whereDate('distributions.distributed_at', '<=', $end7)
+            ->selectRaw('DATE(distributions.distributed_at) as d_date, SUM(distributions.portions_sent) as total')
+            ->groupBy('d_date')
+            ->pluck('total', 'd_date');
+
+        $produksi7Hari = $days7->map(fn ($d) => (int) ($prod7[$d->toDateString()] ?? 0))->values()->all();
+        $distribusi7Hari = $days7->map(fn ($d) => (int) ($dist7[$d->toDateString()] ?? 0))->values()->all();
+
+        // B. 30 Hari Terakhir (Dikelompokkan per minggu: Mgg 1, Mgg 2, Mgg 3, Mgg 4)
+        $labels30Hari = ['Mgg 1', 'Mgg 2', 'Mgg 3', 'Mgg 4'];
+        $produksi30Hari = [];
+        $distribusi30Hari = [];
+
+        for ($w = 3; $w >= 0; $w--) {
+            $wStart = (clone $anchorDate)->subDays(($w * 7) + 6)->toDateString();
+            $wEnd = (clone $anchorDate)->subDays($w * 7)->toDateString();
+
+            $pWeek = (int) DB::table('production_batches')
+                ->where('id_sppg', $idSppg)
+                ->whereBetween('production_date', [$wStart, $wEnd])
+                ->sum(DB::raw('COALESCE(actual_porsi, target_porsi, 0)'));
+
+            $dWeek = (int) DB::table('distributions')
+                ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
+                ->where('production_batches.id_sppg', $idSppg)
+                ->whereDate('distributions.distributed_at', '>=', $wStart)
+                ->whereDate('distributions.distributed_at', '<=', $wEnd)
+                ->sum('distributions.portions_sent');
+
+            $produksi30Hari[] = $pWeek;
+            $distribusi30Hari[] = $dWeek;
+        }
+
+        // C. Tahun Terkait (Per Bulan: Jan - Des)
+        $yearInt = (int) $anchorDate->year;
+        $labelsTahun = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $produksiTahun = [];
+        $distribusiTahun = [];
+
+        $prodMonthly = DB::table('production_batches')
+            ->where('id_sppg', $idSppg)
+            ->whereRaw('EXTRACT(YEAR FROM production_date) = ?', [$yearInt])
+            ->selectRaw('EXTRACT(MONTH FROM production_date)::int as m_num, SUM(COALESCE(actual_porsi, target_porsi, 0)) as total')
+            ->groupBy('m_num')
+            ->pluck('total', 'm_num');
+
+        $distMonthly = DB::table('distributions')
+            ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
+            ->where('production_batches.id_sppg', $idSppg)
+            ->whereRaw('EXTRACT(YEAR FROM distributions.distributed_at) = ?', [$yearInt])
+            ->selectRaw('EXTRACT(MONTH FROM distributions.distributed_at)::int as m_num, SUM(distributions.portions_sent) as total')
+            ->groupBy('m_num')
+            ->pluck('total', 'm_num');
+
+        for ($m = 1; $m <= 12; $m++) {
+            $produksiTahun[] = (int) ($prodMonthly[$m] ?? 0);
+            $distribusiTahun[] = (int) ($distMonthly[$m] ?? 0);
+        }
+
         $trenChartData = [
             'currentPeriod' => '7hari',
             'periods' => [
                 '7hari' => [
-                    'labels' => ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-                    'produksi' => [180, 220, 260, 300, 280, 240, 210],
-                    'distribusi' => [175, 210, 255, 288, 275, 235, 205],
+                    'labels' => $labels7Hari,
+                    'produksi' => $produksi7Hari,
+                    'distribusi' => $distribusi7Hari,
                 ],
                 '30hari' => [
-                    'labels' => ['Mgg 1', 'Mgg 2', 'Mgg 3', 'Mgg 4'],
-                    'produksi' => [1250, 1420, 1600, 1540],
-                    'distribusi' => [1210, 1380, 1560, 1500],
+                    'labels' => $labels30Hari,
+                    'produksi' => $produksi30Hari,
+                    'distribusi' => $distribusi30Hari,
                 ],
                 '2026' => [
-                    'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
-                    'produksi' => [4800, 5200, 5600, 5100, 6000, 6300, 5900, 6400, 6700, 6900],
-                    'distribusi' => [4650, 5080, 5450, 4980, 5890, 6150, 5780, 6290, 6580, 6780],
+                    'labels' => $labelsTahun,
+                    'produksi' => $produksiTahun,
+                    'distribusi' => $distribusiTahun,
                 ],
             ],
         ];
 
         // ==========================================
-        // 3. GRAFIK 2: KONDISI KESEHATAN STOK BAHAN (Donut/Bar Chart)
+        // 3. GRAFIK 2: KONDISI KESEHATAN STOK BAHAN
         // ==========================================
-        $totalBahan = DB::table('materials')->where('id_sppg', $idSppg)->where('is_active', true)->count();
-        $countKritis = $criticalMaterialsCount;
-        $countMenipis = max((int) ($totalBahan * 0.2), 5);
-        $countAman = max($totalBahan - $countKritis - $countMenipis, 24);
-
         $stokChartData = [
             'labels' => ['Stok Aman', 'Mendekati Minimum', 'Kritis / Expired'],
             'counts' => [$countAman, $countMenipis, $countKritis],
@@ -136,11 +280,11 @@ class DashboardController extends Controller
         ];
 
         // ==========================================
-        // 4. LIVE PIPELINE ALUR DAPUR HARI INI
+        // 4. LIVE PIPELINE ALUR DAPUR
         // ==========================================
         $purchasesToday = DB::table('purchases')->where('id_sppg', $idSppg)->whereDate('purchase_date', Carbon::today())->count();
         $receivingsToday = DB::table('receivings')->where('id_sppg', $idSppg)->whereDate('received_at', Carbon::today())->count();
-        $productionsToday = $batchesTodayCount;
+        $productionsToday = DB::table('production_batches')->where('id_sppg', $idSppg)->whereDate('production_date', Carbon::today())->count();
 
         $hasilToday = DB::table('pre_distribution_checks')
             ->join('production_batches', 'pre_distribution_checks.production_batch_id', '=', 'production_batches.id')
@@ -148,7 +292,7 @@ class DashboardController extends Controller
             ->whereDate('pre_distribution_checks.created_at', Carbon::today())
             ->count();
 
-        $distributionsToday = DB::table('distributions')
+        $distributionsCountToday = DB::table('distributions')
             ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
             ->where('production_batches.id_sppg', $idSppg)
             ->whereDate('distributions.distributed_at', Carbon::today())
@@ -158,78 +302,37 @@ class DashboardController extends Controller
             [
                 'step' => 1,
                 'name' => 'Pembelian',
-                'desc' => $purchasesToday > 0 ? "$purchasesToday PO siap" : '1 PO draft',
-                'state' => 'completed',
+                'desc' => $purchasesToday > 0 ? "$purchasesToday PO siap" : '0 PO siap',
+                'state' => $purchasesToday > 0 ? 'completed' : 'pending',
             ],
             [
                 'step' => 2,
                 'name' => 'Penerimaan',
-                'desc' => $receivingsToday > 0 ? "$receivingsToday draft bahan" : '1 draft diterima',
-                'state' => 'completed',
+                'desc' => $receivingsToday > 0 ? "$receivingsToday bahan diterima" : '0 bahan diterima',
+                'state' => $receivingsToday > 0 ? 'completed' : 'pending',
             ],
             [
                 'step' => 3,
                 'name' => 'Pemasakan',
-                'desc' => $productionsToday > 0 ? "$productionsToday batch aktif" : '1 batch pemasakan',
-                'state' => 'active',
+                'desc' => $productionsToday > 0 ? "$productionsToday batch aktif" : '0 batch aktif',
+                'state' => $productionsToday > 0 ? 'active' : 'pending',
             ],
             [
                 'step' => 4,
                 'name' => 'Uji QC Hasil',
-                'desc' => $hasilToday > 0 ? "$hasilToday siap saji" : '0 belum selesai',
-                'state' => 'pending',
+                'desc' => $hasilToday > 0 ? "$hasilToday siap saji" : '0 siap saji',
+                'state' => $hasilToday > 0 ? 'completed' : 'pending',
             ],
             [
                 'step' => 5,
                 'name' => 'Distribusi',
-                'desc' => $distributionsToday > 0 ? "$distributionsToday terkirim" : '0 belum dikirim',
-                'state' => 'pending',
+                'desc' => $distributionsCountToday > 0 ? "$distributionsCountToday terkirim" : '0 terkirim',
+                'state' => $distributionsCountToday > 0 ? 'completed' : 'pending',
             ],
         ];
 
         // ==========================================
-        // 5. DISTRIBUSI TERBARU
-        // ==========================================
-        $dbDistributions = DB::table('distributions')
-            ->join('distribution_destinations', 'distributions.destination_id', '=', 'distribution_destinations.id')
-            ->where('distribution_destinations.id_sppg', $idSppg)
-            ->select('distributions.*', 'distribution_destinations.nama as tujuan_nama')
-            ->orderByDesc('distributions.created_at')
-            ->limit(3)
-            ->get();
-
-        if ($dbDistributions->isNotEmpty()) {
-            $distribusiTerbaru = $dbDistributions->map(function ($d) {
-                return [
-                    'tujuan' => $d->tujuan_nama,
-                    'porsi' => $d->portions_sent,
-                    'status' => ($d->status === 'sent' || $d->status === 'received') ? 'Terkirim' : ucfirst($d->status),
-                ];
-            });
-            $distribusiFooter = Carbon::parse($dbDistributions->first()->created_at)->translatedFormat('d M').': Total '.$dbDistributions->sum('portions_sent').' porsi terkirim';
-        } else {
-            $distribusiTerbaru = collect([
-                [
-                    'tujuan' => 'SMPN 1 Ngadiluwih',
-                    'porsi' => 210,
-                    'status' => 'Terkirim',
-                ],
-                [
-                    'tujuan' => 'Posyandu Melati 1',
-                    'porsi' => 30,
-                    'status' => 'Rencana',
-                ],
-                [
-                    'tujuan' => 'SDN Sukorejo 2',
-                    'porsi' => 48,
-                    'status' => 'Terkirim',
-                ],
-            ]);
-            $distribusiFooter = '22 Okt: 288 porsi ke 3 tujuan sukses diterima';
-        }
-
-        // ==========================================
-        // 5b. BATCH TERBARU (3 Batch Terakhir)
+        // 5. TABEL RINGKASAN OPERASIONAL RIIL
         // ==========================================
         $dbBatches = DB::table('production_batches')
             ->leftJoin('menus', 'production_batches.menu_id', '=', 'menus.id')
@@ -239,170 +342,41 @@ class DashboardController extends Controller
             ->limit(3)
             ->get();
 
-        if ($dbBatches->isNotEmpty()) {
-            $batchTerbaru = $dbBatches->map(function ($b) {
-                return [
-                    'kode' => $b->batch_code,
-                    'menu' => $b->menu_nama ?: 'Menu Sehat SPPG',
-                    'target' => $b->target_porsi,
-                    'hasil' => $b->actual_porsi ?? '-',
-                    'status' => ucfirst($b->status),
-                    'status_badge' => match ($b->status) {
-                        'completed' => 'bg-[#DCFCE7] text-[#16A34A]',
-                        'ready' => 'bg-[#E0E7FF] text-[#4338CA]',
-                        'processing' => 'bg-[#FEF3C7] text-[#D97706]',
-                        default => 'bg-slate-100 text-slate-600',
-                    },
-                ];
-            });
-        } else {
-            $batchTerbaru = collect([
-                ['kode' => 'BTC-20261017-005', 'menu' => 'Nasi Ikan Bakar, Tumis Buncis', 'target' => 120, 'hasil' => '-', 'status' => 'Draft', 'status_badge' => 'bg-slate-100 text-slate-600'],
-                ['kode' => 'BTC-20261016-004', 'menu' => 'Nasi Telur Balado, Tempe', 'target' => 250, 'hasil' => '-', 'status' => 'Processing', 'status_badge' => 'bg-[#FEF3C7] text-[#D97706]'],
-                ['kode' => 'BTC-20261015-003', 'menu' => 'Nasi Ikan Bakar, Tumis Buncis', 'target' => 200, 'hasil' => 198, 'status' => 'Ready', 'status_badge' => 'bg-[#E0E7FF] text-[#4338CA]'],
-            ]);
-        }
+        $batchTerbaru = $dbBatches->map(function ($b) {
+            return [
+                'kode' => $b->batch_code,
+                'menu' => $b->menu_nama ?: 'Menu Sehat SPPG',
+                'target' => $b->target_porsi,
+                'hasil' => $b->actual_porsi ?? '-',
+                'status' => ucfirst($b->status),
+                'status_badge' => match ($b->status) {
+                    'completed' => 'bg-[#DCFCE7] text-[#16A34A]',
+                    'ready' => 'bg-[#E0E7FF] text-[#4338CA]',
+                    'processing' => 'bg-[#FEF3C7] text-[#D97706]',
+                    default => 'bg-slate-100 text-slate-600',
+                },
+            ];
+        });
 
-        // ==========================================
-        // 6. PREVIEW 1: PERSETUJUAN KOREKSI (Correction Request)
-        // ==========================================
-        $dbKoreksi = CorrectionRequest::where('id_sppg', $idSppg)
-            ->latest('requested_at')
+        $dbDistributions = DB::table('distributions')
+            ->join('distribution_destinations', 'distributions.destination_id', '=', 'distribution_destinations.id')
+            ->where('distribution_destinations.id_sppg', $idSppg)
+            ->select('distributions.*', 'distribution_destinations.nama as tujuan_nama')
+            ->orderByDesc('distributions.created_at')
             ->limit(3)
             ->get();
 
-        if ($dbKoreksi->isNotEmpty()) {
-            $koreksiPreview = $dbKoreksi->map(function ($k) {
-                return [
-                    'id' => $k->id,
-                    'no' => $k->request_no,
-                    'staf' => $k->requestedBy?->nama ?? 'Staf SPPG',
-                    'detail' => $k->field_name ? ($k->field_name.': '.$k->old_value.' ➔ '.$k->new_value) : ($k->reason ?: 'Perubahan data bahan'),
-                    'status' => $k->status === 'pending' ? 'Menunggu' : ucfirst($k->status),
-                    'status_badge' => $k->status === 'pending' ? 'bg-[#FEF3C7] text-[#D97706]' : 'bg-[#DCFCE7] text-[#16A34A]',
-                ];
-            });
-        } else {
-            $koreksiPreview = collect([
-                [
-                    'id' => 1,
-                    'no' => 'KR-20261024-001',
-                    'staf' => 'Rina Wulandari',
-                    'detail' => 'Bayam: 20 kg ➔ 18 kg',
-                    'status' => 'Menunggu Review',
-                    'status_badge' => 'bg-[#FEF3C7] text-[#D97706]',
-                ],
-                [
-                    'id' => 2,
-                    'no' => 'KR-20261023-002',
-                    'staf' => 'Ahmad Fauzi',
-                    'detail' => 'Wortel: 15 kg ➔ 12 kg',
-                    'status' => 'Disetujui',
-                    'status_badge' => 'bg-[#DCFCE7] text-[#16A34A]',
-                ],
-                [
-                    'id' => 3,
-                    'no' => 'KR-20261022-003',
-                    'staf' => 'Rina Wulandari',
-                    'detail' => 'Porsi Telur: 250 ➔ 240',
-                    'status' => 'Disetujui',
-                    'status_badge' => 'bg-[#DCFCE7] text-[#16A34A]',
-                ],
-            ]);
-        }
+        $distribusiTerbaru = $dbDistributions->map(function ($d) {
+            return [
+                'tujuan' => $d->tujuan_nama,
+                'porsi' => $d->portions_sent,
+                'status' => ($d->status === 'sent' || $d->status === 'received') ? 'Terkirim' : ucfirst($d->status),
+            ];
+        });
 
-        // ==========================================
-        // 7. PREVIEW 2: STAFF MANAJEMEN
-        // ==========================================
-        $dbStaff = StaffManagement::where('id_sppg', $idSppg)
-            ->latest('created_at')
-            ->limit(3)
-            ->get();
-
-        if ($dbStaff->isNotEmpty()) {
-            $staffPreview = $dbStaff->map(function ($s) {
-                return [
-                    'nama' => $s->nama,
-                    'email' => $s->email,
-                    'status' => ucfirst($s->status),
-                    'status_badge' => $s->status === 'aktif' ? 'bg-[#DCFCE7] text-[#16A34A]' : 'bg-[#FEF3C7] text-[#D97706]',
-                    'tgl' => Carbon::parse($s->created_at)->locale('id')->translatedFormat('d M Y'),
-                ];
-            });
-        } else {
-            $staffPreview = collect([
-                [
-                    'nama' => 'Rina Wulandari',
-                    'email' => 'rina.sppg@mbg.id',
-                    'status' => 'Aktif',
-                    'status_badge' => 'bg-[#DCFCE7] text-[#16A34A]',
-                    'tgl' => '14 Okt 2026',
-                ],
-                [
-                    'nama' => 'Ahmad Fauzi',
-                    'email' => 'fauzi.dapur@mbg.id',
-                    'status' => 'Aktif',
-                    'status_badge' => 'bg-[#DCFCE7] text-[#16A34A]',
-                    'tgl' => '18 Okt 2026',
-                ],
-                [
-                    'nama' => 'Siti Nurhaliza',
-                    'email' => 'siti.logistik@mbg.id',
-                    'status' => 'Aktif',
-                    'status_badge' => 'bg-[#DCFCE7] text-[#16A34A]',
-                    'tgl' => '21 Okt 2026',
-                ],
-            ]);
-        }
-
-        // ==========================================
-        // 8. PREVIEW 3: AUDIT TRAIL TERKINI
-        // ==========================================
-        $auditList = AuditTrail::query()
-            ->untukKepalaSppg($idSppg)
-            ->latest('audit_trails.created_at')
-            ->limit(3)
-            ->get();
-
-        if ($auditList->isNotEmpty()) {
-            $kodeMap = AuditTrail::kodeUntuk($auditList);
-            $auditPreview = $auditList->map(function ($item) use ($kodeMap) {
-                $kodeData = $kodeMap[$item->auditable_type.':'.$item->auditable_id] ?? ('#'.$item->auditable_id);
-                $waktu = Carbon::parse($item->created_at)->locale('id')->translatedFormat('d M H:i');
-
-                return [
-                    'waktu' => $waktu,
-                    'pengguna' => $item->actor_nama ?: 'Staf',
-                    'role' => 'Staf SPPG',
-                    'modul' => $item->modul,
-                    'aktivitas' => $item->aktivitas_label.' '.$kodeData,
-                ];
-            });
-        } else {
-            $auditPreview = collect([
-                [
-                    'waktu' => '24 Okt 08:20',
-                    'pengguna' => 'Rina Wulandari',
-                    'role' => 'Staf SPPG',
-                    'modul' => 'Koreksi',
-                    'aktivitas' => 'Mengajukan koreksi KR-001',
-                ],
-                [
-                    'waktu' => '23 Okt 13:00',
-                    'pengguna' => 'Hj. Siti Aminah',
-                    'role' => 'Kepala SPPG',
-                    'modul' => 'Koreksi',
-                    'aktivitas' => 'Menolak koreksi KR-003',
-                ],
-                [
-                    'waktu' => '22 Okt 07:05',
-                    'pengguna' => 'Rina Wulandari',
-                    'role' => 'Staf SPPG',
-                    'modul' => 'Penerimaan',
-                    'aktivitas' => 'Konfirmasi penerimaan PB-003',
-                ],
-            ]);
-        }
+        $distribusiFooter = $dbDistributions->isNotEmpty()
+            ? Carbon::parse($dbDistributions->first()->created_at)->locale('id')->translatedFormat('d M').': Total '.$dbDistributions->sum('portions_sent').' porsi terkirim'
+            : 'Belum ada riwayat distribusi tercatat';
 
         return view('KepalaSPPG.dashboard', compact(
             'sppg',
@@ -414,9 +388,6 @@ class DashboardController extends Controller
             'alurProses',
             'distribusiTerbaru',
             'distribusiFooter',
-            'koreksiPreview',
-            'staffPreview',
-            'auditPreview',
             'batchTerbaru'
         ));
     }

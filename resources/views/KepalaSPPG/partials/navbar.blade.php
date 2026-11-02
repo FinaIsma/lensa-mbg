@@ -9,50 +9,10 @@
         'staff' => 'Staff',
         default => 'Kepala SPPG',
     };
-
-    $currentSppg = null;
-    if ($currentUser) {
-        $currentSppg = $currentUser->sppg ?? null;
-        if (! $currentSppg && ! empty($currentUser->id_sppg)) {
-            $currentSppg = \App\Models\Sppg::find($currentUser->id_sppg);
-        }
-        if (! $currentSppg) {
-            $currentSppg = \App\Models\Sppg::where('id_user', $currentUser->id_user ?? $currentUser->id)->first();
-        }
-    }
-    if (! $currentSppg) {
-        $currentSppg = \App\Models\Sppg::first();
-    }
-
-    $sppgStatus = ucfirst($currentSppg->status ?? 'Aktif');
-    $isAktif = strtolower($sppgStatus) === 'aktif';
-    $badgeClass = $isAktif
-        ? 'bg-[#DCFCE7] text-[#16A34A] border-[#BBF7D0]'
-        : 'bg-rose-50 text-rose-600 border-rose-200';
-    $dotClass = $isAktif ? 'bg-[#16A34A]' : 'bg-rose-500';
-
-    $todayNavStr = \Carbon\Carbon::now()->locale('id')->translatedFormat('l, d F Y');
-    $sppgNamaNav = $currentSppg->nama_sppg ?? 'SPPG Melati Sukorejo';
-    $sppgKodeNav = 'SPPG' . str_pad($currentSppg->id_sppg ?? 1, 3, '0', STR_PAD_LEFT);
 @endphp
 
 <header class="top-header">
     <div class="header-user-section">
-        @if ($currentRole !== 'staff' && !request()->routeIs('staff.*'))
-            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold {{ $badgeClass }} border whitespace-nowrap">
-                <span class="w-2 h-2 rounded-full {{ $dotClass }} {{ $isAktif ? 'animate-pulse' : '' }}"></span>
-                Unit SPPG {{ $sppgStatus }}
-            </span>
-        @endif
-
-        {{-- Info Tanggal & Nama SPPG di tengah status dan foto profil --}}
-        <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 font-medium px-3.5 py-1 @if($currentRole !== 'staff' && !request()->routeIs('staff.*')) border-l @endif border-r border-slate-200 whitespace-nowrap">
-            <span>{{ $todayNavStr }}</span>
-            <span class="text-slate-300">&bull;</span>
-            <span class="font-semibold text-slate-700">{{ $sppgNamaNav }}</span>
-            <span class="text-slate-400">({{ $sppgKodeNav }})</span>
-        </div>
-
         <div class="header-profile-dropdown" id="profileDropdownWrapper">
             <button type="button" class="header-user-btn" id="profileDropdownBtn" aria-expanded="false" aria-haspopup="true">
                 <div class="avatar-circle" aria-hidden="true">{{ $inisial }}</div>
