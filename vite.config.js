@@ -21,6 +21,7 @@ export default defineConfig({
                 'resources/css/KepalaSPPG/profile-modals.css',
                 'resources/css/staff/sidebar-navbar.css',
                 'resources/css/staff/menu-resep.css',
+                'resources/css/staff/purchases.css',
                 'resources/js/app.js',
                 'resources/js/auth/login.js',
                 'resources/js/auth/register.js',

@@ -11,6 +11,8 @@ use App\Http\Controllers\KepalaSPPG\ProfileController;
 use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\MenuResepController;
+use App\Http\Controllers\Staff\PurchaseController;
+use App\Http\Controllers\Staff\ReceivingController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
 
@@ -118,6 +120,38 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::post('/resep/{id}/toggle-status', [MenuResepController::class, 'toggleRecipeStatus'])->name('recipes.toggle');
     Route::post('/nutrition-types', [MenuResepController::class, 'storeNutritionType'])->name('nutrition-types.store');
 
+    // Pengadaan - Pembelian
+    Route::get('/pembelian', [PurchaseController::class, 'index'])->name('purchases.index');
+    Route::get('/pembelian/create', [PurchaseController::class, 'create'])->name('purchases.create');
+    Route::post('/pembelian', [PurchaseController::class, 'store'])->name('purchases.store');
+    Route::get('/pembelian/{id}', [PurchaseController::class, 'show'])->name('purchases.show');
+    Route::get('/pembelian/{id}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
+    Route::put('/pembelian/{id}', [PurchaseController::class, 'update'])->name('purchases.update');
+    Route::post('/pembelian/{id}/order', [PurchaseController::class, 'order'])->name('purchases.order');
+    Route::post('/pembelian/{id}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
+    Route::get('/pembelian/{id}/print', [PurchaseController::class, 'print'])->name('purchases.print');
+
+    // Pengadaan - Penerimaan
+    Route::get('/penerimaan', [ReceivingController::class, 'index'])->name('receivings.index');
+    Route::get('/penerimaan/create', [ReceivingController::class, 'create'])->name('receivings.create');
+    Route::get('/penerimaan/po/{id}/items', [ReceivingController::class, 'getPurchaseItems'])->name('receivings.po-items');
+    Route::post('/penerimaan', [ReceivingController::class, 'store'])->name('receivings.store');
+    Route::get('/penerimaan/{id}', [ReceivingController::class, 'show'])->name('receivings.show');
+    Route::post('/penerimaan/{id}/confirm', [ReceivingController::class, 'confirm'])->name('receivings.confirm');
+    Route::post('/penerimaan/{id}/void', [ReceivingController::class, 'void'])->name('receivings.void');
+    Route::get('/penerimaan/{id}/barcode', [ReceivingController::class, 'printAllBarcodes'])->name('receivings.barcode-all');
+    Route::get('/penerimaan/{id}/barcode/{lotId}', [ReceivingController::class, 'printBarcode'])->name('receivings.barcode');
+
     // Ubah Kata Sandi Staff
     Route::post('/ubah-kata-sandi', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
+
+// Route untuk melayani file storage public secara andal (fallback symlink di Windows/Local)
+Route::get('/storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    if (! file_exists($filePath)) {
+        abort(404);
+    }
+
+    return response()->file($filePath);
+})->where('path', '.*');

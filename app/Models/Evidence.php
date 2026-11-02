@@ -20,7 +20,7 @@ class Evidence extends Model
 
     public function uploader()
     {
-        return $this->belongsTo(User::class, 'uploaded_by', 'id_user');
+        return $this->belongsTo(Staff::class, 'uploaded_by', 'id');
     }
 
     public function evidenceable()

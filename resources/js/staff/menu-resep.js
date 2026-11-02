@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
    ========================================================================== */
 window.activeDrawerRecipeId = null;
 
-window.openDetailDrawer = async function (recipeId) {
+window.openRecipeDetailDrawer = async function (recipeId) {
     window.activeDrawerRecipeId = recipeId;
     const drawer = document.getElementById('recipeDrawer');
     const backdrop = document.getElementById('recipeDrawerBackdrop');
@@ -312,6 +312,11 @@ window.openDetailDrawer = async function (recipeId) {
         document.getElementById('drawerRecipeTitle').textContent = 'Gagal memuat resep.';
     }
 };
+
+// Pasang alias openDetailDrawer HANYA jika berada di halaman resep
+if (document.getElementById('recipeDrawer')) {
+    window.openDetailDrawer = window.openRecipeDetailDrawer;
+}
 
 window.closeRecipeDrawer = function () {
     const drawer = document.getElementById('recipeDrawer');
