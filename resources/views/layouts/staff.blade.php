@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Staff SPPG') - Lensa MBG</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,6 +16,7 @@
         'resources/css/KepalaSPPG/profile-modals.css',
         'resources/css/staff/sidebar-navbar.css',
         'resources/css/staff/menu-resep.css',
+        'resources/css/staff/purchases.css',
         'resources/js/app.js',
         'resources/js/staff/menu-resep.js',
         'resources/js/KepalaSPPG/profile-modals.js',

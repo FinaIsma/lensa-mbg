@@ -53,8 +53,11 @@
         </div>
 
         {{-- 3. Pengadaan (Dropdown) --}}
-        <div class="nav-group">
-            <button type="button" class="nav-group-header" onclick="this.parentElement.classList.toggle('open')">
+        @php
+            $isPengadaanActive = request()->routeIs('staff.purchases.*') || request()->routeIs('staff.receivings.*');
+        @endphp
+        <div class="nav-group {{ $isPengadaanActive ? 'open' : '' }}">
+            <button type="button" class="nav-group-header {{ $isPengadaanActive ? 'parent-active' : '' }}" onclick="this.parentElement.classList.toggle('open')">
                 <div class="nav-group-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"></circle>
@@ -68,8 +71,8 @@
                 </svg>
             </button>
             <div class="nav-subitems">
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Pembelian</span></a>
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Penerimaan</span></a>
+                <a href="{{ route('staff.purchases.index') }}" class="nav-subitem {{ request()->routeIs('staff.purchases.*') ? 'active' : '' }}"><span>Pembelian</span></a>
+                <a href="{{ route('staff.receivings.index') }}" class="nav-subitem {{ request()->routeIs('staff.receivings.*') ? 'active' : '' }}"><span>Penerimaan</span></a>
             </div>
         </div>
 
