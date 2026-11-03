@@ -13,7 +13,6 @@ use App\Models\Receiving;
 use App\Models\ReceivingItem;
 use App\Models\Staff;
 use App\Models\StockMovement;
-use App\Models\Supplier;
 use App\Support\Keys;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -21,7 +20,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ReceivingController extends Controller
@@ -223,7 +221,7 @@ class ReceivingController extends Controller
             $evidences = $receiving->evidences->map(function (Evidence $ev) {
                 return [
                     'id' => $ev->id,
-                    'url' => asset('storage/' . $ev->file_path),
+                    'url' => asset('storage/'.$ev->file_path),
                     'file_name' => basename($ev->file_path),
                     'description' => $ev->description,
                 ];
@@ -238,7 +236,7 @@ class ReceivingController extends Controller
                     'supplier_name' => $receiving->purchase?->supplier?->nama ?? '-',
                     'received_at' => $receiving->received_at ? $receiving->received_at->format('d-m-Y H:i') : '-',
                     'confirmed_at' => $receiving->confirmed_at ? $receiving->confirmed_at->format('d-m-Y H:i') : '-',
-                    'receiver_name' => ($receiving->receiver?->nama ?? 'Staff') . ' (Staff SPPG)',
+                    'receiver_name' => ($receiving->receiver?->nama ?? 'Staff').' (Staff SPPG)',
                     'status' => $receiving->status,
                     'status_label' => $receiving->status_label,
                     'status_badge_class' => $receiving->status_badge_class,
@@ -299,7 +297,7 @@ class ReceivingController extends Controller
 
             if ($action === 'confirm') {
                 if (empty($row['lot_number_input'])) {
-                    $row['lot_number_input'] = 'LOT-' . date('Ymd') . '-' . ($idx + 1);
+                    $row['lot_number_input'] = 'LOT-'.date('Ymd').'-'.($idx + 1);
                 }
 
                 if (empty($row['expiry_date_input'])) {
@@ -729,74 +727,6 @@ class ReceivingController extends Controller
      */
     private function ensureSampleReceivings(int $idSppg): void
     {
-        if (Receiving::where('id_sppg', $idSppg)->count() > 0) {
-            return;
-        }
-
-        $purchase = Purchase::where('id_sppg', $idSppg)->with('items.material')->first();
-        if (! $purchase) {
-            return;
-        }
-
-        $staff = $this->getAuthenticatedStaff();
-
-        // Buat 1 Penerimaan Terkonfirmasi persis seperti di Gambar 1 Mockup
-        $rcv1 = Receiving::create([
-            'purchase_id' => $purchase->id,
-            'id_sppg' => $idSppg,
-            'received_by' => $staff?->id,
-            'receiving_no' => 'PO-20260927-009',
-            'received_at' => Carbon::parse('2026-10-25 08:30:00'),
-            'status' => 'confirmed',
-            'is_locked' => true,
-            'confirmed_at' => Carbon::parse('2026-10-25 08:30:00'),
-        ]);
-
-        $lotsInfo = [
-            ['barcode' => 'LOT-SPPG01-20261027-001', 'kondisi' => 'Segar, Dingin'],
-            ['barcode' => 'LOT-SPPG01-20261027-002', 'kondisi' => 'Segar, Dingin'],
-            ['barcode' => 'LOT-SPPG01-20261027-003', 'kondisi' => 'Segar, Dingin'],
-        ];
-
-        foreach ($purchase->items as $idx => $pItem) {
-            $info = $lotsInfo[$idx] ?? ['barcode' => "LOT-SPPG01-20261027-00" . ($idx + 1), 'kondisi' => 'Segar, Dingin'];
-
-            $rItem = ReceivingItem::create([
-                'receiving_id' => $rcv1->id,
-                'purchase_item_id' => $pItem->id,
-                'material_id' => $pItem->material_id,
-                'qty_received' => $pItem->qty_ordered,
-                'lot_number_input' => $info['barcode'],
-                'expiry_date_input' => Carbon::parse('2026-11-03'),
-                'kondisi_dilaporkan' => $info['kondisi'],
-            ]);
-
-            $lot = MaterialLot::create([
-                'receiving_item_id' => $rItem->id,
-                'material_id' => $rItem->material_id,
-                'supplier_id' => $purchase->supplier_id,
-                'id_sppg' => $idSppg,
-                'lot_number' => $info['barcode'],
-                'barcode' => $info['barcode'],
-                'received_date' => Carbon::parse('2026-10-25')->toDateString(),
-                'expiry_date' => Carbon::parse('2026-11-03')->toDateString(),
-                'initial_qty' => $rItem->qty_received,
-                'current_qty' => $rItem->qty_received,
-                'unit_cost' => $pItem->unit_price,
-                'status' => 'available',
-                'is_locked' => true,
-            ]);
-
-            StockMovement::create([
-                'material_lot_id' => $lot->id,
-                'created_by' => $staff?->id,
-                'movement_type' => 'RECEIVE_IN',
-                'direction' => 'IN',
-                'qty' => $rItem->qty_received,
-                'reference_type' => 'receiving_items',
-                'reference_id' => $rItem->id,
-                'created_at' => Carbon::parse('2026-10-25 08:30:00'),
-            ]);
-        }
+        // Auto-seeding dinonaktifkan untuk mencegah UniqueConstraintViolationException di lingkungan multi-SPPG.
     }
 }

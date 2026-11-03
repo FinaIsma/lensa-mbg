@@ -241,17 +241,19 @@
                     @empty
                         <tr>
                             <td colspan="7">
-                                <div class="empty-state">
-                                    <div class="empty-state-icon">
-                                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                                        </svg>
-                                    </div>
-                                    <h4 class="empty-state-title">Belum ada data penerimaan</h4>
-                                    <p class="empty-state-desc">Belum ada barang fisik yang diterima. Catat penerimaan bahan pertama Anda.</p>
-                                    <button type="button" class="btn-tambah-staff mt-2" onclick="openCreateModal()">
+                                <div style="padding: 48px 20px; text-align: center; color: #64748B;">
+                                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.6" style="margin: 0 auto 12px; display: block;">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                    </svg>
+                                    <p style="font-size: 15px; font-weight: 600; color: #071E49; margin-bottom: 4px;">
+                                        Belum ada data penerimaan
+                                    </p>
+                                    <p style="font-size: 13px; color: #64748B; margin-bottom: 18px;">
+                                        Belum ada barang fisik yang diterima. Catat penerimaan bahan pertama Anda.
+                                    </p>
+                                    <button type="button" class="btn-tambah-staff" onclick="openCreateModal()" style="display: inline-flex;">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                             <line x1="12" y1="5" x2="12" y2="19"></line>
                                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -267,19 +269,13 @@
         </div>
 
         {{-- Pagination --}}
-        @if ($receivings->hasPages())
-            <div class="table-pagination-footer" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-top: 1px solid #F1F5F9; font-size: 13px; color: #64748B;">
-                <div>
+        @if ($receivings->hasPages() || $receivings->total() > 0)
+            <div class="table-pagination-footer">
+                <div class="pagination-info">
                     Menampilkan {{ $receivings->firstItem() ?? 0 }}-{{ $receivings->lastItem() ?? 0 }} dari {{ $receivings->total() }} data
                 </div>
-                <div>
-                    {{ $receivings->links('pagination::tailwind') }}
-                </div>
-            </div>
-        @else
-            <div class="table-pagination-footer" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-top: 1px solid #F1F5F9; font-size: 13px; color: #64748B;">
-                <div>
-                    Menampilkan 1-{{ $receivings->count() }} dari {{ $receivings->total() }} data
+                <div class="pagination-links">
+                    {{ $receivings->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4') }}
                 </div>
             </div>
         @endif

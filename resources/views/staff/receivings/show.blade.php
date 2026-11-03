@@ -134,9 +134,9 @@
         </div>
     </div>
 
-    {{-- Card 3: Barcode Lot yang terbit (Sesuai Mockup) --}}
+    {{-- Card 3: Label Lot (QR & Barcode) yang terbit (Sesuai Mockup) --}}
     <div class="detail-card">
-        <h2 class="detail-card-title">Barcode Lot yang terbit</h2>
+        <h2 class="detail-card-title">Label Lot (QR & Barcode) yang terbit</h2>
 
         @if ($receiving->isConfirmed())
             <div style="display: flex; flex-direction: column; gap: 14px;">
@@ -157,7 +157,7 @@
                                     <line x1="16" y1="13" x2="8" y2="13"></line>
                                     <line x1="16" y1="17" x2="8" y2="17"></line>
                                 </svg>
-                                <span>Cetak</span>
+                                <span>Cetak Label</span>
                             </a>
                         @endif
                     </div>
@@ -165,7 +165,7 @@
             </div>
         @else
             <p style="font-size: 13.5px; color: #64748B; margin: 0;">
-                Barcode lot akan diterbitkan otomatis setelah penerimaan dikonfirmasi.
+                Label QR & barcode lot akan diterbitkan otomatis setelah penerimaan dikonfirmasi.
             </p>
         @endif
     </div>
@@ -209,7 +209,7 @@
                     <line x1="16" y1="13" x2="8" y2="13"></line>
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                 </svg>
-                <span>Cetak Semua Barcode</span>
+                <span>Cetak Semua Label (QR / Barcode)</span>
             </a>
         @elseif ($receiving->isDraft())
             <button type="button" class="btn-mockup-batal" onclick="openVoidModal()">

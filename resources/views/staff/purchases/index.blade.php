@@ -241,13 +241,14 @@
         </div>
 
         {{-- Pagination & Footer --}}
+        {{-- Pagination & Footer --}}
         @if($purchases->hasPages() || $purchases->total() > 0)
-            <div class="table-pagination-footer" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-top: 1px solid #F1F5F9; font-size: 13px; color: #64748B;">
-                <div>
+            <div class="table-pagination-footer">
+                <div class="pagination-info">
                     Menampilkan {{ $purchases->firstItem() ?? 0 }}-{{ $purchases->lastItem() ?? 0 }} dari {{ $purchases->total() }} data
                 </div>
-                <div>
-                    {{ $purchases->links('pagination::tailwind') }}
+                <div class="pagination-links">
+                    {{ $purchases->appends(request()->query())->onEachSide(1)->links('pagination::bootstrap-4') }}
                 </div>
             </div>
         @endif
