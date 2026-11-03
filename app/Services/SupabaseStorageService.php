@@ -2,15 +2,17 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Exception;
 
 class SupabaseStorageService
 {
     protected string $url;
+
     protected string $key;
+
     protected string $defaultBucket;
 
     public function __construct()
@@ -23,18 +25,18 @@ class SupabaseStorageService
     /**
      * Upload an UploadedFile directly to a Supabase Storage bucket.
      *
-     * @param UploadedFile $file
-     * @param string $folder Subfolder inside bucket (e.g. 'ktp', 'kantor', 'surat')
-     * @param string|null $bucket Custom bucket name if not default
+     * @param  string  $folder  Subfolder inside bucket (e.g. 'ktp', 'kantor', 'surat')
+     * @param  string|null  $bucket  Custom bucket name if not default
      * @return string Public URL of the uploaded file
+     *
      * @throws Exception
      */
     public function upload(UploadedFile $file, string $folder = '', ?string $bucket = null): string
     {
         $targetBucket = $bucket ?: $this->defaultBucket;
         $extension = $file->getClientOriginalExtension() ?: $file->guessExtension() ?: 'bin';
-        $filename = time() . '_' . Str::random(16) . '.' . $extension;
-        $path = $folder ? trim($folder, '/') . '/' . $filename : $filename;
+        $filename = time().'_'.Str::random(16).'.'.$extension;
+        $path = $folder ? trim($folder, '/').'/'.$filename : $filename;
 
         if (empty($this->key)) {
             throw new Exception('Supabase API Key (SUPABASE_KEY / SUPABASE_SERVICE_ROLE_KEY) belum dikonfigurasi di file .env.');
@@ -46,7 +48,7 @@ class SupabaseStorageService
         $fileContent = file_get_contents($file->getRealPath());
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->key,
+            'Authorization' => 'Bearer '.$this->key,
             'apikey' => $this->key,
             'Content-Type' => $mimeType,
             'x-upsert' => 'true',
@@ -55,9 +57,9 @@ class SupabaseStorageService
             $mimeType
         )->post($endpoint);
 
-        if (!$response->successful()) {
-            $errorMessage = $response->json('message') 
-                ?? $response->json('error') 
+        if (! $response->successful()) {
+            $errorMessage = $response->json('message')
+                ?? $response->json('error')
                 ?? $response->body();
             throw new Exception("Gagal mengunggah file ke Supabase Storage [Bucket: {$targetBucket}, Path: {$path}]: {$errorMessage}");
         }
@@ -67,14 +69,11 @@ class SupabaseStorageService
 
     /**
      * Get the public URL for a file stored in Supabase Storage.
-     *
-     * @param string $path
-     * @param string|null $bucket
-     * @return string
      */
     public function getPublicUrl(string $path, ?string $bucket = null): string
     {
         $targetBucket = $bucket ?: $this->defaultBucket;
-        return "{$this->url}/storage/v1/object/public/{$targetBucket}/" . ltrim($path, '/');
+
+        return "{$this->url}/storage/v1/object/public/{$targetBucket}/".ltrim($path, '/');
     }
 }

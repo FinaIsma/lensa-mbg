@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\Sppg;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
-use App\Models\User;
-use App\Models\Sppg;
 
 class RegisterTest extends TestCase
 {
@@ -24,7 +24,7 @@ class RegisterTest extends TestCase
             '*/storage/v1/object/register/*' => Http::response(['Key' => 'register/mock.jpg'], 200),
         ]);
 
-        $email = 'test_' . uniqid() . '@example.com';
+        $email = 'test_'.uniqid().'@example.com';
         $response = $this->post('/register', [
             'nama_lengkap' => 'Rafif Farrelsyah Fawwazka',
             'email' => $email,
@@ -150,8 +150,7 @@ class RegisterTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['email']);
         $response->assertJsonFragment([
-            'email' => ['Email sudah terdaftar dalam sistem.']
+            'email' => ['Email sudah terdaftar dalam sistem.'],
         ]);
     }
 }
-

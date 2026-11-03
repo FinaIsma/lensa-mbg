@@ -14,7 +14,7 @@ class Evidence extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'is_public'   => 'boolean',
+        'is_public' => 'boolean',
         'uploaded_at' => 'datetime',
     ];
 

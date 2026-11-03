@@ -77,7 +77,7 @@
         </div>
 
         @php
-            $isStokActive = request()->routeIs('staff.lots.*');
+            $isStokActive = request()->routeIs('staff.lots.*') || request()->routeIs('staff.riwayat.*');
         @endphp
         <div class="nav-group {{ $isStokActive ? 'open' : '' }}">
             <button type="button" class="nav-group-header {{ $isStokActive ? 'parent-active' : '' }}" onclick="toggleSidebarNavGroup(this)">
@@ -95,7 +95,7 @@
             </button>
             <div class="nav-subitems">
                 <a href="{{ route('staff.lots.index') }}" class="nav-subitem {{ request()->routeIs('staff.lots.*') ? 'active' : '' }}"><span>Lot Bahan</span></a>
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Riwayat Stok</span></a>
+                <a href="{{ route('staff.riwayat.index') }}" class="nav-subitem {{ request()->routeIs('staff.riwayat.*') ? 'active' : '' }}"><span>Riwayat Stok</span></a>
             </div>
         </div>
 
