@@ -158,6 +158,7 @@
                         <th class="riwayat-th">Arah</th>
                         <th class="riwayat-th">Jumlah</th>
                         <th class="riwayat-th">Petugas</th>
+                        <th class="riwayat-th-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -165,6 +166,28 @@
                         @php
                             $lot = $m->lot;
                             $material = $lot?->material;
+                            $docRef = $m->doc_ref;
+
+                            $detailPayload = [
+                                'waktu' => $m->created_at ? $m->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') . ' WIB' : '-',
+                                'direction' => $m->direction,
+                                'direction_label' => $m->direction === 'IN' ? 'Masuk' : 'Keluar',
+                                'direction_class' => $m->direction === 'IN' ? 'badge-received' : 'badge-cancelled',
+                                'movement_type_label' => $m->movement_type_label,
+                                'qty_formatted' => ($m->direction === 'IN' ? '+' : '-') . number_format((float)$m->qty, 2, ',', '.') . ' ' . ($material?->satuan ?? ''),
+                                'petugas' => $m->creator?->nama ?? 'Sistem',
+                                'material_nama' => $material?->nama ?? '-',
+                                'material_kategori' => $material?->kategori ?? '-',
+                                'material_satuan' => $material?->satuan ?? '-',
+                                'barcode' => $lot?->barcode ?? '-',
+                                'lot_number' => $lot?->lot_number ?? '-',
+                                'current_qty' => $lot ? number_format((float)$lot->current_qty, 2, ',', '.') . ' ' . ($material?->satuan ?? '') : '-',
+                                'expiry_date' => $lot?->expiry_date ? $lot->expiry_date->format('d-m-Y') : '-',
+                                'supplier' => $lot?->supplier?->nama ?? '-',
+                                'doc_label' => $docRef['label'] ?? 'Dokumen Mutasi',
+                                'doc_code' => $docRef['code'] ?? '-',
+                                'doc_url' => $docRef['url'] ?? null,
+                            ];
                         @endphp
                         <tr>
                             {{-- Waktu --}}
@@ -204,10 +227,25 @@
                             <td class="riwayat-cell-text">
                                 {{ $m->creator?->nama ?? 'Sistem' }}
                             </td>
+
+                            {{-- Aksi: Tombol Mata untuk Melihat Right Drawer Detail --}}
+                            <td class="riwayat-cell-center">
+                                <div class="action-buttons-group">
+                                    <button type="button" 
+                                            class="btn-action-icon js-btn-movement-detail" 
+                                            data-movement="{{ json_encode($detailPayload) }}" 
+                                            title="Lihat Rincian Mutasi & Dokumen">
+                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7">
+                            <td colspan="8">
                                 <div class="riwayat-empty-state">
                                     <svg class="riwayat-empty-icon" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.6">
                                         <circle cx="12" cy="12" r="10"></circle>
@@ -241,5 +279,132 @@
         @endif
     </div>
 </div>
+@endsection
+
+@section('modals')
+{{-- ==========================================================================
+     POPUP DETAIL MUTASI STOK: RIGHT DRAWER (PERSIS PEMBELIAN BAHAN)
+     ========================================================================== --}}
+<div class="purchase-drawer-backdrop" id="movementDrawerBackdrop"></div>
+<aside class="purchase-drawer" id="movementDetailDrawer" role="dialog" aria-modal="true" aria-label="Detail Mutasi Stok">
+    {{-- Header Drawer --}}
+    <div class="purchase-drawer-header">
+        <div>
+            <h2 class="purchase-drawer-title">Detail Mutasi Stok</h2>
+            <p class="purchase-drawer-subtitle">Informasi lengkap pergerakan bahan pangan dan dokumen transaksi terkait.</p>
+        </div>
+        <button type="button" class="modal-close-corner js-btn-close-drawer" aria-label="Tutup" title="Tutup">
+            &times;
+        </button>
+    </div>
+
+    {{-- Body Drawer (Scrollable) --}}
+    <div class="purchase-drawer-scroll">
+        {{-- Card 1: Informasi Mutasi --}}
+        <div class="detail-card">
+            <div class="riwayat-drawer-card-header">
+                <h3 class="detail-card-title mb-0">Informasi Mutasi</h3>
+                <span class="badge-status" id="drawerDirectionBadge">
+                    <span class="status-dot"></span>
+                    <span id="drawerDirectionText">-</span>
+                </span>
+            </div>
+
+            <div class="detail-grid-2col">
+                <div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Waktu :</span>
+                        <span class="detail-item-value riwayat-value-bold" id="drawerWaktu">-</span>
+                    </div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Jenis Mutasi :</span>
+                        <span class="detail-item-value" id="drawerJenisMutasi">-</span>
+                    </div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Jumlah :</span>
+                        <span class="detail-item-value riwayat-cell-qty" id="drawerJumlah">-</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Dicatat Oleh :</span>
+                        <span class="detail-item-value" id="drawerPetugas">-</span>
+                    </div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Arah Aliran :</span>
+                        <span class="detail-item-value" id="drawerArahLengkap">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Card 2: Rincian Bahan & Lot Terkait --}}
+        <div class="detail-card">
+            <h3 class="detail-card-title">Rincian Bahan & Lot</h3>
+            <div class="detail-grid-2col">
+                <div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Nama Bahan :</span>
+                        <span class="detail-item-value riwayat-value-bold" id="drawerNamaBahan">-</span>
+                    </div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Kategori :</span>
+                        <span class="detail-item-value riwayat-cell-text" id="drawerKategoriBahan">-</span>
+                    </div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Barcode Lot :</span>
+                        <span class="detail-item-value riwayat-value-bold" id="drawerBarcodeLot">-</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Sisa Stok Lot :</span>
+                        <span class="detail-item-value riwayat-value-bold" id="drawerSisaStok">-</span>
+                    </div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Kedaluwarsa :</span>
+                        <span class="detail-item-value" id="drawerExpiryDate">-</span>
+                    </div>
+                    <div class="detail-item-row">
+                        <span class="detail-item-label">Pemasok :</span>
+                        <span class="detail-item-value" id="drawerSupplier">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Card 3: Dokumen Transaksi Asal --}}
+        <div class="detail-card">
+            <div class="riwayat-drawer-card-header">
+                <h3 class="detail-card-title mb-0">Dokumen Transaksi Asal</h3>
+                <span class="riwayat-doc-badge" id="drawerDocType">-</span>
+            </div>
+            
+            <div class="riwayat-doc-box">
+                <div>
+                    <div class="riwayat-doc-subtitle">Nomor Referensi</div>
+                    <div class="riwayat-doc-code" id="drawerDocCode">-</div>
+                </div>
+                <div>
+                    <a href="#" id="drawerDocLink" target="_blank" class="riwayat-doc-link">
+                        <span>Buka Dokumen</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Footer Drawer Actions --}}
+    <div class="purchase-drawer-footer">
+        <button type="button" class="btn-edit-action js-btn-close-drawer">
+            Tutup
+        </button>
+    </div>
+</aside>
 @endsection
 
