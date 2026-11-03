@@ -73,7 +73,7 @@ class PurchaseController extends Controller
             'menunggu_cek' => $menungguCek,
             'selesai_diterima' => $selesaiDiterima,
             'total_belanja' => $totalBelanja,
-            'formatted_total_belanja' => 'Rp ' . number_format($totalBelanja, 0, ',', '.'),
+            'formatted_total_belanja' => 'Rp '.number_format($totalBelanja, 0, ',', '.'),
         ];
 
         // Pemasok dan Bahan Aktif untuk form pop-up di tengah
@@ -517,60 +517,6 @@ class PurchaseController extends Controller
                 ['id_sppg' => $idSppg, 'kode' => $m['kode']],
                 ['nama' => $m['nama'], 'satuan' => $m['satuan'], 'kategori' => $m['kategori'], 'min_stock' => 10, 'is_active' => true]
             );
-        }
-
-        if (Purchase::where('id_sppg', $idSppg)->count() === 0) {
-            $supplier = Supplier::where('id_sppg', $idSppg)->first();
-            $staff = $this->getAuthenticatedStaff();
-            $m1 = Material::where('id_sppg', $idSppg)->where('nama', 'Daging Ayam Broiler')->first();
-            $m2 = Material::where('id_sppg', $idSppg)->where('nama', 'Beras Ramos')->first();
-            $m3 = Material::where('id_sppg', $idSppg)->where('nama', 'Telur Ayam Negeri')->first() ?: $m1;
-
-            if ($supplier && $m1 && $m2) {
-                $statuses = [
-                    1 => 'ordered',
-                    2 => 'ordered',
-                    3 => 'received',
-                    4 => 'received',
-                    5 => 'ordered',
-                    6 => 'ordered',
-                    7 => 'received',
-                    8 => 'ordered',
-                ];
-
-                for ($i = 1; $i <= 8; $i++) {
-                    $noStr = sprintf('%03d', $i);
-                    $po = Purchase::create([
-                        'supplier_id' => $supplier->id,
-                        'id_sppg' => $idSppg,
-                        'created_by' => $staff?->id,
-                        'purchase_no' => "PO-20260927-{$noStr}",
-                        'purchase_date' => '2026-10-25',
-                        'status' => $statuses[$i] ?? 'ordered',
-                    ]);
-
-                    PurchaseItem::create([
-                        'purchase_id' => $po->id,
-                        'material_id' => $m1->id,
-                        'qty_ordered' => 50,
-                        'unit_price' => 35000,
-                    ]);
-
-                    PurchaseItem::create([
-                        'purchase_id' => $po->id,
-                        'material_id' => $m2->id,
-                        'qty_ordered' => 100,
-                        'unit_price' => 14000,
-                    ]);
-
-                    PurchaseItem::create([
-                        'purchase_id' => $po->id,
-                        'material_id' => $m3->id,
-                        'qty_ordered' => 25,
-                        'unit_price' => 28000,
-                    ]);
-                }
-            }
         }
     }
 }

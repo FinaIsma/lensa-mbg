@@ -10,6 +10,7 @@ use App\Http\Controllers\KepalaSPPG\DashboardController as KepalaSPPGDashboardCo
 use App\Http\Controllers\KepalaSPPG\ProfileController;
 use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Staff\LotController;
 use App\Http\Controllers\Staff\MenuResepController;
 use App\Http\Controllers\Staff\PurchaseController;
 use App\Http\Controllers\Staff\ReceivingController;
@@ -142,13 +143,19 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::get('/penerimaan/{id}/barcode', [ReceivingController::class, 'printAllBarcodes'])->name('receivings.barcode-all');
     Route::get('/penerimaan/{id}/barcode/{lotId}', [ReceivingController::class, 'printBarcode'])->name('receivings.barcode');
 
+    // Stok - Lot Bahan
+    Route::get('/lot', [LotController::class, 'index'])->name('lots.index');
+    Route::get('/lot/barcode/{barcode?}', [LotController::class, 'findByBarcode'])->name('lots.find-by-barcode')->where('barcode', '.*');
+    Route::get('/lot/{id}', [LotController::class, 'show'])->name('lots.show')->whereNumber('id');
+    Route::get('/lot/{id}/print', [LotController::class, 'print'])->name('lots.print')->whereNumber('id');
+
     // Ubah Kata Sandi Staff
     Route::post('/ubah-kata-sandi', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
 // Route untuk melayani file storage public secara andal (fallback symlink di Windows/Local)
 Route::get('/storage/{path}', function ($path) {
-    $filePath = storage_path('app/public/' . $path);
+    $filePath = storage_path('app/public/'.$path);
     if (! file_exists($filePath)) {
         abort(404);
     }

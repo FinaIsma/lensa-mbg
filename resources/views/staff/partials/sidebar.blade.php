@@ -22,7 +22,7 @@
             $isMasterActive = request()->routeIs('staff.menu-resep.*') || request()->routeIs('staff.menus.*') || request()->routeIs('staff.recipes.*');
         @endphp
         <div class="nav-group {{ $isMasterActive ? 'open' : '' }}">
-            <button type="button" class="nav-group-header {{ $isMasterActive ? 'parent-active' : '' }}" onclick="this.parentElement.classList.toggle('open')">
+            <button type="button" class="nav-group-header {{ $isMasterActive ? 'parent-active' : '' }}" onclick="toggleSidebarNavGroup(this)">
                 <div class="nav-group-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
@@ -57,7 +57,7 @@
             $isPengadaanActive = request()->routeIs('staff.purchases.*') || request()->routeIs('staff.receivings.*');
         @endphp
         <div class="nav-group {{ $isPengadaanActive ? 'open' : '' }}">
-            <button type="button" class="nav-group-header {{ $isPengadaanActive ? 'parent-active' : '' }}" onclick="this.parentElement.classList.toggle('open')">
+            <button type="button" class="nav-group-header {{ $isPengadaanActive ? 'parent-active' : '' }}" onclick="toggleSidebarNavGroup(this)">
                 <div class="nav-group-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"></circle>
@@ -76,9 +76,11 @@
             </div>
         </div>
 
-        {{-- 4. Stok (Dropdown) --}}
-        <div class="nav-group">
-            <button type="button" class="nav-group-header" onclick="this.parentElement.classList.toggle('open')">
+        @php
+            $isStokActive = request()->routeIs('staff.lots.*');
+        @endphp
+        <div class="nav-group {{ $isStokActive ? 'open' : '' }}">
+            <button type="button" class="nav-group-header {{ $isStokActive ? 'parent-active' : '' }}" onclick="toggleSidebarNavGroup(this)">
                 <div class="nav-group-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -92,14 +94,14 @@
                 </svg>
             </button>
             <div class="nav-subitems">
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Lot Bahan</span></a>
+                <a href="{{ route('staff.lots.index') }}" class="nav-subitem {{ request()->routeIs('staff.lots.*') ? 'active' : '' }}"><span>Lot Bahan</span></a>
                 <a href="#" class="nav-subitem" onclick="return false;"><span>Riwayat Stok</span></a>
             </div>
         </div>
 
         {{-- 5. Produksi (Dropdown) --}}
         <div class="nav-group">
-            <button type="button" class="nav-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <button type="button" class="nav-group-header" onclick="toggleSidebarNavGroup(this)">
                 <div class="nav-group-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 2l4 4-10 10-4-4L18 2z"></path>
@@ -123,7 +125,7 @@
 
         {{-- 6. Distribusi (Dropdown) --}}
         <div class="nav-group">
-            <button type="button" class="nav-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <button type="button" class="nav-group-header" onclick="toggleSidebarNavGroup(this)">
                 <div class="nav-group-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="1" y="3" width="15" height="13"></rect>
@@ -144,3 +146,26 @@
         </div>
     </nav>
 </aside>
+
+<script>
+    function toggleSidebarNavGroup(button) {
+        const currentGroup = button.closest('.nav-group');
+        if (!currentGroup) return;
+
+        const isCurrentlyOpen = currentGroup.classList.contains('open');
+
+        // Tutup semua dropdown menu lainnya (accordion mode: hanya 1 yang bisa terbuka)
+        document.querySelectorAll('.sidebar-nav .nav-group').forEach(group => {
+            if (group !== currentGroup) {
+                group.classList.remove('open');
+            }
+        });
+
+        // Buka jika sebelumnya tertutup, atau tutup jika diklik kembali (tutup manual)
+        if (isCurrentlyOpen) {
+            currentGroup.classList.remove('open');
+        } else {
+            currentGroup.classList.add('open');
+        }
+    }
+</script>

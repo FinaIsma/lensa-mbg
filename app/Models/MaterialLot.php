@@ -62,7 +62,82 @@ class MaterialLot extends Model
 
     public function movements(): HasMany
     {
-        return $this->hasMany(StockMovement::class, 'material_lot_id');
+        return $this->hasMany(StockMovement::class, 'material_lot_id')->orderBy('created_at', 'asc')->orderBy('id', 'asc');
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->expiry_date && $this->expiry_date->isPast();
+    }
+
+    public function isNearExpired(): bool
+    {
+        if (! $this->expiry_date || $this->isExpired()) {
+            return false;
+        }
+
+        return Carbon::today()->diffInDays($this->expiry_date, false) <= 7;
+    }
+
+    public function getExpiryStatusAttribute(): string
+    {
+        if ($this->isExpired()) {
+            return 'expired';
+        }
+
+        if ($this->isNearExpired()) {
+            return 'near_expired';
+        }
+
+        return 'safe';
+    }
+
+    public function getExpiryStatusLabelAttribute(): string
+    {
+        if (! $this->expiry_date) {
+            return '-';
+        }
+
+        if ($this->isExpired()) {
+            return 'Kedaluwarsa';
+        }
+
+        if ($this->isNearExpired()) {
+            $days = (int) Carbon::today()->diffInDays($this->expiry_date, false);
+
+            return $days === 0 ? 'Kedaluwarsa Hari Ini' : "Mendekati ({$days} hari)";
+        }
+
+        return 'Aman';
+    }
+
+    public function getExpiryBadgeClassAttribute(): string
+    {
+        return match ($this->expiry_status) {
+            'expired' => 'badge-expired',
+            'near_expired' => 'badge-near-expired',
+            default => 'badge-safe',
+        };
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'available' => 'Tersedia',
+            'depleted' => 'Habis',
+            'voided' => 'Dibatalkan',
+            default => ucfirst((string) $this->status),
+        };
+    }
+
+    public function getStatusBadgeClassAttribute(): string
+    {
+        return match ($this->status) {
+            'available' => 'badge-received',
+            'depleted' => 'badge-draft',
+            'voided' => 'badge-cancelled',
+            default => 'badge-draft',
+        };
     }
 
     /**
