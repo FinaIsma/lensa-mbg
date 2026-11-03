@@ -67,7 +67,7 @@ class Purchase extends Model
 
     public function getFormattedTotalCostAttribute(): string
     {
-        return 'Rp ' . number_format($this->total_cost, 0, ',', '.');
+        return 'Rp '.number_format($this->total_cost, 0, ',', '.');
     }
 
     public function getTotalItemsCountAttribute(): int

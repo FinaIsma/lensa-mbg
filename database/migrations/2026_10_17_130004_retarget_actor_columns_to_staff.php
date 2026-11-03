@@ -2,9 +2,7 @@
 
 use App\Support\Keys;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -27,7 +25,7 @@ return new class extends Migration
             if (DB::table($tabel)->exists()) {
                 throw new RuntimeException(
                     "Tabel '{$tabel}' masih berisi data, sehingga tujuan foreign key pelaku tidak bisa dipindah ke staff. "
-                    . 'Kosongkan dulu: php artisan db:seed --class=LensaDummyCleanSeeder (lalu jalankan migrate lagi).'
+                    .'Kosongkan dulu: php artisan db:seed --class=LensaDummyCleanSeeder (lalu jalankan migrate lagi).'
                 );
             }
         }
@@ -39,7 +37,7 @@ return new class extends Migration
             DB::statement("ALTER TABLE \"{$tabel}\" DROP CONSTRAINT IF EXISTS \"{$tabel}_{$kolom}_foreign\"");
             DB::statement(
                 "ALTER TABLE \"{$tabel}\" ADD CONSTRAINT \"{$tabel}_{$kolom}_foreign\" "
-                . "FOREIGN KEY (\"{$kolom}\") REFERENCES \"{$tabelTujuan}\" (\"{$pkTujuan}\") ON DELETE RESTRICT"
+                ."FOREIGN KEY (\"{$kolom}\") REFERENCES \"{$tabelTujuan}\" (\"{$pkTujuan}\") ON DELETE RESTRICT"
             );
         }
     }

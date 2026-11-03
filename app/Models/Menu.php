@@ -49,6 +49,6 @@ class Menu extends Model
 
     public function getFormattedIdAttribute(): string
     {
-        return 'MN' . str_pad((string) $this->id, 2, '0', STR_PAD_LEFT);
+        return 'MN'.str_pad((string) $this->id, 2, '0', STR_PAD_LEFT);
     }
 }

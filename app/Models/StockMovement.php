@@ -22,6 +22,7 @@ class StockMovement extends Model
         'qty',
         'reference_type',
         'reference_id',
+        'created_at',
     ];
 
     protected $casts = [
@@ -37,5 +38,29 @@ class StockMovement extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(Staff::class, 'created_by');
+    }
+
+    /**
+     * Label manusiawi untuk jenis mutasi stok.
+     */
+    public function getMovementTypeLabelAttribute(): string
+    {
+        return match ($this->movement_type) {
+            'RECEIVE_IN' => 'Penerimaan Bahan',
+            'PRODUCTION_OUT' => 'Pemakaian Produksi',
+            'DISPOSAL_OUT' => 'Pembuangan / Limbah',
+            'CORRECTION_IN' => 'Koreksi Masuk',
+            'CORRECTION_OUT' => 'Koreksi Keluar',
+            'VOID_REVERSAL' => 'Pembalikan (Void)',
+            default => ucwords(strtolower(str_replace('_', ' ', (string) $this->movement_type))),
+        };
+    }
+
+    /**
+     * Kelas badge arah mutasi (IN hijau, OUT merah).
+     */
+    public function getDirectionBadgeClassAttribute(): string
+    {
+        return $this->direction === 'IN' ? 'badge-in' : 'badge-out';
     }
 }

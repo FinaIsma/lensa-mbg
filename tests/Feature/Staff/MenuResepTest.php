@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Staff;
 
-use App\Models\AuditTrail;
 use App\Models\Material;
 use App\Models\Menu;
 use App\Models\Recipe;
@@ -21,7 +20,9 @@ class MenuResepTest extends TestCase
     protected $connectionsToTransact = ['pgsql'];
 
     private User $kepalaUser;
+
     private Sppg $sppg;
+
     private Staff $staff;
 
     public function createApplication()
@@ -38,8 +39,8 @@ class MenuResepTest extends TestCase
         parent::setUp();
 
         $this->kepalaUser = User::create([
-            'nama' => 'Test Kepala SPPG ' . uniqid(),
-            'email' => 'kepala_' . uniqid() . '@sppg.id',
+            'nama' => 'Test Kepala SPPG '.uniqid(),
+            'email' => 'kepala_'.uniqid().'@sppg.id',
             'password' => Hash::make('password123'),
             'role' => 'kepala_sppg',
             'status' => 'aktif',
@@ -47,7 +48,7 @@ class MenuResepTest extends TestCase
 
         $this->sppg = Sppg::create([
             'id_user' => $this->kepalaUser->id_user,
-            'nama_sppg' => 'SPPG Test ' . uniqid(),
+            'nama_sppg' => 'SPPG Test '.uniqid(),
             'no_telepon' => '081234567890',
             'alamat_sppg' => 'Jl Contoh SPPG',
             'provinsi' => 'Jawa Timur',
@@ -60,7 +61,7 @@ class MenuResepTest extends TestCase
         $this->staff = Staff::create([
             'id_sppg' => $this->sppg->id_sppg,
             'nama' => 'Roh Yu-na',
-            'email' => 'staff_' . uniqid() . '@sppg.id',
+            'email' => 'staff_'.uniqid().'@sppg.id',
             'password' => Hash::make('password123'),
             'status' => 'aktif',
         ]);
@@ -96,7 +97,7 @@ class MenuResepTest extends TestCase
 
         $mat1 = Material::create([
             'id_sppg' => $this->sppg->id_sppg,
-            'kode' => 'BRS_' . uniqid(),
+            'kode' => 'BRS_'.uniqid(),
             'nama' => 'Beras putih',
             'satuan' => 'kg',
             'is_active' => true,
@@ -104,7 +105,7 @@ class MenuResepTest extends TestCase
 
         $mat2 = Material::create([
             'id_sppg' => $this->sppg->id_sppg,
-            'kode' => 'TMP_' . uniqid(),
+            'kode' => 'TMP_'.uniqid(),
             'nama' => 'Tempe',
             'satuan' => 'kg',
             'is_active' => true,
@@ -112,7 +113,7 @@ class MenuResepTest extends TestCase
 
         $mat3 = Material::create([
             'id_sppg' => $this->sppg->id_sppg,
-            'kode' => 'BYM_' . uniqid(),
+            'kode' => 'BYM_'.uniqid(),
             'nama' => 'Sayur Bayam',
             'satuan' => 'kg',
             'is_active' => true,

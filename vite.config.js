@@ -22,6 +22,7 @@ export default defineConfig({
                 'resources/css/staff/sidebar-navbar.css',
                 'resources/css/staff/menu-resep.css',
                 'resources/css/staff/purchases.css',
+                'resources/css/staff/riwayat.css',
                 'resources/js/app.js',
                 'resources/js/auth/login.js',
                 'resources/js/auth/register.js',
@@ -33,6 +34,7 @@ export default defineConfig({
                 'resources/js/KepalaSPPG/staff-management.js',
                 'resources/js/KepalaSPPG/profile-modals.js',
                 'resources/js/staff/menu-resep.js',
+                'resources/js/staff/riwayat.js',
             ],
             refresh: true,
             fonts: [

@@ -8,13 +8,18 @@ use Illuminate\Database\Schema\ForeignKeyDefinition;
 class Keys
 {
     public const SPPG_TABLE = 'sppg';      // nama tabel SPPG
-    public const SPPG_PK    = 'id_sppg';   // nama kolom primary key SPPG
-    public const SPPG_TYPE  = 'bigint';    // tipe PK: 'bigint' | 'int' | 'uuid'
+
+    public const SPPG_PK = 'id_sppg';   // nama kolom primary key SPPG
+
+    public const SPPG_TYPE = 'bigint';    // tipe PK: 'bigint' | 'int' | 'uuid'
+
     public const SPPG_OWNER = 'id_user';   // kolom di tabel SPPG yang menunjuk ke user pemiliknya
 
     public const USER_TABLE = 'users';     // nama tabel user
-    public const USER_PK    = 'id_user';   // nama kolom primary key user
-    public const USER_TYPE  = 'bigint';    // tipe PK: 'bigint' | 'int' | 'uuid'
+
+    public const USER_PK = 'id_user';   // nama kolom primary key user
+
+    public const USER_TYPE = 'bigint';    // tipe PK: 'bigint' | 'int' | 'uuid'
 
     public static function sppg(Blueprint $t, string $column = 'id_sppg', bool $nullable = false): ForeignKeyDefinition
     {
@@ -46,8 +51,8 @@ class Keys
         bool $index = true
     ): ForeignKeyDefinition {
         $col = match ($type) {
-            'uuid'  => $t->uuid($column),
-            'int'   => $t->unsignedInteger($column),
+            'uuid' => $t->uuid($column),
+            'int' => $t->unsignedInteger($column),
             default => $t->unsignedBigInteger($column),
         };
 
