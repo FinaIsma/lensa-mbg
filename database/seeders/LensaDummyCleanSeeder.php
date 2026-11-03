@@ -7,7 +7,6 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-
 class LensaDummyCleanSeeder extends Seeder
 {
     private array $tables = [
@@ -21,6 +20,7 @@ class LensaDummyCleanSeeder extends Seeder
     {
         if (! $this->command->confirm('Ini menghapus SEMUA data tabel Lensa MBG (termasuk yang bukan dummy). Lanjut?', false)) {
             $this->command->info('Dibatalkan.');
+
             return;
         }
 
@@ -35,6 +35,6 @@ class LensaDummyCleanSeeder extends Seeder
             }
         });
 
-        $this->command->info('Data Lensa MBG dikosongkan. Tabel ' . Keys::SPPG_TABLE . ', ' . Keys::USER_TABLE . ' dan staff asli tidak disentuh.');
+        $this->command->info('Data Lensa MBG dikosongkan. Tabel '.Keys::SPPG_TABLE.', '.Keys::USER_TABLE.' dan staff asli tidak disentuh.');
     }
 }

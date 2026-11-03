@@ -9,31 +9,44 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
-
 class LensaDummySeeder extends Seeder
 {
     private DateTimeImmutable $today;
+
     private $sppg;
+
     private $user;
+
     private $userNama;
+
     private $staff;
+
     private $staffNama;
 
     /** @var array<string,int> kode bahan => id material */
     private array $mat = [];
+
     /** @var array<string,array> kunci lot => data lot (id, cost, qty, ...) */
     private array $lots = [];
+
     /** @var array<string,array<string,array<string,float>>> menu => ukuran => bahan => qty per porsi */
     private array $rate = [];
+
     /** @var array<string,array<string,int>> menu => ukuran => id resep */
     private array $recipe = [];
+
     private array $menu = [];
+
     private array $dest = [];
+
     private array $sup = [];
 
     private int $poSeq = 0;
+
     private int $lotSeq = 0;
+
     private int $batchSeq = 0;
+
     private int $corSeq = 0;
 
     private array $noTs = ['stock_movements', 'audit_trails'];
@@ -49,7 +62,8 @@ class LensaDummySeeder extends Seeder
         $this->sppg = $this->sppg ?: DB::table(Keys::SPPG_TABLE)->orderBy(Keys::SPPG_PK)->value(Keys::SPPG_PK);
 
         if (! $this->sppg) {
-            $this->command->error('Tabel ' . Keys::SPPG_TABLE . ' masih kosong. Daftarkan minimal 1 SPPG dulu.');
+            $this->command->error('Tabel '.Keys::SPPG_TABLE.' masih kosong. Daftarkan minimal 1 SPPG dulu.');
+
             return;
         }
 
@@ -57,13 +71,15 @@ class LensaDummySeeder extends Seeder
             ?: DB::table(Keys::USER_TABLE)->orderBy(Keys::USER_PK)->value(Keys::USER_PK);
 
         if (! $this->user) {
-            $this->command->error('Tabel ' . Keys::USER_TABLE . ' masih kosong.');
+            $this->command->error('Tabel '.Keys::USER_TABLE.' masih kosong.');
+
             return;
         }
 
         if (DB::table('suppliers')->exists()) {
             $this->command->warn('Tabel suppliers sudah berisi. Seeder dibatalkan agar data yang ada tidak tercampur. '
-                . 'Jalankan LensaDummyCleanSeeder dulu jika ingin mengulang dari nol.');
+                .'Jalankan LensaDummyCleanSeeder dulu jika ingin mengulang dari nol.');
+
             return;
         }
 
@@ -74,7 +90,7 @@ class LensaDummySeeder extends Seeder
             if (! $this->staff) {
                 $now = $this->t(0, '07:00:00');
                 $this->staff = DB::table('staff')->insertGetId([
-                    'id_sppg' => $this->sppg, 'nama' => 'Staff Dummy', 'email' => 'staff.dummy.' . $this->sppg . '@lensa.test',
+                    'id_sppg' => $this->sppg, 'nama' => 'Staff Dummy', 'email' => 'staff.dummy.'.$this->sppg.'@lensa.test',
                     'password' => Hash::make('password'), 'status' => 'aktif', 'created_at' => $now, 'updated_at' => $now,
                 ]);
             }
@@ -86,7 +102,7 @@ class LensaDummySeeder extends Seeder
             $this->corrections();
         });
 
-        $this->command->info('Data dummy Lensa MBG selesai dibuat untuk SPPG id=' . $this->sppg . '.');
+        $this->command->info('Data dummy Lensa MBG selesai dibuat untuk SPPG id='.$this->sppg.'.');
     }
 
     private function master(): void
@@ -99,8 +115,8 @@ class LensaDummySeeder extends Seeder
             ['SJ', 'Toko Sembako Jaya', 'inactive'],
         ] as [$k, $nama, $status]) {
             $this->sup[$k] = $this->ins('suppliers', [
-                'id_sppg' => $this->sppg, 'nama' => $nama, 'kontak' => '0812-' . random_int(1000, 9999) . '-' . random_int(1000, 9999),
-                'alamat' => 'Jl. Pasar Induk No. ' . random_int(1, 40), 'status' => $status,
+                'id_sppg' => $this->sppg, 'nama' => $nama, 'kontak' => '0812-'.random_int(1000, 9999).'-'.random_int(1000, 9999),
+                'alamat' => 'Jl. Pasar Induk No. '.random_int(1, 40), 'status' => $status,
             ]);
         }
 
@@ -128,7 +144,7 @@ class LensaDummySeeder extends Seeder
         ] as [$k, $nama, $gizi]) {
             $this->menu[$k] = $this->ins('menus', [
                 'id_sppg' => $this->sppg, 'nama' => $nama, 'kategori' => 'Makan siang',
-                'deskripsi' => 'Menu makan bergizi gratis: ' . strtolower($nama) . '.', 'gizi' => $gizi, 'is_active' => true,
+                'deskripsi' => 'Menu makan bergizi gratis: '.strtolower($nama).'.', 'gizi' => $gizi, 'is_active' => true,
             ]);
         }
 
@@ -244,26 +260,26 @@ class LensaDummySeeder extends Seeder
 
         $this->ins('evidences', [
             'uploaded_by' => $this->staff, 'evidenceable_type' => 'receivings', 'evidenceable_id' => $rcvId,
-            'file_path' => 'evidence/receiving/' . $rcvNo . '-barang.jpg', 'file_type' => 'image/jpeg',
+            'file_path' => 'evidence/receiving/'.$rcvNo.'-barang.jpg', 'file_type' => 'image/jpeg',
             'description' => 'Foto bahan saat diterima', 'is_public' => false, 'uploaded_at' => $this->t($rd, '09:20:00'),
         ]);
         $this->ins('evidences', [
             'uploaded_by' => $this->staff, 'evidenceable_type' => 'receivings', 'evidenceable_id' => $rcvId,
-            'file_path' => 'evidence/receiving/' . $rcvNo . '-surat-jalan.pdf', 'file_type' => 'application/pdf',
+            'file_path' => 'evidence/receiving/'.$rcvNo.'-surat-jalan.pdf', 'file_type' => 'application/pdf',
             'description' => 'Surat jalan', 'is_public' => false, 'uploaded_at' => $this->t($rd, '09:22:00'),
         ]);
 
         foreach ($items as $i => [$matKey, $qty, $price, $expOffset, $lotKey]) {
             $riId = $this->ins('receiving_items', [
                 'receiving_id' => $rcvId, 'purchase_item_id' => $piIds[$i], 'material_id' => $this->mat[$matKey],
-                'qty_received' => $qty, 'lot_number_input' => 'LT-' . $matKey . '-' . $this->ymd($rd),
+                'qty_received' => $qty, 'lot_number_input' => 'LT-'.$matKey.'-'.$this->ymd($rd),
                 'expiry_date_input' => $this->d($expOffset), 'kondisi_dilaporkan' => 'Kondisi baik, kemasan utuh',
                 'created_at' => $this->t($rd, '09:15:00'),
             ]);
 
             $lotId = $this->ins('material_lots', [
                 'receiving_item_id' => $riId, 'material_id' => $this->mat[$matKey], 'supplier_id' => $this->sup[$supKey],
-                'id_sppg' => $this->sppg, 'lot_number' => 'LT-' . $matKey . '-' . $this->ymd($rd),
+                'id_sppg' => $this->sppg, 'lot_number' => 'LT-'.$matKey.'-'.$this->ymd($rd),
                 'barcode' => sprintf('LOT-%s-%03d', $this->ymd($rd), ++$this->lotSeq),
                 'received_date' => $this->d($rd), 'expiry_date' => $this->d($expOffset),
                 'initial_qty' => $qty, 'current_qty' => 0, 'unit_cost' => $price, // current_qty terisi lewat RECEIVE_IN
@@ -383,8 +399,8 @@ class LensaDummySeeder extends Seeder
             foreach ([1 => 'pemasakan', 2 => 'pengemasan'] as $i => $label) {
                 $this->ins('evidences', [
                     'uploaded_by' => $this->staff, 'evidenceable_type' => 'processing_steps', 'evidenceable_id' => $ids[$i],
-                    'file_path' => 'evidence/processing/batch' . $batchId . '-' . $label . '.jpg', 'file_type' => 'image/jpeg',
-                    'description' => 'Foto tahap ' . $label, 'is_public' => true, 'uploaded_at' => $this->t($day, '09:30:00'),
+                    'file_path' => 'evidence/processing/batch'.$batchId.'-'.$label.'.jpg', 'file_type' => 'image/jpeg',
+                    'description' => 'Foto tahap '.$label, 'is_public' => true, 'uploaded_at' => $this->t($day, '09:30:00'),
                 ]);
             }
         }
@@ -400,6 +416,7 @@ class LensaDummySeeder extends Seeder
                 'status' => $status, 'note' => null, 'created_at' => $this->t($day, $start),
             ]);
         }
+
         return $ids;
     }
 
@@ -416,7 +433,7 @@ class LensaDummySeeder extends Seeder
         if ($withEvidence) {
             $this->ins('evidences', [
                 'uploaded_by' => $this->staff, 'evidenceable_type' => 'pre_distribution_checks', 'evidenceable_id' => $pid,
-                'file_path' => 'evidence/pre-distribution/batch' . $batchId . '.jpg', 'file_type' => 'image/jpeg',
+                'file_path' => 'evidence/pre-distribution/batch'.$batchId.'.jpg', 'file_type' => 'image/jpeg',
                 'description' => 'Foto hasil produksi siap kirim', 'is_public' => true, 'uploaded_at' => $this->t($day, '10:50:00'),
             ]);
         }
@@ -433,7 +450,7 @@ class LensaDummySeeder extends Seeder
         if ($withEvidence) {
             $this->ins('evidences', [
                 'uploaded_by' => $this->staff, 'evidenceable_type' => 'distributions', 'evidenceable_id' => $id,
-                'file_path' => 'evidence/distribution/dist' . $id . '.jpg', 'file_type' => 'image/jpeg',
+                'file_path' => 'evidence/distribution/dist'.$id.'.jpg', 'file_type' => 'image/jpeg',
                 'description' => 'Foto serah terima di lokasi', 'is_public' => true, 'uploaded_at' => $this->t($day, $time),
             ]);
         }
@@ -473,7 +490,7 @@ class LensaDummySeeder extends Seeder
 
         // C2 - APPLIED: expiry telur salah ketik (+14), dikoreksi menjadi +12. Perubahan benar-benar diterapkan.
         $c2 = $this->correction('receiving_items', $this->lots['TLR#1']['ri'], 'expiry_date_input', $this->d(14), $this->d(12),
-            'Tanggal kedaluwarsa pada kemasan telur tertulis ' . $this->d(12) . ', salah ketik saat penerimaan.', 'applied', -4,
+            'Tanggal kedaluwarsa pada kemasan telur tertulis '.$this->d(12).', salah ketik saat penerimaan.', 'applied', -4,
             'Sesuai foto kemasan. Disetujui.');
         $this->corrEvidence($c2, 'foto-kemasan-telur.jpg', -4);
         DB::table('receiving_items')->where('id', $this->lots['TLR#1']['ri'])->update(['expiry_date_input' => $this->d(12)]);
@@ -496,9 +513,10 @@ class LensaDummySeeder extends Seeder
     }
 
     private function correction(string $table, int $targetId, string $field, string $old, string $new, string $reason,
-                                string $status, int $day, ?string $note): int
+        string $status, int $day, ?string $note): int
     {
         $reviewed = $status !== 'pending';
+
         return $this->ins('correction_requests', [
             'id_sppg' => $this->sppg, 'requested_by' => $this->staff, 'reviewed_by' => $reviewed ? $this->user : null,
             'request_no' => sprintf('COR-%s-%03d', $this->ymd($day), ++$this->corSeq),
@@ -516,7 +534,7 @@ class LensaDummySeeder extends Seeder
     {
         $this->ins('evidences', [
             'uploaded_by' => $this->staff, 'evidenceable_type' => 'correction_requests', 'evidenceable_id' => $corId,
-            'file_path' => 'evidence/correction/' . $file, 'file_type' => $type,
+            'file_path' => 'evidence/correction/'.$file, 'file_type' => $type,
             'description' => 'Bukti pendukung koreksi', 'is_public' => false, 'uploaded_at' => $this->t($day, '09:05:00'),
         ]);
     }
@@ -540,6 +558,7 @@ class LensaDummySeeder extends Seeder
                     'current_qty' => $this->lots[$key]['qty'],
                     'status' => $this->lots[$key]['qty'] <= 0 ? 'depleted' : 'available',
                 ]);
+
                 return;
             }
         }
@@ -575,7 +594,7 @@ class LensaDummySeeder extends Seeder
 
     private function t(int $offset, string $time = '08:00:00'): string
     {
-        return $this->d($offset) . ' ' . $time;
+        return $this->d($offset).' '.$time;
     }
 
     private function ymd(int $offset): string

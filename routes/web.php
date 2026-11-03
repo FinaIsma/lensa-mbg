@@ -14,6 +14,7 @@ use App\Http\Controllers\Staff\LotController;
 use App\Http\Controllers\Staff\MenuResepController;
 use App\Http\Controllers\Staff\PurchaseController;
 use App\Http\Controllers\Staff\ReceivingController;
+use App\Http\Controllers\Staff\RiwayatController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
 
@@ -143,11 +144,12 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::get('/penerimaan/{id}/barcode', [ReceivingController::class, 'printAllBarcodes'])->name('receivings.barcode-all');
     Route::get('/penerimaan/{id}/barcode/{lotId}', [ReceivingController::class, 'printBarcode'])->name('receivings.barcode');
 
-    // Stok - Lot Bahan
+    // Stok - Lot Bahan & Riwayat
     Route::get('/lot', [LotController::class, 'index'])->name('lots.index');
     Route::get('/lot/barcode/{barcode?}', [LotController::class, 'findByBarcode'])->name('lots.find-by-barcode')->where('barcode', '.*');
     Route::get('/lot/{id}', [LotController::class, 'show'])->name('lots.show')->whereNumber('id');
     Route::get('/lot/{id}/print', [LotController::class, 'print'])->name('lots.print')->whereNumber('id');
+    Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
 
     // Ubah Kata Sandi Staff
     Route::post('/ubah-kata-sandi', [ProfileController::class, 'updatePassword'])->name('password.update');

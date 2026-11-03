@@ -1,0 +1,94 @@
+/* ==========================================================================
+   Modul Riwayat Mutasi Stok Bahan - Staff SPPG
+   ========================================================================== */
+
+/* Filter Search & Dropdowns */
+.riwayat-search-box {
+    flex: 1;
+    max-width: 420px;
+}
+
+.riwayat-select-box {
+    min-width: 160px;
+}
+
+.riwayat-select {
+    padding-right: 2.25rem !important;
+}
+
+/* Tabel Riwayat Stok */
+.riwayat-table {
+    width: 100%;
+    table-layout: auto;
+}
+
+.riwayat-th {
+    font-weight: 700;
+    color: #071E49;
+    white-space: nowrap;
+}
+
+.riwayat-th-material {
+    font-weight: 700;
+    color: #071E49;
+}
+
+.riwayat-cell-time {
+    color: #334155;
+    font-size: 13.5px;
+    white-space: nowrap;
+}
+
+.riwayat-cell-primary {
+    font-weight: 600;
+    color: #071E49;
+    white-space: nowrap;
+}
+
+.riwayat-cell-text {
+    color: #334155;
+    white-space: nowrap;
+}
+
+.riwayat-cell-badge {
+    white-space: nowrap;
+}
+
+.riwayat-cell-qty {
+    font-weight: 700;
+    font-size: 13.5px;
+    white-space: nowrap;
+}
+
+.riwayat-qty-in {
+    color: #16A34A;
+}
+
+.riwayat-qty-out {
+    color: #DC2626;
+}
+
+/* Empty State */
+.riwayat-empty-state {
+    padding: 48px 20px;
+    text-align: center;
+    color: #64748B;
+}
+
+.riwayat-empty-icon {
+    margin: 0 auto 12px;
+    display: block;
+}
+
+.riwayat-empty-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #071E49;
+    margin-bottom: 4px;
+}
+
+.riwayat-empty-desc {
+    font-size: 13px;
+    color: #64748B;
+}
+

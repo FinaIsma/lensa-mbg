@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 
 class WilayahController extends Controller
 {
@@ -15,19 +13,22 @@ class WilayahController extends Controller
         $path = public_path('data_wilayah.json');
         if (file_exists($path)) {
             $content = file_get_contents($path);
+
             return json_decode($content, true);
         }
+
         return null;
     }
 
     public function getProvinces()
     {
         $local = $this->getLocalData();
-        if ($local && !empty($local['provinces'])) {
+        if ($local && ! empty($local['provinces'])) {
             $provinces = $local['provinces'];
             if (isset($provinces['value'])) {
                 $provinces = $provinces['value'];
             }
+
             return response()->json($provinces);
         }
 
@@ -35,9 +36,11 @@ class WilayahController extends Controller
             $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseApi}/provinces.json");
             if ($response->successful()) {
                 $json = $response->json();
+
                 return response()->json(isset($json['value']) ? $json['value'] : $json);
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         return response()->json([
             ['id' => '11', 'name' => 'ACEH'],
@@ -77,18 +80,19 @@ class WilayahController extends Controller
             ['id' => '93', 'name' => 'PAPUA SELATAN'],
             ['id' => '94', 'name' => 'PAPUA TENGAH'],
             ['id' => '95', 'name' => 'PAPUA PEGUNUNGAN'],
-            ['id' => '96', 'name' => 'PAPUA BARAT DAYA']
+            ['id' => '96', 'name' => 'PAPUA BARAT DAYA'],
         ]);
     }
 
     public function getRegencies($provinceId)
     {
         $local = $this->getLocalData();
-        if ($local && !empty($local['regencies'][$provinceId])) {
+        if ($local && ! empty($local['regencies'][$provinceId])) {
             $regencies = $local['regencies'][$provinceId];
             if (isset($regencies['value'])) {
                 $regencies = $regencies['value'];
             }
+
             return response()->json($regencies);
         }
 
@@ -96,9 +100,11 @@ class WilayahController extends Controller
             $response = Http::withoutVerifying()->timeout(5)->get("{$this->baseApi}/regencies/{$provinceId}.json");
             if ($response->successful()) {
                 $json = $response->json();
+
                 return response()->json(isset($json['value']) ? $json['value'] : $json);
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         return response()->json([]);
     }
@@ -115,6 +121,7 @@ class WilayahController extends Controller
                     if (isset($item['value'])) {
                         $item = $item['value'];
                     }
+
                     return response()->json($item);
                 }
             }
@@ -124,9 +131,11 @@ class WilayahController extends Controller
             $response = Http::withoutVerifying()->timeout(3)->get("{$this->baseApi}/districts/{$regencyId}.json");
             if ($response->successful()) {
                 $json = $response->json();
+
                 return response()->json(isset($json['value']) ? $json['value'] : $json);
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         return response()->json([]);
     }

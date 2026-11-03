@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Recipe extends Model
 {
@@ -40,14 +41,14 @@ class Recipe extends Model
      */
     public function isUsedInBatch(): bool
     {
-        return \Illuminate\Support\Facades\DB::table('production_batches')
+        return DB::table('production_batches')
             ->where('recipe_id', $this->id)
             ->exists();
     }
 
     public function getFormattedIdAttribute(): string
     {
-        return 'RS' . str_pad((string) $this->id, 2, '0', STR_PAD_LEFT);
+        return 'RS'.str_pad((string) $this->id, 2, '0', STR_PAD_LEFT);
     }
 
     public function getBahanListAttribute(): string

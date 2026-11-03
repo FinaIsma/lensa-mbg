@@ -21,7 +21,7 @@ class SupabaseStorageServiceTest extends TestCase
             'https://test-project.supabase.co/storage/v1/object/register/*' => Http::response(['Key' => 'register/ktp/test.jpg'], 200),
         ]);
 
-        $service = new SupabaseStorageService();
+        $service = new SupabaseStorageService;
         $file = UploadedFile::fake()->image('test.jpg');
 
         $url = $service->upload($file, 'ktp', 'register');
@@ -35,7 +35,7 @@ class SupabaseStorageServiceTest extends TestCase
             'services.supabase.key' => '',
         ]);
 
-        $service = new SupabaseStorageService();
+        $service = new SupabaseStorageService;
         $file = UploadedFile::fake()->image('test.jpg');
 
         $this->expectException(\Exception::class);

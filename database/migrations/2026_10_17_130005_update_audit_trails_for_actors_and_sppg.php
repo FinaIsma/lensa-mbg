@@ -2,9 +2,7 @@
 
 use App\Support\Keys;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -32,8 +30,11 @@ return new class extends Migration
 
     public function up(): void
     {
-        $u = Keys::USER_TABLE; $upk = Keys::USER_PK;
-        $s = Keys::SPPG_TABLE; $spk = Keys::SPPG_PK; $sown = Keys::SPPG_OWNER;
+        $u = Keys::USER_TABLE;
+        $upk = Keys::USER_PK;
+        $s = Keys::SPPG_TABLE;
+        $spk = Keys::SPPG_PK;
+        $sown = Keys::SPPG_OWNER;
 
         DB::statement('ALTER TABLE audit_trails
             ADD COLUMN id_sppg bigint NULL,
@@ -59,10 +60,11 @@ return new class extends Migration
 
     public function down(): void
     {
-        $u = Keys::USER_TABLE; $upk = Keys::USER_PK;
+        $u = Keys::USER_TABLE;
+        $upk = Keys::USER_PK;
 
         // Baris dengan aksi baru atau pelaku staff tidak punya padanan di skema lama: dihapus agar rollback bisa jalan.
-        DB::statement("DELETE FROM audit_trails WHERE actor_type = 'staff' OR action IN ('" . implode("', '", $this->aksiBaru) . "')");
+        DB::statement("DELETE FROM audit_trails WHERE actor_type = 'staff' OR action IN ('".implode("', '", $this->aksiBaru)."')");
 
         $this->setAksi($this->aksiLama);
 
