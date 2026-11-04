@@ -304,9 +304,15 @@ class ProfileController extends Controller
 
             DB::commit();
 
+            // Logout Kepala SPPG agar tidak dapat melanjutkan sesi selama menunggu verifikasi Admin
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
             return response()->json([
                 'success' => true,
-                'message' => 'Pengajuan perubahan data berhasil dikirim dan akan diverifikasi oleh Admin Sistem.',
+                'message' => 'Pengajuan perubahan data berhasil dikirim dan sedang menunggu verifikasi Admin Sistem. Akun Anda telah dikeluarkan dan tidak dapat login sampai perubahan disetujui.',
+                'redirect_url' => route('login'),
                 'data' => [
                     'nama_lengkap' => $validated['nama_lengkap'],
                     'email' => $validated['email'],

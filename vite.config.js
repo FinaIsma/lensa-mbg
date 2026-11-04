@@ -25,6 +25,7 @@ export default defineConfig({
                 'resources/css/staff/riwayat.css',
                 'resources/css/staff/lots.css',
                 'resources/css/staff/lots-print.css',
+                'resources/css/staff/pemasok.css',
                 'resources/js/app.js',
                 'resources/js/auth/login.js',
                 'resources/js/auth/register.js',
@@ -39,6 +40,7 @@ export default defineConfig({
                 'resources/js/staff/riwayat.js',
                 'resources/js/staff/lots.js',
                 'resources/js/staff/lots-print.js',
+                'resources/js/staff/pemasok.js',
             ],
             refresh: true,
             fonts: [

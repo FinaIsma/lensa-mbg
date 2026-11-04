@@ -371,6 +371,9 @@ class SppgManagementController extends Controller
                     } elseif ($sppg->status_verifikasi === 'perubahan') {
                         $sppg->status_verifikasi = 'terverifikasi';
                         $sppg->status = 'aktif';
+                        if ($sppg->user) {
+                            $sppg->user->update(['status' => 'aktif']);
+                        }
                         $aksi = 'kepala_change_reject';
 
                         $reviewNote = $request->input('review_note') ?: 'Pengajuan penambahan staff ditolak oleh Administrator.';

@@ -19,10 +19,12 @@
         'resources/css/staff/purchases.css',
         'resources/css/staff/riwayat.css',
         'resources/css/staff/lots.css',
+        'resources/css/staff/pemasok.css',
         'resources/js/app.js',
         'resources/js/staff/menu-resep.js',
         'resources/js/staff/riwayat.js',
         'resources/js/staff/lots.js',
+        'resources/js/staff/pemasok.js',
         'resources/js/KepalaSPPG/profile-modals.js',
     ])
 

@@ -15,6 +15,7 @@ use App\Http\Controllers\Staff\MenuResepController;
 use App\Http\Controllers\Staff\PurchaseController;
 use App\Http\Controllers\Staff\ReceivingController;
 use App\Http\Controllers\Staff\RiwayatController;
+use App\Http\Controllers\Staff\SupplierController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
 
@@ -106,6 +107,13 @@ Route::middleware(['role:kepala_sppg'])->prefix('sppg')->name('sppg.')->group(fu
 
 Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->group(function () {
     Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+
+    // Data Master - Pemasok
+    Route::get('/pemasok', [SupplierController::class, 'index'])->name('suppliers.index');
+    Route::post('/pemasok', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::get('/pemasok/{id}', [SupplierController::class, 'show'])->name('suppliers.show');
+    Route::put('/pemasok/{id}', [SupplierController::class, 'update'])->name('suppliers.update');
+    Route::post('/pemasok/{id}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('suppliers.toggle');
 
     // Data Master - Menu & Resep
     Route::get('/menu-resep', [MenuResepController::class, 'index'])->name('menu-resep.index');
