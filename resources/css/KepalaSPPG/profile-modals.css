@@ -46,6 +46,7 @@
         opacity: 0;
         transform: translateY(14px) scale(0.98);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -693,26 +694,33 @@
     .pm-dialog {
         padding: 16px 14px;
     }
+
     .pm-docs-grid,
     .mv2-doc-grid {
         grid-template-columns: 1fr;
     }
+
     .pm-edit-row {
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
     }
-    .pm-edit-label, .pm-view-label {
+
+    .pm-edit-label,
+    .pm-view-label {
         width: 100%;
     }
+
     .pm-edit-input-wrapper {
         width: 100%;
     }
+
     .pm-footer {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
+
     .pm-footer-actions {
         justify-content: flex-end;
     }
@@ -762,6 +770,7 @@
         transform: scale(0.9);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -860,4 +869,3 @@
 .pm-alert-btn:active {
     transform: scale(0.98);
 }
-

@@ -647,7 +647,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     message: result.message || 'Pengajuan perubahan data berhasil dikirim dan akan diverifikasi oleh Admin Sistem.',
                     type: 'success',
                     onConfirm: function () {
-                        window.location.reload();
+                        if (result.redirect_url) {
+                            window.location.href = result.redirect_url;
+                        } else {
+                            window.location.reload();
+                        }
                     },
                 });
 

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 class LoginController extends Controller
 {
@@ -18,8 +20,39 @@ class LoginController extends Controller
                 return redirect()->route('admin.dashboard');
             }
 
-            if ($user->role === 'kepala_sppg' && Route::has('sppg.dashboard')) {
-                return redirect()->route('sppg.dashboard');
+            if ($user->role === 'kepala_sppg') {
+                $sppg = $user->sppg;
+                $hasPendingChange = false;
+                if (Schema::hasTable('kepala_change_requests') && $sppg) {
+                    $hasPendingChange = DB::table('kepala_change_requests')
+                        ->where('id_sppg', $sppg->id_sppg)
+                        ->where('status', 'pending')
+                        ->exists();
+                }
+
+                if ($user->status === 'menunggu_verifikasi' || ($sppg && $sppg->status_verifikasi === 'menunggu_verifikasi')) {
+                    Auth::logout();
+                    request()->session()->invalidate();
+                    request()->session()->regenerateToken();
+
+                    return redirect()->route('login')->withErrors([
+                        'sppg_status' => 'Akun Kepala SPPG Anda masih menunggu verifikasi Admin.',
+                    ]);
+                }
+
+                if (($sppg && $sppg->status_verifikasi === 'perubahan') || $hasPendingChange) {
+                    Auth::logout();
+                    request()->session()->invalidate();
+                    request()->session()->regenerateToken();
+
+                    return redirect()->route('login')->withErrors([
+                        'sppg_status' => 'Pengajuan perubahan data profil SPPG Anda sedang dalam proses verifikasi oleh Admin Sistem. Anda belum dapat login sampai perubahan disetujui.',
+                    ]);
+                }
+
+                if (Route::has('sppg.dashboard')) {
+                    return redirect()->route('sppg.dashboard');
+                }
             }
 
             if ($user->role === 'staff' && Route::has('staff.dashboard')) {
@@ -65,20 +98,45 @@ class LoginController extends Controller
             'role' => 'kepala_sppg',
         ], $request->boolean('remember'))) {
             $user = Auth::user();
+            $sppg = $user->sppg;
 
-            if ($user->status !== 'aktif') {
+            // 1. Cek jika akun / SPPG masih menunggu verifikasi pendaftaran awal
+            if ($user->status === 'menunggu_verifikasi' || ($sppg && $sppg->status_verifikasi === 'menunggu_verifikasi')) {
                 Auth::logout();
 
-                $message = $user->status === 'menunggu_verifikasi'
-                    ? 'Akun Kepala SPPG Anda masih menunggu verifikasi Admin.'
-                    : 'Akun Anda sedang dinonaktifkan. Silakan hubungi Administrator.';
-
                 return back()->withErrors([
-                    'sppg_status' => $message,
+                    'sppg_status' => 'Akun Kepala SPPG Anda masih menunggu verifikasi Admin.',
                 ])->withInput();
             }
 
-            if ($user->sppg && $user->sppg->status !== 'aktif') {
+            // 2. Cek jika Kepala SPPG sedang menunggu verifikasi perubahan profil
+            $hasPendingChange = false;
+            if (Schema::hasTable('kepala_change_requests') && $sppg) {
+                $hasPendingChange = DB::table('kepala_change_requests')
+                    ->where('id_sppg', $sppg->id_sppg)
+                    ->where('status', 'pending')
+                    ->exists();
+            }
+
+            if (($sppg && $sppg->status_verifikasi === 'perubahan') || $hasPendingChange) {
+                Auth::logout();
+
+                return back()->withErrors([
+                    'sppg_status' => 'Pengajuan perubahan data profil SPPG Anda sedang dalam proses verifikasi oleh Admin Sistem. Anda belum dapat login sampai perubahan disetujui.',
+                ])->withInput();
+            }
+
+            // 3. Cek jika akun dinonaktifkan
+            if ($user->status !== 'aktif') {
+                Auth::logout();
+
+                return back()->withErrors([
+                    'sppg_status' => 'Akun Anda sedang dinonaktifkan. Silakan hubungi Administrator.',
+                ])->withInput();
+            }
+
+            // 4. Cek jika layanan SPPG dinonaktifkan
+            if ($sppg && $sppg->status !== 'aktif') {
                 Auth::logout();
 
                 return back()->withErrors([
