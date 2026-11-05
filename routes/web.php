@@ -11,6 +11,7 @@ use App\Http\Controllers\KepalaSPPG\ProfileController;
 use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\LotController;
+use App\Http\Controllers\Staff\MaterialController;
 use App\Http\Controllers\Staff\MenuResepController;
 use App\Http\Controllers\Staff\PurchaseController;
 use App\Http\Controllers\Staff\ReceivingController;
@@ -114,6 +115,13 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::get('/pemasok/{id}', [SupplierController::class, 'show'])->name('suppliers.show');
     Route::put('/pemasok/{id}', [SupplierController::class, 'update'])->name('suppliers.update');
     Route::post('/pemasok/{id}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('suppliers.toggle');
+
+    // Data Master - Bahan
+    Route::get('/bahan', [MaterialController::class, 'index'])->name('materials.index');
+    Route::post('/bahan', [MaterialController::class, 'store'])->name('materials.store');
+    Route::get('/bahan/{id}', [MaterialController::class, 'show'])->name('materials.show');
+    Route::put('/bahan/{id}', [MaterialController::class, 'update'])->name('materials.update');
+    Route::post('/bahan/{id}/toggle-status', [MaterialController::class, 'toggleStatus'])->name('materials.toggle');
 
     // Data Master - Menu & Resep
     Route::get('/menu-resep', [MenuResepController::class, 'index'])->name('menu-resep.index');
