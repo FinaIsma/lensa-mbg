@@ -262,7 +262,22 @@
                     <label style="display: block; font-size: 12.5px; font-weight: 600; color: #071E49; margin-bottom: 5px;">
                         Foto Bukti Limbah / Sisa <span style="font-size: 11px; font-weight: 400; color: #94A3B8;">(Opsional)</span>
                     </label>
-                    <input type="file" name="evidence_file" accept="image/*" class="form-input" style="width: 100%; font-size: 12px; padding: 6px; border-radius: 8px; border: 1px solid #CBD5E1; background: #FFFFFF;">
+                    <div class="hasil-upload-dropzone">
+                        <input type="file" name="evidence_file" id="susut_evidence_file_input" accept="image/*" onchange="previewEvidenceImage(this)" style="display: none;">
+                        <label for="susut_evidence_file_input" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                            <div style="width: 38px; height: 38px; border-radius: 50%; background: #EFF6FF; color: #0284C7; display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div>
+                                <span style="font-size: 12.5px; font-weight: 600; color: #071E49;">Pilih file foto bukti</span>
+                                <span style="font-size: 11.5px; color: #64748B;"> atau seret ke sini</span>
+                            </div>
+                            <span style="font-size: 11px; color: #94A3B8;">Format JPG, PNG, WEBP maks. 5MB</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 

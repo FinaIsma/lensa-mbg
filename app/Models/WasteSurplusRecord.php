@@ -42,6 +42,11 @@ class WasteSurplusRecord extends Model
         return $this->belongsTo(MaterialLot::class, 'material_lot_id');
     }
 
+    public function distribution(): BelongsTo
+    {
+        return $this->belongsTo(Distribution::class, 'distribution_id');
+    }
+
     public function recorder(): BelongsTo
     {
         return $this->belongsTo(Staff::class, 'recorded_by');
@@ -56,6 +61,43 @@ class WasteSurplusRecord extends Model
     {
         return $this->hasMany(Evidence::class, 'evidenceable_id', 'id')
             ->where('evidenceable_type', 'waste_surplus_records');
+    }
+
+    public function correctionRequests(): HasMany
+    {
+        return $this->hasMany(CorrectionRequest::class, 'target_id', 'id')
+            ->where('target_table', 'waste_surplus_records');
+    }
+
+    public function getTypeLabelAttribute(): string
+    {
+        return match ($this->record_type) {
+            'PRODUCTION_LOSS' => 'Susut Olah',
+            'FOOD_WASTE' => 'Makanan Sisa',
+            'SURPLUS' => 'Surplus Porsi',
+            'MATERIAL_DISPOSAL' => 'Bahan Dibuang',
+            default => str_replace('_', ' ', (string) $this->record_type),
+        };
+    }
+
+    public function getTypeBadgeClassAttribute(): string
+    {
+        return match ($this->record_type) {
+            'PRODUCTION_LOSS' => 'chip-type-loss',
+            'FOOD_WASTE' => 'chip-type-waste',
+            'SURPLUS' => 'chip-type-surplus',
+            'MATERIAL_DISPOSAL' => 'chip-type-disposal',
+            default => 'chip-type-default',
+        };
+    }
+
+    public function getSatuanAttribute(): string
+    {
+        if ($this->record_type === 'MATERIAL_DISPOSAL') {
+            return $this->lot?->material?->satuan ?? 'unit';
+        }
+
+        return 'porsi';
     }
 }
 

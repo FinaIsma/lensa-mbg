@@ -1,0 +1,317 @@
+/* ==========================================================================
+   Modul Limbah & Surplus - Staff SPPG Styles
+   ========================================================================== */
+
+/* Modal Backdrop & Dialog khusus modul Limbah */
+.limbah-modal-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(4px) !important;
+    z-index: 99999 !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+}
+
+.limbah-modal-backdrop.open,
+.limbah-modal-backdrop.show {
+    display: flex !important;
+}
+
+.limbah-modal-dialog {
+    background: #FFFFFF !important;
+    width: 100% !important;
+    max-width: 620px !important;
+    max-height: 90vh !important;
+    border-radius: 16px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    animation: limbahModalSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.limbah-modal-dialog.modal-sm {
+    max-width: 500px !important;
+}
+
+@keyframes limbahModalSlide {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ==========================================================================
+   Table Card & Filter Bar (Sesuai Mockup)
+   ========================================================================== */
+.limbah-table-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid #E2E8F0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+}
+
+.limbah-filter-bar {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.limbah-search-box {
+    position: relative;
+    flex: 1;
+    max-width: 440px;
+    min-width: 240px;
+}
+
+.limbah-search-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 16px 0 42px;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    font-size: 13.5px;
+    color: #1E293B;
+    background: #FFFFFF;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.limbah-search-input:focus {
+    border-color: #071E49;
+    box-shadow: 0 0 0 3px rgba(7, 30, 73, 0.1);
+}
+
+.limbah-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    pointer-events: none;
+}
+
+.limbah-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.limbah-select-wrapper {
+    position: relative;
+    min-width: 150px;
+}
+
+.limbah-select {
+    width: 100%;
+    height: 42px;
+    padding: 0 36px 0 16px;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    background: #FFFFFF;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1E293B;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.limbah-select:focus {
+    border-color: #071E49;
+    box-shadow: 0 0 0 3px rgba(7, 30, 73, 0.1);
+}
+
+.limbah-select-chevron {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748B;
+    pointer-events: none;
+}
+
+.btn-catat-limbah {
+    height: 42px;
+    padding: 0 20px;
+    background: #071E49;
+    color: #FFFFFF;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: inherit;
+    text-decoration: none;
+}
+
+.btn-catat-limbah:hover {
+    background: #0B2B68;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(7, 30, 73, 0.2);
+    color: #FFFFFF;
+}
+
+/* ==========================================================================
+   Chip 4 Warna untuk Tipe Limbah
+   ========================================================================== */
+.chip-type-loss {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: #FEF3C7;
+    color: #D97706;
+    font-size: 11.5px;
+    font-weight: 700;
+    border: 1px solid #FDE68A;
+}
+
+.chip-type-waste {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: #FEE2E2;
+    color: #DC2626;
+    font-size: 11.5px;
+    font-weight: 700;
+    border: 1px solid #FECACA;
+}
+
+.chip-type-surplus {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: #EFF6FF;
+    color: #2563EB;
+    font-size: 11.5px;
+    font-weight: 700;
+    border: 1px solid #BFDBFE;
+}
+
+.chip-type-disposal {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: #F3E8FF;
+    color: #7E22CE;
+    font-size: 11.5px;
+    font-weight: 700;
+    border: 1px solid #E9D5FF;
+}
+
+/* Baris Catatan Voided (Abu-abu Redup) */
+tr.row-voided {
+    background-color: #F8FAFC !important;
+    opacity: 0.72;
+}
+
+tr.row-voided td {
+    color: #94A3B8 !important;
+}
+
+tr.row-voided .voided-text {
+    text-decoration: line-through;
+    color: #94A3B8;
+}
+
+/* Badge Status Active & Voided */
+.badge-limbah-active {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: #DCFCE7;
+    color: #15803D;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-limbah-voided {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: #F1F5F9;
+    color: #64748B;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.btn-ajukan-koreksi {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    color: #475569;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-ajukan-koreksi:hover {
+    background: #F8FAFC;
+    border-color: #94A3B8;
+    color: #0F172A;
+}
+
+/* Helper Box Form Modal */
+.limbah-helper-box {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+}
+
+/* Dropzone Upload */
+.limbah-upload-dropzone {
+    border: 2px dashed #CBD5E1;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    background: #F8FAFC;
+    transition: all 0.2s ease;
+}
+
+.limbah-upload-dropzone:hover {
+    border-color: #071E49;
+    background: #F1F5F9;
+}
+

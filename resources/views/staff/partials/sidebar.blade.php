@@ -144,7 +144,7 @@
             </button>
             <div class="nav-subitems">
                 <a href="#" class="nav-subitem" onclick="return false;"><span>Pengiriman</span></a>
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Limbah</span></a>
+                <a href="{{ route('staff.limbah.index') }}" class="nav-subitem {{ request()->routeIs('staff.limbah.*') ? 'active' : '' }}"><span>Limbah</span></a>
             </div>
         </div>
     </nav>
