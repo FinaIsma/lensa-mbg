@@ -12,6 +12,7 @@ use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Staff\BatchController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\HasilController;
+use App\Http\Controllers\Staff\LimbahController;
 use App\Http\Controllers\Staff\DestinationController;
 use App\Http\Controllers\Staff\LotController;
 use App\Http\Controllers\Staff\MaterialController;
@@ -200,6 +201,13 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::get('/hasil/batch/{id}', [HasilController::class, 'getBatchInfo'])->name('hasil.batch-info');
     Route::post('/hasil', [HasilController::class, 'store'])->name('hasil.store');
     Route::post('/hasil/susut', [HasilController::class, 'storeSusut'])->name('hasil.susut.store');
+
+    // Distribusi - Limbah
+    Route::get('/limbah', [LimbahController::class, 'index'])->name('limbah.index');
+    Route::get('/limbah/batch-info/{id}', [LimbahController::class, 'getBatchInfo'])->name('limbah.batch-info');
+    Route::get('/limbah/lot-info/{id}', [LimbahController::class, 'getLotInfo'])->name('limbah.lot-info');
+    Route::post('/limbah', [LimbahController::class, 'store'])->name('limbah.store');
+    Route::post('/limbah/koreksi', [LimbahController::class, 'ajukanKoreksi'])->name('limbah.koreksi');
 
     // Ubah Kata Sandi Staff
     Route::post('/ubah-kata-sandi', [ProfileController::class, 'updatePassword'])->name('password.update');
