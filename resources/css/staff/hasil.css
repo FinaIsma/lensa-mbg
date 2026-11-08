@@ -1,0 +1,311 @@
+/* ==========================================================================
+   Modul Hasil Produksi - Staff SPPG Styles
+   ========================================================================== */
+
+/* Modal Backdrop & Dialog khusus modul Hasil */
+.hasil-modal-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(4px) !important;
+    z-index: 99999 !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+}
+
+.hasil-modal-backdrop.open,
+.hasil-modal-backdrop.show {
+    display: flex !important;
+}
+
+.hasil-modal-dialog {
+    background: #FFFFFF !important;
+    width: 100% !important;
+    max-width: 620px !important;
+    max-height: 90vh !important;
+    border-radius: 16px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    animation: hasilModalSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.hasil-modal-dialog.modal-sm {
+    max-width: 520px !important;
+}
+
+@keyframes hasilModalSlide {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Kartu Ringkasan Batch Hanya Baca */
+.hasil-batch-summary-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.hasil-batch-summary-header {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hasil-batch-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    font-size: 12.5px;
+}
+
+.hasil-batch-summary-item span {
+    color: #64748B;
+    font-size: 11.5px;
+    display: block;
+}
+
+.hasil-batch-summary-item strong {
+    color: #071E49;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Badges Susut di Tabel */
+.chip-susut-loss {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: #FEE2E2;
+    color: #DC2626;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.chip-susut-zero {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: #DCFCE7;
+    color: #15803D;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Tombol Catat Susut Inline */
+.btn-catat-susut-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #D97706;
+    color: #FFFFFF;
+    border: none;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    margin-top: 5px;
+}
+
+.btn-catat-susut-inline:hover {
+    background-color: #B45309;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+}
+
+.badge-susut-recorded {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    color: #16A34A;
+    background: #DCFCE7;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+/* Quick Suggestion Chips */
+.quick-chip-btn {
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.quick-chip-btn:hover {
+    background: #E2E8F0;
+    color: #071E49;
+    border-color: #CBD5E1;
+}
+
+/* Dropzone Upload */
+.hasil-upload-dropzone {
+    border: 2px dashed #CBD5E1;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    background: #F8FAFC;
+    transition: all 0.2s ease;
+}
+
+.hasil-upload-dropzone:hover {
+    border-color: #042A70;
+    background: #F1F5F9;
+}
+
+/* ==========================================================================
+   Table Card & Filter Bar (Sesuai Mockup Pemasok)
+   ========================================================================== */
+.hasil-table-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid #E2E8F0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+}
+
+.hasil-filter-bar {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.hasil-search-box {
+    position: relative;
+    flex: 1;
+    max-width: 440px;
+    min-width: 240px;
+}
+
+.hasil-search-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 16px 0 42px;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    font-size: 13.5px;
+    color: #1E293B;
+    background: #FFFFFF;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.hasil-search-input:focus {
+    border-color: #071E49;
+    box-shadow: 0 0 0 3px rgba(7, 30, 73, 0.1);
+}
+
+.hasil-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    pointer-events: none;
+}
+
+.hasil-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hasil-select-wrapper {
+    position: relative;
+    min-width: 160px;
+}
+
+.hasil-select {
+    width: 100%;
+    height: 42px;
+    padding: 0 36px 0 16px;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    background: #FFFFFF;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #1E293B;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.hasil-select:focus {
+    border-color: #071E49;
+    box-shadow: 0 0 0 3px rgba(7, 30, 73, 0.1);
+}
+
+.hasil-select-chevron {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748B;
+    pointer-events: none;
+}
+
+.btn-catat-hasil {
+    height: 42px;
+    padding: 0 20px;
+    background: #071E49;
+    color: #FFFFFF;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: inherit;
+    text-decoration: none;
+}
+
+.btn-catat-hasil:hover {
+    background: #0B2B68;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(7, 30, 73, 0.2);
+    color: #FFFFFF;
+}
+
+

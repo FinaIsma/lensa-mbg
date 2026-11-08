@@ -28,6 +28,7 @@ export default defineConfig({
                 'resources/css/staff/pemasok.css',
                 'resources/css/staff/bahan.css',
                 'resources/css/staff/produksi.css',
+                'resources/css/staff/hasil.css',
                 'resources/js/app.js',
                 'resources/js/auth/login.js',
                 'resources/js/auth/register.js',
@@ -44,6 +45,7 @@ export default defineConfig({
                 'resources/js/staff/lots-print.js',
                 'resources/js/staff/pemasok.js',
                 'resources/js/staff/bahan.js',
+                'resources/js/staff/hasil.js',
             ],
             refresh: true,
             fonts: [
