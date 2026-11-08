@@ -30,9 +30,6 @@
                         </span>
                     @endif
                 </div>
-                <p class="page-subtitle" style="margin: 2px 0 0; font-size: 12px; color: #64748B;">
-                    Menu: <strong>{{ $batch->menu?->nama }}</strong> • Porsi: <strong>{{ ucfirst($batch->recipe?->ukuran_porsi) }}</strong>
-                </p>
             </div>
         </div>
 

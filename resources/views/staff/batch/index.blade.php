@@ -244,21 +244,21 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" style="text-align: center; padding: 40px 20px; color: #64748B;">
-                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
-                                    <div style="width: 52px; height: 52px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #94A3B8;">
-                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <td colspan="9" style="text-align: center; padding: 30px 16px; color: #64748B;">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #94A3B8;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <rect x="3" y="3" width="7" height="7" rx="1"></rect>
                                             <rect x="14" y="3" width="7" height="7" rx="1"></rect>
                                             <rect x="14" y="14" width="7" height="7" rx="1"></rect>
                                             <rect x="3" y="14" width="7" height="7" rx="1"></rect>
                                         </svg>
                                     </div>
-                                    <div style="font-weight: 600; font-size: 15px; color: #071E49;">Belum Ada Data Batch Produksi</div>
-                                    <p style="font-size: 13px; color: #64748B; margin: 0; max-width: 400px;">
+                                    <div style="font-weight: 600; font-size: 13.5px; color: #071E49;">Belum Ada Data Batch Produksi</div>
+                                    <p style="font-size: 12px; color: #64748B; margin: 0; max-width: 380px; line-height: 1.45;">
                                         Silakan buat batch produksi baru dengan memilih menu aktif dan mengalokasikan lot bahan baku.
                                     </p>
-                                    <button type="button" onclick="openCreateBatchModal()" class="btn-primary" style="margin-top: 8px;">
+                                    <button type="button" onclick="openCreateBatchModal()" class="btn-primary" style="margin-top: 4px; font-size: 12px; padding: 6px 14px;">
                                         Buat Batch Baru
                                     </button>
                                 </div>
@@ -736,10 +736,9 @@
     }
 
     function onCustomAlertOk() {
+        const cb = customAlertCallback;
         closeCustomAlert();
-        if (typeof customAlertCallback === 'function') {
-            const cb = customAlertCallback;
-            customAlertCallback = null;
+        if (typeof cb === 'function') {
             cb();
         }
     }

@@ -169,13 +169,13 @@
 
             {{-- Linimasa Vertikal Tahap --}}
             @if ($steps->isEmpty())
-                <div style="text-align: center; padding: 30px 20px; background: #F8FAFC; border-radius: 10px; margin-top: 18px;">
-                    <div style="color: #64748B; font-size: 13px;">Belum ada tahap yang dicatat untuk batch ini.</div>
-                    <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">Klik tombol "Tambah Tahap" di atas untuk memulai pencatatan alur pengolahan.</div>
+                <div style="text-align: center; padding: 18px 16px; background: #F8FAFC; border-radius: 8px; margin-top: 14px; border: 1px dashed #CBD5E1;">
+                    <div style="color: #64748B; font-size: 12px; font-weight: 500;">Belum ada tahap yang dicatat untuk batch ini.</div>
+                    <div style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Klik tombol "Tambah Tahap" di atas untuk memulai pencatatan alur pengolahan.</div>
                     <button type="button" 
                             onclick="openAddStepModal({{ $batch->id }}, '{{ $batch->batch_code }}', '{{ $batch->menu?->nama }}', '{{ $batch->menu?->kategori }}')" 
                             class="btn-primary" 
-                            style="font-size: 12.5px; padding: 6px 14px; margin-top: 12px;">
+                            style="font-size: 11.5px; padding: 5px 12px; margin-top: 10px;">
                         Mulai Tahap Pertama
                     </button>
                 </div>
@@ -264,19 +264,19 @@
         </div>
     @empty
         {{-- Keadaan Kosong (Empty State) --}}
-        <div class="table-card" style="text-align: center; padding: 60px 20px; color: #64748B;">
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;">
-                <div style="width: 64px; height: 64px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #94A3B8;">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="table-card" style="text-align: center; padding: 36px 16px; color: #64748B;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #94A3B8;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 14 14"></polyline>
                     </svg>
                 </div>
-                <div style="font-weight: 700; font-size: 16px; color: #071E49;">Belum Ada Batch yang Dikonfirmasi</div>
-                <p style="font-size: 13.5px; color: #64748B; margin: 0; max-width: 440px; line-height: 1.5;">
+                <div style="font-weight: 700; font-size: 14px; color: #071E49;">Belum Ada Batch yang Dikonfirmasi</div>
+                <p style="font-size: 12px; color: #64748B; margin: 0; max-width: 420px; line-height: 1.45;">
                     Laman pengolahan menampilkan batch yang telah dikonfirmasi dan siap diolah di dapur. Silakan konfirmasi batch di laman Batch Produksi.
                 </p>
-                <a href="{{ route('staff.batches.index') }}" class="btn-primary" style="margin-top: 8px;">
+                <a href="{{ route('staff.batches.index') }}" class="btn-primary" style="margin-top: 6px; font-size: 12px; padding: 7px 16px;">
                     Menuju Laman Batch Produksi
                 </a>
             </div>

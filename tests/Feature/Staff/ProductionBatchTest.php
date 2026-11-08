@@ -491,4 +491,119 @@ class ProductionBatchTest extends TestCase
             ],
         ]);
     }
+
+    public function test_staff_can_update_draft_batch(): void
+    {
+        $batch = ProductionBatch::create([
+            'menu_id' => $this->menu->id,
+            'recipe_id' => $this->recipe->id,
+            'id_sppg' => $this->sppg->id_sppg,
+            'created_by' => $this->staff->id,
+            'batch_code' => ProductionBatch::generateBatchCode($this->sppg->id_sppg, date('Y-m-d')),
+            'production_date' => date('Y-m-d'),
+            'target_porsi' => 100,
+            'status' => 'draft',
+            'is_locked' => false,
+        ]);
+
+        $lot = $this->createLot(50, 14, 12000);
+
+        $response = $this->actingAs($this->staff, 'staff')
+            ->put(route('staff.batches.update', $batch->id), [
+                'production_date' => date('Y-m-d'),
+                'target_porsi' => 150,
+                'action' => 'draft',
+                'usages' => [
+                    [
+                        'material_lot_id' => $lot->id,
+                        'qty_used' => 7.5,
+                    ],
+                ],
+            ]);
+
+        $response->assertRedirect(route('staff.batches.show', $batch->id));
+        $batch->refresh();
+        $this->assertEquals(150, $batch->target_porsi);
+        $this->assertEquals('draft', $batch->status);
+        $this->assertFalse($batch->is_locked);
+    }
+
+    public function test_staff_can_update_and_confirm_batch_in_one_step(): void
+    {
+        $batch = ProductionBatch::create([
+            'menu_id' => $this->menu->id,
+            'recipe_id' => $this->recipe->id,
+            'id_sppg' => $this->sppg->id_sppg,
+            'created_by' => $this->staff->id,
+            'batch_code' => ProductionBatch::generateBatchCode($this->sppg->id_sppg, date('Y-m-d')),
+            'production_date' => date('Y-m-d'),
+            'target_porsi' => 100,
+            'status' => 'draft',
+            'is_locked' => false,
+        ]);
+
+        // Target 100 * 0.05 = 5.0 kg
+        $lot = $this->createLot(30, 14, 15000);
+
+        $response = $this->actingAs($this->staff, 'staff')
+            ->put(route('staff.batches.update', $batch->id), [
+                'production_date' => date('Y-m-d'),
+                'target_porsi' => 100,
+                'action' => 'confirm',
+                'usages' => [
+                    [
+                        'material_lot_id' => $lot->id,
+                        'qty_used' => 5.0,
+                    ],
+                ],
+            ]);
+
+        $response->assertRedirect(route('staff.batches.show', $batch->id));
+        $batch->refresh();
+        $this->assertEquals('confirmed', $batch->status);
+        $this->assertTrue($batch->is_locked);
+        $this->assertEquals(75000.0, (float) $batch->total_cost);
+
+        // Lot stock deducted
+        $this->assertEquals(25.0, (float) $lot->fresh()->current_qty);
+    }
+
+    public function test_pengolahan_index_prioritizes_today_batches_first(): void
+    {
+        $tomorrow = Carbon::tomorrow()->toDateString();
+        $today = Carbon::today()->toDateString();
+
+        $batchTomorrow = ProductionBatch::create([
+            'menu_id' => $this->menu->id,
+            'recipe_id' => $this->recipe->id,
+            'id_sppg' => $this->sppg->id_sppg,
+            'created_by' => $this->staff->id,
+            'batch_code' => ProductionBatch::generateBatchCode($this->sppg->id_sppg, $tomorrow),
+            'production_date' => $tomorrow,
+            'target_porsi' => 100,
+            'status' => 'confirmed',
+            'is_locked' => true,
+        ]);
+
+        $batchToday = ProductionBatch::create([
+            'menu_id' => $this->menu->id,
+            'recipe_id' => $this->recipe->id,
+            'id_sppg' => $this->sppg->id_sppg,
+            'created_by' => $this->staff->id,
+            'batch_code' => ProductionBatch::generateBatchCode($this->sppg->id_sppg, $today),
+            'production_date' => $today,
+            'target_porsi' => 100,
+            'status' => 'confirmed',
+            'is_locked' => true,
+        ]);
+
+        $response = $this->actingAs($this->staff, 'staff')
+            ->get(route('staff.pengolahan.index'));
+
+        $response->assertStatus(200);
+        $batches = $response->viewData('batches');
+        $this->assertNotEmpty($batches);
+        // Batch hari ini harus berada di urutan pertama
+        $this->assertEquals($batchToday->id, $batches->first()->id);
+    }
 }

@@ -49,8 +49,11 @@ class PengolahanController extends Controller
             $query->where('id', $batchIdFilter);
         }
 
-        $batches = $query->orderBy('production_date', 'asc')
-            ->orderBy('id', 'asc')
+        $today = Carbon::today()->toDateString();
+
+        $batches = $query->orderByRaw('CASE WHEN production_date = ? THEN 0 ELSE 1 END', [$today])
+            ->orderBy('production_date', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         // Statistik Pengolahan
@@ -64,11 +67,13 @@ class PengolahanController extends Controller
             'total_aktif' => ProductionBatch::where('id_sppg', $idSppg)->whereIn('status', ['confirmed', 'processing'])->count(),
         ];
 
-        // Daftar batch aktif untuk dropdown filter
+        // Daftar batch aktif untuk dropdown filter (prioritas hari ini dan terbaru)
         $activeBatchOptions = ProductionBatch::where('id_sppg', $idSppg)
             ->whereIn('status', ['confirmed', 'processing'])
             ->with('menu')
-            ->orderBy('batch_code')
+            ->orderByRaw('CASE WHEN production_date = ? THEN 0 ELSE 1 END', [$today])
+            ->orderBy('production_date', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         return view('staff.pengolahan.index', compact(

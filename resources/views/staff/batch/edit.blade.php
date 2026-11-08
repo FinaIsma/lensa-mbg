@@ -136,6 +136,44 @@
     </div>
 </div>
 
+{{-- MODAL CUSTOM ALERT & CONFIRM DI TENGAH --}}
+<div id="modalCustomAlert" class="modal-backdrop-custom" style="z-index: 10005;">
+    <div class="modal-content-custom" style="max-width: 440px; text-align: center; border-radius: 14px; overflow: hidden;">
+        <div style="padding: 24px 20px;">
+            <div id="customAlertIconBox" style="width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; background: #FEF3C7; color: #D97706;">
+                <svg id="customAlertIconWarning" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <svg id="customAlertIconConfirm" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <svg id="customAlertIconSuccess" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+
+            <h3 id="customAlertTitle" style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #071E49;">Peringatan</h3>
+            <p id="customAlertMessage" style="margin: 0; font-size: 13px; color: #475569; line-height: 1.5;"></p>
+            
+            <div id="customAlertDetails" style="display: none; margin-top: 12px; text-align: left; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400E; max-height: 140px; overflow-y: auto;">
+            </div>
+        </div>
+
+        <div id="customAlertFooter" style="padding: 12px 20px; background: #FAFAFA; border-top: 1px solid #F1F5F9; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <button type="button" id="customAlertCancelBtn" style="display: none;" onclick="closeCustomAlert()" class="btn-secondary" style="font-size: 12.5px; padding: 7px 16px;">
+                Batal
+            </button>
+            <button type="button" id="customAlertOkBtn" onclick="onCustomAlertOk()" class="btn-primary" style="font-size: 12.5px; padding: 7px 20px;">
+                Mengerti
+            </button>
+        </div>
+    </div>
+</div>
+
 <style>
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 </style>
@@ -378,6 +416,105 @@
         document.getElementById('batchEditForm').submit();
     }
 
+    let customAlertCallback = null;
+
+    function showStyledAlert(title, message, details = null, type = 'warning') {
+        const modal = document.getElementById('modalCustomAlert');
+        const iconBox = document.getElementById('customAlertIconBox');
+        const iconWarning = document.getElementById('customAlertIconWarning');
+        const iconConfirm = document.getElementById('customAlertIconConfirm');
+        const iconSuccess = document.getElementById('customAlertIconSuccess');
+        const titleEl = document.getElementById('customAlertTitle');
+        const msgEl = document.getElementById('customAlertMessage');
+        const detailsEl = document.getElementById('customAlertDetails');
+        const cancelBtn = document.getElementById('customAlertCancelBtn');
+        const okBtn = document.getElementById('customAlertOkBtn');
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+
+        if (details && Array.isArray(details) && details.length > 0) {
+            detailsEl.style.display = 'block';
+            detailsEl.innerHTML = `<ul style="margin: 0; padding-left: 18px; line-height: 1.6;">${details.map(d => `<li>${d}</li>`).join('')}</ul>`;
+        } else if (details && typeof details === 'string') {
+            detailsEl.style.display = 'block';
+            detailsEl.textContent = details;
+        } else {
+            detailsEl.style.display = 'none';
+            detailsEl.innerHTML = '';
+        }
+
+        cancelBtn.style.display = 'none';
+        okBtn.textContent = 'Mengerti';
+        okBtn.className = 'btn-primary';
+        customAlertCallback = null;
+
+        if (type === 'error') {
+            iconBox.style.background = '#FEF2F2';
+            iconBox.style.color = '#DC2626';
+            iconWarning.style.display = 'block';
+            iconConfirm.style.display = 'none';
+            iconSuccess.style.display = 'none';
+        } else if (type === 'success') {
+            iconBox.style.background = '#F0FDF4';
+            iconBox.style.color = '#16A34A';
+            iconWarning.style.display = 'none';
+            iconConfirm.style.display = 'none';
+            iconSuccess.style.display = 'block';
+        } else {
+            iconBox.style.background = '#FEF3C7';
+            iconBox.style.color = '#D97706';
+            iconWarning.style.display = 'block';
+            iconConfirm.style.display = 'none';
+            iconSuccess.style.display = 'none';
+        }
+
+        modal.classList.add('show');
+    }
+
+    function showStyledConfirm(title, message, onConfirm, confirmBtnText = 'Ya, Lanjutkan') {
+        const modal = document.getElementById('modalCustomAlert');
+        const iconBox = document.getElementById('customAlertIconBox');
+        const iconWarning = document.getElementById('customAlertIconWarning');
+        const iconConfirm = document.getElementById('customAlertIconConfirm');
+        const iconSuccess = document.getElementById('customAlertIconSuccess');
+        const titleEl = document.getElementById('customAlertTitle');
+        const msgEl = document.getElementById('customAlertMessage');
+        const detailsEl = document.getElementById('customAlertDetails');
+        const cancelBtn = document.getElementById('customAlertCancelBtn');
+        const okBtn = document.getElementById('customAlertOkBtn');
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        detailsEl.style.display = 'none';
+
+        iconBox.style.background = '#EFF6FF';
+        iconBox.style.color = '#0284C7';
+        iconWarning.style.display = 'none';
+        iconConfirm.style.display = 'block';
+        iconSuccess.style.display = 'none';
+
+        cancelBtn.style.display = 'inline-flex';
+        okBtn.textContent = confirmBtnText;
+        okBtn.className = 'btn-success';
+
+        customAlertCallback = onConfirm;
+        modal.classList.add('show');
+    }
+
+    function onCustomAlertOk() {
+        const cb = customAlertCallback;
+        closeCustomAlert();
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('modalCustomAlert').classList.remove('show');
+        customAlertCallback = null;
+    }
+
     function confirmAndSubmitBatch() {
         let unfulfilled = [];
         currentBlocks.forEach(b => {
@@ -392,13 +529,16 @@
         });
 
         if (unfulfilled.length > 0) {
-            alert("Konfirmasi Ditolak:\n" + unfulfilled.join("\n") + "\n\nSemua bahan resep harus terpenuhi sebelum konfirmasi.");
+            showStyledAlert("Konfirmasi Ditolak", "Semua bahan resep harus terpenuhi sebelum batch dapat dikonfirmasi.", unfulfilled, "warning");
             return;
         }
 
-        if (confirm("Konfirmasi batch ini sekarang?\nStok bahan akan langsung dipotong dan batch akan dikunci.")) {
-            submitBatch('confirm');
-        }
+        showStyledConfirm(
+            "Konfirmasi Batch Ini?",
+            "Stok bahan akan langsung dipotong dan batch akan dikunci.",
+            () => submitBatch('confirm'),
+            "Ya, Konfirmasi Batch"
+        );
     }
 
     document.addEventListener('DOMContentLoaded', () => {
