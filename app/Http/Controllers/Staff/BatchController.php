@@ -486,7 +486,7 @@ class BatchController extends Controller
     /**
      * Tampilkan formulir ubah batch (hanya saat draft).
      */
-    public function edit(int $id): View|RedirectResponse
+    public function edit(Request $request, int $id): View|RedirectResponse|JsonResponse
     {
         $idSppg = $this->resolveSppgId();
 
@@ -495,8 +495,33 @@ class BatchController extends Controller
             ->findOrFail($id);
 
         if ($batch->status !== 'draft') {
-            return redirect()->route('staff.batches.show', $batch->id)
-                ->with('error', 'Batch yang sudah dikonfirmasi atau dibatalkan tidak dapat diubah.');
+            $msg = 'Batch yang sudah dikonfirmasi atau dibatalkan tidak dapat diubah.';
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+
+            return redirect()->route('staff.batches.show', $batch->id)->with('error', $msg);
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'batch' => [
+                    'id' => $batch->id,
+                    'batch_code' => $batch->batch_code,
+                    'production_date' => $batch->production_date ? $batch->production_date->format('Y-m-d') : '',
+                    'menu_id' => $batch->menu_id,
+                    'menu_nama' => $batch->menu?->nama,
+                    'kategori_label' => $batch->menu?->kategori_label,
+                    'ukuran_porsi' => $batch->recipe?->ukuran_porsi,
+                    'target_porsi' => $batch->target_porsi,
+                    'recipe_id' => $batch->recipe_id,
+                    'usages' => $batch->materialUsages->map(fn ($u) => [
+                        'material_lot_id' => $u->material_lot_id,
+                        'qty_used' => (float) $u->qty_used,
+                    ])->values(),
+                ],
+            ]);
         }
 
         $allMaterials = Material::where('id_sppg', $idSppg)

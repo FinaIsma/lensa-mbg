@@ -661,10 +661,13 @@
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
 }
 
 .modal-content-custom.modal-large {
-    max-width: 960px;
+    max-width: 980px;
     width: 95%;
     max-height: 90vh;
 }
@@ -672,6 +675,15 @@
 .modal-content-custom.modal-medium {
     max-width: 720px;
     width: 95%;
+    max-height: 90vh;
+}
+
+.modal-content-custom form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
 @keyframes modalSlideIn {
@@ -680,26 +692,29 @@
 }
 
 .modal-header-custom {
-    padding: 18px 24px;
+    padding: 16px 22px;
     border-bottom: 1px solid #F1F5F9;
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: #FAFAFA;
+    flex-shrink: 0;
 }
 
 .modal-body-custom {
-    padding: 24px;
-    max-height: 80vh;
+    padding: 20px 24px;
+    flex: 1;
     overflow-y: auto;
+    min-height: 0;
 }
 
 .modal-footer-custom {
-    padding: 16px 24px;
+    padding: 14px 24px;
     border-top: 1px solid #F1F5F9;
     background: #FAFAFA;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 12px;
+    flex-shrink: 0;
 }

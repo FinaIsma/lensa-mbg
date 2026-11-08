@@ -71,9 +71,11 @@
 
             <div>
                 <span style="display: block; font-size: 11px; color: #64748B; font-weight: 500;">Menu & Kategori</span>
-                <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
-                    <span style="font-size: 13.5px; font-weight: 700; color: #071E49;">{{ $batch->menu?->nama }}</span>
-                    <span class="chip-kategori" style="font-size: 11px; padding: 2px 7px;">{{ $batch->menu?->kategori_label }}</span>
+                <div style="margin-top: 2px;">
+                    <span style="font-size: 13.5px; font-weight: 700; color: #071E49; display: block;">{{ $batch->menu?->nama }}</span>
+                    <div style="margin-top: 4px;">
+                        <span class="chip-kategori" style="font-size: 11px; padding: 2px 7px;">{{ $batch->menu?->kategori_label }}</span>
+                    </div>
                 </div>
             </div>
 

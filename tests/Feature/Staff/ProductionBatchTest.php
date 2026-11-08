@@ -463,4 +463,32 @@ class ProductionBatchTest extends TestCase
             ->where('action', 'cancel')
             ->exists());
     }
+
+    public function test_staff_can_fetch_batch_edit_json_for_modal(): void
+    {
+        $batch = ProductionBatch::create([
+            'menu_id' => $this->menu->id,
+            'recipe_id' => $this->recipe->id,
+            'id_sppg' => $this->sppg->id_sppg,
+            'created_by' => $this->staff->id,
+            'batch_code' => ProductionBatch::generateBatchCode($this->sppg->id_sppg, date('Y-m-d')),
+            'production_date' => date('Y-m-d'),
+            'target_porsi' => 120,
+            'status' => 'draft',
+            'is_locked' => false,
+        ]);
+
+        $response = $this->actingAs($this->staff, 'staff')
+            ->getJson(route('staff.batches.edit', $batch->id));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'batch' => [
+                'id' => $batch->id,
+                'batch_code' => $batch->batch_code,
+                'target_porsi' => 120,
+            ],
+        ]);
+    }
 }

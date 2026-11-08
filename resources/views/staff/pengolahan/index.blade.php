@@ -421,6 +421,26 @@
     </div>
 </div>
 
+{{-- MODAL CUSTOM ALERT DI TENGAH (GAYA MODERN, BUKAN DEFAULT BROWSER) --}}
+<div id="modalCustomAlert" class="modal-backdrop-custom" style="z-index: 10005;">
+    <div class="modal-content-custom" style="max-width: 440px; text-align: center; border-radius: 14px; overflow: hidden;">
+        <div style="padding: 24px 20px;">
+            <div id="customAlertIconBox" style="width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; background: #DCFCE7; color: #16A34A;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h3 id="customAlertTitle" style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #071E49;">Tahap Pengolahan Selesai</h3>
+            <p id="customAlertMessage" style="margin: 0; font-size: 13px; color: #475569; line-height: 1.5;"></p>
+        </div>
+        <div style="padding: 12px 20px; background: #FAFAFA; border-top: 1px solid #F1F5F9; display: flex; align-items: center; justify-content: center;">
+            <button type="button" onclick="closeCustomAlert()" class="btn-primary" style="font-size: 12.5px; padding: 7px 24px;">
+                Mengerti
+            </button>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
     const categorySuggestions = {
@@ -517,8 +537,21 @@
         document.getElementById('modalPreviewEvidence').classList.remove('show');
     }
 
+    function showStyledAlert(title, message) {
+        document.getElementById('customAlertTitle').textContent = title;
+        document.getElementById('customAlertMessage').textContent = message;
+        document.getElementById('modalCustomAlert').classList.add('show');
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('modalCustomAlert').classList.remove('show');
+    }
+
     function notifyHasil(batchCode, batchId) {
-        alert(`Batch ${batchCode} siap dicatat hasilnya!\n\nSeluruh tahapan pengolahan telah selesai. Alur akan diteruskan ke modul Hasil Produksi (Pre-Distribution Check).`);
+        showStyledAlert(
+            `Batch ${batchCode} Siap Dicatat Hasilnya`,
+            `Seluruh tahapan pengolahan telah selesai dicatat. Alur kerja berikutnya adalah pengujian mutu & pencatatan porsi jadi pada formulir Hasil Produksi (Pre-Distribution Check).`
+        );
     }
 </script>
 @endpush

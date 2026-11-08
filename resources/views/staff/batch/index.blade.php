@@ -138,21 +138,20 @@
             @endif
         </form>
 
-        {{-- Table Content (Kolom Kategori Dihapus, Font Kolom Standar) --}}
-        <div class="table-responsive">
-            <table class="staff-table data-table">
+        {{-- Table Content (Kolom Pembuat & Kategori Dihapus, Tabel Fit Sesuai Layar Tanpa Scroll Kanan) --}}
+        <div class="table-responsive" style="margin-top: 14px;">
+            <table class="staff-table data-table" style="width: 100%;">
                 <thead>
                     <tr>
-                        <th style="min-width: 150px;">Kode Batch</th>
-                        <th style="min-width: 110px;">Tgl Produksi</th>
-                        <th style="min-width: 200px;">Menu</th>
-                        <th style="min-width: 90px;">Ukuran</th>
-                        <th style="min-width: 80px; text-align: center;">Target</th>
-                        <th style="min-width: 80px; text-align: center;">Hasil</th>
-                        <th style="min-width: 130px;">Status</th>
-                        <th style="min-width: 130px; text-align: right;">Biaya / Porsi</th>
-                        <th style="min-width: 120px;">Pembuat</th>
-                        <th style="min-width: 120px; text-align: center;">Aksi</th>
+                        <th style="width: 16%; min-width: 135px;">Kode Batch</th>
+                        <th style="width: 11%; min-width: 95px;">Tgl Produksi</th>
+                        <th style="width: 25%; min-width: 160px;">Menu</th>
+                        <th style="width: 8%; min-width: 70px;">Ukuran</th>
+                        <th style="width: 7%; text-align: center; min-width: 65px;">Target</th>
+                        <th style="width: 7%; text-align: center; min-width: 65px;">Hasil</th>
+                        <th style="width: 13%; min-width: 110px;">Status</th>
+                        <th style="width: 13%; text-align: right; min-width: 105px;">Biaya / Porsi</th>
+                        <th style="width: 95px; text-align: center; white-space: nowrap;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -206,9 +205,6 @@
                                     <span style="color: #94A3B8;">-</span>
                                 @endif
                             </td>
-                            <td style="color: #64748B; font-size: 12.5px;">
-                                {{ $batch->creator?->nama ?? 'Staff' }}
-                            </td>
                             <td>
                                 <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
                                     {{-- Detail --}}
@@ -220,13 +216,13 @@
                                     </a>
 
                                     @if ($batch->status === 'draft')
-                                        {{-- Ubah (hanya draft) --}}
-                                        <a href="{{ route('staff.batches.edit', $batch->id) }}" class="btn-action-icon" title="Ubah Batch Draft">
+                                        {{-- Ubah (hanya draft - buka modal form pop up) --}}
+                                        <button type="button" class="btn-action-icon" title="Ubah Batch Draft" onclick="openEditBatchModal({{ $batch->id }})">
                                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                             </svg>
-                                        </a>
+                                        </button>
 
                                         {{-- Konfirmasi (hanya draft) --}}
                                         <button type="button" class="btn-action-icon" title="Konfirmasi Batch (Potong Stok)" onclick="openConfirmModal({{ $batch->id }}, '{{ $batch->batch_code }}', '{{ $batch->menu?->nama }}', {{ $batch->target_porsi }})" style="color: #16A34A; border-color: #BBF7D0; background: #F0FDF4;">
@@ -248,7 +244,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" style="text-align: center; padding: 40px 20px; color: #64748B;">
+                            <td colspan="9" style="text-align: center; padding: 40px 20px; color: #64748B;">
                                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
                                     <div style="width: 52px; height: 52px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #94A3B8;">
                                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -390,16 +386,161 @@
                 <div style="flex: 1; text-align: left;">
                     <span id="modalOverallShortageText" style="font-size: 12.5px; font-weight: 600; color: #64748B;">Lengkapi menu & target porsi</span>
                 </div>
-                <button type="button" onclick="closeCreateBatchModal()" class="btn-secondary" style="font-size: 13px;">Batal</button>
-                <button type="button" onclick="submitModalBatch('draft')" class="btn-secondary" style="font-size: 13px; font-weight: 600; color: #071E49; border-color: #CBD5E1;">
-                    Simpan Draft
+                <button type="button" onclick="closeCreateBatchModal()" class="btn-secondary" style="font-size: 12.5px; padding: 7px 16px;">Batal</button>
+                <button type="button" onclick="submitModalBatch('draft')" class="btn-primary" style="font-size: 12.5px; font-weight: 600; background: #042A70; border-color: #042A70; padding: 7px 18px;">
+                    Simpan Batch (Draft)
                 </button>
-                <button type="button" onclick="confirmAndSubmitModalBatch()" class="btn-success" style="font-size: 13px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <button type="button" onclick="confirmAndSubmitModalBatch()" class="btn-success" style="font-size: 12.5px; padding: 7px 18px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Konfirmasi Batch</span>
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+{{-- MODAL UBAH BATCH POP UP DI TENGAH (CUKUP NOMOR 1 & 2 TANPA TULISAN LANGKAH) --}}
+<div id="modalEditBatch" class="modal-backdrop-custom">
+    <div class="modal-content-custom modal-large">
+        <div class="modal-header-custom">
+            <div>
+                <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #071E49;" id="editModalBatchTitle">Ubah Batch Produksi</h3>
+                <p style="margin: 2px 0 0; font-size: 12px; color: #64748B;">Perbarui tanggal produksi, target porsi, atau sesuaikan alokasi lot bahan baku.</p>
+            </div>
+            <button type="button" onclick="closeEditBatchModal()" style="border: none; background: transparent; cursor: pointer; color: #64748B;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <form id="editBatchForm" method="POST" action="">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="action" id="editModalFormAction" value="draft">
+
+            <div class="modal-body-custom" style="padding: 20px 24px;">
+                {{-- Bagian 1: Cukup Nomor 1 --}}
+                <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                        <div style="width: 26px; height: 26px; border-radius: 50%; background: #042A70; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700;">
+                            1
+                        </div>
+                        <h4 style="margin: 0; font-size: 14.5px; font-weight: 700; color: #071E49;">Informasi Batch & Target Porsi</h4>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+                        {{-- Kode Batch --}}
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Kode Batch</label>
+                            <input type="text" id="editBatchCode" readonly class="form-input" style="height: 38px; font-weight: 700; color: #042A70; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; width: 100%; padding: 0 10px; font-size: 12.5px;">
+                        </div>
+
+                        {{-- Tanggal Produksi --}}
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Tanggal Produksi <span style="color: #DC2626;">*</span></label>
+                            <input type="date" name="production_date" id="editProductionDate" required class="form-input" style="height: 38px; font-size: 12.5px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 10px; width: 100%;" onchange="onEditStepOneChange()">
+                        </div>
+
+                        {{-- Menu --}}
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Menu & Kategori</label>
+                            <input type="text" id="editMenuDisplay" readonly class="form-input" style="height: 38px; font-weight: 600; color: #071E49; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; width: 100%; padding: 0 10px; font-size: 12.5px;">
+                        </div>
+
+                        {{-- Ukuran Porsi --}}
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Ukuran Porsi</label>
+                            <input type="text" id="editUkuranDisplay" readonly class="form-input" style="height: 38px; font-weight: 600; color: #071E49; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; width: 100%; padding: 0 10px; font-size: 12.5px;">
+                        </div>
+
+                        {{-- Target Porsi --}}
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Target Porsi <span style="color: #DC2626;">*</span></label>
+                            <div style="position: relative;">
+                                <input type="number" name="target_porsi" id="editTargetPorsi" min="1" step="1" required class="form-input" style="height: 38px; font-size: 13.5px; font-weight: 700; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 50px 0 10px; width: 100%; color: #071E49;" oninput="onEditStepOneChange()">
+                                <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: 600; color: #64748B;">porsi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Bagian 2: Cukup Nomor 2 --}}
+                <div id="editStepTwoSection">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 26px; height: 26px; border-radius: 50%; background: #042A70; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700;">
+                                2
+                            </div>
+                            <h4 style="margin: 0; font-size: 14.5px; font-weight: 700; color: #071E49;">Kebutuhan & Alokasi Lot Bahan</h4>
+                        </div>
+                        <button type="button" onclick="openExtraMaterialModal('edit')" class="btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>Tambah Bahan di Luar Resep</span>
+                        </button>
+                    </div>
+
+                    {{-- Loading State --}}
+                    <div id="editLoadingBlocks" style="display: none; text-align: center; padding: 30px; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0;">
+                        <div style="display: inline-block; width: 28px; height: 28px; border: 3px solid #E2E8F0; border-top-color: #042A70; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <div style="font-size: 12.5px; color: #64748B; margin-top: 8px;">Memuat stok lot bahan...</div>
+                    </div>
+
+                    <div id="editMaterialBlocksContainer"></div>
+                    <div id="editExtraMaterialsContainer"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom" style="padding: 14px 24px; background: #FAFAFA;">
+                <div style="flex: 1; text-align: left;">
+                    <span id="editOverallShortageText" style="font-size: 12px; font-weight: 600; color: #64748B;">Memuat data alokasi...</span>
+                </div>
+                <button type="button" onclick="closeEditBatchModal()" class="btn-secondary" style="font-size: 12.5px; padding: 7px 16px;">Batal</button>
+                <button type="button" onclick="submitEditModalBatch('draft')" class="btn-primary" style="font-size: 12.5px; font-weight: 600; background: #042A70; border-color: #042A70; padding: 7px 18px;">
+                    Simpan Perubahan (Draft)
+                </button>
+                <button type="button" onclick="confirmAndSubmitEditModalBatch()" class="btn-success" style="font-size: 12.5px; padding: 7px 18px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Konfirmasi Batch</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- MODAL CUSTOM ALERT & CONFIRM DI TENGAH (GAYA MODERN, BUKAN DEFAULT BROWSER) --}}
+<div id="modalCustomAlert" class="modal-backdrop-custom" style="z-index: 10005;">
+    <div class="modal-content-custom" style="max-width: 440px; text-align: center; border-radius: 14px; overflow: hidden;">
+        <div style="padding: 24px 20px;">
+            <div id="customAlertIconBox" style="width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; background: #FEF3C7; color: #D97706;">
+                <svg id="customAlertIconWarning" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <svg id="customAlertIconConfirm" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <svg id="customAlertIconSuccess" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+
+            <h3 id="customAlertTitle" style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #071E49;">Peringatan</h3>
+            <p id="customAlertMessage" style="margin: 0; font-size: 13px; color: #475569; line-height: 1.5;"></p>
+            
+            <div id="customAlertDetails" style="display: none; margin-top: 12px; text-align: left; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400E; max-height: 140px; overflow-y: auto;">
+            </div>
+        </div>
+
+        <div id="customAlertFooter" style="padding: 12px 20px; background: #FAFAFA; border-top: 1px solid #F1F5F9; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <button type="button" id="customAlertCancelBtn" style="display: none;" onclick="closeCustomAlert()" class="btn-secondary" style="font-size: 12.5px; padding: 7px 16px;">
+                Batal
+            </button>
+            <button type="button" id="customAlertOkBtn" onclick="onCustomAlertOk()" class="btn-primary" style="font-size: 12.5px; padding: 7px 20px;">
+                Mengerti
+            </button>
+        </div>
     </div>
 </div>
 
@@ -502,7 +643,115 @@
 @push('scripts')
 <script>
     let currentBlocks = [];
+    let editCurrentBlocks = [];
+    let editBatchData = null;
+    let extraMaterialTarget = 'create';
+    let customAlertCallback = null;
 
+    /* =========================================================================
+       CUSTOM STYLED ALERT & CONFIRM DI TENGAH (BUKAN DEFAULT BROWSER)
+       ========================================================================= */
+    function showStyledAlert(title, message, details = null, type = 'warning') {
+        const modal = document.getElementById('modalCustomAlert');
+        const iconBox = document.getElementById('customAlertIconBox');
+        const iconWarning = document.getElementById('customAlertIconWarning');
+        const iconConfirm = document.getElementById('customAlertIconConfirm');
+        const iconSuccess = document.getElementById('customAlertIconSuccess');
+        const titleEl = document.getElementById('customAlertTitle');
+        const msgEl = document.getElementById('customAlertMessage');
+        const detailsEl = document.getElementById('customAlertDetails');
+        const cancelBtn = document.getElementById('customAlertCancelBtn');
+        const okBtn = document.getElementById('customAlertOkBtn');
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+
+        if (details && Array.isArray(details) && details.length > 0) {
+            detailsEl.style.display = 'block';
+            detailsEl.innerHTML = `<ul style="margin: 0; padding-left: 18px; line-height: 1.6;">${details.map(d => `<li>${d}</li>`).join('')}</ul>`;
+        } else if (details && typeof details === 'string') {
+            detailsEl.style.display = 'block';
+            detailsEl.textContent = details;
+        } else {
+            detailsEl.style.display = 'none';
+            detailsEl.innerHTML = '';
+        }
+
+        cancelBtn.style.display = 'none';
+        okBtn.textContent = 'Mengerti';
+        okBtn.className = 'btn-primary';
+        customAlertCallback = null;
+
+        if (type === 'error') {
+            iconBox.style.background = '#FEF2F2';
+            iconBox.style.color = '#DC2626';
+            iconWarning.style.display = 'block';
+            iconConfirm.style.display = 'none';
+            iconSuccess.style.display = 'none';
+        } else if (type === 'success') {
+            iconBox.style.background = '#F0FDF4';
+            iconBox.style.color = '#16A34A';
+            iconWarning.style.display = 'none';
+            iconConfirm.style.display = 'none';
+            iconSuccess.style.display = 'block';
+        } else {
+            iconBox.style.background = '#FEF3C7';
+            iconBox.style.color = '#D97706';
+            iconWarning.style.display = 'block';
+            iconConfirm.style.display = 'none';
+            iconSuccess.style.display = 'none';
+        }
+
+        modal.classList.add('show');
+    }
+
+    function showStyledConfirm(title, message, onConfirm, confirmBtnText = 'Ya, Lanjutkan') {
+        const modal = document.getElementById('modalCustomAlert');
+        const iconBox = document.getElementById('customAlertIconBox');
+        const iconWarning = document.getElementById('customAlertIconWarning');
+        const iconConfirm = document.getElementById('customAlertIconConfirm');
+        const iconSuccess = document.getElementById('customAlertIconSuccess');
+        const titleEl = document.getElementById('customAlertTitle');
+        const msgEl = document.getElementById('customAlertMessage');
+        const detailsEl = document.getElementById('customAlertDetails');
+        const cancelBtn = document.getElementById('customAlertCancelBtn');
+        const okBtn = document.getElementById('customAlertOkBtn');
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        detailsEl.style.display = 'none';
+
+        iconBox.style.background = '#EFF6FF';
+        iconBox.style.color = '#0284C7';
+        iconWarning.style.display = 'none';
+        iconConfirm.style.display = 'block';
+        iconSuccess.style.display = 'none';
+
+        cancelBtn.style.display = 'inline-flex';
+        okBtn.textContent = confirmBtnText;
+        okBtn.className = 'btn-success';
+
+        customAlertCallback = onConfirm;
+        modal.classList.add('show');
+    }
+
+    function onCustomAlertOk() {
+        closeCustomAlert();
+        if (typeof customAlertCallback === 'function') {
+            const cb = customAlertCallback;
+            customAlertCallback = null;
+            cb();
+        }
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('modalCustomAlert').classList.remove('show');
+        customAlertCallback = null;
+    }
+
+    /* =========================================================================
+       MODAL BUAT BATCH BARU
+       ========================================================================= */
     function openCreateBatchModal() {
         document.getElementById('modalCreateBatch').classList.add('show');
     }
@@ -792,7 +1041,399 @@
         }
     }
 
-    function openExtraMaterialModal() {
+    function submitModalBatch(actionType) {
+        document.getElementById('modalFormAction').value = actionType;
+
+        // Disable lot inputs yang kosong/0 agar tidak memicu validasi error di backend
+        document.querySelectorAll('#modalCreateBatch .qty-usage-input').forEach(input => {
+            const val = parseFloat(input.value) || 0;
+            if (val <= 0) {
+                input.disabled = true;
+                const hiddenInput = input.parentElement.querySelector('input[type="hidden"]');
+                if (hiddenInput) hiddenInput.disabled = true;
+            }
+        });
+
+        document.getElementById('createBatchForm').submit();
+    }
+
+    function confirmAndSubmitModalBatch() {
+        let unfulfilled = [];
+        currentBlocks.forEach(b => {
+            const inputs = document.querySelectorAll(`#modalMaterialBlocksContainer .qty-usage-input[data-material-id="${b.material_id}"]`);
+            let total = 0;
+            inputs.forEach(inp => total += (parseFloat(inp.value) || 0));
+
+            const diff = Math.round((b.kebutuhan - total) * 1000) / 1000;
+            if (diff > 0) {
+                unfulfilled.push(`Bahan ${b.material_name} masih kurang ${diff} ${b.satuan}`);
+            }
+        });
+
+        if (unfulfilled.length > 0) {
+            showStyledAlert("Konfirmasi Ditolak", "Semua bahan resep harus memenuhi target sebelum batch dapat dikonfirmasi.", unfulfilled, "warning");
+            return;
+        }
+
+        showStyledConfirm(
+            "Konfirmasi Batch Sekarang?",
+            "Stok bahan akan langsung dipotong dari lot gudang dan batch akan dikunci ke status terkonfirmasi.",
+            () => submitModalBatch('confirm'),
+            "Ya, Konfirmasi Batch"
+        );
+    }
+
+    /* =========================================================================
+       MODAL UBAH BATCH DRAFT (FORM POP UP DI TENGAH SAMA SEPERTI BUAT BATCH)
+       ========================================================================= */
+    async function openEditBatchModal(batchId) {
+        const modal = document.getElementById('modalEditBatch');
+        const form = document.getElementById('editBatchForm');
+        form.action = `/staff/batch/${batchId}`;
+
+        // Reset
+        document.getElementById('editBatchCode').value = 'Memuat...';
+        document.getElementById('editProductionDate').value = '';
+        document.getElementById('editMenuDisplay').value = 'Memuat...';
+        document.getElementById('editUkuranDisplay').value = 'Memuat...';
+        document.getElementById('editTargetPorsi').value = '';
+        document.getElementById('editMaterialBlocksContainer').innerHTML = '';
+        document.getElementById('editExtraMaterialsContainer').innerHTML = '';
+        document.getElementById('editLoadingBlocks').style.display = 'block';
+
+        modal.classList.add('show');
+
+        try {
+            const res = await fetch(`/staff/batch/${batchId}/edit`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            const data = await res.json();
+            if (!data.success) {
+                showStyledAlert("Gagal Membuka Batch", data.message || "Data batch tidak dapat dimuat.", null, "error");
+                closeEditBatchModal();
+                return;
+            }
+
+            editBatchData = data.batch;
+            document.getElementById('editModalBatchTitle').textContent = `Ubah Batch: ${editBatchData.batch_code}`;
+            document.getElementById('editBatchCode').value = editBatchData.batch_code;
+            document.getElementById('editProductionDate').value = editBatchData.production_date;
+            document.getElementById('editMenuDisplay').value = `${editBatchData.menu_nama} (${editBatchData.kategori_label})`;
+            document.getElementById('editUkuranDisplay').value = `Porsi ${editBatchData.ukuran_porsi.charAt(0).toUpperCase() + editBatchData.ukuran_porsi.slice(1)}`;
+            document.getElementById('editTargetPorsi').value = editBatchData.target_porsi;
+
+            await fetchEditRecipeMaterials(editBatchData.menu_id, editBatchData.ukuran_porsi, editBatchData.target_porsi, editBatchData.production_date, editBatchData.usages || []);
+        } catch (e) {
+            showStyledAlert("Terjadi Kesalahan", "Gagal memuat batch: " + e.message, null, "error");
+            closeEditBatchModal();
+        }
+    }
+
+    function closeEditBatchModal() {
+        document.getElementById('modalEditBatch').classList.remove('show');
+        editBatchData = null;
+    }
+
+    function onEditStepOneChange() {
+        if (!editBatchData) return;
+        const target = parseInt(document.getElementById('editTargetPorsi').value || '0', 10);
+        const date = document.getElementById('editProductionDate').value;
+        if (target <= 0 || !date) return;
+
+        // Current usages values
+        let currentUsages = [];
+        document.querySelectorAll('#editMaterialBlocksContainer .qty-usage-input').forEach(inp => {
+            const lotId = parseInt(inp.getAttribute('data-lot-id'), 10);
+            const val = parseFloat(inp.value) || 0;
+            if (val > 0) {
+                currentUsages.push({ material_lot_id: lotId, qty_used: val });
+            }
+        });
+
+        fetchEditRecipeMaterials(editBatchData.menu_id, editBatchData.ukuran_porsi, target, date, currentUsages);
+    }
+
+    async function fetchEditRecipeMaterials(menuId, ukuran, target, date, prefilledUsages) {
+        const loader = document.getElementById('editLoadingBlocks');
+        const container = document.getElementById('editMaterialBlocksContainer');
+        loader.style.display = 'block';
+        container.innerHTML = '';
+
+        try {
+            const res = await fetch(`/staff/batch/recipe-materials?menu_id=${menuId}&ukuran_porsi=${ukuran}&target_porsi=${target}&production_date=${date}`);
+            const data = await res.json();
+            loader.style.display = 'none';
+
+            if (!data.success) {
+                container.innerHTML = `<div class="alert alert-error" style="background:#FEE2E2; color:#B91C1C; padding:12px; border-radius:8px; font-size:12.5px;">${data.message}</div>`;
+                return;
+            }
+
+            editCurrentBlocks = data.blocks || [];
+            renderEditMaterialBlocks(prefilledUsages);
+        } catch (e) {
+            loader.style.display = 'none';
+            container.innerHTML = `<div class="alert alert-error">Terjadi kesalahan: ${e.message}</div>`;
+        }
+    }
+
+    function renderEditMaterialBlocks(prefilledUsages = []) {
+        const container = document.getElementById('editMaterialBlocksContainer');
+        container.innerHTML = '';
+
+        const usageMap = {};
+        prefilledUsages.forEach(u => {
+            usageMap[u.material_lot_id] = u.qty_used;
+        });
+
+        editCurrentBlocks.forEach((block) => {
+            const card = document.createElement('div');
+            card.className = 'material-block-card';
+            card.style.padding = '14px 16px';
+            card.style.marginBottom = '14px';
+
+            let lotsHtml = '';
+            if (!block.lots || block.lots.length === 0) {
+                lotsHtml = `
+                    <div style="text-align: center; padding: 16px; color: #DC2626; font-size: 12px; background: #FEF2F2; border-radius: 8px;">
+                        Tidak ada lot tersedia untuk bahan ini sebelum tanggal produksi.
+                    </div>
+                `;
+            } else {
+                lotsHtml = `
+                    <div class="table-responsive" style="margin-top: 8px;">
+                        <table class="staff-table data-table" style="font-size: 12px;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 130px; padding: 8px 10px;">Barcode</th>
+                                    <th style="width: 120px; padding: 8px 10px;">No. Lot</th>
+                                    <th style="width: 120px; padding: 8px 10px;">Kedaluwarsa</th>
+                                    <th style="width: 100px; padding: 8px 10px;">Sisa Stok</th>
+                                    <th style="min-width: 130px; padding: 8px 10px;">Pemasok</th>
+                                    <th style="width: 140px; padding: 8px 10px;">Pakai (${block.satuan})</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${block.lots.map((lot, lIdx) => {
+                                    const isExpired = lot.days_to_expiry !== null && lot.days_to_expiry < 0;
+                                    const isNear = lot.is_near_expiry;
+                                    const expiryBadge = isExpired
+                                        ? `<span class="badge-status badge-expired"><span class="status-dot"></span>Kedaluwarsa</span>`
+                                        : (isNear ? `<span class="badge-status badge-near-expired"><span class="status-dot"></span>H-${lot.days_to_expiry}</span>` : `<span style="color:#16A34A; font-weight:600;">${lot.expiry_date_formatted}</span>`);
+
+                                    const initialVal = usageMap[lot.id] !== undefined ? usageMap[lot.id] : '';
+
+                                    return `
+                                        <tr class="${isExpired ? 'opacity-50' : ''}">
+                                            <td style="font-family: monospace; font-weight: 600; padding: 8px 10px;">${lot.barcode}</td>
+                                            <td style="padding: 8px 10px;">${lot.lot_number || '-'}</td>
+                                            <td style="padding: 8px 10px;">${expiryBadge}</td>
+                                            <td style="font-weight: 600; padding: 8px 10px;">${lot.current_qty} ${block.satuan}</td>
+                                            <td style="color: #64748B; padding: 8px 10px;">${lot.supplier_name}</td>
+                                            <td style="padding: 8px 10px;">
+                                                <input type="number" 
+                                                       name="usages[${lot.id}][qty_used]"
+                                                       data-material-id="${block.material_id}"
+                                                       data-lot-id="${lot.id}"
+                                                       data-max-qty="${lot.current_qty}"
+                                                       data-lot-idx="${lIdx}"
+                                                       value="${initialVal}"
+                                                       class="form-input qty-usage-input"
+                                                       min="0"
+                                                       max="${lot.current_qty}"
+                                                       step="0.001"
+                                                       placeholder="0.000"
+                                                       ${isExpired ? 'disabled' : ''}
+                                                       oninput="onEditQtyInput(this, ${block.material_id}, ${lot.current_qty})"
+                                                       style="width: 100%; height: 32px; font-size: 12.5px; font-weight: 600; padding: 0 8px; border-radius: 6px; border: 1px solid #CBD5E1;">
+                                                <input type="hidden" name="usages[${lot.id}][material_lot_id]" value="${lot.id}">
+                                                <div id="edit_mwarn_${lot.id}" style="display:none; font-size: 11px; color: #DC2626; margin-top: 2px;"></div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="material-block-header" style="padding-bottom: 10px; margin-bottom: 10px;">
+                    <div class="material-title-group">
+                        <div class="material-avatar" style="width: 32px; height: 32px; font-size: 13px;">${block.material_name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #071E49;">${block.material_name}</h4>
+                            <div style="font-size: 11.5px; color: #64748B;">Resep: ${block.qty_per_porsi} ${block.satuan} / porsi</div>
+                        </div>
+                    </div>
+                    <div class="material-pills-group">
+                        <span class="pill-info" style="font-size: 11.5px; padding: 3px 8px;">Kebutuhan: <strong>${block.kebutuhan} ${block.satuan}</strong></span>
+                        <span class="pill-info" id="edit_mselected_${block.material_id}" style="font-size: 11.5px; padding: 3px 8px;">Terpilih: <strong>0.000 ${block.satuan}</strong></span>
+                        <span class="pill-kurang" id="edit_mstatusPill_${block.material_id}" style="font-size: 11.5px; padding: 3px 10px;">Kurang ${block.kebutuhan} ${block.satuan}</span>
+                        ${block.lots && block.lots.length > 0 ? `
+                            <button type="button" class="btn-fefo" onclick="autoFillEditFefo(${block.material_id})" style="font-size: 11.5px; padding: 4px 10px;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <span>Isi otomatis FEFO</span>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+                ${lotsHtml}
+            `;
+
+            container.appendChild(card);
+            updateEditMaterialBlockStatus(block.material_id);
+        });
+
+        updateEditOverallSummary();
+    }
+
+    function onEditQtyInput(input, materialId, maxQty) {
+        const val = parseFloat(input.value) || 0;
+        const warnDiv = document.getElementById(`edit_mwarn_${input.getAttribute('data-lot-id')}`);
+
+        if (val > maxQty) {
+            warnDiv.style.display = 'block';
+            warnDiv.textContent = `Stok lot hanya ${maxQty}`;
+            input.style.borderColor = '#DC2626';
+        } else {
+            warnDiv.style.display = 'none';
+            input.style.borderColor = '#CBD5E1';
+        }
+
+        updateEditMaterialBlockStatus(materialId);
+        updateEditOverallSummary();
+    }
+
+    function updateEditMaterialBlockStatus(materialId) {
+        const block = editCurrentBlocks.find(b => b.material_id === materialId);
+        if (!block) return;
+
+        const inputs = document.querySelectorAll(`#editMaterialBlocksContainer .qty-usage-input[data-material-id="${materialId}"]`);
+        let totalUsed = 0;
+        inputs.forEach(inp => totalUsed += (parseFloat(inp.value) || 0));
+
+        totalUsed = Math.round(totalUsed * 1000) / 1000;
+        const pillSelected = document.getElementById(`edit_mselected_${materialId}`);
+        const pillStatus = document.getElementById(`edit_mstatusPill_${materialId}`);
+
+        if (pillSelected) pillSelected.innerHTML = `Terpilih: <strong>${totalUsed.toFixed(3)} ${block.satuan}</strong>`;
+
+        const diff = Math.round((block.kebutuhan - totalUsed) * 1000) / 1000;
+        if (pillStatus) {
+            if (diff <= 0) {
+                pillStatus.className = 'pill-terpenuhi';
+                pillStatus.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Terpenuhi</span>`;
+            } else {
+                pillStatus.className = 'pill-kurang';
+                pillStatus.innerHTML = `Kurang ${diff.toFixed(3)} ${block.satuan}`;
+            }
+        }
+    }
+
+    function autoFillEditFefo(materialId) {
+        const block = editCurrentBlocks.find(b => b.material_id === materialId);
+        if (!block) return;
+
+        let needed = block.kebutuhan;
+        const inputs = Array.from(document.querySelectorAll(`#editMaterialBlocksContainer .qty-usage-input[data-material-id="${materialId}"]`));
+
+        inputs.forEach(input => {
+            if (input.disabled) return;
+            const max = parseFloat(input.getAttribute('data-max-qty') || '0');
+
+            if (needed <= 0) {
+                input.value = '';
+            } else if (max <= needed) {
+                input.value = max.toFixed(3);
+                needed = Math.round((needed - max) * 1000) / 1000;
+            } else {
+                input.value = needed.toFixed(3);
+                needed = 0;
+            }
+            input.dispatchEvent(new Event('input'));
+        });
+    }
+
+    function updateEditOverallSummary() {
+        let allSatisfied = true;
+        let shortages = [];
+
+        editCurrentBlocks.forEach(b => {
+            const inputs = document.querySelectorAll(`#editMaterialBlocksContainer .qty-usage-input[data-material-id="${b.material_id}"]`);
+            let total = 0;
+            inputs.forEach(inp => total += (parseFloat(inp.value) || 0));
+
+            const diff = Math.round((b.kebutuhan - total) * 1000) / 1000;
+            if (diff > 0) {
+                allSatisfied = false;
+                shortages.push(`${b.material_name} kurang ${diff} ${b.satuan}`);
+            }
+        });
+
+        const summaryText = document.getElementById('editOverallShortageText');
+        if (summaryText) {
+            if (allSatisfied && editCurrentBlocks.length > 0) {
+                summaryText.style.color = '#16A34A';
+                summaryText.textContent = 'Semua bahan resep telah terpenuhi!';
+            } else if (shortages.length > 0) {
+                summaryText.style.color = '#DC2626';
+                summaryText.textContent = shortages.join(' • ');
+            }
+        }
+    }
+
+    function submitEditModalBatch(actionType) {
+        document.getElementById('editModalFormAction').value = actionType;
+
+        document.querySelectorAll('#modalEditBatch .qty-usage-input').forEach(input => {
+            const val = parseFloat(input.value) || 0;
+            if (val <= 0) {
+                input.disabled = true;
+                const hiddenInput = input.parentElement.querySelector('input[type="hidden"]');
+                if (hiddenInput) hiddenInput.disabled = true;
+            }
+        });
+
+        document.getElementById('editBatchForm').submit();
+    }
+
+    function confirmAndSubmitEditModalBatch() {
+        let unfulfilled = [];
+        editCurrentBlocks.forEach(b => {
+            const inputs = document.querySelectorAll(`#editMaterialBlocksContainer .qty-usage-input[data-material-id="${b.material_id}"]`);
+            let total = 0;
+            inputs.forEach(inp => total += (parseFloat(inp.value) || 0));
+
+            const diff = Math.round((b.kebutuhan - total) * 1000) / 1000;
+            if (diff > 0) {
+                unfulfilled.push(`Bahan ${b.material_name} masih kurang ${diff} ${b.satuan}`);
+            }
+        });
+
+        if (unfulfilled.length > 0) {
+            showStyledAlert("Konfirmasi Ditolak", "Semua bahan resep harus terpenuhi sebelum batch dapat dikonfirmasi.", unfulfilled, "warning");
+            return;
+        }
+
+        showStyledConfirm(
+            "Konfirmasi Batch Ini?",
+            "Stok bahan akan langsung dipotong dan batch akan dikunci.",
+            () => submitEditModalBatch('confirm'),
+            "Ya, Konfirmasi Batch"
+        );
+    }
+
+    /* =========================================================================
+       TAMBAH BAHAN DI LUAR RESEP
+       ========================================================================= */
+    function openExtraMaterialModal(target = 'create') {
+        extraMaterialTarget = target;
+        document.getElementById('extraMaterialSelect').value = '';
         document.getElementById('modalExtraMaterial').classList.add('show');
     }
 
@@ -804,29 +1445,35 @@
         const select = document.getElementById('extraMaterialSelect');
         const matId = parseInt(select.value, 10);
         if (!matId) {
-            alert('Pilih bahan terlebih dahulu.');
+            showStyledAlert('Pilihan Bahan Kosong', 'Silakan pilih bahan di luar resep terlebih dahulu.', null, 'warning');
             return;
         }
 
-        const date = document.getElementById('modalProductionDate').value;
+        const date = extraMaterialTarget === 'edit'
+            ? document.getElementById('editProductionDate').value
+            : document.getElementById('modalProductionDate').value;
+
         closeExtraMaterialModal();
 
         try {
             const res = await fetch(`/staff/batch/material-lots?material_id=${matId}&production_date=${date}`);
             const data = await res.json();
             if (!data.success) {
-                alert(data.message || 'Gagal memuat lot bahan.');
+                showStyledAlert('Gagal Memuat Lot', data.message || 'Gagal memuat lot bahan.', null, 'error');
                 return;
             }
 
-            renderExtraMaterialBlock(data.material, data.lots);
+            renderExtraMaterialBlock(data.material, data.lots, extraMaterialTarget);
         } catch (e) {
-            alert('Terjadi kesalahan: ' + e.message);
+            showStyledAlert('Terjadi Kesalahan', e.message, null, 'error');
         }
     }
 
-    function renderExtraMaterialBlock(material, lots) {
-        const container = document.getElementById('modalExtraMaterialsContainer');
+    function renderExtraMaterialBlock(material, lots, target = 'create') {
+        const container = target === 'edit'
+            ? document.getElementById('editExtraMaterialsContainer')
+            : document.getElementById('modalExtraMaterialsContainer');
+
         const card = document.createElement('div');
         card.className = 'material-block-card';
         card.style.padding = '14px 16px';
@@ -891,45 +1538,6 @@
         `;
 
         container.appendChild(card);
-    }
-
-    function submitModalBatch(actionType) {
-        document.getElementById('modalFormAction').value = actionType;
-        
-        // Disable lot inputs yang kosong/0 agar tidak memicu validasi error di backend
-        document.querySelectorAll('#modalCreateBatch .qty-usage-input').forEach(input => {
-            const val = parseFloat(input.value) || 0;
-            if (val <= 0) {
-                input.disabled = true;
-                const hiddenInput = input.parentElement.querySelector('input[type="hidden"]');
-                if (hiddenInput) hiddenInput.disabled = true;
-            }
-        });
-
-        document.getElementById('createBatchForm').submit();
-    }
-
-    function confirmAndSubmitModalBatch() {
-        let unfulfilled = [];
-        currentBlocks.forEach(b => {
-            const inputs = document.querySelectorAll(`#modalMaterialBlocksContainer .qty-usage-input[data-material-id="${b.material_id}"]`);
-            let total = 0;
-            inputs.forEach(inp => total += (parseFloat(inp.value) || 0));
-
-            const diff = Math.round((b.kebutuhan - total) * 1000) / 1000;
-            if (diff > 0) {
-                unfulfilled.push(`Bahan ${b.material_name} masih kurang ${diff} ${b.satuan}`);
-            }
-        });
-
-        if (unfulfilled.length > 0) {
-            alert("Konfirmasi Ditolak:\n" + unfulfilled.join("\n") + "\n\nSemua bahan resep harus memenuhi target sebelum batch dapat dikonfirmasi.");
-            return;
-        }
-
-        if (confirm("Konfirmasi batch sekarang?\nStok bahan akan langsung dipotong dan batch akan dikunci.")) {
-            submitModalBatch('confirm');
-        }
     }
 
     function openConfirmModal(id, code, menu, target) {
