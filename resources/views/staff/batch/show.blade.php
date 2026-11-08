@@ -3,18 +3,18 @@
 @section('title', 'Detail Batch ' . $batch->batch_code . ' - Staff SPPG')
 
 @section('content')
-<div class="space-y-6 pb-12" style="max-width: 1040px; margin: 0 auto;">
+<div class="space-y-4 pb-12" style="max-width: 1040px; margin: 0 auto;">
     {{-- Top Header Navigation --}}
-    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-            <a href="{{ route('staff.batches.index') }}" class="btn-action-icon" style="width: 38px; height: 38px;" title="Kembali ke Daftar Batch">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <a href="{{ route('staff.batches.index') }}" class="btn-action-icon" style="width: 32px; height: 32px;" title="Kembali ke Daftar Batch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </a>
             <div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <h1 class="page-title" style="margin: 0; font-size: 24px; font-weight: 700; color: #071E49;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h1 class="page-title" style="margin: 0; font-size: 19px; font-weight: 700; color: #071E49;">
                         {{ $batch->batch_code }}
                     </h1>
                     <span class="badge-status {{ $batch->status_badge_class }}">
@@ -23,36 +23,36 @@
                     </span>
                     @if ($batch->is_locked)
                         <span title="Batch Terkunci" style="color: #64748B; display: inline-flex; align-items: center;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
                         </span>
                     @endif
                 </div>
-                <p class="page-subtitle" style="margin: 2px 0 0; font-size: 13px; color: #64748B;">
+                <p class="page-subtitle" style="margin: 2px 0 0; font-size: 12px; color: #64748B;">
                     Menu: <strong>{{ $batch->menu?->nama }}</strong> • Porsi: <strong>{{ ucfirst($batch->recipe?->ukuran_porsi) }}</strong>
                 </p>
             </div>
         </div>
 
         {{-- Action Buttons --}}
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
             @if ($batch->status === 'draft')
-                <a href="{{ route('staff.batches.edit', $batch->id) }}" class="btn-secondary" style="font-size: 13px;">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <a href="{{ route('staff.batches.edit', $batch->id) }}" class="btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     <span>Ubah Batch</span>
                 </a>
-                <button type="button" onclick="openConfirmModal()" class="btn-success" style="font-size: 13px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <button type="button" onclick="openConfirmModal()" class="btn-success" style="font-size: 12px; padding: 6px 12px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Konfirmasi Batch</span>
                 </button>
-                <button type="button" onclick="openCancelModal()" class="btn-danger-outline" style="font-size: 13px;">
+                <button type="button" onclick="openCancelModal()" class="btn-danger-outline" style="font-size: 12px; padding: 6px 12px;">
                     <span>Batalkan</span>
                 </button>
             @elseif(in_array($batch->status, ['confirmed', 'processing']))
-                <a href="{{ route('staff.pengolahan.index', ['batch_id' => $batch->id]) }}" class="btn-primary" style="font-size: 13px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2l4 4-10 10-4-4L18 2z"></path><path d="M14.5 5.5l4 4"></path><path d="M3 21l3-3"></path><path d="M6 18l-3 3"></path><line x1="8" y1="16" x2="4" y2="20"></line></svg>
+                <a href="{{ route('staff.pengolahan.index', ['batch_id' => $batch->id]) }}" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2l4 4-10 10-4-4L18 2z"></path><path d="M14.5 5.5l4 4"></path><path d="M3 21l3-3"></path><path d="M6 18l-3 3"></path><line x1="8" y1="16" x2="4" y2="20"></line></svg>
                     <span>Buka Lembar Pengolahan</span>
                 </a>
             @endif
@@ -60,66 +60,66 @@
     </div>
 
     {{-- Main Info Header Card --}}
-    <div class="detail-card" style="margin-bottom: 24px;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+    <div class="detail-card" style="padding: 14px 18px; margin-bottom: 16px; border-radius: 10px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px 16px;">
             <div>
-                <span style="display: block; font-size: 12px; color: #64748B; font-weight: 500;">Tanggal Produksi</span>
-                <span style="display: block; font-size: 15px; font-weight: 700; color: #071E49; margin-top: 4px;">
+                <span style="display: block; font-size: 11px; color: #64748B; font-weight: 500;">Tanggal Produksi</span>
+                <span style="display: block; font-size: 13.5px; font-weight: 700; color: #071E49; margin-top: 2px;">
                     {{ $batch->production_date ? $batch->production_date->format('d F Y') : '-' }}
                 </span>
             </div>
 
             <div>
-                <span style="display: block; font-size: 12px; color: #64748B; font-weight: 500;">Menu & Kategori</span>
-                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-                    <span style="font-size: 14.5px; font-weight: 700; color: #071E49;">{{ $batch->menu?->nama }}</span>
-                    <span class="chip-kategori">{{ $batch->menu?->kategori_label }}</span>
+                <span style="display: block; font-size: 11px; color: #64748B; font-weight: 500;">Menu & Kategori</span>
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                    <span style="font-size: 13.5px; font-weight: 700; color: #071E49;">{{ $batch->menu?->nama }}</span>
+                    <span class="chip-kategori" style="font-size: 11px; padding: 2px 7px;">{{ $batch->menu?->kategori_label }}</span>
                 </div>
             </div>
 
             <div>
-                <span style="display: block; font-size: 12px; color: #64748B; font-weight: 500;">Ukuran Porsi (Resep v{{ $batch->recipe?->version ?? 1 }})</span>
-                <span style="display: inline-block; margin-top: 4px;" class="chip-porsi {{ $batch->recipe?->ukuran_porsi === 'besar' ? 'chip-porsi-besar' : 'chip-porsi-kecil' }}">
+                <span style="display: block; font-size: 11px; color: #64748B; font-weight: 500;">Ukuran Porsi (Resep v{{ $batch->recipe?->version ?? 1 }})</span>
+                <span style="display: inline-block; margin-top: 2px; font-size: 11px; padding: 2px 7px;" class="chip-porsi {{ $batch->recipe?->ukuran_porsi === 'besar' ? 'chip-porsi-besar' : 'chip-porsi-kecil' }}">
                     Porsi {{ ucfirst($batch->recipe?->ukuran_porsi) }}
                 </span>
             </div>
 
             <div>
-                <span style="display: block; font-size: 12px; color: #64748B; font-weight: 500;">Target & Hasil Jadi</span>
-                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
-                    <span style="font-size: 15px; font-weight: 700; color: #071E49;">
+                <span style="display: block; font-size: 11px; color: #64748B; font-weight: 500;">Target & Hasil Jadi</span>
+                <div style="display: flex; align-items: baseline; gap: 6px; margin-top: 2px;">
+                    <span style="font-size: 13.5px; font-weight: 700; color: #071E49;">
                         Target: {{ number_format($batch->target_porsi, 0, ',', '.') }}
                     </span>
-                    <span style="font-size: 13px; color: #64748B;">/</span>
-                    <span style="font-size: 15px; font-weight: 700; color: {{ $batch->actual_porsi !== null ? '#16A34A' : '#94A3B8' }};">
+                    <span style="font-size: 12px; color: #64748B;">/</span>
+                    <span style="font-size: 13.5px; font-weight: 700; color: {{ $batch->actual_porsi !== null ? '#16A34A' : '#94A3B8' }};">
                         Hasil: {{ $batch->actual_porsi !== null ? number_format($batch->actual_porsi, 0, ',', '.') : 'Belum dicatat' }}
                     </span>
                 </div>
             </div>
 
             <div>
-                <span style="display: block; font-size: 12px; color: #64748B; font-weight: 500;">Total Biaya Bahan</span>
-                <span style="display: block; font-size: 16px; font-weight: 700; color: #042A70; margin-top: 4px;">
+                <span style="display: block; font-size: 11px; color: #64748B; font-weight: 500;">Total Biaya Bahan</span>
+                <span style="display: block; font-size: 14.5px; font-weight: 700; color: #042A70; margin-top: 2px;">
                     {{ $batch->total_cost ? 'Rp ' . number_format($batch->total_cost, 0, ',', '.') : 'Menunggu konfirmasi' }}
                 </span>
             </div>
 
             <div>
-                <span style="display: block; font-size: 12px; color: #64748B; font-weight: 500;">Biaya per Porsi</span>
-                <span style="display: block; font-size: 16px; font-weight: 700; color: #071E49; margin-top: 4px;">
+                <span style="display: block; font-size: 11px; color: #64748B; font-weight: 500;">Biaya per Porsi</span>
+                <span style="display: block; font-size: 14.5px; font-weight: 700; color: #071E49; margin-top: 2px;">
                     @if ($batch->biaya_per_porsi !== null)
                         Rp {{ number_format($batch->biaya_per_porsi, 0, ',', '.') }}
                     @elseif($batch->estimasi_biaya_per_porsi !== null)
-                        <span style="font-size: 12.5px; color: #64748B;">~Rp {{ number_format($batch->estimasi_biaya_per_porsi, 0, ',', '.') }} (est)</span>
+                        <span style="font-size: 12px; color: #64748B;">~Rp {{ number_format($batch->estimasi_biaya_per_porsi, 0, ',', '.') }} (est)</span>
                     @else
-                        <span style="color: #94A3B8; font-size: 13px;">-</span>
+                        <span style="color: #94A3B8; font-size: 12px;">-</span>
                     @endif
                 </span>
             </div>
 
             <div>
-                <span style="display: block; font-size: 12px; color: #64748B; font-weight: 500;">Petugas Pembuat</span>
-                <span style="display: block; font-size: 13.5px; font-weight: 600; color: #334155; margin-top: 4px;">
+                <span style="display: block; font-size: 11px; color: #64748B; font-weight: 500;">Petugas Pembuat</span>
+                <span style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-top: 2px;">
                     {{ $batch->creator?->nama ?? 'Staff SPPG' }}
                 </span>
             </div>
@@ -317,8 +317,9 @@
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
                 <h2 class="detail-card-title" style="margin-bottom: 0;">Linimasa Tahap Pengolahan</h2>
                 @if (in_array($batch->status, ['confirmed', 'processing']))
-                    <a href="{{ route('staff.pengolahan.index', ['batch_id' => $batch->id]) }}" class="btn-primary" style="font-size: 12.5px; padding: 6px 14px;">
-                        + Tambah / Kelola Tahap
+                    <a href="{{ route('staff.pengolahan.index', ['batch_id' => $batch->id]) }}" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 2l4 4-10 10-4-4L18 2z"></path><path d="M14.5 5.5l4 4"></path><path d="M3 21l3-3"></path><path d="M6 18l-3 3"></path><line x1="8" y1="16" x2="4" y2="20"></line></svg>
+                        <span>Kelola Tahap Pengolahan</span>
                     </a>
                 @endif
             </div>

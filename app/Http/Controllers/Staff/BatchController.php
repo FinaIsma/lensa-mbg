@@ -94,10 +94,30 @@ class BatchController extends Controller
             ->orderBy('nama')
             ->get();
 
+        // Master menu & bahan untuk modal pop up Buat Batch
+        $menusWithRecipes = Menu::where('id_sppg', $idSppg)
+            ->where('is_active', true)
+            ->whereHas('recipes', fn ($q) => $q->where('status', 'active'))
+            ->with(['recipes' => fn ($q) => $q->where('status', 'active')->with('items.material')])
+            ->orderBy('nama')
+            ->get();
+
+        $allMaterials = Material::where('id_sppg', $idSppg)
+            ->where('is_active', true)
+            ->orderBy('nama')
+            ->get();
+
+        $autoBatchCode = ProductionBatch::generateBatchCode($idSppg, date('Y-m-d'));
+        $today = date('Y-m-d');
+
         return view('staff.batch.index', compact(
             'batches',
             'stats',
             'menus',
+            'menusWithRecipes',
+            'allMaterials',
+            'autoBatchCode',
+            'today',
             'q',
             'status',
             'menuId',
@@ -312,6 +332,8 @@ class BatchController extends Controller
         $idSppg = $this->resolveSppgId();
         $staff = $this->getAuthenticatedStaff();
 
+        $this->filterUsagesInput($request);
+
         $validated = $request->validate([
             'menu_id' => ['required', 'exists:menus,id'],
             'ukuran_porsi' => ['required', 'in:besar,kecil'],
@@ -503,6 +525,8 @@ class BatchController extends Controller
 
             return redirect()->route('staff.batches.show', $batch->id)->with('error', $msg);
         }
+
+        $this->filterUsagesInput($request);
 
         $validated = $request->validate([
             'production_date' => ['required', 'date'],
@@ -770,6 +794,30 @@ class BatchController extends Controller
 
         // 5. Catat audit trail
         AuditTrail::catat('confirm', $batch, ['status' => 'draft'], ['status' => 'confirmed']);
+    }
+
+    /**
+     * Filter array usages agar baris lot yang tidak diisi (qty_used kosong atau <= 0)
+     * tidak memicu validasi error 'min:0.001'.
+     */
+    protected function filterUsagesInput(Request $request): void
+    {
+        if ($request->has('usages') && is_array($request->input('usages'))) {
+            $filtered = [];
+            foreach ($request->input('usages') as $lotId => $u) {
+                if (! is_array($u)) {
+                    continue;
+                }
+                $qty = isset($u['qty_used']) ? trim((string) $u['qty_used']) : '';
+                if ($qty !== '' && is_numeric($qty) && (float) $qty > 0) {
+                    $filtered[$lotId] = [
+                        'material_lot_id' => $u['material_lot_id'] ?? $lotId,
+                        'qty_used' => (float) $qty,
+                    ];
+                }
+            }
+            $request->merge(['usages' => $filtered]);
+        }
     }
 
     /**

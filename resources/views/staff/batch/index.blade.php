@@ -10,13 +10,13 @@
             <h1 class="page-title">Batch Produksi</h1>
             <p class="page-subtitle">Kelola alur batch produksi menu SPPG dari resep, alokasi lot bahan, hingga hasil porsi.</p>
         </div>
-        <a href="{{ route('staff.batches.create') }}" class="btn-primary" style="padding: 10px 20px;">
+        <button type="button" onclick="openCreateBatchModal()" class="btn-primary" style="padding: 10px 18px; font-size: 13.5px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
             <span>Buat Batch Baru</span>
-        </a>
+        </button>
     </div>
 
     {{-- 4 Stat Cards Grid --}}
@@ -89,81 +89,69 @@
 
     {{-- Filter Bar & Table --}}
     <div class="table-card">
-        <form method="GET" action="{{ route('staff.batches.index') }}" id="filterForm" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
-            <div style="display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap;">
-                {{-- Search Box --}}
-                <div style="position: relative; min-width: 220px; flex: 1;">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8;">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" name="q" value="{{ $q }}" placeholder="Cari kode batch, menu..." class="form-input" style="padding-left: 38px; height: 40px; font-size: 13px; border-radius: 8px; border: 1px solid #CBD5E1; width: 100%;">
-                </div>
-
-                {{-- Status Filter --}}
-                <div style="min-width: 150px;">
-                    <select name="status" onchange="this.form.submit()" class="form-select" style="height: 40px; font-size: 13px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 12px; width: 100%;">
-                        <option value="">Semua Status</option>
-                        <option value="draft" {{ $status === 'draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="confirmed" {{ $status === 'confirmed' ? 'selected' : '' }}>Terkonfirmasi</option>
-                        <option value="processing" {{ $status === 'processing' ? 'selected' : '' }}>Pengolahan</option>
-                        <option value="ready" {{ $status === 'ready' ? 'selected' : '' }}>Siap Distribusi</option>
-                        <option value="distributed" {{ $status === 'distributed' ? 'selected' : '' }}>Didistribusikan</option>
-                        <option value="completed" {{ $status === 'completed' ? 'selected' : '' }}>Selesai</option>
-                        <option value="cancelled" {{ $status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
-                    </select>
-                </div>
-
-                {{-- Menu Filter --}}
-                <div style="min-width: 170px;">
-                    <select name="menu_id" onchange="this.form.submit()" class="form-select" style="height: 40px; font-size: 13px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 12px; width: 100%;">
-                        <option value="">Semua Menu</option>
-                        @foreach ($menus as $m)
-                            <option value="{{ $m->id }}" {{ $menuId == $m->id ? 'selected' : '' }}>{{ $m->nama }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- Kategori Filter --}}
-                <div style="min-width: 170px;">
-                    <select name="kategori" onchange="this.form.submit()" class="form-select" style="height: 40px; font-size: 13px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 12px; width: 100%;">
-                        <option value="">Semua Kategori</option>
-                        <option value="makanan_siap_santap" {{ $kategori === 'makanan_siap_santap' ? 'selected' : '' }}>Makanan Siap Santap</option>
-                        <option value="paket_siap_konsumsi" {{ $kategori === 'paket_siap_konsumsi' ? 'selected' : '' }}>Paket Siap Konsumsi</option>
-                        <option value="pangan_siap_olah" {{ $kategori === 'pangan_siap_olah' ? 'selected' : '' }}>Pangan Siap Olah</option>
-                    </select>
-                </div>
-
-                {{-- Date From & To --}}
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <input type="date" name="date_from" value="{{ $dateFrom }}" onchange="this.form.submit()" title="Dari Tanggal" class="form-input" style="height: 40px; font-size: 12.5px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 10px;">
-                    <span style="color: #94A3B8; font-size: 12px;">s/d</span>
-                    <input type="date" name="date_to" value="{{ $dateTo }}" onchange="this.form.submit()" title="Sampai Tanggal" class="form-input" style="height: 40px; font-size: 12.5px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 10px;">
-                </div>
-
-                @if($q || $status || $menuId || $kategori || $dateFrom || $dateTo)
-                    <a href="{{ route('staff.batches.index') }}" class="btn-secondary" style="height: 40px; padding: 0 12px; font-size: 12.5px; display: inline-flex; align-items: center;">
-                        Reset
-                    </a>
-                @endif
+        {{-- Filter Bar Seline --}}
+        <form method="GET" action="{{ route('staff.batches.index') }}" id="filterForm" style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px;">
+            {{-- Search Box Compact --}}
+            <div style="position: relative; width: 170px; flex-shrink: 0;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94A3B8;">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" name="q" value="{{ $q }}" placeholder="Cari batch..." class="form-input" style="padding-left: 32px; height: 38px; font-size: 12.5px; border-radius: 8px; border: 1px solid #CBD5E1; width: 100%;">
             </div>
+
+            {{-- Status Filter --}}
+            <div style="width: 140px; flex-shrink: 0;">
+                <select name="status" onchange="this.form.submit()" class="form-select" style="height: 38px; font-size: 12.5px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 10px; width: 100%;">
+                    <option value="">Semua Status</option>
+                    <option value="draft" {{ $status === 'draft' ? 'selected' : '' }}>Draft</option>
+                    <option value="confirmed" {{ $status === 'confirmed' ? 'selected' : '' }}>Terkonfirmasi</option>
+                    <option value="processing" {{ $status === 'processing' ? 'selected' : '' }}>Pengolahan</option>
+                    <option value="ready" {{ $status === 'ready' ? 'selected' : '' }}>Siap Distribusi</option>
+                    <option value="distributed" {{ $status === 'distributed' ? 'selected' : '' }}>Didistribusikan</option>
+                    <option value="completed" {{ $status === 'completed' ? 'selected' : '' }}>Selesai</option>
+                    <option value="cancelled" {{ $status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+                </select>
+            </div>
+
+            {{-- Menu Filter --}}
+            <div style="width: 160px; flex-shrink: 0;">
+                <select name="menu_id" onchange="this.form.submit()" class="form-select" style="height: 38px; font-size: 12.5px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 10px; width: 100%;">
+                    <option value="">Semua Menu</option>
+                    @foreach ($menus as $m)
+                        <option value="{{ $m->id }}" {{ $menuId == $m->id ? 'selected' : '' }}>{{ $m->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Date From & To Seline --}}
+            <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+                <input type="date" name="date_from" value="{{ $dateFrom }}" onchange="this.form.submit()" title="Dari Tanggal" class="form-input" style="height: 38px; font-size: 12px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 8px; width: 125px;">
+                <span style="color: #94A3B8; font-size: 11.5px;">s/d</span>
+                <input type="date" name="date_to" value="{{ $dateTo }}" onchange="this.form.submit()" title="Sampai Tanggal" class="form-input" style="height: 38px; font-size: 12px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 8px; width: 125px;">
+            </div>
+
+            @if($q || $status || $menuId || $dateFrom || $dateTo)
+                <a href="{{ route('staff.batches.index') }}" class="btn-secondary" style="height: 38px; padding: 0 12px; font-size: 12px; display: inline-flex; align-items: center; flex-shrink: 0;">
+                    Reset
+                </a>
+            @endif
         </form>
 
-        {{-- Table Content --}}
+        {{-- Table Content (Kolom Kategori Dihapus, Font Kolom Standar) --}}
         <div class="table-responsive">
-            <table class="data-table">
+            <table class="staff-table data-table">
                 <thead>
                     <tr>
-                        <th style="min-width: 140px;">Kode Batch</th>
+                        <th style="min-width: 150px;">Kode Batch</th>
                         <th style="min-width: 110px;">Tgl Produksi</th>
-                        <th style="min-width: 170px;">Menu</th>
-                        <th style="min-width: 140px;">Kategori</th>
+                        <th style="min-width: 200px;">Menu</th>
                         <th style="min-width: 90px;">Ukuran</th>
                         <th style="min-width: 80px; text-align: center;">Target</th>
                         <th style="min-width: 80px; text-align: center;">Hasil</th>
-                        <th style="min-width: 120px;">Status</th>
-                        <th style="min-width: 120px; text-align: right;">Biaya / Porsi</th>
-                        <th style="min-width: 110px;">Pembuat</th>
+                        <th style="min-width: 130px;">Status</th>
+                        <th style="min-width: 130px; text-align: right;">Biaya / Porsi</th>
+                        <th style="min-width: 120px;">Pembuat</th>
                         <th style="min-width: 120px; text-align: center;">Aksi</th>
                     </tr>
                 </thead>
@@ -180,11 +168,6 @@
                             </td>
                             <td>
                                 <div style="font-weight: 600; color: #071E49;">{{ $batch->menu?->nama ?? '-' }}</div>
-                            </td>
-                            <td>
-                                <span class="chip-kategori">
-                                    {{ $batch->menu?->kategori_label ?? '-' }}
-                                </span>
                             </td>
                             <td>
                                 @php $ukuran = $batch->recipe?->ukuran_porsi; @endphp
@@ -265,7 +248,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" style="text-align: center; padding: 40px 20px; color: #64748B;">
+                            <td colspan="10" style="text-align: center; padding: 40px 20px; color: #64748B;">
                                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
                                     <div style="width: 52px; height: 52px; border-radius: 50%; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #94A3B8;">
                                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -279,9 +262,9 @@
                                     <p style="font-size: 13px; color: #64748B; margin: 0; max-width: 400px;">
                                         Silakan buat batch produksi baru dengan memilih menu aktif dan mengalokasikan lot bahan baku.
                                     </p>
-                                    <a href="{{ route('staff.batches.create') }}" class="btn-primary" style="margin-top: 8px;">
+                                    <button type="button" onclick="openCreateBatchModal()" class="btn-primary" style="margin-top: 8px;">
                                         Buat Batch Baru
-                                    </a>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -298,50 +281,185 @@
     </div>
 </div>
 
+{{-- MODAL BUAT BATCH POP UP DI TENGAH (CUKUP NOMOR 1 & 2 TANPA TULISAN LANGKAH) --}}
+<div id="modalCreateBatch" class="modal-backdrop-custom">
+    <div class="modal-content-custom modal-large">
+        <div class="modal-header-custom">
+            <div>
+                <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #071E49;">Buat Batch Produksi</h3>
+                <p style="margin: 2px 0 0; font-size: 12px; color: #64748B;">Satu batch = satu menu = satu ukuran porsi. Alokasikan lot bahan baku dengan aturan FEFO.</p>
+            </div>
+            <button type="button" onclick="closeCreateBatchModal()" style="border: none; background: transparent; cursor: pointer; color: #64748B;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <form id="createBatchForm" method="POST" action="{{ route('staff.batches.store') }}">
+            @csrf
+            <input type="hidden" name="action" id="modalFormAction" value="draft">
+
+            <div class="modal-body-custom" style="padding: 20px 24px;">
+                {{-- Bagian 1: Cukup Nomor 1 (Tanpa tulisan 'Langkah 1') --}}
+                <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                        <div style="width: 26px; height: 26px; border-radius: 50%; background: #042A70; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700;">
+                            1
+                        </div>
+                        <h4 style="margin: 0; font-size: 14.5px; font-weight: 700; color: #071E49;">Menu & Target Porsi</h4>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+                        {{-- Kode Batch --}}
+                        <div>
+                            <label style="display: block; font-size: 12.5px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Kode Batch (Otomatis)</label>
+                            <input type="text" value="{{ $autoBatchCode }}" readonly class="form-input" style="height: 38px; font-weight: 700; color: #042A70; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; width: 100%; padding: 0 10px; font-size: 12.5px;">
+                        </div>
+
+                        {{-- Tanggal Produksi --}}
+                        <div>
+                            <label style="display: block; font-size: 12.5px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Tanggal Produksi <span style="color: #DC2626;">*</span></label>
+                            <input type="date" name="production_date" id="modalProductionDate" value="{{ $today }}" required class="form-input" style="height: 38px; font-size: 12.5px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 10px; width: 100%;" onchange="onModalStepOneChange()">
+                        </div>
+
+                        {{-- Menu Pilihan --}}
+                        <div>
+                            <label style="display: block; font-size: 12.5px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Menu Aktif <span style="color: #DC2626;">*</span></label>
+                            <select name="menu_id" id="modalMenuSelect" required class="form-select" style="height: 38px; font-size: 12.5px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 10px; width: 100%;" onchange="onModalMenuSelected()">
+                                <option value="">-- Pilih Menu --</option>
+                                @foreach ($menusWithRecipes as $m)
+                                    <option value="{{ $m->id }}" data-kategori="{{ $m->kategori_label }}" data-recipes="{{ json_encode($m->recipes) }}">
+                                        {{ $m->nama }} ({{ $m->kategori_label }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Ukuran Porsi --}}
+                        <div>
+                            <label style="display: block; font-size: 12.5px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Ukuran Porsi <span style="color: #DC2626;">*</span></label>
+                            <div style="display: flex; gap: 8px;">
+                                <label id="modalLabelPorsiBesar" style="flex: 1; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; height: 38px;">
+                                    <span style="font-size: 12.5px; font-weight: 600; color: #071E49;">Besar</span>
+                                    <input type="radio" name="ukuran_porsi" value="besar" id="modalRadioPorsiBesar" onchange="onModalStepOneChange()" style="accent-color: #042A70;">
+                                </label>
+                                <label id="modalLabelPorsiKecil" style="flex: 1; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; height: 38px;">
+                                    <span style="font-size: 12.5px; font-weight: 600; color: #071E49;">Kecil</span>
+                                    <input type="radio" name="ukuran_porsi" value="kecil" id="modalRadioPorsiKecil" onchange="onModalStepOneChange()" style="accent-color: #042A70;">
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- Target Porsi --}}
+                        <div>
+                            <label style="display: block; font-size: 12.5px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Target Porsi <span style="color: #DC2626;">*</span></label>
+                            <div style="position: relative;">
+                                <input type="number" name="target_porsi" id="modalTargetPorsi" value="100" min="1" step="1" required class="form-input" style="height: 38px; font-size: 13.5px; font-weight: 700; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 50px 0 10px; width: 100%; color: #071E49;" oninput="onModalStepOneChange()">
+                                <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: 600; color: #64748B;">porsi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Bagian 2: Cukup Nomor 2 (Tanpa tulisan 'Langkah 2') --}}
+                <div id="modalStepTwoSection" style="display: none;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 26px; height: 26px; border-radius: 50%; background: #042A70; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700;">
+                                2
+                            </div>
+                            <h4 style="margin: 0; font-size: 14.5px; font-weight: 700; color: #071E49;">Kebutuhan & Alokasi Lot Bahan</h4>
+                        </div>
+                        <button type="button" onclick="openExtraMaterialModal()" class="btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>Tambah Bahan di Luar Resep</span>
+                        </button>
+                    </div>
+
+                    {{-- Loading State --}}
+                    <div id="modalLoadingBlocks" style="display: none; text-align: center; padding: 30px; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0;">
+                        <div style="display: inline-block; width: 28px; height: 28px; border: 3px solid #E2E8F0; border-top-color: #042A70; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <div style="font-size: 12.5px; color: #64748B; margin-top: 8px;">Membaca stok lot FEFO...</div>
+                    </div>
+
+                    <div id="modalMaterialBlocksContainer"></div>
+                    <div id="modalExtraMaterialsContainer"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom" style="padding: 14px 24px; background: #FAFAFA;">
+                <div style="flex: 1; text-align: left;">
+                    <span id="modalOverallShortageText" style="font-size: 12.5px; font-weight: 600; color: #64748B;">Lengkapi menu & target porsi</span>
+                </div>
+                <button type="button" onclick="closeCreateBatchModal()" class="btn-secondary" style="font-size: 13px;">Batal</button>
+                <button type="button" onclick="submitModalBatch('draft')" class="btn-secondary" style="font-size: 13px; font-weight: 600; color: #071E49; border-color: #CBD5E1;">
+                    Simpan Draft
+                </button>
+                <button type="button" onclick="confirmAndSubmitModalBatch()" class="btn-success" style="font-size: 13px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Konfirmasi Batch</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal Tambah Bahan di Luar Resep --}}
+<div id="modalExtraMaterial" class="modal-backdrop-custom" style="z-index: 10001;">
+    <div class="modal-content-custom">
+        <div class="modal-header-custom">
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #071E49;">Tambah Bahan di Luar Resep</h3>
+            <button type="button" onclick="closeExtraMaterialModal()" style="border: none; background: transparent; cursor: pointer; color: #64748B;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="modal-body-custom">
+            <label style="display: block; font-size: 12.5px; font-weight: 600; color: #071E49; margin-bottom: 6px;">Pilih Bahan Tambahan</label>
+            <select id="extraMaterialSelect" class="form-select" style="height: 38px; font-size: 13px; border-radius: 8px; border: 1px solid #CBD5E1; width: 100%; padding: 0 10px;">
+                <option value="">-- Pilih Bahan --</option>
+                @foreach ($allMaterials as $mat)
+                    <option value="{{ $mat->id }}">{{ $mat->nama }} ({{ $mat->satuan ?: 'kg' }})</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="modal-footer-custom">
+            <button type="button" onclick="closeExtraMaterialModal()" class="btn-secondary" style="font-size: 12.5px;">Batal</button>
+            <button type="button" onclick="confirmAddExtraMaterial()" class="btn-primary" style="font-size: 12.5px;">Tambahkan</button>
+        </div>
+    </div>
+</div>
+
 {{-- Modal Konfirmasi Batch --}}
 <div id="modalConfirmBatch" class="modal-backdrop-custom">
     <div class="modal-content-custom">
         <div class="modal-header-custom">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 36px; height: 36px; border-radius: 8px; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
                 <div>
-                    <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #071E49;">Konfirmasi Batch Produksi</h3>
+                    <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #071E49;">Konfirmasi Batch Produksi</h3>
                     <p style="margin: 2px 0 0; font-size: 12px; color: #64748B;" id="confirmBatchSubtitle">Kode Batch</p>
                 </div>
             </div>
             <button type="button" onclick="closeConfirmModal()" style="border: none; background: transparent; cursor: pointer; color: #64748B;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         <form id="formConfirmBatch" method="POST" action="">
             @csrf
             <div class="modal-body-custom">
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
-                    <div style="font-size: 13px; color: #334155; line-height: 1.5;">
-                        Dengan mengonfirmasi batch ini:
-                        <ul style="margin: 8px 0 0 18px; padding: 0; color: #475569;">
-                            <li>Stok fisik bahan pada masing-masing lot terpilih akan <strong>langsung dipotong</strong> (mutasi <em>PRODUCTION_OUT</em>).</li>
-                            <li>Harga satuan lot saat ini akan dicatat permanen (<em>snapshot unit cost</em>).</li>
-                            <li>Dokumen batch akan <strong>terkunci</strong> (<em>is_locked = true</em>) dan siap masuk ke tahap pengolahan.</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="alert-warning-pill" style="margin-top: 0;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    <span>Pastikan alokasi lot bahan telah memenuhi kebutuhan porsi sebelum melanjutkan.</span>
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; margin-bottom: 14px; font-size: 12.5px; color: #334155;">
+                    Dengan mengonfirmasi batch ini:
+                    <ul style="margin: 6px 0 0 16px; padding: 0; color: #475569;">
+                        <li>Stok fisik bahan pada masing-masing lot terpilih akan <strong>langsung dipotong</strong> (mutasi <em>PRODUCTION_OUT</em>).</li>
+                        <li>Harga satuan lot saat ini akan dicatat permanen (<em>snapshot unit cost</em>).</li>
+                        <li>Dokumen batch akan <strong>terkunci</strong> (<em>is_locked = true</em>) dan siap masuk ke tahap pengolahan.</li>
+                    </ul>
                 </div>
             </div>
             <div class="modal-footer-custom">
-                <button type="button" onclick="closeConfirmModal()" class="btn-secondary">Batal</button>
-                <button type="submit" class="btn-success">Konfirmasi & Potong Stok</button>
+                <button type="button" onclick="closeConfirmModal()" class="btn-secondary" style="font-size: 12.5px;">Batal</button>
+                <button type="submit" class="btn-success" style="font-size: 12.5px;">Konfirmasi & Potong Stok</button>
             </div>
         </form>
     </div>
@@ -351,45 +469,469 @@
 <div id="modalCancelBatch" class="modal-backdrop-custom">
     <div class="modal-content-custom">
         <div class="modal-header-custom">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 36px; height: 36px; border-radius: 8px; background: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </div>
-                <div>
-                    <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #071E49;">Batalkan Batch Produksi</h3>
-                    <p style="margin: 2px 0 0; font-size: 12px; color: #64748B;" id="cancelBatchSubtitle">Draft Batch</p>
-                </div>
-            </div>
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #071E49;">Batalkan Batch Produksi</h3>
             <button type="button" onclick="closeCancelModal()" style="border: none; background: transparent; cursor: pointer; color: #64748B;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         <form id="formCancelBatch" method="POST" action="">
             @csrf
             <div class="modal-body-custom">
-                <p style="font-size: 13.5px; color: #475569; margin: 0 0 14px;">
-                    Apakah Anda yakin ingin membatalkan draft batch produksi ini? Batch yang dibatalkan tidak akan dapat diproses lagi.
+                <p style="font-size: 13px; color: #475569; margin: 0 0 12px;" id="cancelBatchSubtitle">
+                    Apakah Anda yakin ingin membatalkan draft batch produksi ini?
                 </p>
                 <div>
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #071E49; margin-bottom: 6px;">
+                    <label style="display: block; font-size: 12.5px; font-weight: 600; color: #071E49; margin-bottom: 6px;">
                         Alasan Pembatalan <span style="color: #DC2626;">*</span>
                     </label>
-                    <textarea name="reason" required rows="3" class="form-input" placeholder="Contoh: Perubahan menu sekolah, kesalahan input target porsi..." style="width: 100%; font-size: 13px; padding: 10px; border-radius: 8px; border: 1px solid #CBD5E1;"></textarea>
+                    <textarea name="reason" required rows="3" class="form-input" placeholder="Contoh: Perubahan menu sekolah, kesalahan input..." style="width: 100%; font-size: 12.5px; padding: 8px 10px; border-radius: 8px; border: 1px solid #CBD5E1;"></textarea>
                 </div>
             </div>
             <div class="modal-footer-custom">
-                <button type="button" onclick="closeCancelModal()" class="btn-secondary">Kembali</button>
-                <button type="submit" class="btn-danger-outline" style="background: #DC2626; color: #FFFFFF; border: none;">Ya, Batalkan Batch</button>
+                <button type="button" onclick="closeCancelModal()" class="btn-secondary" style="font-size: 12.5px;">Kembali</button>
+                <button type="submit" class="btn-danger-outline" style="background: #DC2626; color: #FFFFFF; border: none; font-size: 12.5px;">Ya, Batalkan Batch</button>
             </div>
         </form>
     </div>
 </div>
 
+<style>
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+
 @push('scripts')
 <script>
+    let currentBlocks = [];
+
+    function openCreateBatchModal() {
+        document.getElementById('modalCreateBatch').classList.add('show');
+    }
+
+    function closeCreateBatchModal() {
+        document.getElementById('modalCreateBatch').classList.remove('show');
+    }
+
+    function onModalMenuSelected() {
+        const menuSelect = document.getElementById('modalMenuSelect');
+        const selectedOption = menuSelect.options[menuSelect.selectedIndex];
+
+        if (!selectedOption || !selectedOption.value) {
+            document.getElementById('modalRadioPorsiBesar').disabled = true;
+            document.getElementById('modalRadioPorsiKecil').disabled = true;
+            document.getElementById('modalStepTwoSection').style.display = 'none';
+            return;
+        }
+
+        const recipesData = JSON.parse(selectedOption.getAttribute('data-recipes') || '[]');
+        const availableUkuran = recipesData.map(r => r.ukuran_porsi);
+
+        const radioBesar = document.getElementById('modalRadioPorsiBesar');
+        const radioKecil = document.getElementById('modalRadioPorsiKecil');
+        const labelBesar = document.getElementById('modalLabelPorsiBesar');
+        const labelKecil = document.getElementById('modalLabelPorsiKecil');
+
+        radioBesar.disabled = !availableUkuran.includes('besar');
+        radioKecil.disabled = !availableUkuran.includes('kecil');
+
+        labelBesar.style.opacity = radioBesar.disabled ? '0.4' : '1';
+        labelKecil.style.opacity = radioKecil.disabled ? '0.4' : '1';
+
+        if (!radioBesar.checked && !radioKecil.checked) {
+            if (availableUkuran.includes('besar')) {
+                radioBesar.checked = true;
+            } else if (availableUkuran.includes('kecil')) {
+                radioKecil.checked = true;
+            }
+        } else if (radioBesar.checked && radioBesar.disabled) {
+            radioBesar.checked = false;
+            if (!radioKecil.disabled) radioKecil.checked = true;
+        } else if (radioKecil.checked && radioKecil.disabled) {
+            radioKecil.checked = false;
+            if (!radioBesar.disabled) radioBesar.checked = true;
+        }
+
+        onModalStepOneChange();
+    }
+
+    function onModalStepOneChange() {
+        const menuId = document.getElementById('modalMenuSelect').value;
+        const ukuran = document.querySelector('input[name="ukuran_porsi"]:checked')?.value;
+        const target = parseInt(document.getElementById('modalTargetPorsi').value || '0', 10);
+        const date = document.getElementById('modalProductionDate').value;
+
+        if (!menuId || !ukuran || target <= 0 || !date) {
+            document.getElementById('modalStepTwoSection').style.display = 'none';
+            return;
+        }
+
+        fetchModalRecipeMaterials(menuId, ukuran, target, date);
+    }
+
+    async function fetchModalRecipeMaterials(menuId, ukuran, target, date) {
+        const stepTwo = document.getElementById('modalStepTwoSection');
+        const loader = document.getElementById('modalLoadingBlocks');
+        const container = document.getElementById('modalMaterialBlocksContainer');
+
+        stepTwo.style.display = 'block';
+        loader.style.display = 'block';
+        container.innerHTML = '';
+
+        try {
+            const res = await fetch(`/staff/batch/recipe-materials?menu_id=${menuId}&ukuran_porsi=${ukuran}&target_porsi=${target}&production_date=${date}`);
+            const data = await res.json();
+            loader.style.display = 'none';
+
+            if (!data.success) {
+                container.innerHTML = `<div class="alert alert-error" style="background:#FEE2E2; color:#B91C1C; padding:12px; border-radius:8px; font-size:12.5px;">${data.message}</div>`;
+                return;
+            }
+
+            currentBlocks = data.blocks || [];
+            renderModalMaterialBlocks();
+        } catch (e) {
+            loader.style.display = 'none';
+            container.innerHTML = `<div class="alert alert-error">Terjadi kesalahan: ${e.message}</div>`;
+        }
+    }
+
+    function renderModalMaterialBlocks() {
+        const container = document.getElementById('modalMaterialBlocksContainer');
+        container.innerHTML = '';
+
+        currentBlocks.forEach((block) => {
+            const card = document.createElement('div');
+            card.className = 'material-block-card';
+            card.style.padding = '14px 16px';
+            card.style.marginBottom = '14px';
+
+            let lotsHtml = '';
+            if (!block.lots || block.lots.length === 0) {
+                lotsHtml = `
+                    <div style="text-align: center; padding: 16px; color: #DC2626; font-size: 12px; background: #FEF2F2; border-radius: 8px;">
+                        Tidak ada lot tersedia untuk bahan ini sebelum tanggal produksi.
+                    </div>
+                `;
+            } else {
+                lotsHtml = `
+                    <div class="table-responsive" style="margin-top: 8px;">
+                        <table class="staff-table data-table" style="font-size: 12px;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 130px; padding: 8px 10px;">Barcode</th>
+                                    <th style="width: 120px; padding: 8px 10px;">No. Lot</th>
+                                    <th style="width: 120px; padding: 8px 10px;">Kedaluwarsa</th>
+                                    <th style="width: 100px; padding: 8px 10px;">Sisa Stok</th>
+                                    <th style="min-width: 130px; padding: 8px 10px;">Pemasok</th>
+                                    <th style="width: 140px; padding: 8px 10px;">Pakai (${block.satuan})</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${block.lots.map((lot, lIdx) => {
+                                    const isExpired = lot.days_to_expiry !== null && lot.days_to_expiry < 0;
+                                    const isNear = lot.is_near_expiry;
+                                    const expiryBadge = isExpired
+                                        ? `<span class="badge-status badge-expired"><span class="status-dot"></span>Kedaluwarsa</span>`
+                                        : (isNear ? `<span class="badge-status badge-near-expired"><span class="status-dot"></span>H-${lot.days_to_expiry}</span>` : `<span style="color:#16A34A; font-weight:600;">${lot.expiry_date_formatted}</span>`);
+
+                                    return `
+                                        <tr class="${isExpired ? 'opacity-50' : ''}">
+                                            <td style="font-family: monospace; font-weight: 600; padding: 8px 10px;">${lot.barcode}</td>
+                                            <td style="padding: 8px 10px;">${lot.lot_number || '-'}</td>
+                                            <td style="padding: 8px 10px;">${expiryBadge}</td>
+                                            <td style="font-weight: 600; padding: 8px 10px;">${lot.current_qty} ${block.satuan}</td>
+                                            <td style="color: #64748B; padding: 8px 10px;">${lot.supplier_name}</td>
+                                            <td style="padding: 8px 10px;">
+                                                <input type="number" 
+                                                       name="usages[${lot.id}][qty_used]"
+                                                       data-material-id="${block.material_id}"
+                                                       data-lot-id="${lot.id}"
+                                                       data-max-qty="${lot.current_qty}"
+                                                       data-lot-idx="${lIdx}"
+                                                       class="form-input qty-usage-input"
+                                                       min="0"
+                                                       max="${lot.current_qty}"
+                                                       step="0.001"
+                                                       placeholder="0.000"
+                                                       ${isExpired ? 'disabled' : ''}
+                                                       oninput="onModalQtyInput(this, ${block.material_id}, ${lot.current_qty})"
+                                                       style="width: 100%; height: 32px; font-size: 12.5px; font-weight: 600; padding: 0 8px; border-radius: 6px; border: 1px solid #CBD5E1;">
+                                                <input type="hidden" name="usages[${lot.id}][material_lot_id]" value="${lot.id}">
+                                                <div id="mwarn_${lot.id}" style="display:none; font-size: 11px; color: #DC2626; margin-top: 2px;"></div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="material-block-header" style="padding-bottom: 10px; margin-bottom: 10px;">
+                    <div class="material-title-group">
+                        <div class="material-avatar" style="width: 32px; height: 32px; font-size: 13px;">${block.material_name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #071E49;">${block.material_name}</h4>
+                            <div style="font-size: 11.5px; color: #64748B;">Resep: ${block.qty_per_porsi} ${block.satuan} / porsi</div>
+                        </div>
+                    </div>
+                    <div class="material-pills-group">
+                        <span class="pill-info" style="font-size: 11.5px; padding: 3px 8px;">Kebutuhan: <strong>${block.kebutuhan} ${block.satuan}</strong></span>
+                        <span class="pill-info" id="mselected_${block.material_id}" style="font-size: 11.5px; padding: 3px 8px;">Terpilih: <strong>0.000 ${block.satuan}</strong></span>
+                        <span class="pill-kurang" id="mstatusPill_${block.material_id}" style="font-size: 11.5px; padding: 3px 10px;">Kurang ${block.kebutuhan} ${block.satuan}</span>
+                        ${block.lots && block.lots.length > 0 ? `
+                            <button type="button" class="btn-fefo" onclick="autoFillModalFefo(${block.material_id})" style="font-size: 11.5px; padding: 4px 10px;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <span>Isi otomatis FEFO</span>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+                ${lotsHtml}
+            `;
+
+            container.appendChild(card);
+        });
+
+        updateModalOverallSummary();
+    }
+
+    function onModalQtyInput(input, materialId, maxQty) {
+        const val = parseFloat(input.value) || 0;
+        const warnDiv = document.getElementById(`mwarn_${input.getAttribute('data-lot-id')}`);
+
+        if (val > maxQty) {
+            warnDiv.style.display = 'block';
+            warnDiv.textContent = `Stok lot hanya ${maxQty}`;
+            input.style.borderColor = '#DC2626';
+        } else {
+            warnDiv.style.display = 'none';
+            input.style.borderColor = '#CBD5E1';
+        }
+
+        updateModalMaterialBlockStatus(materialId);
+        updateModalOverallSummary();
+    }
+
+    function updateModalMaterialBlockStatus(materialId) {
+        const block = currentBlocks.find(b => b.material_id === materialId);
+        if (!block) return;
+
+        const inputs = document.querySelectorAll(`#modalMaterialBlocksContainer .qty-usage-input[data-material-id="${materialId}"]`);
+        let totalUsed = 0;
+        inputs.forEach(inp => totalUsed += (parseFloat(inp.value) || 0));
+
+        totalUsed = Math.round(totalUsed * 1000) / 1000;
+        const pillSelected = document.getElementById(`mselected_${materialId}`);
+        const pillStatus = document.getElementById(`mstatusPill_${materialId}`);
+
+        if (pillSelected) pillSelected.innerHTML = `Terpilih: <strong>${totalUsed.toFixed(3)} ${block.satuan}</strong>`;
+
+        const diff = Math.round((block.kebutuhan - totalUsed) * 1000) / 1000;
+        if (pillStatus) {
+            if (diff <= 0) {
+                pillStatus.className = 'pill-terpenuhi';
+                pillStatus.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Terpenuhi</span>`;
+            } else {
+                pillStatus.className = 'pill-kurang';
+                pillStatus.innerHTML = `Kurang ${diff.toFixed(3)} ${block.satuan}`;
+            }
+        }
+    }
+
+    function autoFillModalFefo(materialId) {
+        const block = currentBlocks.find(b => b.material_id === materialId);
+        if (!block) return;
+
+        let needed = block.kebutuhan;
+        const inputs = Array.from(document.querySelectorAll(`#modalMaterialBlocksContainer .qty-usage-input[data-material-id="${materialId}"]`));
+
+        inputs.forEach(input => {
+            if (input.disabled) return;
+            const max = parseFloat(input.getAttribute('data-max-qty') || '0');
+
+            if (needed <= 0) {
+                input.value = '';
+            } else if (max <= needed) {
+                input.value = max.toFixed(3);
+                needed = Math.round((needed - max) * 1000) / 1000;
+            } else {
+                input.value = needed.toFixed(3);
+                needed = 0;
+            }
+            input.dispatchEvent(new Event('input'));
+        });
+    }
+
+    function updateModalOverallSummary() {
+        let allSatisfied = true;
+        let shortages = [];
+
+        currentBlocks.forEach(b => {
+            const inputs = document.querySelectorAll(`#modalMaterialBlocksContainer .qty-usage-input[data-material-id="${b.material_id}"]`);
+            let total = 0;
+            inputs.forEach(inp => total += (parseFloat(inp.value) || 0));
+
+            const diff = Math.round((b.kebutuhan - total) * 1000) / 1000;
+            if (diff > 0) {
+                allSatisfied = false;
+                shortages.push(`${b.material_name} kurang ${diff} ${b.satuan}`);
+            }
+        });
+
+        const summaryText = document.getElementById('modalOverallShortageText');
+        if (summaryText) {
+            if (allSatisfied && currentBlocks.length > 0) {
+                summaryText.style.color = '#16A34A';
+                summaryText.textContent = 'Semua bahan resep telah terpenuhi!';
+            } else if (shortages.length > 0) {
+                summaryText.style.color = '#DC2626';
+                summaryText.textContent = shortages.join(' • ');
+            }
+        }
+    }
+
+    function openExtraMaterialModal() {
+        document.getElementById('modalExtraMaterial').classList.add('show');
+    }
+
+    function closeExtraMaterialModal() {
+        document.getElementById('modalExtraMaterial').classList.remove('show');
+    }
+
+    async function confirmAddExtraMaterial() {
+        const select = document.getElementById('extraMaterialSelect');
+        const matId = parseInt(select.value, 10);
+        if (!matId) {
+            alert('Pilih bahan terlebih dahulu.');
+            return;
+        }
+
+        const date = document.getElementById('modalProductionDate').value;
+        closeExtraMaterialModal();
+
+        try {
+            const res = await fetch(`/staff/batch/material-lots?material_id=${matId}&production_date=${date}`);
+            const data = await res.json();
+            if (!data.success) {
+                alert(data.message || 'Gagal memuat lot bahan.');
+                return;
+            }
+
+            renderExtraMaterialBlock(data.material, data.lots);
+        } catch (e) {
+            alert('Terjadi kesalahan: ' + e.message);
+        }
+    }
+
+    function renderExtraMaterialBlock(material, lots) {
+        const container = document.getElementById('modalExtraMaterialsContainer');
+        const card = document.createElement('div');
+        card.className = 'material-block-card';
+        card.style.padding = '14px 16px';
+        card.style.marginBottom = '14px';
+        card.style.borderLeft = '3.5px solid #0284C7';
+
+        let lotsHtml = '';
+        if (!lots || lots.length === 0) {
+            lotsHtml = `<div style="padding:12px; color:#64748B; font-size:12px; text-align:center;">Tidak ada stok lot tersedia.</div>`;
+        } else {
+            lotsHtml = `
+                <div class="table-responsive" style="margin-top: 8px;">
+                    <table class="staff-table data-table" style="font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 130px; padding: 8px 10px;">Barcode</th>
+                                <th style="width: 120px; padding: 8px 10px;">No. Lot</th>
+                                <th style="width: 120px; padding: 8px 10px;">Kedaluwarsa</th>
+                                <th style="width: 100px; padding: 8px 10px;">Sisa Stok</th>
+                                <th style="min-width: 130px; padding: 8px 10px;">Pemasok</th>
+                                <th style="width: 140px; padding: 8px 10px;">Pakai (${material.satuan})</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${lots.map(lot => `
+                                <tr>
+                                    <td style="font-family: monospace; font-weight: 600; padding: 8px 10px;">${lot.barcode}</td>
+                                    <td style="padding: 8px 10px;">${lot.lot_number || '-'}</td>
+                                    <td style="padding: 8px 10px;">${lot.expiry_date_formatted}</td>
+                                    <td style="font-weight: 600; padding: 8px 10px;">${lot.current_qty} ${material.satuan}</td>
+                                    <td style="color: #64748B; padding: 8px 10px;">${lot.supplier_name}</td>
+                                    <td style="padding: 8px 10px;">
+                                        <input type="number" 
+                                               name="usages[${lot.id}][qty_used]"
+                                               class="form-input qty-usage-input"
+                                               min="0"
+                                               max="${lot.current_qty}"
+                                               step="0.001"
+                                               placeholder="0.000"
+                                               style="width: 100%; height: 32px; font-size: 12.5px; font-weight: 600; padding: 0 8px; border-radius: 6px; border: 1px solid #CBD5E1;">
+                                        <input type="hidden" name="usages[${lot.id}][material_lot_id]" value="${lot.id}">
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        card.innerHTML = `
+            <div class="material-block-header" style="padding-bottom: 8px; margin-bottom: 8px;">
+                <div class="material-title-group">
+                    <div class="material-avatar" style="width: 30px; height: 30px; font-size: 12px; background:#E0F2FE; color:#0284C7;">+</div>
+                    <div>
+                        <h4 style="margin: 0; font-size: 13.5px; font-weight: 700; color: #071E49;">${material.nama} <span class="chip-kategori" style="background:#E0F2FE; color:#0369A1; border:none; font-size:11px;">Bahan Luar Resep</span></h4>
+                    </div>
+                </div>
+                <button type="button" class="btn-danger-outline" onclick="this.closest('.material-block-card').remove()" style="font-size:11.5px; padding:3px 8px;">Hapus</button>
+            </div>
+            ${lotsHtml}
+        `;
+
+        container.appendChild(card);
+    }
+
+    function submitModalBatch(actionType) {
+        document.getElementById('modalFormAction').value = actionType;
+        
+        // Disable lot inputs yang kosong/0 agar tidak memicu validasi error di backend
+        document.querySelectorAll('#modalCreateBatch .qty-usage-input').forEach(input => {
+            const val = parseFloat(input.value) || 0;
+            if (val <= 0) {
+                input.disabled = true;
+                const hiddenInput = input.parentElement.querySelector('input[type="hidden"]');
+                if (hiddenInput) hiddenInput.disabled = true;
+            }
+        });
+
+        document.getElementById('createBatchForm').submit();
+    }
+
+    function confirmAndSubmitModalBatch() {
+        let unfulfilled = [];
+        currentBlocks.forEach(b => {
+            const inputs = document.querySelectorAll(`#modalMaterialBlocksContainer .qty-usage-input[data-material-id="${b.material_id}"]`);
+            let total = 0;
+            inputs.forEach(inp => total += (parseFloat(inp.value) || 0));
+
+            const diff = Math.round((b.kebutuhan - total) * 1000) / 1000;
+            if (diff > 0) {
+                unfulfilled.push(`Bahan ${b.material_name} masih kurang ${diff} ${b.satuan}`);
+            }
+        });
+
+        if (unfulfilled.length > 0) {
+            alert("Konfirmasi Ditolak:\n" + unfulfilled.join("\n") + "\n\nSemua bahan resep harus memenuhi target sebelum batch dapat dikonfirmasi.");
+            return;
+        }
+
+        if (confirm("Konfirmasi batch sekarang?\nStok bahan akan langsung dipotong dan batch akan dikunci.")) {
+            submitModalBatch('confirm');
+        }
+    }
+
     function openConfirmModal(id, code, menu, target) {
         const form = document.getElementById('formConfirmBatch');
         form.action = `/staff/batch/${id}/confirm`;

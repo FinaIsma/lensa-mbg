@@ -27,13 +27,13 @@
         @csrf
         <input type="hidden" name="action" id="formAction" value="draft">
 
-        {{-- Langkah 1: Pengaturan Menu, Porsi & Tanggal --}}
+        {{-- Bagian 1: Pengaturan Menu, Porsi & Tanggal --}}
         <div class="detail-card" style="margin-bottom: 24px;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px;">
                 <div style="width: 28px; height: 28px; border-radius: 50%; background: #042A70; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">
                     1
                 </div>
-                <h2 class="detail-card-title" style="margin-bottom: 0;">Langkah 1: Tentukan Menu & Target Porsi</h2>
+                <h2 class="detail-card-title" style="margin-bottom: 0;">Tentukan Menu & Target Porsi</h2>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
@@ -108,7 +108,7 @@
                         2
                     </div>
                     <div>
-                        <h2 class="detail-card-title" style="margin-bottom: 0;">Langkah 2: Kebutuhan Bahan & Alokasi Lot Bahan</h2>
+                        <h2 class="detail-card-title" style="margin-bottom: 0;">Kebutuhan Bahan & Alokasi Lot Bahan</h2>
                         <p style="margin: 2px 0 0; font-size: 12.5px; color: #64748B;">Gunakan tombol Isi Otomatis FEFO atau tentukan jumlah pemakaian tiap lot.</p>
                     </div>
                 </div>
@@ -116,7 +116,7 @@
                 {{-- Action Tambah Bahan Luar Resep --}}
                 <button type="button" onclick="openExtraMaterialModal()" class="btn-secondary" style="font-size: 12.5px; padding: 7px 14px;">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>+ Tambah Bahan di Luar Resep</span>
+                    <span>Tambah Bahan di Luar Resep</span>
                 </button>
             </div>
 
@@ -624,6 +624,17 @@
 
     function submitBatch(actionType) {
         document.getElementById('formAction').value = actionType;
+
+        // Disable lot inputs yang kosong/0 agar tidak memicu validasi error di backend
+        document.querySelectorAll('.qty-usage-input').forEach(input => {
+            const val = parseFloat(input.value) || 0;
+            if (val <= 0) {
+                input.disabled = true;
+                const hiddenInput = input.parentElement.querySelector('input[type="hidden"]');
+                if (hiddenInput) hiddenInput.disabled = true;
+            }
+        });
+
         document.getElementById('batchForm').submit();
     }
 

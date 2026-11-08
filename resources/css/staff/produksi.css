@@ -124,32 +124,38 @@
     border: 1px solid #F1F5F9;
 }
 
+.staff-table.data-table,
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13.5px;
+    font-size: 13px;
     text-align: left;
 }
 
+.staff-table.data-table thead th,
 .data-table thead th {
     background: #F8FAFC;
-    color: #475569;
-    font-weight: 600;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 12px 16px;
-    border-bottom: 1px solid #E2E8F0;
+    color: #071E49;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: none;
+    letter-spacing: -0.01em;
+    padding: 12px 14px;
+    border-bottom: 1.5px solid #E2E8F0;
     white-space: nowrap;
 }
 
+.staff-table.data-table tbody td,
 .data-table tbody td {
-    padding: 14px 16px;
+    padding: 12px 14px;
     border-bottom: 1px solid #F1F5F9;
-    color: #1E293B;
+    color: #071E49;
+    font-size: 13px;
     vertical-align: middle;
 }
 
+.staff-table.data-table tbody tr:hover td,
+.data-table tbody tr:hover td,
 .data-table tbody tr:hover {
     background-color: #F8FAFC;
 }
@@ -495,35 +501,35 @@
 .detail-card {
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
-    border-radius: 14px;
-    padding: 24px;
+    border-radius: 12px;
+    padding: 16px 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .detail-card-title {
-    font-size: 16px;
+    font-size: 14.5px;
     font-weight: 700;
     color: #071E49;
-    margin: 0 0 16px;
+    margin: 0 0 14px;
     letter-spacing: -0.01em;
 }
 
 .tabs-nav {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     border-bottom: 2px solid #E2E8F0;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
     overflow-x: auto;
     padding-bottom: 2px;
 }
 
 .tab-btn {
-    padding: 10px 18px;
+    padding: 8px 14px;
     background: transparent;
     border: none;
-    border-bottom: 3px solid transparent;
-    font-size: 13.5px;
+    border-bottom: 2.5px solid transparent;
+    font-size: 12.5px;
     font-weight: 600;
     color: #64748B;
     cursor: pointer;
@@ -655,6 +661,17 @@
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content-custom.modal-large {
+    max-width: 960px;
+    width: 95%;
+    max-height: 90vh;
+}
+
+.modal-content-custom.modal-medium {
+    max-width: 720px;
+    width: 95%;
 }
 
 @keyframes modalSlideIn {

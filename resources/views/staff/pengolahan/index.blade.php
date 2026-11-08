@@ -15,7 +15,7 @@
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            <span>+ Tambah Tahap Kerja</span>
+            <span>Tambah Tahap Kerja</span>
         </button>
     </div>
 
@@ -89,15 +89,15 @@
 
     {{-- Filter Bar --}}
     <div class="table-card" style="padding: 16px 20px; margin-bottom: 24px;">
-        <form method="GET" action="{{ route('staff.pengolahan.index') }}" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <form method="GET" action="{{ route('staff.pengolahan.index') }}" style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+            <div style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;">
                 <div>
-                    <label style="font-size: 12px; font-weight: 600; color: #64748B; margin-right: 6px;">Tanggal Produksi:</label>
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: #64748B; margin-bottom: 5px;">Tanggal Produksi</label>
                     <input type="date" name="date" value="{{ $dateFilter }}" onchange="this.form.submit()" class="form-input" style="height: 38px; font-size: 13px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 10px;">
                 </div>
 
                 <div>
-                    <label style="font-size: 12px; font-weight: 600; color: #64748B; margin-right: 6px;">Pilih Batch:</label>
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: #64748B; margin-bottom: 5px;">Pilih Batch</label>
                     <select name="batch_id" onchange="this.form.submit()" class="form-select" style="height: 38px; font-size: 13px; border-radius: 8px; border: 1px solid #CBD5E1; padding: 0 12px; min-width: 220px;">
                         <option value="">Semua Batch Aktif</option>
                         @foreach ($activeBatchOptions as $bOpt)
@@ -109,13 +109,15 @@
                 </div>
 
                 @if ($dateFilter || $batchIdFilter)
-                    <a href="{{ route('staff.pengolahan.index') }}" class="btn-secondary" style="height: 38px; padding: 0 12px; font-size: 12.5px; display: inline-flex; align-items: center;">
-                        Reset Filter
-                    </a>
+                    <div style="display: flex; align-items: flex-end;">
+                        <a href="{{ route('staff.pengolahan.index') }}" class="btn-secondary" style="height: 38px; padding: 0 14px; font-size: 12.5px; display: inline-flex; align-items: center; border-radius: 8px; box-sizing: border-box;">
+                            Reset Filter
+                        </a>
+                    </div>
                 @endif
             </div>
 
-            <div style="font-size: 12.5px; color: #64748B;">
+            <div style="font-size: 12.5px; color: #64748B; padding-bottom: 8px;">
                 Menampilkan <strong>{{ $batches->count() }}</strong> batch dalam antrean pengolahan
             </div>
         </form>
@@ -157,7 +159,7 @@
                             class="btn-secondary" 
                             style="font-size: 13px; font-weight: 600; padding: 7px 14px;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        <span>+ Tambah Tahap</span>
+                        <span>Tambah Tahap</span>
                     </button>
                     <a href="{{ route('staff.batches.show', $batch->id) }}" class="btn-action-icon" title="Lihat Detail Batch">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
@@ -169,7 +171,7 @@
             @if ($steps->isEmpty())
                 <div style="text-align: center; padding: 30px 20px; background: #F8FAFC; border-radius: 10px; margin-top: 18px;">
                     <div style="color: #64748B; font-size: 13px;">Belum ada tahap yang dicatat untuk batch ini.</div>
-                    <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">Klik tombol "+ Tambah Tahap" di atas untuk memulai pencatatan alur pengolahan.</div>
+                    <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">Klik tombol "Tambah Tahap" di atas untuk memulai pencatatan alur pengolahan.</div>
                     <button type="button" 
                             onclick="openAddStepModal({{ $batch->id }}, '{{ $batch->batch_code }}', '{{ $batch->menu?->nama }}', '{{ $batch->menu?->kategori }}')" 
                             class="btn-primary" 
