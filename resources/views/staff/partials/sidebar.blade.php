@@ -19,7 +19,7 @@
 
         {{-- 2. Master (Dropdown) --}}
         @php
-            $isMasterActive = request()->routeIs('staff.suppliers.*') || request()->routeIs('staff.materials.*') || request()->routeIs('staff.menu-resep.*') || request()->routeIs('staff.menus.*') || request()->routeIs('staff.recipes.*');
+            $isMasterActive = request()->routeIs('staff.suppliers.*') || request()->routeIs('staff.materials.*') || request()->routeIs('staff.menu-resep.*') || request()->routeIs('staff.menus.*') || request()->routeIs('staff.recipes.*') || request()->routeIs('staff.destinations.*');
         @endphp
         <div class="nav-group {{ $isMasterActive ? 'open' : '' }}">
             <button type="button" class="nav-group-header {{ $isMasterActive ? 'parent-active' : '' }}" onclick="toggleSidebarNavGroup(this)">
@@ -46,7 +46,7 @@
                 <a href="{{ route('staff.menu-resep.index') }}" class="nav-subitem {{ (request()->routeIs('staff.menu-resep.*') || request()->routeIs('staff.menus.*') || request()->routeIs('staff.recipes.*')) ? 'active' : '' }}">
                     <span>Menu dan Resep</span>
                 </a>
-                <a href="#" class="nav-subitem" onclick="return false;">
+                <a href="{{ route('staff.destinations.index') }}" class="nav-subitem {{ request()->routeIs('staff.destinations.*') ? 'active' : '' }}">
                     <span>Tujuan</span>
                 </a>
             </div>
