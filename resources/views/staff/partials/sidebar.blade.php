@@ -101,7 +101,7 @@
 
         {{-- 5. Produksi (Dropdown) --}}
         @php
-            $isProduksiActive = request()->routeIs('staff.batches.*') || request()->routeIs('staff.pengolahan.*');
+            $isProduksiActive = request()->routeIs('staff.batches.*') || request()->routeIs('staff.pengolahan.*') || request()->routeIs('staff.hasil.*');
         @endphp
         <div class="nav-group {{ $isProduksiActive ? 'open' : '' }}">
             <button type="button" class="nav-group-header {{ $isProduksiActive ? 'parent-active' : '' }}" onclick="toggleSidebarNavGroup(this)">
@@ -122,7 +122,7 @@
             <div class="nav-subitems">
                 <a href="{{ route('staff.batches.index') }}" class="nav-subitem {{ request()->routeIs('staff.batches.*') ? 'active' : '' }}"><span>Batch</span></a>
                 <a href="{{ route('staff.pengolahan.index') }}" class="nav-subitem {{ request()->routeIs('staff.pengolahan.*') ? 'active' : '' }}"><span>Pengolahan</span></a>
-                <a href="#" class="nav-subitem" onclick="return false;" title="Pencatatan hasil produksi (tahap selanjutnya)"><span>Hasil</span></a>
+                <a href="{{ route('staff.hasil.index') }}" class="nav-subitem {{ request()->routeIs('staff.hasil.*') ? 'active' : '' }}"><span>Hasil</span></a>
             </div>
         </div>
 

@@ -11,6 +11,7 @@ use App\Http\Controllers\KepalaSPPG\ProfileController;
 use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Staff\BatchController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Staff\HasilController;
 use App\Http\Controllers\Staff\DestinationController;
 use App\Http\Controllers\Staff\LotController;
 use App\Http\Controllers\Staff\MaterialController;
@@ -193,6 +194,12 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::get('/pengolahan', [PengolahanController::class, 'index'])->name('pengolahan.index');
     Route::post('/pengolahan/tahap', [PengolahanController::class, 'storeStep'])->name('pengolahan.step.store');
     Route::post('/pengolahan/tahap/{id}/selesaikan', [PengolahanController::class, 'completeStep'])->name('pengolahan.step.complete');
+
+    // Produksi - Hasil
+    Route::get('/hasil', [HasilController::class, 'index'])->name('hasil.index');
+    Route::get('/hasil/batch/{id}', [HasilController::class, 'getBatchInfo'])->name('hasil.batch-info');
+    Route::post('/hasil', [HasilController::class, 'store'])->name('hasil.store');
+    Route::post('/hasil/susut', [HasilController::class, 'storeSusut'])->name('hasil.susut.store');
 
     // Ubah Kata Sandi Staff
     Route::post('/ubah-kata-sandi', [ProfileController::class, 'updatePassword'])->name('password.update');
