@@ -11,6 +11,7 @@ use App\Http\Controllers\KepalaSPPG\ProfileController;
 use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Staff\BatchController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Staff\DestinationController;
 use App\Http\Controllers\Staff\LotController;
 use App\Http\Controllers\Staff\MaterialController;
 use App\Http\Controllers\Staff\MenuResepController;
@@ -124,6 +125,13 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::get('/bahan/{id}', [MaterialController::class, 'show'])->name('materials.show');
     Route::put('/bahan/{id}', [MaterialController::class, 'update'])->name('materials.update');
     Route::post('/bahan/{id}/toggle-status', [MaterialController::class, 'toggleStatus'])->name('materials.toggle');
+
+    // Data Master - Tujuan
+    Route::get('/tujuan', [DestinationController::class, 'index'])->name('destinations.index');
+    Route::post('/tujuan', [DestinationController::class, 'store'])->name('destinations.store');
+    Route::get('/tujuan/{id}', [DestinationController::class, 'show'])->name('destinations.show');
+    Route::put('/tujuan/{id}', [DestinationController::class, 'update'])->name('destinations.update');
+    Route::delete('/tujuan/{id}', [DestinationController::class, 'destroy'])->name('destinations.destroy');
 
     // Data Master - Menu & Resep
     Route::get('/menu-resep', [MenuResepController::class, 'index'])->name('menu-resep.index');

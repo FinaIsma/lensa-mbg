@@ -1,0 +1,823 @@
+/* ==========================================================================
+   Modul Data Tujuan Distribusi - Staff SPPG Styles
+   ========================================================================== */
+
+.tujuan-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: 32px;
+}
+
+/* Page Header */
+.tujuan-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tujuan-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #071E49;
+    margin: 0;
+    line-height: 1.25;
+}
+
+.tujuan-subtitle {
+    font-size: 14px;
+    color: #64748B;
+    margin: 0;
+}
+
+/* Stat Cards Grid */
+.tujuan-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.tujuan-stat-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid #E2E8F0;
+    padding: 22px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tujuan-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px -2px rgba(7, 30, 73, 0.06);
+}
+
+.tujuan-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tujuan-icon-box.icon-blue {
+    background-color: #EFF6FF;
+    color: #2563EB;
+}
+
+.tujuan-icon-box.icon-green {
+    background-color: #DCFCE7;
+    color: #16A34A;
+}
+
+.tujuan-icon-box.icon-indigo {
+    background-color: #EEF2FF;
+    color: #4F46E5;
+}
+
+.tujuan-stat-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.tujuan-stat-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748B;
+}
+
+.tujuan-stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #071E49;
+    line-height: 1.2;
+    margin: 3px 0;
+}
+
+.tujuan-stat-sub {
+    font-size: 12px;
+    color: #94A3B8;
+}
+
+/* Unified Table Card Container */
+.tujuan-table-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+}
+
+/* Filter Bar */
+.tujuan-filter-bar {
+    padding: 20px 24px;
+    border-bottom: 1px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.tujuan-search-box {
+    position: relative;
+    flex: 1;
+    min-width: 260px;
+    max-width: 420px;
+}
+
+.tujuan-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    pointer-events: none;
+}
+
+.tujuan-search-input {
+    width: 100%;
+    padding: 10px 14px 10px 42px;
+    font-size: 14px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    color: #0F172A;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.tujuan-search-input:focus {
+    outline: none;
+    border-color: #071E49;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(7, 30, 73, 0.08);
+}
+
+.tujuan-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.tujuan-select-wrapper {
+    position: relative;
+}
+
+.tujuan-select {
+    appearance: none;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 10px 38px 10px 14px;
+    font-size: 14px;
+    color: #334155;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tujuan-select:focus {
+    outline: none;
+    border-color: #071E49;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(7, 30, 73, 0.08);
+}
+
+.tujuan-select-chevron {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748B;
+    pointer-events: none;
+}
+
+.btn-tujuan-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #071E49;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(7, 30, 73, 0.12);
+}
+
+.btn-tujuan-primary:hover {
+    background-color: #042A70;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(7, 30, 73, 0.18);
+}
+
+/* Table */
+.tujuan-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tujuan-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.tujuan-table th {
+    background-color: #F8FAFC;
+    color: #64748B;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 14px 20px;
+    border-bottom: 1px solid #E2E8F0;
+    white-space: nowrap;
+}
+
+.tujuan-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #F1F5F9;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.tujuan-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.tujuan-table tbody tr:hover {
+    background-color: #F8FAFC;
+}
+
+.tujuan-name-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.tujuan-name-link {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #071E49;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.tujuan-name-link:hover {
+    color: #2563EB;
+    text-decoration: underline;
+}
+
+.tujuan-name-meta {
+    font-size: 12px;
+    color: #94A3B8;
+}
+
+/* Badges for Tipe */
+.badge-tipe {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-tipe-sekolah {
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+    border: 1px solid #BFDBFE;
+}
+
+.badge-tipe-posyandu {
+    background-color: #ECFDF5;
+    color: #047857;
+    border: 1px solid #A7F3D0;
+}
+
+.badge-tipe-lainnya {
+    background-color: #F3E8FF;
+    color: #7E22CE;
+    border: 1px solid #E9D5FF;
+}
+
+.badge-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #F1F5F9;
+    color: #475569;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+/* Action Buttons */
+.tujuan-actions-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-table-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #E2E8F0;
+    background-color: #FFFFFF;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-table-action:hover {
+    background-color: #F8FAFC;
+    border-color: #CBD5E1;
+    color: #071E49;
+}
+
+.btn-table-action.btn-detail:hover {
+    background-color: #EFF6FF;
+    border-color: #BFDBFE;
+    color: #2563EB;
+}
+
+.btn-table-action.btn-edit:hover {
+    background-color: #F0FDF4;
+    border-color: #BBF7D0;
+    color: #16A34A;
+}
+
+.btn-table-action.btn-delete:hover {
+    background-color: #FEF2F2;
+    border-color: #FECACA;
+    color: #DC2626;
+}
+
+/* Empty State */
+.tujuan-empty-state {
+    text-align: center;
+    padding: 48px 20px;
+}
+
+.tujuan-empty-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    color: #94A3B8;
+    background: #F1F5F9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tujuan-empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0F172A;
+    margin: 0 0 6px 0;
+}
+
+.tujuan-empty-desc {
+    font-size: 13.5px;
+    color: #64748B;
+    margin: 0 0 18px 0;
+}
+
+/* Pagination Wrapper */
+.tujuan-pagination-wrapper {
+    padding: 16px 24px;
+    border-top: 1px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   SLIDE-OVER DRAWER (DETAIL TUJUAN)
+   ========================================================================== */
+.tujuan-drawer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 1050;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.tujuan-drawer-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tujuan-drawer-dialog {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 520px;
+    background-color: #FFFFFF;
+    box-shadow: -4px 0 25px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1051;
+}
+
+.tujuan-drawer-backdrop.show .tujuan-drawer-dialog {
+    transform: translateX(0);
+}
+
+.tujuan-drawer-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #F8FAFC;
+}
+
+.tujuan-drawer-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #071E49;
+    margin: 0;
+}
+
+.tujuan-drawer-close {
+    background: none;
+    border: none;
+    color: #64748B;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.tujuan-drawer-close:hover {
+    background-color: #E2E8F0;
+    color: #0F172A;
+}
+
+.tujuan-drawer-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tujuan-drawer-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #E2E8F0;
+    background-color: #F8FAFC;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Drawer Inner Cards */
+.drawer-entity-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.drawer-entity-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #071E49;
+    margin: 0 0 4px 0;
+}
+
+.drawer-info-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.drawer-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.drawer-info-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748B;
+}
+
+.drawer-info-value {
+    font-size: 14px;
+    color: #0F172A;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.drawer-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.drawer-metric-box {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.drawer-metric-label {
+    font-size: 12px;
+    color: #64748B;
+    font-weight: 500;
+}
+
+.drawer-metric-val {
+    font-size: 22px;
+    font-weight: 700;
+    color: #071E49;
+    margin-top: 4px;
+}
+
+/* History Table in Drawer */
+.drawer-history-table-wrapper {
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.drawer-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.drawer-history-table th {
+    background-color: #F8FAFC;
+    padding: 10px 14px;
+    color: #64748B;
+    font-size: 11.5px;
+    font-weight: 600;
+    border-bottom: 1px solid #E2E8F0;
+    text-align: left;
+}
+
+.drawer-history-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #F1F5F9;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.drawer-history-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* ==========================================================================
+   MODAL POPUP (TAMBAH & UBAH TUJUAN)
+   ========================================================================== */
+.tujuan-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 1060;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.tujuan-modal-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tujuan-modal-dialog {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.96);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tujuan-modal-backdrop.show .tujuan-modal-dialog {
+    transform: scale(1);
+}
+
+.tujuan-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #F8FAFC;
+}
+
+.tujuan-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #071E49;
+    margin: 0;
+}
+
+.tujuan-modal-close {
+    background: none;
+    border: none;
+    color: #64748B;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.tujuan-modal-close:hover {
+    background-color: #E2E8F0;
+    color: #0F172A;
+}
+
+.tujuan-modal-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-height: calc(85vh - 140px);
+    overflow-y: auto;
+}
+
+.tujuan-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tujuan-form-label {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #0F172A;
+}
+
+.tujuan-form-label .required {
+    color: #EF4444;
+}
+
+.tujuan-form-input,
+.tujuan-form-select,
+.tujuan-form-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    color: #0F172A;
+    box-sizing: border-box;
+    transition: all 0.15s ease;
+}
+
+.tujuan-form-input:focus,
+.tujuan-form-select:focus,
+.tujuan-form-textarea:focus {
+    outline: none;
+    border-color: #071E49;
+    box-shadow: 0 0 0 3px rgba(7, 30, 73, 0.1);
+}
+
+.tujuan-form-help {
+    font-size: 12px;
+    color: #64748B;
+    margin-top: 2px;
+}
+
+.tujuan-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #E2E8F0;
+    background-color: #F8FAFC;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-modal-cancel {
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748B;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-modal-cancel:hover {
+    background-color: #F1F5F9;
+    color: #334155;
+}
+
+.btn-modal-submit {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: #071E49;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 4px rgba(7, 30, 73, 0.1);
+}
+
+.btn-modal-submit:hover {
+    background-color: #042A70;
+}
+
+.btn-modal-delete {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: #DC2626;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-modal-delete:hover {
+    background-color: #B91C1C;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .tujuan-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
