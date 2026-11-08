@@ -21,6 +21,7 @@
         'resources/css/staff/lots.css',
         'resources/css/staff/pemasok.css',
         'resources/css/staff/bahan.css',
+        'resources/css/staff/produksi.css',
         'resources/js/app.js',
         'resources/js/staff/menu-resep.js',
         'resources/js/staff/riwayat.js',
