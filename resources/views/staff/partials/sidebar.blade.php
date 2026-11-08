@@ -100,8 +100,11 @@
         </div>
 
         {{-- 5. Produksi (Dropdown) --}}
-        <div class="nav-group">
-            <button type="button" class="nav-group-header" onclick="toggleSidebarNavGroup(this)">
+        @php
+            $isProduksiActive = request()->routeIs('staff.batches.*') || request()->routeIs('staff.pengolahan.*');
+        @endphp
+        <div class="nav-group {{ $isProduksiActive ? 'open' : '' }}">
+            <button type="button" class="nav-group-header {{ $isProduksiActive ? 'parent-active' : '' }}" onclick="toggleSidebarNavGroup(this)">
                 <div class="nav-group-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 2l4 4-10 10-4-4L18 2z"></path>
@@ -117,9 +120,9 @@
                 </svg>
             </button>
             <div class="nav-subitems">
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Batch</span></a>
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Pengolahan</span></a>
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Hasil</span></a>
+                <a href="{{ route('staff.batches.index') }}" class="nav-subitem {{ request()->routeIs('staff.batches.*') ? 'active' : '' }}"><span>Batch</span></a>
+                <a href="{{ route('staff.pengolahan.index') }}" class="nav-subitem {{ request()->routeIs('staff.pengolahan.*') ? 'active' : '' }}"><span>Pengolahan</span></a>
+                <a href="#" class="nav-subitem" onclick="return false;" title="Pencatatan hasil produksi (tahap selanjutnya)"><span>Hasil</span></a>
             </div>
         </div>
 

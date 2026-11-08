@@ -9,10 +9,12 @@ use App\Http\Controllers\KepalaSPPG\CorrectionRequestController as KepalaSPPGCor
 use App\Http\Controllers\KepalaSPPG\DashboardController as KepalaSPPGDashboardController;
 use App\Http\Controllers\KepalaSPPG\ProfileController;
 use App\Http\Controllers\KepalaSPPG\StaffManagementController;
+use App\Http\Controllers\Staff\BatchController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\LotController;
 use App\Http\Controllers\Staff\MaterialController;
 use App\Http\Controllers\Staff\MenuResepController;
+use App\Http\Controllers\Staff\PengolahanController;
 use App\Http\Controllers\Staff\PurchaseController;
 use App\Http\Controllers\Staff\ReceivingController;
 use App\Http\Controllers\Staff\RiwayatController;
@@ -166,6 +168,23 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::get('/lot/{id}', [LotController::class, 'show'])->name('lots.show')->whereNumber('id');
     Route::get('/lot/{id}/print', [LotController::class, 'print'])->name('lots.print')->whereNumber('id');
     Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
+
+    // Produksi - Batch
+    Route::get('/batch', [BatchController::class, 'index'])->name('batches.index');
+    Route::get('/batch/create', [BatchController::class, 'create'])->name('batches.create');
+    Route::get('/batch/recipe-materials', [BatchController::class, 'getRecipeMaterials'])->name('batches.recipe-materials');
+    Route::get('/batch/material-lots', [BatchController::class, 'getMaterialLots'])->name('batches.material-lots');
+    Route::post('/batch', [BatchController::class, 'store'])->name('batches.store');
+    Route::get('/batch/{id}', [BatchController::class, 'show'])->name('batches.show');
+    Route::get('/batch/{id}/edit', [BatchController::class, 'edit'])->name('batches.edit');
+    Route::put('/batch/{id}', [BatchController::class, 'update'])->name('batches.update');
+    Route::post('/batch/{id}/confirm', [BatchController::class, 'confirm'])->name('batches.confirm');
+    Route::post('/batch/{id}/cancel', [BatchController::class, 'cancel'])->name('batches.cancel');
+
+    // Produksi - Pengolahan
+    Route::get('/pengolahan', [PengolahanController::class, 'index'])->name('pengolahan.index');
+    Route::post('/pengolahan/tahap', [PengolahanController::class, 'storeStep'])->name('pengolahan.step.store');
+    Route::post('/pengolahan/tahap/{id}/selesaikan', [PengolahanController::class, 'completeStep'])->name('pengolahan.step.complete');
 
     // Ubah Kata Sandi Staff
     Route::post('/ubah-kata-sandi', [ProfileController::class, 'updatePassword'])->name('password.update');

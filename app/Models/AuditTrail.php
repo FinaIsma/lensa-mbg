@@ -299,6 +299,7 @@ class AuditTrail extends Model
 
         return $q->where(function (Builder $w) use ($like) {
             $w->where('audit_trails.actor_nama', 'ilike', $like)
+                ->orWhereRaw("'AUD-' || LPAD(audit_trails.id::text, 4, '0') ILIKE ?", [$like])
                 // SPPG
                 ->orWhere(fn ($x) => $x->where('audit_trails.auditable_type', Keys::SPPG_TABLE)
                     ->whereRaw("'SPPG' || LPAD(audit_trails.auditable_id::text, 3, '0') ILIKE ?", [$like]))
