@@ -127,8 +127,11 @@
         </div>
 
         {{-- 6. Distribusi (Dropdown) --}}
-        <div class="nav-group">
-            <button type="button" class="nav-group-header" onclick="toggleSidebarNavGroup(this)">
+        @php
+            $isDistribusiActive = request()->routeIs('staff.pengiriman.*') || request()->routeIs('staff.limbah.*');
+        @endphp
+        <div class="nav-group {{ $isDistribusiActive ? 'open' : '' }}">
+            <button type="button" class="nav-group-header {{ $isDistribusiActive ? 'parent-active' : '' }}" onclick="toggleSidebarNavGroup(this)">
                 <div class="nav-group-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="1" y="3" width="15" height="13"></rect>
@@ -143,7 +146,7 @@
                 </svg>
             </button>
             <div class="nav-subitems">
-                <a href="#" class="nav-subitem" onclick="return false;"><span>Pengiriman</span></a>
+                <a href="{{ route('staff.pengiriman.index') }}" class="nav-subitem {{ request()->routeIs('staff.pengiriman.*') ? 'active' : '' }}"><span>Pengiriman</span></a>
                 <a href="{{ route('staff.limbah.index') }}" class="nav-subitem {{ request()->routeIs('staff.limbah.*') ? 'active' : '' }}"><span>Limbah</span></a>
             </div>
         </div>

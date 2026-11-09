@@ -25,6 +25,7 @@
         'resources/css/staff/produksi.css',
         'resources/css/staff/hasil.css',
         'resources/css/staff/limbah.css',
+        'resources/css/staff/pengiriman.css',
         'resources/js/app.js',
         'resources/js/staff/menu-resep.js',
         'resources/js/staff/riwayat.js',
@@ -34,6 +35,7 @@
         'resources/js/staff/hasil.js',
         'resources/js/staff/limbah.js',
         'resources/js/staff/tujuan.js',
+        'resources/js/staff/pengiriman.js',
         'resources/js/KepalaSPPG/profile-modals.js',
     ])
 

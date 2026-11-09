@@ -31,6 +31,7 @@ export default defineConfig({
                 'resources/css/staff/produksi.css',
                 'resources/css/staff/hasil.css',
                 'resources/css/staff/limbah.css',
+                'resources/css/staff/pengiriman.css',
                 'resources/js/app.js',
                 'resources/js/auth/login.js',
                 'resources/js/auth/register.js',
@@ -50,6 +51,7 @@ export default defineConfig({
                 'resources/js/staff/hasil.js',
                 'resources/js/staff/limbah.js',
                 'resources/js/staff/tujuan.js',
+                'resources/js/staff/pengiriman.js',
             ],
             refresh: true,
             fonts: [

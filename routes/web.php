@@ -13,6 +13,7 @@ use App\Http\Controllers\Staff\BatchController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\HasilController;
 use App\Http\Controllers\Staff\LimbahController;
+use App\Http\Controllers\Staff\PengirimanController;
 use App\Http\Controllers\Staff\DestinationController;
 use App\Http\Controllers\Staff\LotController;
 use App\Http\Controllers\Staff\MaterialController;
@@ -201,6 +202,16 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::get('/hasil/batch/{id}', [HasilController::class, 'getBatchInfo'])->name('hasil.batch-info');
     Route::post('/hasil', [HasilController::class, 'store'])->name('hasil.store');
     Route::post('/hasil/susut', [HasilController::class, 'storeSusut'])->name('hasil.susut.store');
+
+    // Distribusi - Pengiriman
+    Route::get('/pengiriman', [PengirimanController::class, 'index'])->name('pengiriman.index');
+    Route::get('/pengiriman/batch-info/{id}', [PengirimanController::class, 'getBatchInfo'])->name('pengiriman.batch-info');
+    Route::post('/pengiriman', [PengirimanController::class, 'store'])->name('pengiriman.store');
+    Route::get('/pengiriman/{id}', [PengirimanController::class, 'show'])->name('pengiriman.show');
+    Route::put('/pengiriman/{id}', [PengirimanController::class, 'update'])->name('pengiriman.update');
+    Route::post('/pengiriman/{id}/kirim', [PengirimanController::class, 'markAsSent'])->name('pengiriman.mark-sent');
+    Route::post('/pengiriman/{id}/terima', [PengirimanController::class, 'markAsReceived'])->name('pengiriman.mark-received');
+    Route::post('/pengiriman/{id}/batal', [PengirimanController::class, 'cancel'])->name('pengiriman.cancel');
 
     // Distribusi - Limbah
     Route::get('/limbah', [LimbahController::class, 'index'])->name('limbah.index');
