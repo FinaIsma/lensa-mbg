@@ -22,9 +22,14 @@ class DashboardController extends Controller
 
         // 1. SPPG Statistics
         $dbTotalSppg = Sppg::count();
-        $dbPendingVerifikasi = Sppg::where(function ($q) {
-            $q->whereIn('status_verifikasi', ['menunggu_verifikasi', 'perubahan'])
-                ->orWhere('status', 'menunggu_verifikasi');
+        $hasStatusVerifikasi = Schema::hasColumn('sppg', 'status_verifikasi');
+        $dbPendingVerifikasi = Sppg::where(function ($q) use ($hasStatusVerifikasi) {
+            if ($hasStatusVerifikasi) {
+                $q->whereIn('status_verifikasi', ['menunggu_verifikasi', 'perubahan'])
+                    ->orWhere('status', 'menunggu_verifikasi');
+            } else {
+                $q->where('status', 'menunggu_verifikasi');
+            }
         })->count();
         $dbActiveSppg = Sppg::where('status', 'aktif')->count();
         $dbInactiveSppg = Sppg::where('status', 'nonaktif')->count();

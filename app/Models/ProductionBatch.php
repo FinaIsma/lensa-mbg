@@ -97,6 +97,27 @@ class ProductionBatch extends Model
     }
 
     /**
+     * Relasi ke daftar pengiriman distribusi
+     */
+    public function distributions(): HasMany
+    {
+        return $this->hasMany(Distribution::class, 'production_batch_id');
+    }
+
+    /**
+     * Sisa porsi batch yang belum dialokasikan ke pengiriman
+     */
+    public function getSisaPorsiSiapKirimAttribute(): int
+    {
+        $actual = (int) ($this->actual_porsi ?? 0);
+        $allocated = (int) $this->distributions()
+            ->where('status', '!=', 'cancelled')
+            ->sum('portions_sent');
+
+        return max(0, $actual - $allocated);
+    }
+
+    /**
      * Bukti foto terkait batch
      */
     public function evidences(): HasMany
