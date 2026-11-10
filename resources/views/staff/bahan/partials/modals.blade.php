@@ -1,118 +1,113 @@
 {{-- =====================================================================
      1. PANEL DETAIL BAHAN BAKU (SLIDE-OVER DRAWER)
      ===================================================================== --}}
-<div class="bahan-drawer-backdrop" id="drawerDetailBahan">
-    <div class="bahan-drawer-dialog">
-        {{-- Header Drawer --}}
-        <div class="bahan-drawer-header">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="bahan-icon-box icon-blue" style="width: 38px; height: 38px;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="bahan-drawer-title">Detail Bahan Baku</h3>
-                    <span style="font-size: 12px; color: #64748B;">Informasi spesifikasi bahan & riwayat lot persediaan</span>
-                </div>
-            </div>
-            <button type="button" class="bahan-modal-close" onclick="closeDetailPanelBahan()" aria-label="Tutup Panel">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
+<div class="bahan-drawer-backdrop" id="bahanDrawerBackdrop" onclick="closeDetailPanelBahan()"></div>
+<aside class="purchase-drawer" id="drawerDetailBahan" role="dialog" aria-modal="true" aria-label="Detail Bahan Baku">
+    {{-- Header Drawer --}}
+    <div class="purchase-drawer-header">
+        <div>
+            <h2 class="purchase-drawer-title">Detail Bahan Baku</h2>
+            <p class="purchase-drawer-subtitle">Informasi spesifikasi bahan &amp; riwayat lot persediaan</p>
         </div>
+        <button type="button" class="modal-close-corner" onclick="closeDetailPanelBahan()" aria-label="Tutup Panel" title="Tutup">
+            &times;
+        </button>
+    </div>
 
-        {{-- Body Drawer --}}
-        <div class="bahan-drawer-body">
-            {{-- Entity Header Card --}}
-            <div class="drawer-entity-card">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="detail_bahan_kode" style="font-weight: 700; font-size: 13px; color: #071E49; background-color: #EEF2F6; padding: 2px 8px; border-radius: 4px;">-</span>
-                        <h4 id="detail_bahan_nama" class="drawer-entity-name" style="margin: 0;">-</h4>
-                    </div>
-                    <span id="detail_bahan_kategori_satuan" style="font-size: 12.5px; color: #64748B; margin-top: 4px; display: block;">Kategori: - | Satuan: -</span>
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
-                    <div id="detail_bahan_aktif_chip">
-                        <span class="chip-status chip-aktif">
-                            <span class="chip-dot"></span>
-                            Aktif
+    {{-- Body Drawer (Scrollable) --}}
+    <div class="purchase-drawer-scroll">
+        {{-- Card 1: Informasi Bahan --}}
+        <div class="detail-card">
+            <div class="bahan-drawer-card-header">
+                <h3 class="detail-card-title">Informasi Bahan</h3>
+                <div class="bahan-drawer-chips">
+                    <span id="detail_bahan_aktif_chip">
+                        <span class="badge-status badge-draft">
+                            <span class="status-dot"></span>
+                            Memuat...
                         </span>
-                    </div>
-                    <div id="detail_bahan_indikator_chip">
-                        <span class="chip-status chip-aman">
-                            <span class="chip-dot"></span>
-                            Aman
-                        </span>
-                    </div>
+                    </span>
+                    <span id="detail_bahan_indikator_chip"></span>
                 </div>
             </div>
 
-            {{-- 2 Statistik Mini Persediaan --}}
-            <div class="drawer-metrics-grid">
-                <div class="drawer-metric-box">
-                    <span class="drawer-metric-label">Stok Total</span>
-                    <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 4px;">
-                        <span id="detail_bahan_total_stok" class="drawer-metric-val" style="color: #071E49; font-size: 18px;">0</span>
+            <div class="detail-grid-2col-exact">
+                <div class="bahan-col-group">
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Kode Bahan</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value"><span id="detail_bahan_kode" class="bahan-code-badge">-</span></span>
                     </div>
-                    <span style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Lot available yang belum kedaluwarsa</span>
-                </div>
-
-                <div class="drawer-metric-box">
-                    <span class="drawer-metric-label">Stok Minimum</span>
-                    <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 4px;">
-                        <span id="detail_bahan_min_stock" class="drawer-metric-val" style="color: #475569; font-size: 18px;">0</span>
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Nama Bahan</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_bahan_nama" style="font-weight: 700;">-</span>
                     </div>
-                    <span style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Batas pemicu status peringatan</span>
-                </div>
-            </div>
-
-            {{-- Riwayat / Daftar Lot Bahan --}}
-            <div class="drawer-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h5 style="font-size: 13.5px; font-weight: 700; color: #071E49; margin: 0;">Riwayat Lot Bahan</h5>
-                    <span id="detail_bahan_lot_count" style="font-size: 12px; color: #64748B;">-</span>
-                </div>
-                <div class="drawer-lot-table-wrapper">
-                    <table class="drawer-lot-table">
-                        <thead>
-                            <tr>
-                                <th>No. Lot</th>
-                                <th>Pemasok</th>
-                                <th>Tgl Terima</th>
-                                <th>Kedaluwarsa</th>
-                                <th style="text-align: right;">Sisa Qty</th>
-                                <th style="text-align: center;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detail_bahan_lot_tbody">
-                            <tr>
-                                <td colspan="6" style="text-align: center; color: #94A3B8; padding: 24px 0;">Memuat riwayat lot...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Kategori</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_bahan_kategori">-</span>
+                    </div>
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Satuan</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_bahan_satuan">-</span>
+                    </div>
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Stok Total</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_bahan_total_stok" style="font-weight: 700;">0</span>
+                    </div>
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Stok Minimum</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_bahan_min_stock" style="font-weight: 600;">0</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- Footer Drawer --}}
-        <div class="bahan-drawer-footer">
-            <button type="button" class="btn-drawer-close" onclick="closeDetailPanelBahan()">Tutup</button>
-            <button type="button" id="btnEditFromDrawer" class="btn-drawer-edit" onclick="openModalEditBahanFromDetail()">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 20h9"></path>
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-                <span>Ubah Bahan</span>
-            </button>
+        {{-- Card 2: Riwayat / Daftar Lot Bahan --}}
+        <div class="detail-card">
+            <div class="bahan-drawer-card-header">
+                <h3 class="detail-card-title">Riwayat Lot Bahan</h3>
+                <span id="detail_bahan_lot_count" class="bahan-lot-count">-</span>
+            </div>
+
+            <div class="drawer-lot-table-wrapper">
+                <table class="drawer-lot-table">
+                    <thead>
+                        <tr>
+                            <th>No. Lot</th>
+                            <th>Pemasok</th>
+                            <th>Tgl Terima</th>
+                            <th>Kedaluwarsa</th>
+                            <th style="text-align: right;">Sisa Qty</th>
+                            <th style="text-align: center;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detail_bahan_lot_tbody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #94A3B8; padding: 24px 0;">Memuat riwayat lot...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+
+    {{-- Footer Drawer --}}
+    <div class="purchase-drawer-footer">
+        <button type="button" class="btn-edit-action" onclick="closeDetailPanelBahan()">Tutup</button>
+        <button type="button" id="btnEditFromDrawer" class="btn-pesan-action" onclick="openModalEditBahanFromDetail()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            <span>Ubah Bahan</span>
+        </button>
+    </div>
+</aside>
 
 {{-- =====================================================================
      2. MODAL TAMBAH BAHAN BAKU

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==========================================
     // 1. PANEL DETAIL (SLIDE-OVER DRAWER)
     // ==========================================
-    window.openDetailPanel = async function (id) {
+    window.openDetailPanelPemasok = async function (id) {
         if (!drawerDetail) return;
 
         const requestId = ++activeDetailRequestId;
@@ -143,7 +143,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    window.closeDetailPanel = function () {
+    window.openDetailPanel = window.openDetailPanelPemasok;
+
+    window.closeDetailPanelPemasok = function () {
         activeDetailRequestId++;
         if (drawerDetail) drawerDetail.classList.remove('open');
         if (drawerBackdrop) drawerBackdrop.classList.remove('open');
@@ -156,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
         detailBtnEdit.addEventListener('click', function () {
             if (currentDetailSupplier) {
                 const supplierToEdit = currentDetailSupplier;
-                closeDetailPanel();
+                closeDetailPanelPemasok();
                 openModalEditPemasok(supplierToEdit);
             }
         });
@@ -233,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
             if (drawerDetail && drawerDetail.classList.contains('open')) {
-                closeDetailPanel();
+                closeDetailPanelPemasok();
             }
         }
     });

@@ -7,8 +7,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalEdit = document.getElementById('modalEditBahan');
     const modalToggle = document.getElementById('modalToggleStatusBahan');
     const drawerDetail = document.getElementById('drawerDetailBahan');
+    const drawerBackdrop = document.getElementById('bahanDrawerBackdrop');
 
     let currentDetailMaterial = null;
+    let activeDetailRequestId = 0;
+
+    function syncBodyScrollLock() {
+        const hasOpen = document.querySelector('#drawerDetailBahan.open, #modalTambahBahan.show, #modalEditBahan.show, #modalToggleStatusBahan.show');
+        document.body.style.overflow = hasOpen ? 'hidden' : '';
+    }
 
     // ==========================================
     // 1. PANEL DETAIL BAHAN (SLIDE-OVER DRAWER)
@@ -16,10 +23,14 @@ document.addEventListener('DOMContentLoaded', function () {
     window.openDetailPanelBahan = async function (id) {
         if (!drawerDetail) return;
 
+        const requestId = ++activeDetailRequestId;
+        currentDetailMaterial = null;
+
         // Reset display
         const kodeEl = document.getElementById('detail_bahan_kode');
         const namaEl = document.getElementById('detail_bahan_nama');
-        const katSatEl = document.getElementById('detail_bahan_kategori_satuan');
+        const kategoriEl = document.getElementById('detail_bahan_kategori');
+        const satuanEl = document.getElementById('detail_bahan_satuan');
         const aktifChipEl = document.getElementById('detail_bahan_aktif_chip');
         const indChipEl = document.getElementById('detail_bahan_indikator_chip');
         const totalStokEl = document.getElementById('detail_bahan_total_stok');
@@ -29,16 +40,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (kodeEl) kodeEl.textContent = '...';
         if (namaEl) namaEl.textContent = 'Memuat data...';
-        if (katSatEl) katSatEl.textContent = 'Kategori: - | Satuan: -';
+        if (kategoriEl) kategoriEl.textContent = '-';
+        if (satuanEl) satuanEl.textContent = '-';
         if (totalStokEl) totalStokEl.textContent = '-';
         if (minStockEl) minStockEl.textContent = '-';
-        if (lotCountEl) lotCountEl.textContent = '';
+        if (lotCountEl) lotCountEl.textContent = '-';
+        if (aktifChipEl) {
+            aktifChipEl.innerHTML = '<span class="badge-status badge-draft"><span class="status-dot"></span>Memuat...</span>';
+        }
+        if (indChipEl) indChipEl.innerHTML = '';
         if (lotTbody) {
             lotTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #94A3B8; padding: 24px 0;">Memuat riwayat lot...</td></tr>';
         }
 
-        drawerDetail.classList.add('is-active');
-        document.body.style.overflow = 'hidden';
+        drawerDetail.classList.add('open');
+        if (drawerBackdrop) drawerBackdrop.classList.add('open');
+        syncBodyScrollLock();
 
         try {
             const res = await fetch(`/staff/bahan/${id}`, {
@@ -49,31 +66,30 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!res.ok) throw new Error('Gagal memuat detail bahan');
             const resJson = await res.json();
+            if (requestId !== activeDetailRequestId) return;
+
             const data = resJson.data;
             currentDetailMaterial = data;
 
-            if (kodeEl) kodeEl.textContent = data.kode;
-            if (namaEl) namaEl.textContent = data.nama;
-            if (katSatEl) katSatEl.textContent = `Kategori: ${data.kategori || '-'} | Satuan: ${data.satuan || '-'}`;
+            if (kodeEl) kodeEl.textContent = data.kode || '-';
+            if (namaEl) namaEl.textContent = data.nama || '-';
+            if (kategoriEl) kategoriEl.textContent = data.kategori || '-';
+            if (satuanEl) satuanEl.textContent = data.satuan || '-';
 
             if (aktifChipEl) {
-                if (data.is_active) {
-                    aktifChipEl.innerHTML = '<span class="chip-status chip-aktif"><span class="chip-dot"></span>Aktif</span>';
-                } else {
-                    aktifChipEl.innerHTML = '<span class="chip-status chip-nonaktif"><span class="chip-dot"></span>Nonaktif</span>';
-                }
+                aktifChipEl.innerHTML = data.is_active
+                    ? '<span class="badge-status badge-received"><span class="status-dot"></span>Aktif</span>'
+                    : '<span class="badge-status badge-draft"><span class="status-dot"></span>Nonaktif</span>';
             }
 
             if (indChipEl) {
-                if (data.indikator === 'Aman') {
-                    indChipEl.innerHTML = '<span class="chip-status chip-aman"><span class="chip-dot"></span>Aman</span>';
-                } else {
-                    indChipEl.innerHTML = '<span class="chip-status chip-di-bawah-min"><span class="chip-dot"></span>Di bawah minimum</span>';
-                }
+                indChipEl.innerHTML = data.indikator === 'Aman'
+                    ? '<span class="badge-status badge-safe"><span class="status-dot"></span>Aman</span>'
+                    : '<span class="badge-status badge-cancelled"><span class="status-dot"></span>Di bawah minimum</span>';
             }
 
-            if (totalStokEl) totalStokEl.textContent = data.formatted_total_stok;
-            if (minStockEl) minStockEl.textContent = data.formatted_min_stock;
+            if (totalStokEl) totalStokEl.textContent = data.formatted_total_stok || '0';
+            if (minStockEl) minStockEl.textContent = data.formatted_min_stock || '0';
 
             // Render Lots
             const lots = data.lots || [];
@@ -83,36 +99,40 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (lots.length === 0) {
                     lotTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #94A3B8; padding: 24px 0;">Belum ada lot persediaan untuk bahan ini.</td></tr>';
                 } else {
-                    let html = '';
-                    lots.forEach((lot) => {
+                    lotTbody.innerHTML = lots.map((lot) => {
                         const statusClass = lot.status === 'available' ? 'chip-aman' : 'chip-nonaktif';
-                        const statusLabel = lot.status === 'available' ? 'Tersedia' : (lot.status || '-');
-                        const expiredBadge = lot.is_expired ? '<span style="color: #DC2626; font-size: 10.5px; font-weight: 600;">(Kedaluwarsa)</span>' : '';
+                        const statusLabel = lot.status === 'available'
+                            ? 'Tersedia'
+                            : (lot.status === 'depleted' ? 'Habis' : (lot.status === 'voided' ? 'Dibatalkan' : (lot.status || '-')));
+                        const expiredBadge = lot.is_expired
+                            ? '<span style="color: #DC2626; font-size: 10.5px; font-weight: 600;">(Kedaluwarsa)</span>'
+                            : '';
 
-                        html += `
+                        return `
                             <tr>
-                                <td style="font-weight: 600; color: #071E49;">${lot.lot_number || '-'}</td>
-                                <td style="color: #475569;">${lot.supplier_nama || '-'}</td>
-                                <td style="color: #64748B;">${lot.received_date || '-'}</td>
+                                <td style="font-weight: 600; color: #071E49;">${escapeHtml(lot.lot_number || '-')}</td>
+                                <td style="color: #475569;">${escapeHtml(lot.supplier_nama || '-')}</td>
+                                <td style="color: #64748B;">${escapeHtml(lot.received_date || '-')}</td>
                                 <td style="color: ${lot.is_expired ? '#DC2626' : '#64748B'};">
-                                    ${lot.expiry_date || '-'} ${expiredBadge}
+                                    ${escapeHtml(lot.expiry_date || '-')} ${expiredBadge}
                                 </td>
                                 <td style="text-align: right; font-weight: 600; color: #0F172A;">
-                                    ${lot.current_qty} ${data.satuan}
+                                    ${escapeHtml(`${lot.current_qty} ${data.satuan || ''}`.trim())}
                                 </td>
                                 <td style="text-align: center;">
                                     <span class="chip-status ${statusClass}" style="padding: 2px 8px; font-size: 11px;">
-                                        ${statusLabel}
+                                        ${escapeHtml(statusLabel)}
                                     </span>
                                 </td>
                             </tr>
                         `;
-                    });
-                    lotTbody.innerHTML = html;
+                    }).join('');
                 }
             }
         } catch (e) {
+            if (requestId !== activeDetailRequestId) return;
             console.error(e);
+            if (namaEl) namaEl.textContent = 'Gagal memuat';
             if (lotTbody) {
                 lotTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #DC2626; padding: 20px 0;">Gagal memuat data dari server.</td></tr>';
             }
@@ -120,15 +140,17 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     window.closeDetailPanelBahan = function () {
-        if (!drawerDetail) return;
-        drawerDetail.classList.remove('is-active');
-        document.body.style.overflow = '';
+        activeDetailRequestId++;
+        if (drawerDetail) drawerDetail.classList.remove('open');
+        if (drawerBackdrop) drawerBackdrop.classList.remove('open');
+        syncBodyScrollLock();
     };
 
     window.openModalEditBahanFromDetail = function () {
         if (currentDetailMaterial) {
+            const materialToEdit = currentDetailMaterial;
             closeDetailPanelBahan();
-            openModalEditBahan(currentDetailMaterial);
+            openModalEditBahan(materialToEdit);
         }
     };
 
@@ -142,14 +164,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (form) form.reset();
         clearModalErrors(modal);
         modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        syncBodyScrollLock();
     };
 
     window.closeModalTambahBahan = function () {
         const modal = document.getElementById('modalTambahBahan');
         if (!modal) return;
         modal.classList.remove('show');
-        document.body.style.overflow = '';
+        syncBodyScrollLock();
     };
 
     // ==========================================
@@ -220,14 +242,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        syncBodyScrollLock();
     };
 
     window.closeModalEditBahan = function () {
         const modal = document.getElementById('modalEditBahan');
         if (!modal) return;
         modal.classList.remove('show');
-        document.body.style.overflow = '';
+        syncBodyScrollLock();
     };
 
     // ==========================================
@@ -283,14 +305,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        syncBodyScrollLock();
     };
 
     window.closeModalToggleStatusBahan = function () {
         const modal = document.getElementById('modalToggleStatusBahan');
         if (!modal) return;
         modal.classList.remove('show');
-        document.body.style.overflow = '';
+        syncBodyScrollLock();
     };
 
     // Close modal on backdrop click
@@ -299,30 +321,26 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.addEventListener('click', function (e) {
             if (e.target === modal) {
                 modal.classList.remove('show');
-                document.body.style.overflow = '';
+                syncBodyScrollLock();
             }
         });
     });
 
-    // Close drawer on backdrop click
-    if (drawerDetail) {
-        drawerDetail.addEventListener('click', function (e) {
-            if (e.target === drawerDetail) {
-                closeDetailPanelBahan();
-            }
-        });
-    }
-
     // Close on Escape key
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
+            let closedModal = false;
             [modalTambah, modalEdit, modalToggle].forEach((modal) => {
                 if (modal && modal.classList.contains('show')) {
                     modal.classList.remove('show');
-                    document.body.style.overflow = '';
+                    closedModal = true;
                 }
             });
-            if (drawerDetail && drawerDetail.classList.contains('is-active')) {
+            if (closedModal) {
+                syncBodyScrollLock();
+                return;
+            }
+            if (drawerDetail && drawerDetail.classList.contains('open')) {
                 closeDetailPanelBahan();
             }
         }
@@ -335,5 +353,13 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.querySelectorAll('.bahan-form-input, .bahan-select').forEach((el) => {
             el.style.borderColor = '#CBD5E1';
         });
+    }
+
+    // Helper: Escape HTML
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        const div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
     }
 });

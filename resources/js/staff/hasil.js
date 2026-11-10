@@ -46,7 +46,7 @@ export function handleHasilBatchChange(select) {
     }
 
     currentBatchTarget = parseInt(selectedOpt.getAttribute('data-target') || '0', 10);
-    
+
     const menuEl = document.getElementById('info_menu');
     const targetEl = document.getElementById('info_target');
     const tglEl = document.getElementById('info_tgl');
@@ -92,19 +92,22 @@ export function calculateHasilSusut() {
     }
 
     const portionsReady = parseInt(valStr, 10);
+    if (Number.isNaN(portionsReady) || portionsReady < 0) {
+        if (warnExcess) warnExcess.style.display = 'none';
+        if (infoSusut) infoSusut.style.display = 'none';
+        portionsInput.style.borderColor = '#CBD5E1';
+        return;
+    }
 
     if (warnTargetVal) warnTargetVal.innerText = currentBatchTarget.toLocaleString('id-ID');
     if (warnReadyVal) warnReadyVal.innerText = portionsReady.toLocaleString('id-ID');
 
-    // Kasus 1: Melebihi target [BARU: Peringatan, bukan blokir. Susut tampil 0 dan catatan]
+    // Kasus 1: Melebihi target [BARU: Peringatan, bukan blokir. Susut tampil 0]
     if (portionsReady > currentBatchTarget) {
         const excess = portionsReady - currentBatchTarget;
         if (warnExcess) warnExcess.style.display = 'block';
         if (warnExcessDiff) warnExcessDiff.innerText = excess.toLocaleString('id-ID');
-        if (infoSusut) infoSusut.style.display = 'block';
-        if (susutMsgText) {
-            susutMsgText.innerHTML = `<strong>Info Otomatis:</strong> Susut: <strong>0 porsi</strong> (Target terpenuhi, surplus +${excess.toLocaleString('id-ID')} porsi).`;
-        }
+        if (infoSusut) infoSusut.style.display = 'none';
         portionsInput.style.borderColor = '#F59E0B';
     }
     // Kasus 2: Kurang dari target (Ada susut dihitung otomatis)
@@ -113,7 +116,7 @@ export function calculateHasilSusut() {
         if (warnExcess) warnExcess.style.display = 'none';
         if (infoSusut) infoSusut.style.display = 'block';
         if (susutMsgText) {
-            susutMsgText.innerHTML = `<strong>Info Otomatis Susut:</strong> Ditemukan susut sebanyak <strong style="color: #DC2626;">${susut.toLocaleString('id-ID')}</strong> porsi. Setelah disimpan, Anda dapat langsung mencatat susut ini ke formulir Limbah tipe <em>PRODUCTION_LOSS</em>.`;
+            susutMsgText.innerHTML = `Susut: <strong style="color: #DC2626;">${susut.toLocaleString('id-ID')} porsi</strong> (bisa dicatat ke Limbah).`;
         }
         portionsInput.style.borderColor = '#CBD5E1';
     }
@@ -122,7 +125,7 @@ export function calculateHasilSusut() {
         if (warnExcess) warnExcess.style.display = 'none';
         if (infoSusut) infoSusut.style.display = 'block';
         if (susutMsgText) {
-            susutMsgText.innerHTML = `<strong>Info Otomatis:</strong> Susut: <strong>0 porsi</strong>. Target terpenuhi 100% tanpa susut pengolahan.`;
+            susutMsgText.innerHTML = `Susut: <strong>0 porsi</strong> (sesuai target).`;
         }
         portionsInput.style.borderColor = '#10B981';
     }
@@ -146,7 +149,7 @@ export function previewEvidenceImage(input) {
     if (input.files && input.files[0]) {
         const file = input.files[0];
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             const img = document.getElementById('preview_img');
             const box = document.getElementById('image_preview_box');
             if (img && box) {
@@ -270,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Close on backdrop click
     const backdropAdd = document.getElementById('modalAddHasil');
     if (backdropAdd) {
-        backdropAdd.addEventListener('click', function(e) {
+        backdropAdd.addEventListener('click', function (e) {
             if (e.target === backdropAdd) {
                 closeAddHasilModal();
             }
@@ -279,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const backdropSusut = document.getElementById('modalCatatSusut');
     if (backdropSusut) {
-        backdropSusut.addEventListener('click', function(e) {
+        backdropSusut.addEventListener('click', function (e) {
             if (e.target === backdropSusut) {
                 closeCatatSusutModal();
             }
