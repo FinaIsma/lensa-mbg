@@ -649,10 +649,27 @@ class PengirimanController extends Controller
         }
 
         if (Auth::check()) {
-            return Staff::where('id_user', Auth::id())->first();
+            $webUser = Auth::user();
+            if ($webUser && ! empty($webUser->email)) {
+                $staffByEmail = Staff::where('email', $webUser->email)->first();
+                if ($staffByEmail) {
+                    return $staffByEmail;
+                }
+            }
+
+            $idSppg = $webUser->id_sppg ?? null;
+            if (! $idSppg && isset($webUser->id_user)) {
+                $idSppg = DB::table(Keys::SPPG_TABLE)->where(Keys::SPPG_OWNER, $webUser->id_user)->value(Keys::SPPG_PK);
+            }
+            if ($idSppg) {
+                $staffInSppg = Staff::where('id_sppg', $idSppg)->first();
+                if ($staffInSppg) {
+                    return $staffInSppg;
+                }
+            }
         }
 
-        return null;
+        return Staff::first();
     }
 
     /**
@@ -664,7 +681,11 @@ class PengirimanController extends Controller
         $idSppg = $staff?->id_sppg;
 
         if (! $idSppg && Auth::check()) {
-            $idSppg = DB::table(Keys::SPPG_TABLE)->where(Keys::SPPG_OWNER, Auth::id())->value(Keys::SPPG_PK);
+            $user = Auth::user();
+            $idSppg = $user->id_sppg ?? null;
+            if (! $idSppg && isset($user->id_user)) {
+                $idSppg = DB::table(Keys::SPPG_TABLE)->where(Keys::SPPG_OWNER, $user->id_user)->value(Keys::SPPG_PK);
+            }
         }
 
         return (int) ($idSppg ?? 1);
