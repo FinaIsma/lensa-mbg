@@ -1,7 +1,7 @@
 {{-- =====================================================================
      1. PANEL DETAIL PEMASOK (SLIDE-OVER DRAWER)
      ===================================================================== --}}
-<div class="pemasok-drawer-backdrop" id="pemasokDrawerBackdrop" onclick="closeDetailPanel()"></div>
+<div class="pemasok-drawer-backdrop" id="pemasokDrawerBackdrop" onclick="closeDetailPanelPemasok()"></div>
 <aside class="purchase-drawer" id="drawerDetailPemasok" role="dialog" aria-modal="true" aria-label="Detail Pemasok">
     {{-- Header Drawer --}}
     <div class="purchase-drawer-header">
@@ -9,7 +9,7 @@
             <h2 class="purchase-drawer-title">Detail Pemasok</h2>
             <p class="purchase-drawer-subtitle">Informasi lengkap vendor bahan pangan</p>
         </div>
-        <button type="button" class="modal-close-corner" onclick="closeDetailPanel()" aria-label="Tutup Panel" title="Tutup">
+        <button type="button" class="modal-close-corner" onclick="closeDetailPanelPemasok()" aria-label="Tutup Panel" title="Tutup">
             &times;
         </button>
     </div>
@@ -98,7 +98,7 @@
 
     {{-- Footer Drawer --}}
     <div class="purchase-drawer-footer">
-        <button type="button" class="btn-edit-action" onclick="closeDetailPanel()">Tutup</button>
+        <button type="button" class="btn-edit-action" onclick="closeDetailPanelPemasok()">Tutup</button>
         <button type="button" id="detail_btn_edit" class="btn-pesan-action">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 20h9"></path>

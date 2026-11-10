@@ -115,7 +115,7 @@
                     @forelse ($suppliers as $item)
                         <tr class="{{ strtolower($item->status) === 'inactive' ? 'row-pemasok-nonaktif' : '' }}">
                             <td>
-                                <a href="javascript:void(0)" class="pemasok-name-link" onclick="openDetailPanel({{ $item->id }})" title="Klik untuk melihat panel detail">
+                                <a href="javascript:void(0)" class="pemasok-name-link" onclick="openDetailPanelPemasok({{ $item->id }})" title="Klik untuk melihat panel detail">
                                     {{ $item->nama }}
                                 </a>
                             </td>
@@ -144,7 +144,7 @@
                             <td style="text-align: center; white-space: nowrap;">
                                 <div class="pemasok-actions-group">
                                     {{-- Tombol Detail (Ikon Saja) --}}
-                                    <button type="button" class="btn-pemasok-detail" onclick="openDetailPanel({{ $item->id }})" title="Lihat Detail Pemasok" aria-label="Lihat Detail Pemasok">
+                                    <button type="button" class="btn-pemasok-detail" onclick="openDetailPanelPemasok({{ $item->id }})" title="Lihat Detail Pemasok" aria-label="Lihat Detail Pemasok">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>

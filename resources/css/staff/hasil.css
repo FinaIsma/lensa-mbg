@@ -42,6 +42,7 @@
         opacity: 0;
         transform: translateY(16px) scale(0.98);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -53,7 +54,7 @@
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
     border-radius: 10px;
-    padding: 14px 16px;
+    padding: 12px 14px;
 }
 
 .hasil-batch-summary-header {
@@ -71,7 +72,7 @@
 .hasil-batch-summary-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 8px 16px;
     font-size: 12.5px;
 }
 
@@ -79,55 +80,74 @@
     color: #64748B;
     font-size: 11.5px;
     display: block;
+    margin-bottom: 2px;
 }
 
 .hasil-batch-summary-item strong {
     color: #071E49;
     font-size: 13px;
     font-weight: 600;
+    display: block;
+}
+
+.hasil-batch-summary-item strong.is-accent {
+    color: #0284C7;
+    font-weight: 700;
 }
 
 /* Badges Susut di Tabel */
 .chip-susut-loss {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     padding: 3px 10px;
     border-radius: 9999px;
     background: #FEE2E2;
     color: #DC2626;
+    border: 1px solid #FECACA;
     font-size: 12px;
     font-weight: 700;
+    line-height: 1.3;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 .chip-susut-zero {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     padding: 3px 10px;
     border-radius: 9999px;
     background: #DCFCE7;
     color: #15803D;
+    border: 1px solid #BBF7D0;
     font-size: 12px;
     font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Tombol Catat Susut Inline */
 .btn-catat-susut-inline {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 5px;
     background-color: #D97706;
     color: #FFFFFF;
     border: none;
-    padding: 5px 10px;
+    padding: 4px 10px;
     font-size: 11.5px;
     font-weight: 600;
+    line-height: 1.3;
     border-radius: 6px;
     cursor: pointer;
     text-decoration: none;
+    white-space: nowrap;
     transition: all 0.15s ease;
-    margin-top: 5px;
 }
 
 .btn-catat-susut-inline:hover {
@@ -139,14 +159,22 @@
 .badge-susut-recorded {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
+    justify-content: center;
+    gap: 4px;
     font-size: 11px;
-    color: #16A34A;
-    background: #DCFCE7;
-    padding: 3px 8px;
-    border-radius: 5px;
+    line-height: 1.3;
+    color: #15803D;
+    background: #ECFDF5;
+    border: 1px solid #BBF7D0;
+    padding: 3px 9px;
+    border-radius: 9999px;
     font-weight: 600;
-    margin-top: 5px;
+    white-space: nowrap;
+}
+
+.badge-susut-recorded svg,
+.btn-catat-susut-inline svg {
+    flex-shrink: 0;
 }
 
 /* Quick Suggestion Chips */
@@ -170,8 +198,8 @@
 /* Dropzone Upload */
 .hasil-upload-dropzone {
     border: 2px dashed #CBD5E1;
-    border-radius: 12px;
-    padding: 18px;
+    border-radius: 10px;
+    padding: 12px 14px;
     text-align: center;
     background: #F8FAFC;
     transition: all 0.2s ease;
@@ -180,6 +208,52 @@
 .hasil-upload-dropzone:hover {
     border-color: #042A70;
     background: #F1F5F9;
+}
+
+.hasil-upload-label {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.hasil-upload-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #EFF6FF;
+    color: #0284C7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hasil-modal-alert {
+    display: none;
+    margin-top: 8px;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.hasil-modal-alert-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hasil-modal-alert.is-warning {
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    color: #92400E;
+}
+
+.hasil-modal-alert.is-info {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    color: #1E40AF;
 }
 
 /* ==========================================================================
@@ -308,4 +382,308 @@
     color: #FFFFFF;
 }
 
+/* ==========================================================================
+   Hasil Produksi Table (Rapi, Selaras dengan Pemasok & Bahan)
+   ========================================================================== */
+.hasil-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
 
+.hasil-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.hasil-table thead th {
+    background: #F8FAFC;
+    color: #071E49;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    padding: 14px 12px;
+    border-bottom: 1px solid #E2E8F0;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.hasil-table tbody td {
+    padding: 16px 12px;
+    border-bottom: 1px solid #F1F5F9;
+    color: #0F172A;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.hasil-table th:first-child,
+.hasil-table td:first-child {
+    padding-left: 24px;
+}
+
+.hasil-table th:last-child,
+.hasil-table td:last-child {
+    padding-right: 24px;
+}
+
+.hasil-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.hasil-table tbody tr:hover td {
+    background-color: #F8FAFC;
+}
+
+.hasil-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.hasil-table .is-center {
+    text-align: center;
+}
+
+/* Proporsi Lebar Kolom Seimbang */
+.hasil-table th.col-batch {
+    width: 15%;
+    min-width: 155px;
+}
+
+.hasil-table th.col-menu {
+    width: 17%;
+    min-width: 155px;
+}
+
+.hasil-table th.col-target {
+    width: 8%;
+    min-width: 74px;
+}
+
+.hasil-table th.col-ready {
+    width: 9%;
+    min-width: 88px;
+}
+
+.hasil-table th.col-susut {
+    width: 13%;
+    min-width: 132px;
+}
+
+.hasil-table th.col-kondisi {
+    width: 17%;
+    min-width: 160px;
+}
+
+.hasil-table th.col-pencatat {
+    width: 11%;
+    min-width: 118px;
+}
+
+.hasil-table th.col-waktu {
+    width: 10%;
+    min-width: 100px;
+}
+
+/* Stack Konten Sel Tabel */
+.hasil-cell-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.hasil-cell-stack.is-center {
+    align-items: center;
+}
+
+.hasil-batch-link {
+    font-weight: 700;
+    font-size: 13px;
+    color: #042A70;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+}
+
+.hasil-batch-link:hover {
+    color: #1D4ED8;
+    text-decoration: underline;
+}
+
+.hasil-table .badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.hasil-table .badge-status .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.hasil-table .badge-status.badge-draft {
+    background-color: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+}
+
+.hasil-table .badge-status.badge-ordered {
+    background-color: #FEF3C7;
+    color: #B45309;
+    border: 1px solid #FDE68A;
+}
+
+.hasil-table .badge-status.badge-received {
+    background-color: #DCFCE7 !important;
+    color: #15803D !important;
+    border: 1px solid #BBF7D0;
+}
+
+.hasil-table .badge-status.badge-cancelled {
+    background-color: #FEE2E2 !important;
+    color: #B91C1C !important;
+    border: 1px solid #FECACA;
+}
+
+.hasil-menu-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: #071E49;
+    line-height: 1.4;
+}
+
+.hasil-table .chip-porsi {
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 6px;
+    line-height: 1.4;
+}
+
+.hasil-qty-target {
+    font-weight: 600;
+    font-size: 13px;
+    color: #0F172A;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.hasil-qty-ready {
+    font-weight: 700;
+    font-size: 14px;
+    color: #15803D;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.hasil-surplus-tag {
+    font-size: 11px;
+    color: #D97706;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.hasil-condition-text {
+    font-size: 12.5px;
+    color: #1E293B;
+    line-height: 1.45;
+}
+
+.hasil-condition-note {
+    font-size: 11.5px;
+    color: #64748B;
+    line-height: 1.4;
+}
+
+.btn-hasil-evidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    color: #1D4ED8;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 1.3;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.btn-hasil-evidence:hover {
+    background: #DBEAFE;
+    border-color: #BFDBFE;
+    color: #1E40AF;
+}
+
+.btn-hasil-evidence svg {
+    flex-shrink: 0;
+}
+
+.hasil-checker-name {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 12.5px;
+    color: #071E49;
+    line-height: 1.4;
+}
+
+.hasil-time-stack {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.hasil-time-date {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1E293B;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.hasil-time-hour {
+    font-size: 11px;
+    color: #94A3B8;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Empty State */
+.hasil-table tbody td.hasil-empty-cell {
+    text-align: center;
+    padding: 48px 24px;
+    color: #64748B;
+}
+
+.hasil-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.hasil-empty-icon {
+    color: #94A3B8;
+}
+
+.hasil-empty-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.hasil-empty-desc {
+    font-size: 12px;
+    color: #94A3B8;
+}
