@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditTrail;
-use App\Models\Material;
 use App\Models\Purchase;
-use App\Models\PurchaseItem;
 use App\Models\Staff;
 use App\Models\Supplier;
 use App\Support\Keys;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,7 +23,6 @@ class SupplierController extends Controller
     public function index(Request $request): View
     {
         $idSppg = $this->resolveSppgId();
-        $this->ensureSampleSuppliersAndPurchases($idSppg);
 
         $q = trim((string) $request->input('q', ''));
         $status = trim((string) $request->input('status', ''));
@@ -306,116 +302,5 @@ class SupplierController extends Controller
         abort_unless($idSppg, 403, 'Akun ini tidak terhubung ke SPPG mana pun.');
 
         return (int) $idSppg;
-    }
-
-    /**
-     * Pastikan data pemasok sample dan transaksi PO tersedia sesuai kebutuhan tampilan.
-     */
-    private function ensureSampleSuppliersAndPurchases(int $idSppg): void
-    {
-        if (Supplier::where('id_sppg', $idSppg)->count() === 0) {
-            $sampleSuppliers = [
-                [
-                    'nama' => 'CV Tani Makmur',
-                    'kontak' => '081255782666',
-                    'alamat' => 'Jl. Pasar Induk No. 34',
-                    'status' => 'active',
-                ],
-                [
-                    'nama' => 'UD Berkah Pangan',
-                    'kontak' => '081291661544',
-                    'alamat' => 'Jl. Pasar Induk No. 26',
-                    'status' => 'active',
-                ],
-                [
-                    'nama' => 'UD Berkah Pangan Utama',
-                    'kontak' => '081291661544',
-                    'alamat' => 'Jl. Pasar Induk No. 26',
-                    'status' => 'active',
-                ],
-                [
-                    'nama' => 'PT Samudra Segar',
-                    'kontak' => '081241766537',
-                    'alamat' => 'Jl. Pasar Induk No. 25',
-                    'status' => 'inactive',
-                ],
-                [
-                    'nama' => 'Toko Berkah Sayur',
-                    'kontak' => '081291661544',
-                    'alamat' => 'Jl. Pasar Induk No. 26',
-                    'status' => 'active',
-                ],
-                [
-                    'nama' => 'UD Berkah Pangan Makmur',
-                    'kontak' => '081291661544',
-                    'alamat' => 'Jl. Pasar Induk No. 26',
-                    'status' => 'active',
-                ],
-                [
-                    'nama' => 'UD Berkah Pangan Jaya',
-                    'kontak' => '081291661544',
-                    'alamat' => 'Jl. Pasar Induk No. 26',
-                    'status' => 'active',
-                ],
-            ];
-
-            foreach ($sampleSuppliers as $data) {
-                Supplier::create(array_merge($data, ['id_sppg' => $idSppg]));
-            }
-        }
-
-        // Pastikan ada bahan sample untuk item PO
-        $material = Material::where('id_sppg', $idSppg)->first();
-        if (! $material) {
-            $material = Material::create([
-                'id_sppg' => $idSppg,
-                'kode' => 'BRS-RMS',
-                'nama' => 'Beras Ramos',
-                'satuan' => 'kg',
-                'kategori' => 'Bahan Pokok',
-                'min_stock' => 10,
-                'is_active' => true,
-            ]);
-        }
-
-        // Jika pemasok belum memiliki PO, buatkan PO sample agar Jumlah pembelian dan Total nilai terisi dari DB
-        $suppliersWithoutPo = Supplier::where('id_sppg', $idSppg)
-            ->whereDoesntHave('purchases')
-            ->limit(5)
-            ->get();
-
-        $sampleCounts = [8, 6, 6, 16, 6];
-        $samplePrices = [1812500, 1416666, 1416666, 1281250, 1416666];
-
-        $staff = $this->getAuthenticatedStaff();
-        $creatorId = $staff?->id ?? Staff::where('id_sppg', $idSppg)->value('id');
-
-        foreach ($suppliersWithoutPo as $index => $sup) {
-            $poCount = $sampleCounts[$index % count($sampleCounts)];
-            $unitPrice = $samplePrices[$index % count($samplePrices)];
-
-            for ($i = 1; $i <= $poCount; $i++) {
-                $poNumber = 'PO-'.date('Ym').'-'.str_pad((string) ($sup->id * 100 + $i), 5, '0', STR_PAD_LEFT);
-                if (Purchase::where('id_sppg', $idSppg)->where('purchase_no', $poNumber)->exists()) {
-                    continue;
-                }
-
-                $purchase = Purchase::create([
-                    'id_sppg' => $idSppg,
-                    'supplier_id' => $sup->id,
-                    'created_by' => $creatorId,
-                    'purchase_no' => $poNumber,
-                    'purchase_date' => Carbon::now()->subDays($i * 2),
-                    'status' => 'received',
-                ]);
-
-                PurchaseItem::create([
-                    'purchase_id' => $purchase->id,
-                    'material_id' => $material->id,
-                    'qty_ordered' => 1,
-                    'unit_price' => $unitPrice,
-                ]);
-            }
-        }
     }
 }
