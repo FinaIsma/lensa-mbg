@@ -168,4 +168,30 @@ class MaterialTest extends TestCase
             ],
         ]);
     }
+
+    public function test_staff_can_filter_materials_by_indikator_di_bawah_minimum_and_aman(): void
+    {
+        $material = Material::create([
+            'id_sppg' => $this->sppg->id_sppg,
+            'kode' => 'FLT_'.uniqid(),
+            'nama' => 'Bahan Uji Filter Minimum',
+            'kategori' => 'Karbohidrat',
+            'satuan' => 'KG',
+            'min_stock' => 50,
+            'is_active' => true,
+        ]);
+
+        // Filter di bawah minimum
+        $responseBelow = $this->actingAs($this->staff, 'staff')
+            ->get(route('staff.materials.index', ['indikator' => 'di_bawah_minimum']));
+
+        $responseBelow->assertStatus(200);
+        $responseBelow->assertSee('Bahan Uji Filter Minimum');
+
+        // Filter aman
+        $responseAman = $this->actingAs($this->staff, 'staff')
+            ->get(route('staff.materials.index', ['indikator' => 'aman']));
+
+        $responseAman->assertStatus(200);
+    }
 }

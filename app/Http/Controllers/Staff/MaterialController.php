@@ -34,7 +34,7 @@ class MaterialController extends Controller
         // Jumlah current_qty lot available yang belum kedaluwarsa (expiry_date >= CURRENT_DATE atau expiry_date IS NULL)
         $stockSubquery = MaterialLot::selectRaw('COALESCE(SUM(current_qty), 0)')
             ->whereColumn('material_lots.material_id', 'materials.id')
-            ->where('material_lots.status', 'available')
+            ->whereRaw("material_lots.status = 'available'")
             ->whereRaw('(material_lots.expiry_date IS NULL OR material_lots.expiry_date >= CURRENT_DATE)');
 
         $query = Material::query()
