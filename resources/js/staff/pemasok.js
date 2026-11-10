@@ -4,15 +4,25 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     const drawerDetail = document.getElementById('drawerDetailPemasok');
+    const drawerBackdrop = document.getElementById('pemasokDrawerBackdrop');
     const modalTambah = document.getElementById('modalTambahPemasok');
     const modalEdit = document.getElementById('modalEditPemasok');
     let currentDetailSupplier = null;
+    let activeDetailRequestId = 0;
+
+    function syncBodyScrollLock() {
+        const hasOpen = document.querySelector('#drawerDetailPemasok.open, #modalTambahPemasok.show, #modalEditPemasok.show');
+        document.body.style.overflow = hasOpen ? 'hidden' : '';
+    }
 
     // ==========================================
     // 1. PANEL DETAIL (SLIDE-OVER DRAWER)
     // ==========================================
     window.openDetailPanel = async function (id) {
         if (!drawerDetail) return;
+
+        const requestId = ++activeDetailRequestId;
+        currentDetailSupplier = null;
 
         // Reset display while loading
         const namaEl = document.getElementById('detail_nama');
@@ -26,12 +36,27 @@ document.addEventListener('DOMContentLoaded', function () {
         const poTbodyEl = document.getElementById('detail_po_tbody');
 
         if (namaEl) namaEl.textContent = 'Memuat...';
+        if (createdEl) createdEl.textContent = '-';
+        if (kontakEl) kontakEl.textContent = '-';
+        if (alamatEl) alamatEl.textContent = '-';
+        if (jumlahPoEl) jumlahPoEl.textContent = '0 PO';
+        if (totalNilaiEl) totalNilaiEl.textContent = 'Rp 0';
+        if (poCountEl) poCountEl.textContent = '-';
+        if (chipEl) {
+            chipEl.innerHTML = `
+                <span class="badge-status badge-draft">
+                    <span class="status-dot"></span>
+                    Memuat...
+                </span>
+            `;
+        }
         if (poTbodyEl) {
-            poTbodyEl.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 24px 0; color: #94A3B8; font-size: 13px;">Mengambil data dari server...</td></tr>';
+            poTbodyEl.innerHTML = '<tr><td colspan="4" class="drawer-po-empty">Mengambil data dari server...</td></tr>';
         }
 
-        drawerDetail.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        drawerDetail.classList.add('open');
+        if (drawerBackdrop) drawerBackdrop.classList.add('open');
+        syncBodyScrollLock();
 
         try {
             const res = await fetch(`/staff/pemasok/${id}`, {
@@ -44,22 +69,24 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!res.ok) throw new Error('Gagal mengambil data detail pemasok');
 
             const result = await res.json();
+            if (requestId !== activeDetailRequestId) return;
+
             const data = result.data;
             currentDetailSupplier = data;
 
             if (namaEl) namaEl.textContent = data.nama || '-';
-            if (createdEl) createdEl.textContent = `Terdaftar: ${data.created_at || '-'}`;
+            if (createdEl) createdEl.textContent = data.created_at || '-';
             if (kontakEl) kontakEl.textContent = data.kontak || '-';
             if (alamatEl) alamatEl.textContent = data.alamat || '-';
-            if (jumlahPoEl) jumlahPoEl.textContent = data.jumlah_pembelian || '0';
+            if (jumlahPoEl) jumlahPoEl.textContent = `${data.jumlah_pembelian ?? 0} PO`;
             if (totalNilaiEl) totalNilaiEl.textContent = data.formatted_total_nilai || 'Rp 0';
 
-            // Status Chip: Chip hijau Aktif / abu-abu Nonaktif
+            // Status Chip: Badge hijau Aktif / abu-abu Nonaktif
             if (chipEl) {
                 const isActive = (data.status || '').toLowerCase() === 'active';
                 chipEl.innerHTML = `
-                    <span class="chip-status ${isActive ? 'chip-aktif' : 'chip-nonaktif'}">
-                        <span class="chip-dot"></span>
+                    <span class="badge-status ${isActive ? 'badge-received' : 'badge-draft'}">
+                        <span class="status-dot"></span>
                         ${isActive ? 'Aktif' : 'Nonaktif'}
                     </span>
                 `;
@@ -93,11 +120,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                     ${escapeHtml(po.purchase_date)}
                                 </td>
                                 <td>
-                                    <span class="drawer-po-badge ${escapeHtml(badgeClass)}">
+                                    <span class="badge-status ${escapeHtml(badgeClass)}">
+                                        <span class="status-dot"></span>
                                         ${escapeHtml(po.status_label || po.status)}
                                     </span>
                                 </td>
-                                <td style="text-align: right; font-weight: 600; color: #0F172A; white-space: nowrap;">
+                                <td style="text-align: right; font-weight: 600; color: #071E49; white-space: nowrap;">
                                     ${escapeHtml(po.formatted_total_cost)}
                                 </td>
                             </tr>
@@ -106,18 +134,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         } catch (err) {
+            if (requestId !== activeDetailRequestId) return;
             console.error(err);
             if (namaEl) namaEl.textContent = 'Gagal memuat';
             if (poTbodyEl) {
-                poTbodyEl.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px 0; color: #DC2626; font-size: 13px;">Gagal memuat riwayat pembelian.</td></tr>';
+                poTbodyEl.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px 12px; color: #DC2626; font-size: 13px;">Gagal memuat riwayat pembelian.</td></tr>';
             }
         }
     };
 
     window.closeDetailPanel = function () {
-        if (!drawerDetail) return;
-        drawerDetail.classList.remove('show');
-        document.body.style.overflow = '';
+        activeDetailRequestId++;
+        if (drawerDetail) drawerDetail.classList.remove('open');
+        if (drawerBackdrop) drawerBackdrop.classList.remove('open');
+        syncBodyScrollLock();
     };
 
     // Tombol Ubah di dalam Panel Detail
@@ -125,8 +155,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (detailBtnEdit) {
         detailBtnEdit.addEventListener('click', function () {
             if (currentDetailSupplier) {
+                const supplierToEdit = currentDetailSupplier;
                 closeDetailPanel();
-                openModalEditPemasok(currentDetailSupplier);
+                openModalEditPemasok(supplierToEdit);
             }
         });
     }
@@ -140,13 +171,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (form) form.reset();
         clearModalErrors(modalTambah);
         modalTambah.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        syncBodyScrollLock();
     };
 
     window.closeModalTambahPemasok = function () {
         if (!modalTambah) return;
         modalTambah.classList.remove('show');
-        document.body.style.overflow = '';
+        syncBodyScrollLock();
     };
 
     window.openModalEditPemasok = function (supplier) {
@@ -170,24 +201,41 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         modalEdit.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        syncBodyScrollLock();
     };
 
     window.closeModalEditPemasok = function () {
         if (!modalEdit) return;
         modalEdit.classList.remove('show');
-        document.body.style.overflow = '';
+        syncBodyScrollLock();
     };
 
     // Close on backdrop click
-    [drawerDetail, modalTambah, modalEdit].forEach((modal) => {
+    [modalTambah, modalEdit].forEach((modal) => {
         if (!modal) return;
         modal.addEventListener('click', function (e) {
             if (e.target === modal) {
                 modal.classList.remove('show');
-                document.body.style.overflow = '';
+                syncBodyScrollLock();
             }
         });
+    });
+
+    // Close open drawer or modal on Escape key
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            if (modalEdit && modalEdit.classList.contains('show')) {
+                closeModalEditPemasok();
+                return;
+            }
+            if (modalTambah && modalTambah.classList.contains('show')) {
+                closeModalTambahPemasok();
+                return;
+            }
+            if (drawerDetail && drawerDetail.classList.contains('open')) {
+                closeDetailPanel();
+            }
+        }
     });
 
     // Helper: Clear validation errors inside modal

@@ -1,117 +1,113 @@
 {{-- =====================================================================
      1. PANEL DETAIL PEMASOK (SLIDE-OVER DRAWER)
      ===================================================================== --}}
-<div class="pemasok-drawer-backdrop" id="drawerDetailPemasok">
-    <div class="pemasok-drawer-dialog">
-        {{-- Header Drawer --}}
-        <div class="pemasok-drawer-header">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="pemasok-icon-box icon-blue" style="width: 38px; height: 38px;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="pemasok-drawer-title">Detail Pemasok</h3>
-                    <span style="font-size: 12px; color: #64748B;">Informasi lengkap vendor bahan pangan</span>
-                </div>
-            </div>
-            <button type="button" class="pemasok-modal-close" onclick="closeDetailPanel()" aria-label="Tutup Panel">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
+<div class="pemasok-drawer-backdrop" id="pemasokDrawerBackdrop" onclick="closeDetailPanel()"></div>
+<aside class="purchase-drawer" id="drawerDetailPemasok" role="dialog" aria-modal="true" aria-label="Detail Pemasok">
+    {{-- Header Drawer --}}
+    <div class="purchase-drawer-header">
+        <div>
+            <h2 class="purchase-drawer-title">Detail Pemasok</h2>
+            <p class="purchase-drawer-subtitle">Informasi lengkap vendor bahan pangan</p>
         </div>
+        <button type="button" class="modal-close-corner" onclick="closeDetailPanel()" aria-label="Tutup Panel" title="Tutup">
+            &times;
+        </button>
+    </div>
 
-        {{-- Body Drawer --}}
-        <div class="pemasok-drawer-body">
-            {{-- Entity Header Card --}}
-            <div class="drawer-entity-card">
-                <div>
-                    <h4 id="detail_nama" class="drawer-entity-name">-</h4>
-                    <span id="detail_created_at" style="font-size: 12px; color: #64748B;">Terdaftar: -</span>
-                </div>
+    {{-- Body Drawer (Scrollable) --}}
+    <div class="purchase-drawer-scroll">
+        {{-- Card 1: Informasi Pemasok --}}
+        <div class="detail-card">
+            <div class="pemasok-drawer-card-header">
+                <h3 class="detail-card-title" style="margin-bottom: 0;">Informasi Pemasok</h3>
                 <div id="detail_status_chip">
-                    <span class="chip-status chip-aktif">
-                        <span class="chip-dot"></span>
-                        Aktif
+                    <span class="badge-status badge-draft">
+                        <span class="status-dot"></span>
+                        Memuat...
                     </span>
                 </div>
             </div>
 
-            {{-- Info Kontak & Alamat --}}
-            <div class="drawer-info-card">
-                <div class="drawer-info-item">
-                    <span class="drawer-info-label">Kontak</span>
-                    <span id="detail_kontak" class="drawer-info-value">-</span>
-                </div>
-                <div class="drawer-info-item" style="border-top: 1px solid #F1F5F9; padding-top: 10px;">
-                    <span class="drawer-info-label">Alamat</span>
-                    <span id="detail_alamat" class="drawer-info-value">-</span>
-                </div>
-            </div>
-
-            {{-- 2 Statistik Mini --}}
-            <div class="drawer-metrics-grid">
-                <div class="drawer-metric-box">
-                    <span class="drawer-metric-label">Jumlah Pembelian</span>
-                    <div style="display: flex; align-items: baseline; gap: 4px; margin-top: 4px;">
-                        <span id="detail_jumlah_pembelian" class="drawer-metric-val">0</span>
-                        <span style="font-size: 12px; color: #64748B;">PO</span>
+            <div class="detail-grid-2col-exact">
+                <div class="pemasok-col-group">
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Nama Pemasok</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_nama" style="font-weight: 700;">-</span>
                     </div>
-                    <span style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Selain draft & cancelled</span>
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Kontak</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_kontak">-</span>
+                    </div>
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Alamat</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_alamat">-</span>
+                    </div>
                 </div>
 
-                <div class="drawer-metric-box">
-                    <span class="drawer-metric-label">Total Nilai</span>
-                    <span id="detail_total_nilai" class="drawer-metric-val" style="color: #071E49; font-size: 17px; margin-top: 4px;">Rp 0</span>
-                    <span style="font-size: 11px; color: #94A3B8; margin-top: 2px;">Akumulasi nilai transaksi</span>
-                </div>
-            </div>
-
-            {{-- Riwayat PO --}}
-            <div class="drawer-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h5 style="font-size: 13.5px; font-weight: 700; color: #071E49; margin: 0;">Riwayat PO</h5>
-                    <span id="detail_po_count" style="font-size: 12px; color: #64748B;">-</span>
-                </div>
-                <div class="drawer-po-table-wrapper">
-                    <table class="drawer-po-table">
-                        <thead>
-                            <tr>
-                                <th>Nomor</th>
-                                <th>Tanggal</th>
-                                <th>Status</th>
-                                <th style="text-align: right;">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detail_po_tbody">
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 20px 0; color: #94A3B8; font-size: 13px;">
-                                    Memuat data riwayat...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="pemasok-col-group">
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Terdaftar</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_created_at">-</span>
+                    </div>
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Jumlah Pembelian</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_jumlah_pembelian" style="font-weight: 700;">0 PO</span>
+                    </div>
+                    <div class="detail-exact-row">
+                        <span class="detail-exact-label">Total Nilai</span>
+                        <span class="detail-exact-colon">:</span>
+                        <span class="detail-exact-value" id="detail_total_nilai" style="font-weight: 700;">Rp 0</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- Footer Drawer --}}
-        <div class="pemasok-drawer-footer">
-            <button type="button" class="btn-modal-cancel" onclick="closeDetailPanel()">Tutup</button>
-            <button type="button" id="detail_btn_edit" class="btn-modal-submit" style="display: inline-flex; align-items: center; gap: 6px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 20h9"></path>
-                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-                <span>Ubah Data</span>
-            </button>
+        {{-- Card 2: Riwayat PO --}}
+        <div class="detail-card">
+            <div class="pemasok-drawer-card-header" style="margin-bottom: 12px;">
+                <h3 class="detail-card-title" style="margin-bottom: 0;">Riwayat PO</h3>
+                <span id="detail_po_count" class="pemasok-po-count">-</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="detail-items-table">
+                    <thead>
+                        <tr>
+                            <th>Nomor</th>
+                            <th>Tanggal</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detail_po_tbody">
+                        <tr>
+                            <td colspan="4" class="drawer-po-empty">
+                                Memuat data riwayat...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
+
+    {{-- Footer Drawer --}}
+    <div class="purchase-drawer-footer">
+        <button type="button" class="btn-edit-action" onclick="closeDetailPanel()">Tutup</button>
+        <button type="button" id="detail_btn_edit" class="btn-pesan-action">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            <span>Ubah Data</span>
+        </button>
+    </div>
+</aside>
 
 {{-- =====================================================================
      2. MODAL TAMBAH PEMASOK
