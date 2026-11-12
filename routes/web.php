@@ -9,6 +9,7 @@ use App\Http\Controllers\KepalaSPPG\CorrectionRequestController as KepalaSPPGCor
 use App\Http\Controllers\KepalaSPPG\DashboardController as KepalaSPPGDashboardController;
 use App\Http\Controllers\KepalaSPPG\ProfileController;
 use App\Http\Controllers\KepalaSPPG\StaffManagementController;
+use App\Http\Controllers\Public\PublicPortalController;
 use App\Http\Controllers\Staff\BatchController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\HasilController;
@@ -26,31 +27,11 @@ use App\Http\Controllers\Staff\SupplierController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    $user = auth('staff')->user() ?: auth()->user();
-
-    if ($user) {
-        if ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard');
-        }
-
-        if ($user->role === 'kepala_sppg') {
-            if (Route::has('sppg.dashboard')) {
-                return redirect()->route('sppg.dashboard');
-            }
-        }
-
-        if ($user->role === 'staff') {
-            if (Route::has('staff.dashboard')) {
-                return redirect()->route('staff.dashboard');
-            }
-        }
-
-        return redirect()->route('login');
-    }
-
-    return redirect()->route('login');
-});
+// Halaman Publik (Penerima, Radar MBG, & Traceability)
+Route::get('/', [PublicPortalController::class, 'index'])->name('public.home');
+Route::get('/s/{kode}', [PublicPortalController::class, 'sppgDetail'])->name('public.sppg');
+Route::get('/telusur/{batch_code?}', [PublicPortalController::class, 'traceBatch'])->name('public.trace');
+Route::get('/api/public/destinations', [PublicPortalController::class, 'searchDestinations'])->name('api.public.destinations');
 
 Route::middleware('guest:web,staff')->group(function () {
     Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
@@ -66,6 +47,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/api/wilayah/provinces', [WilayahController::class, 'getProvinces']);
 Route::get('/api/wilayah/regencies/{provinceId}', [WilayahController::class, 'getRegencies']);
 Route::get('/api/wilayah/districts/{regencyId}', [WilayahController::class, 'getDistricts']);
+Route::get('/api/wilayah/villages/{districtId}', [WilayahController::class, 'getVillages']);
 Route::get('/api/check-email', [RegisterController::class, 'checkEmail'])->name('api.check-email');
 
 Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
