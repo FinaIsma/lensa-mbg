@@ -139,4 +139,19 @@ class WilayahController extends Controller
 
         return response()->json([]);
     }
+
+    public function getVillages($districtId)
+    {
+        try {
+            $response = Http::withoutVerifying()->timeout(3)->get("{$this->baseApi}/villages/{$districtId}.json");
+            if ($response->successful()) {
+                $json = $response->json();
+
+                return response()->json(isset($json['value']) ? $json['value'] : $json);
+            }
+        } catch (\Exception $e) {
+        }
+
+        return response()->json([]);
+    }
 }

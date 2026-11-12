@@ -34,6 +34,11 @@ class MaterialUsage extends Model
         return $this->belongsTo(MaterialLot::class, 'material_lot_id');
     }
 
+    public function materialLot(): BelongsTo
+    {
+        return $this->lot();
+    }
+
     public function getMaterialAttribute(): ?Material
     {
         return $this->lot?->material;
