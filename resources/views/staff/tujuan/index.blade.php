@@ -107,12 +107,12 @@
             <table class="tujuan-table">
                 <thead>
                     <tr>
-                        <th style="min-width: 220px;">Nama Tujuan</th>
-                        <th style="min-width: 120px;">Tipe</th>
-                        <th style="min-width: 200px;">Alamat</th>
-                        <th style="min-width: 150px; text-align: right;">Target Penerima</th>
-                        <th style="min-width: 130px; text-align: center;">Pengiriman</th>
-                        <th style="min-width: 160px; text-align: center;">Aksi</th>
+                        <th style="width: 25%;">Nama tujuan</th>
+                        <th style="width: 15%;">Tipe</th>
+                        <th style="width: 26%;">Alamat</th>
+                        <th style="width: 14%; text-align: right;">Target penerima</th>
+                        <th style="width: 10%; text-align: center;">Pengiriman</th>
+                        <th style="width: 100px; text-align: center; white-space: nowrap;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -134,17 +134,20 @@
                             </td>
                             <td>
                                 <span class="badge-tipe {{ $badgeClass }}">
-                                    {{ $dest->tipe_label }}
+                                    <span class="status-dot"></span>
+                                    <span>{{ $dest->tipe_label }}</span>
                                 </span>
                             </td>
                             <td>
-                                <span style="font-size: 13.5px; color: #475569;" title="{{ $dest->alamat }}">
+                                <span class="tujuan-alamat-text" title="{{ $dest->alamat }}">
                                     {{ $dest->alamat ? \Illuminate\Support\Str::limit($dest->alamat, 45) : '-' }}
                                 </span>
                             </td>
-                            <td style="text-align: right; font-weight: 600; color: #071E49;">
-                                {{ number_format($dest->jumlah_penerima, 0, ',', '.') }}
-                                <span style="font-size: 12px; font-weight: 400; color: #64748B;">Porsi</span>
+                            <td style="text-align: right;">
+                                <span class="tujuan-target-val">
+                                    {{ number_format($dest->jumlah_penerima, 0, ',', '.') }}
+                                </span>
+                                <span class="tujuan-target-unit">Porsi</span>
                             </td>
                             <td style="text-align: center;">
                                 <span class="badge-count">
@@ -154,27 +157,25 @@
                                     {{ number_format($dest->jumlah_pengiriman ?? 0, 0, ',', '.') }}
                                 </span>
                             </td>
-                            <td>
-                                <div class="tujuan-actions-cell" style="justify-content: center;">
-                                    <button type="button" class="btn-table-action btn-detail" onclick="openDetailTujuan({{ $dest->id }})" title="Lihat detail & riwayat pengiriman">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <td style="text-align: center; white-space: nowrap;">
+                                <div class="tujuan-actions-group">
+                                    <button type="button" class="btn-tujuan-detail" onclick="openDetailTujuan({{ $dest->id }})" title="Lihat detail tujuan" aria-label="Lihat detail tujuan">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>
                                         </svg>
-                                        <span>Detail</span>
                                     </button>
 
-                                    <button type="button" class="btn-table-action btn-edit" onclick="openModalEdit({{ $dest->id }}, @js($dest->nama), @js($dest->tipe), @js($dest->alamat), {{ $dest->jumlah_penerima }})" title="Ubah data tujuan">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <button type="button" class="btn-tujuan-edit" onclick="openModalEdit({{ $dest->id }}, @js($dest->nama), @js($dest->tipe), @js($dest->alamat), {{ $dest->jumlah_penerima }})" title="Ubah data tujuan" aria-label="Ubah data tujuan">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M12 20h9"></path>
                                             <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                                         </svg>
-                                        <span>Ubah</span>
                                     </button>
 
                                     @if (($dest->jumlah_pengiriman ?? 0) === 0)
-                                        <button type="button" class="btn-table-action btn-delete" onclick="confirmDelete({{ $dest->id }}, @js($dest->nama))" title="Hapus tujuan (hanya jika belum ada pengiriman)">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <button type="button" class="btn-tujuan-delete" onclick="confirmDelete({{ $dest->id }}, @js($dest->nama))" title="Hapus tujuan" aria-label="Hapus tujuan">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <polyline points="3 6 5 6 21 6"></polyline>
                                                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                             </svg>
@@ -216,17 +217,39 @@
             </table>
         </div>
 
-        {{-- Pagination --}}
-        @if ($destinations->hasPages())
-            <div class="tujuan-pagination-wrapper">
-                <span style="font-size: 13px; color: #64748B;">
-                    Menampilkan {{ $destinations->firstItem() }} sampai {{ $destinations->lastItem() }} dari {{ $destinations->total() }} data tujuan
-                </span>
-                <div>
-                    {{ $destinations->links() }}
+        {{-- Footer & Pagination Sesuai Mockup Master --}}
+        <div class="tujuan-footer">
+            <p class="tujuan-footer-text">
+                Menampilkan {{ $destinations->firstItem() ?? 0 }}-{{ $destinations->lastItem() ?? 0 }} dari {{ $destinations->total() }} data
+            </p>
+
+            @if ($destinations->hasPages())
+                <div class="tujuan-pagination">
+                    {{-- Previous Page Link --}}
+                    @if ($destinations->onFirstPage())
+                        <span class="tujuan-page-btn disabled" aria-disabled="true">&lt;</span>
+                    @else
+                        <a href="{{ $destinations->previousPageUrl() }}" class="tujuan-page-btn" rel="prev">&lt;</a>
+                    @endif
+
+                    {{-- Pagination Elements --}}
+                    @foreach ($destinations->getUrlRange(1, $destinations->lastPage()) as $page => $url)
+                        @if ($page == $destinations->currentPage())
+                            <span class="tujuan-page-btn active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="tujuan-page-btn">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    {{-- Next Page Link --}}
+                    @if ($destinations->hasMorePages())
+                        <a href="{{ $destinations->nextPageUrl() }}" class="tujuan-page-btn" rel="next">&gt;</a>
+                    @else
+                        <span class="tujuan-page-btn disabled" aria-disabled="true">&gt;</span>
+                    @endif
                 </div>
-            </div>
-        @endif
+            @endif
+        </div>
     </div>
 </div>
 

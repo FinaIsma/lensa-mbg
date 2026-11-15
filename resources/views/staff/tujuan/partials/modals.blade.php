@@ -34,7 +34,10 @@
                     <span id="detail_created_at" style="font-size: 12px; color: #64748B;">Terdaftar: -</span>
                 </div>
                 <div id="detail_tipe_chip">
-                    <span class="badge-tipe badge-tipe-sekolah">Sekolah</span>
+                    <span class="badge-tipe badge-tipe-sekolah">
+                        <span class="status-dot"></span>
+                        <span>Sekolah</span>
+                    </span>
                 </div>
             </div>
 
