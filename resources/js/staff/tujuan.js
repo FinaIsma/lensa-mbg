@@ -75,7 +75,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 tipeChipEl.innerHTML = `
                     <span class="badge-tipe ${badgeClass}">
-                        ${escapeHtml(data.tipe_label || data.tipe)}
+                        <span class="status-dot"></span>
+                        <span>${escapeHtml(data.tipe_label || data.tipe)}</span>
                     </span>
                 `;
             }
@@ -95,20 +96,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     `;
                 } else {
                     distTbodyEl.innerHTML = distributions.map((dist) => {
-                        let statusColor = '#64748B';
-                        let statusBg = '#F1F5F9';
+                        let badgeClass = 'badge-planned';
                         if (dist.status === 'received') {
-                            statusColor = '#047857';
-                            statusBg = '#ECFDF5';
+                            badgeClass = 'badge-received';
                         } else if (dist.status === 'sent') {
-                            statusColor = '#1D4ED8';
-                            statusBg = '#EFF6FF';
-                        } else if (dist.status === 'planned') {
-                            statusColor = '#B45309';
-                            statusBg = '#FEF3C7';
+                            badgeClass = 'badge-sent';
                         } else if (dist.status === 'cancelled') {
-                            statusColor = '#B91C1C';
-                            statusBg = '#FEF2F2';
+                            badgeClass = 'badge-cancelled';
                         }
 
                         return `
@@ -126,8 +120,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                     ${escapeHtml(dist.distributed_at)}
                                 </td>
                                 <td>
-                                    <span style="display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; background-color: ${statusBg}; color: ${statusColor};">
-                                        ${escapeHtml(dist.status_label)}
+                                    <span class="badge-status ${badgeClass}">
+                                        <span class="status-dot"></span>
+                                        <span>${escapeHtml(dist.status_label)}</span>
                                     </span>
                                 </td>
                             </tr>

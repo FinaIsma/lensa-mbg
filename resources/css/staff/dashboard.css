@@ -497,28 +497,30 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .table-modern thead th {
-    background-color: #F8FAFC;
-    font-size: 11px;
+    background-color: #FFFFFF;
+    font-size: 13px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #64748B;
-    padding: 10px 14px;
+    text-transform: none;
+    letter-spacing: normal;
+    color: #071E49;
+    padding: 14px 16px;
     text-align: left;
     border-bottom: 1px solid #E2E8F0;
+    white-space: nowrap;
 }
 
-.table-modern thead th:first-child {
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+.table-modern thead th.text-center,
+.table-modern tbody td.text-center {
+    text-align: center;
 }
 
-.table-modern thead th:last-child {
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+.table-modern thead th.text-right,
+.table-modern tbody td.text-right {
+    text-align: right;
 }
 
 .table-modern tbody tr {
@@ -530,10 +532,10 @@
 }
 
 .table-modern tbody td {
-    padding: 12px 14px;
-    font-size: 12.5px;
+    padding: 16px;
+    font-size: 13.5px;
     border-bottom: 1px solid #F1F5F9;
-    color: #334155;
+    color: #1E293B;
     vertical-align: middle;
 }
 
@@ -541,44 +543,71 @@
     border-bottom: none;
 }
 
-/* Status Chips */
+/* Status Badges & Chips */
+.badge-status,
 .status-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px;
+    padding: 4px 11px;
     border-radius: 9999px;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 600;
-    line-height: 1;
+    line-height: 1.2;
+    white-space: nowrap;
+    border: none;
 }
 
-.status-chip::before {
+.badge-status .status-dot,
+.status-chip .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.badge-status:not(:has(.status-dot))::before,
+.status-chip:not(:has(.status-dot))::before {
     content: '';
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background-color: currentColor;
+    display: inline-block;
+    flex-shrink: 0;
 }
 
 .badge-planned {
     background-color: #FEF3C7;
     color: #B45309;
 }
+.badge-planned .status-dot {
+    background-color: #D97706;
+}
 
 .badge-sent {
-    background-color: #DBEAFE;
+    background-color: #EFF6FF;
     color: #1D4ED8;
+}
+.badge-sent .status-dot {
+    background-color: #2563EB;
 }
 
 .badge-received {
     background-color: #DCFCE7;
     color: #15803D;
 }
+.badge-received .status-dot {
+    background-color: #16A34A;
+}
 
 .badge-cancelled {
     background-color: #FEE2E2;
     color: #B91C1C;
+}
+.badge-cancelled .status-dot {
+    background-color: #EF4444;
 }
 
 .badge-danger {
@@ -589,6 +618,51 @@
 .badge-warning {
     background-color: #FEF3C7;
     color: #D97706;
+}
+
+/* Action button in table */
+.btn-table-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid #CBD5E1;
+    background-color: #FFFFFF;
+    color: #071E49;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    text-decoration: none;
+}
+
+.btn-table-icon:hover {
+    background-color: #EFF6FF;
+    border-color: #3B82F6;
+    color: #2563EB;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.12);
+}
+
+/* PO Dashboard Item */
+.po-dashboard-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #E2E8F0;
+    background-color: #FFFFFF;
+    margin-bottom: 8px;
+    transition: all 0.15s ease;
+    text-decoration: none;
+}
+
+.po-dashboard-item:hover {
+    border-color: #CBD5E1;
+    background-color: #F8FAFC;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(7, 30, 73, 0.04);
 }
 
 /* Material critical items list */

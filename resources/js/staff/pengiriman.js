@@ -294,8 +294,8 @@ window.openDrawerDetail = function (id) {
         
         const badgeEl = document.getElementById('drawer_status_badge');
         if (badgeEl) {
-            badgeEl.textContent = d.status_label || '-';
-            badgeEl.className = `status-chip ${d.status_badge_class || 'badge-planned'}`;
+            badgeEl.innerHTML = `<span class="status-dot"></span><span>${d.status_label || '-'}</span>`;
+            badgeEl.className = `badge-status ${d.status_badge_class || 'badge-planned'}`;
         }
 
         // Timeline Step: 1=planned, 2=sent, 3=received
