@@ -533,8 +533,11 @@
                                 <p class="text-xs text-slate-500 leading-relaxed">
                                     {{ $qc?->reported_condition ?? 'Makanan dinyatakan layak konsumsi, uji organoleptik aroma & rasa prima sebelum dikirim.' }}
                                 </p>
-                                <div class="text-[11px] text-slate-400 font-medium pt-2 border-t border-slate-200/60">
-                                    Kesiapan: {{ $qc?->portions_ready ?? $batch->actual_porsi ?? 0 }} Porsi
+                                <div class="text-[11px] text-slate-400 font-medium pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                                    <span>Kesiapan: {{ $qc?->portions_ready ?? $batch->actual_porsi ?? 0 }} Porsi</span>
+                                    @if($qc?->consume_by)
+                                        <span class="text-rose-600 font-bold">Maks: {{ \Carbon\Carbon::parse($qc->consume_by)->format('H:i') }} WIB</span>
+                                    @endif
                                 </div>
                             </div>
 

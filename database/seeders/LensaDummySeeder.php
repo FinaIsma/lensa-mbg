@@ -423,10 +423,30 @@ class LensaDummySeeder extends Seeder
     /** Hasil produksi (pre-distribution) + mengisi actual_porsi di batch. */
     private function result(int $batchId, int $day, int $ready, string $kondisi, bool $withEvidence): void
     {
+        $matrixJson = json_encode([
+            'rasa' => ['label' => 'Rasa', 'status' => 'sesuai', 'keterangan' => 'Gurih bumbu meresap sesuai resep'],
+            'aroma' => ['label' => 'Aroma', 'status' => 'segar', 'keterangan' => 'Segar wangi rempah alami'],
+            'warna' => ['label' => 'Warna/Visual', 'status' => 'cerah', 'keterangan' => 'Cerah menarik bebas benda asing'],
+            'tekstur' => ['label' => 'Tekstur', 'status' => 'matang', 'keterangan' => 'Matang sempurna empuk'],
+            'suhu' => ['label' => 'Suhu', 'status' => 'hangat', 'keterangan' => 'Hangat (≥60°C) siap kemas'],
+            'kemasan' => ['label' => 'Kemasan', 'status' => 'rapat', 'keterangan' => 'Tertutup rapat higienis'],
+        ]);
+
         $pid = $this->ins('pre_distribution_checks', [
-            'production_batch_id' => $batchId, 'checked_by' => $this->staff, 'portions_ready' => $ready,
-            'reported_condition' => $kondisi, 'note' => null, 'checked_at' => $this->t($day, '10:45:00'),
-            'created_at' => $this->t($day, '10:45:00'),
+            'production_batch_id' => $batchId,
+            'checked_by' => $this->staff,
+            'form_type' => 'makanan_siap_santap',
+            'nutritionist_name' => 'Fadhilah Ayu, S.Gz',
+            'nutritionist_id' => $this->staff,
+            'portions_ready' => $ready,
+            'reported_condition' => $kondisi,
+            'note' => null,
+            'checked_at' => $this->t($day, '09:30:00'),
+            'estimated_distribution_at' => $this->t($day, '10:00:00'),
+            'consume_by' => $this->t($day, '13:30:00'),
+            'physical_test_matrix' => $matrixJson,
+            'physical_test_status' => 'passed',
+            'created_at' => $this->t($day, '09:30:00'),
         ]);
         DB::table('production_batches')->where('id', $batchId)->update(['actual_porsi' => $ready]);
 

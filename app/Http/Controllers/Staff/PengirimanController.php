@@ -129,7 +129,7 @@ class PengirimanController extends Controller
         $idSppg = $this->resolveSppgId();
 
         $batch = ProductionBatch::query()
-            ->with(['menu', 'distributions'])
+            ->with(['menu', 'distributions', 'preDistributionCheck.nutritionist'])
             ->where('id_sppg', $idSppg)
             ->find($id);
 
@@ -159,6 +159,9 @@ class PengirimanController extends Controller
                 'allocated_porsi' => $allocated,
                 'sisa_porsi' => $sisa,
                 'status' => $batch->status,
+                'consume_by' => $batch->preDistributionCheck?->consume_by ? $batch->preDistributionCheck->consume_by->format('H:i').' WIB' : 'Maks. 4 Jam',
+                'checked_at' => $batch->preDistributionCheck?->checked_at ? $batch->preDistributionCheck->checked_at->format('H:i').' WIB' : '-',
+                'nutritionist_name' => $batch->preDistributionCheck?->effective_nutritionist_name ?? 'Tenaga Gizi',
             ],
         ]);
     }
@@ -174,6 +177,7 @@ class PengirimanController extends Controller
             ->with([
                 'batch.menu',
                 'batch.distributions',
+                'batch.preDistributionCheck.nutritionist',
                 'destination',
                 'recorder',
                 'evidences.uploader',
@@ -246,6 +250,9 @@ class PengirimanController extends Controller
                     'allocated_porsi' => $allocatedBatch,
                     'sisa_porsi' => $sisaBatch,
                     'status' => $batch?->status ?? '-',
+                    'consume_by' => $batch?->preDistributionCheck?->consume_by ? $batch->preDistributionCheck->consume_by->format('H:i').' WIB' : 'Maks. 4 Jam Pasca Masak',
+                    'checked_at' => $batch?->preDistributionCheck?->checked_at ? $batch->preDistributionCheck->checked_at->format('H:i').' WIB' : '-',
+                    'nutritionist_name' => $batch?->preDistributionCheck?->effective_nutritionist_name ?? 'Tenaga Gizi',
                 ],
                 'evidences' => $evidences,
             ],

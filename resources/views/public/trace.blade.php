@@ -168,19 +168,23 @@
 
                     <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-xs space-y-2">
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-emerald-900 text-sm">Hasil Pemeriksaan Petugas Dapur:</span>
+                            <span class="font-bold text-emerald-900 text-sm">Hasil Pemeriksaan Uji Kelayakan Saji:</span>
                             <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-200 text-emerald-900">
-                                Lolos Kelayakan
+                                Lolos Uji Fisik
                             </span>
                         </div>
                         <p class="text-slate-700 leading-relaxed">
                             {{ $qcCheck?->reported_condition ?? 'Makanan matang sempurna, aroma segar khas rempah, baki tertutup rapat dan higienis.' }}
                         </p>
-                        @if($qcCheck?->checked_at)
-                            <div class="text-[11px] text-slate-500">
-                                Waktu Pemeriksaan: {{ \Carbon\Carbon::parse($qcCheck->checked_at)->format('H:i') }} WIB
-                            </div>
-                        @endif
+                        <div class="pt-2 border-t border-emerald-200/60 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-600">
+                            <div><strong>Tenaga Ahli Gizi:</strong> {{ $qcCheck?->effective_nutritionist_name ?? 'Tenaga Pelaksana Gizi SPPG' }}</div>
+                            @if($qcCheck?->checked_at)
+                                <div><strong>Waktu Pengecekan (QC):</strong> {{ \Carbon\Carbon::parse($qcCheck->checked_at)->format('H:i') }} WIB</div>
+                            @endif
+                            @if($qcCheck?->consume_by)
+                                <div class="text-rose-700 font-bold"><strong>Batas Maksimal Dimakan:</strong> {{ \Carbon\Carbon::parse($qcCheck->consume_by)->format('H:i') }} WIB</div>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
