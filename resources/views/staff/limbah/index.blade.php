@@ -76,47 +76,47 @@
         </div>
     </div>
 
-    {{-- Unified Table Card Container --}}
-    <div class="limbah-table-card">
-        <form method="GET" action="{{ route('staff.limbah.index') }}" class="limbah-filter-bar">
+    {{-- Unified Table Card Container Sesuai Standar Modul Pemasok & Hasil --}}
+    <div class="pemasok-table-card limbah-table-card">
+        <form method="GET" action="{{ route('staff.limbah.index') }}" class="pemasok-filter-bar limbah-filter-bar">
             {{-- Search Box (Kiri) --}}
-            <div class="limbah-search-box">
-                <svg class="limbah-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="pemasok-search-box limbah-search-box">
+                <svg class="pemasok-search-icon limbah-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" name="q" value="{{ $q }}" placeholder="Cari alasan, batch, barcode lot..." class="limbah-search-input">
+                <input type="text" name="q" value="{{ $q }}" placeholder="Cari alasan, batch, barcode lot..." class="pemasok-search-input limbah-search-input">
             </div>
 
-            <div class="limbah-actions-right">
+            <div class="pemasok-actions-right limbah-actions-right">
                 {{-- Dropdown Tipe Filter --}}
-                <div class="limbah-select-wrapper">
-                    <select name="type" class="limbah-select" onchange="this.form.submit()">
+                <div class="pemasok-select-wrapper limbah-select-wrapper">
+                    <select name="type" class="pemasok-select limbah-select" onchange="this.form.submit()">
                         <option value="" {{ empty($type) ? 'selected' : '' }}>Semua Tipe</option>
                         <option value="PRODUCTION_LOSS" {{ $type === 'PRODUCTION_LOSS' ? 'selected' : '' }}>Susut Olah (Loss)</option>
                         <option value="FOOD_WASTE" {{ $type === 'FOOD_WASTE' ? 'selected' : '' }}>Makanan Sisa</option>
                         <option value="SURPLUS" {{ $type === 'SURPLUS' ? 'selected' : '' }}>Surplus Porsi</option>
                         <option value="MATERIAL_DISPOSAL" {{ $type === 'MATERIAL_DISPOSAL' ? 'selected' : '' }}>Bahan Dibuang</option>
                     </select>
-                    <svg class="limbah-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="pemasok-select-chevron limbah-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </div>
 
                 {{-- Dropdown Status Filter --}}
-                <div class="limbah-select-wrapper" style="min-width: 120px;">
-                    <select name="status" class="limbah-select" onchange="this.form.submit()">
+                <div class="pemasok-select-wrapper limbah-select-wrapper" style="min-width: 120px;">
+                    <select name="status" class="pemasok-select limbah-select" onchange="this.form.submit()">
                         <option value="" {{ empty($status) ? 'selected' : '' }}>Semua Status</option>
                         <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
                         <option value="voided" {{ $status === 'voided' ? 'selected' : '' }}>Voided</option>
                     </select>
-                    <svg class="limbah-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="pemasok-select-chevron limbah-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </div>
 
                 {{-- Tombol + Catat Limbah (Kanan) --}}
-                <button type="button" class="btn-catat-limbah" onclick="openAddLimbahModal()">
+                <button type="button" class="btn-tambah-pemasok btn-catat-limbah" onclick="openAddLimbahModal()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -126,18 +126,19 @@
             </div>
         </form>
 
-        {{-- Table Content: daftar (waktu, tipe, batch atau lot, jumlah, alasan, status, pencatat) --}}
-        <div class="table-responsive">
-            <table class="staff-table data-table" style="width: 100%;">
+        {{-- Table Content: Sesuai Standar Modul Pemasok & Hasil (Fit 100%, Tanpa Scroll Horizontal) --}}
+        <div class="pemasok-table-responsive limbah-table-responsive">
+            <table class="pemasok-table limbah-table">
                 <thead>
                     <tr>
-                        <th style="width: 12%;">Waktu</th>
-                        <th style="width: 15%;">Tipe</th>
-                        <th style="width: 20%;">Batch atau Lot</th>
-                        <th style="width: 11%; text-align: center;">Jumlah</th>
-                        <th style="width: 22%;">Alasan</th>
-                        <th style="width: 8%; text-align: center;">Status</th>
-                        <th style="width: 12%;">Pencatat</th>
+                        <th class="col-waktu">Waktu</th>
+                        <th class="col-tipe">Tipe</th>
+                        <th class="col-batch">Batch atau Lot</th>
+                        <th class="col-jumlah is-center">Jumlah</th>
+                        <th class="col-alasan">Alasan</th>
+                        <th class="col-pencatat">Pencatat</th>
+                        <th class="col-status is-center">Status</th>
+                        <th class="col-aksi is-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -149,45 +150,47 @@
                         @endphp
                         <tr class="{{ $isVoided ? 'row-voided' : '' }}">
                             {{-- 1. Waktu (recorded_at) --}}
-                            <td>
-                                <div style="font-size: 12px; font-weight: 600; color: #1E293B;">
+                            <td class="col-waktu">
+                                <div style="font-size: 12.5px; font-weight: 500; color: #1E293B; line-height: 1.25;">
                                     {{ $record->recorded_at ? $record->recorded_at->format('d/m/Y') : '-' }}
                                 </div>
-                                <div style="font-size: 11px; color: #94A3B8;">
-                                    {{ $record->recorded_at ? $record->recorded_at->format('H:i') : '' }} WIB
-                                </div>
+                                @if ($record->recorded_at)
+                                    <div style="font-size: 11px; color: #64748B; margin-top: 2px;">
+                                        {{ $record->recorded_at->format('H:i') }} WIB
+                                    </div>
+                                @endif
                             </td>
 
                             {{-- 2. Tipe (Chip empat warna) --}}
-                            <td>
-                                <span class="{{ $record->type_badge_class }}">
+                            <td class="col-tipe">
+                                <span class="chip-status {{ $record->type_badge_class }}">
                                     {{ $record->type_label }}
                                 </span>
                             </td>
 
                             {{-- 3. Batch atau Lot --}}
-                            <td>
+                            <td class="col-batch">
                                 @if ($record->record_type === 'MATERIAL_DISPOSAL')
                                     <div>
-                                        <a href="{{ route('staff.lots.show', $record->material_lot_id) }}" style="font-weight: 700; color: #7E22CE; text-decoration: none;">
+                                        <a href="{{ route('staff.lots.show', $record->material_lot_id) }}" class="pemasok-name-link limbah-batch-link">
                                             {{ $record->lot?->lot_number ?? 'Lot' }}
                                         </a>
                                         <span style="font-size: 11px; color: #64748B;">({{ $record->lot?->barcode }})</span>
                                     </div>
-                                    <div style="font-size: 12px; color: #334155; margin-top: 2px;">
+                                    <div style="font-size: 12px; color: #475569; margin-top: 2px;">
                                         {{ $record->lot?->material?->nama ?? '-' }}
                                     </div>
                                 @else
                                     <div>
                                         @if ($record->batch)
-                                            <a href="{{ route('staff.batches.show', $record->production_batch_id) }}" style="font-weight: 700; color: #042A70; text-decoration: none;">
+                                            <a href="{{ route('staff.batches.show', $record->production_batch_id) }}" class="pemasok-name-link limbah-batch-link">
                                                 {{ $record->batch->batch_code }}
                                             </a>
                                         @else
                                             <span style="color: #64748B;">-</span>
                                         @endif
                                     </div>
-                                    <div style="font-size: 12px; color: #334155; margin-top: 2px;">
+                                    <div style="font-size: 12px; color: #475569; margin-top: 2px;">
                                         {{ $record->batch?->menu?->nama ?? '-' }}
                                     </div>
                                     @if ($record->distribution)
@@ -199,71 +202,82 @@
                             </td>
 
                             {{-- 4. Jumlah dengan Satuan --}}
-                            <td style="text-align: center;">
-                                <div style="font-weight: 800; font-size: 14px; color: #071E49;" class="{{ $isVoided ? 'voided-text' : '' }}">
+                            <td class="col-jumlah is-center">
+                                <div style="font-weight: 600; font-size: 13.5px; color: #0F172A;" class="{{ $isVoided ? 'voided-text' : '' }}">
                                     {{ rtrim(rtrim(number_format($record->qty, 3, ',', '.'), '0'), ',') }}
                                 </div>
-                                <div style="font-size: 11px; color: #64748B; font-weight: 600;">
+                                <div style="font-size: 11.5px; color: #64748B;">
                                     {{ $record->satuan }}
                                 </div>
                             </td>
 
-                            {{-- 5. Alasan (+ foto bukti) --}}
-                            <td>
-                                <div style="font-size: 12.5px; color: #1E293B; line-height: 1.35;" class="{{ $isVoided ? 'voided-text' : '' }}">
+                            {{-- 5. Alasan --}}
+                            <td class="col-alasan">
+                                <div style="font-size: 13px; color: #1E293B; line-height: 1.35;" class="{{ $isVoided ? 'voided-text' : '' }}">
                                     {{ $record->reason ?? '-' }}
                                 </div>
-                                @if ($evidence)
-                                    <div style="margin-top: 4px;">
-                                        <button type="button" onclick="showEvidencePreview('{{ asset('storage/' . $evidence->file_path) }}', 'Bukti {{ $record->type_label }}', '{{ addslashes($record->reason ?? '') }}')" style="display: inline-flex; align-items: center; gap: 4px; background: #EFF6FF; border: 1px solid #DBEAFE; color: #1D4ED8; padding: 2px 7px; border-radius: 5px; font-size: 11px; cursor: pointer;">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                                                <circle cx="12" cy="13" r="4"></circle>
-                                            </svg>
-                                            <span>Foto Bukti</span>
-                                        </button>
-                                    </div>
-                                @endif
                             </td>
 
-                            {{-- 6. Status (active atau voided) --}}
-                            <td style="text-align: center;">
+                            {{-- 6. Pencatat --}}
+                            <td class="col-pencatat" style="color: #475569;">
+                                {{ $record->recorder?->nama ?? 'Staff' }}
+                            </td>
+
+                            {{-- 7. Status (Active atau Voided) --}}
+                            <td class="col-status is-center">
                                 @if ($isVoided)
-                                    <span class="badge-limbah-voided" title="Catatan telah dibatalkan via koreksi">
-                                        Voided
+                                    <span class="chip-status badge-status badge-draft" title="Catatan telah dibatalkan via koreksi">
+                                        <span class="chip-dot status-dot"></span>
+                                        <span>Voided</span>
                                     </span>
                                 @else
-                                    <span class="badge-limbah-active" title="Catatan sah">
-                                        Active
+                                    <span class="chip-status badge-status badge-safe badge-received" title="Catatan sah">
+                                        <span class="chip-dot status-dot"></span>
+                                        <span>Active</span>
                                     </span>
                                 @endif
                             </td>
 
-                            {{-- 7. Pencatat + Ajukan Koreksi --}}
-                            <td>
-                                <div style="font-weight: 600; font-size: 12px; color: #071E49;">
-                                    {{ $record->recorder?->nama ?? 'Staff' }}
-                                </div>
-                                @if (! $isVoided)
-                                    <div style="margin-top: 4px;">
+                            {{-- 8. Aksi (Foto Bukti & Ajukan Koreksi) --}}
+                            <td class="col-aksi is-center" style="white-space: nowrap;">
+                                <div class="pemasok-actions-group action-buttons-group" style="justify-content: center; gap: 6px;">
+                                    {{-- Foto Bukti --}}
+                                    @if ($evidence)
+                                        <button type="button" 
+                                                class="btn-pemasok-detail btn-action-icon" 
+                                                onclick="showEvidencePreview('{{ asset('storage/' . $evidence->file_path) }}', 'Bukti {{ $record->type_label }}', '{{ addslashes($record->reason ?? '') }}')" 
+                                                title="Lihat Foto Bukti" 
+                                                aria-label="Lihat Foto Bukti">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
+                                    @endif
+
+                                    {{-- Ajukan Koreksi --}}
+                                    @if (! $isVoided)
                                         @if ($hasPendingCorrection)
-                                            <span style="font-size: 10.5px; color: #D97706; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">
-                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-                                                Koreksi Ditinjau
+                                            <span class="chip-status badge-status badge-ordered" style="padding: 3px 8px; font-size: 11px;" title="Koreksi sedang ditinjau">
+                                                <span class="chip-dot status-dot"></span>
+                                                <span>Ditinjau</span>
                                             </span>
                                         @else
-                                            <button type="button" onclick="openKoreksiLimbahModal({{ $record->id }}, '{{ $record->type_label }}', '{{ (float) $record->qty }} {{ $record->satuan }}')" class="btn-ajukan-koreksi" title="Ajukan pembatalan (void) ke Kepala SPPG">
-                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                                            <button type="button" 
+                                                    onclick="openKoreksiLimbahModal({{ $record->id }}, '{{ $record->type_label }}', '{{ (float) $record->qty }} {{ $record->satuan }}')" 
+                                                    class="btn-ajukan-koreksi" 
+                                                    title="Ajukan pembatalan (void) ke Kepala SPPG">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
                                                 <span>Ajukan Koreksi</span>
                                             </button>
                                         @endif
-                                    </div>
-                                @endif
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 40px 20px; color: #64748B;">
+                            <td colspan="8" style="text-align: center; padding: 40px 20px; color: #64748B;">
                                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
                                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: #94A3B8;">
                                         <polyline points="3 6 5 6 21 6"></polyline>

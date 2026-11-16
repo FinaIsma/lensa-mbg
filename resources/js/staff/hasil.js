@@ -143,31 +143,47 @@ export function setConditionText(text) {
 }
 
 /**
- * Preview bukti foto yang diunggah
+ * Preview bukti foto yang diunggah (Hasil & Susut)
  */
 export function previewEvidenceImage(input) {
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const img = document.getElementById('preview_img');
-            const box = document.getElementById('image_preview_box');
-            if (img && box) {
-                img.src = e.target.result;
-                box.style.display = 'block';
-            }
-        };
-        reader.readAsDataURL(file);
-    }
+    if (!input || !input.files || !input.files[0]) return;
+
+    const isSusut = input.id === 'susut_evidence_file_input';
+    const imgId = isSusut ? 'susut_preview_img' : 'preview_img';
+    const boxId = isSusut ? 'susut_image_preview_box' : 'image_preview_box';
+
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const img = document.getElementById(imgId);
+        const box = document.getElementById(boxId);
+        if (img && box) {
+            img.src = e.target.result;
+            box.style.display = 'block';
+        }
+    };
+    reader.readAsDataURL(file);
 }
 
 /**
- * Hapus pilihan bukti foto
+ * Hapus pilihan bukti foto hasil produksi
  */
 export function clearEvidencePreview() {
     const input = document.getElementById('evidence_file_input');
     const box = document.getElementById('image_preview_box');
     const img = document.getElementById('preview_img');
+    if (input) input.value = '';
+    if (img) img.src = '';
+    if (box) box.style.display = 'none';
+}
+
+/**
+ * Hapus pilihan bukti foto susut limbah
+ */
+export function clearSusutEvidencePreview() {
+    const input = document.getElementById('susut_evidence_file_input');
+    const box = document.getElementById('susut_image_preview_box');
+    const img = document.getElementById('susut_preview_img');
     if (input) input.value = '';
     if (img) img.src = '';
     if (box) box.style.display = 'none';
@@ -186,6 +202,8 @@ export function openCatatSusutModal(batchId, batchCode, defaultQty) {
     if (codeDisplay) codeDisplay.innerText = batchCode;
     if (qtyInput) qtyInput.value = defaultQty || '';
 
+    clearSusutEvidencePreview();
+
     if (modal) {
         modal.classList.add('open', 'show');
         modal.style.setProperty('display', 'flex', 'important');
@@ -198,6 +216,8 @@ export function openCatatSusutModal(batchId, batchCode, defaultQty) {
  */
 export function closeCatatSusutModal() {
     const modal = document.getElementById('modalCatatSusut');
+    clearSusutEvidencePreview();
+
     if (modal) {
         modal.classList.remove('open', 'show');
         modal.style.setProperty('display', 'none', 'important');
@@ -254,13 +274,49 @@ window.calculateHasilSusut = calculateHasilSusut;
 window.setConditionText = setConditionText;
 window.previewEvidenceImage = previewEvidenceImage;
 window.clearEvidencePreview = clearEvidencePreview;
+window.clearSusutEvidencePreview = clearSusutEvidencePreview;
 window.openCatatSusutModal = openCatatSusutModal;
 window.closeCatatSusutModal = closeCatatSusutModal;
 window.showEvidencePreview = showEvidencePreview;
 window.closePreviewModal = closePreviewModal;
 
+function initDropzoneEvents(dropzoneId, inputId) {
+    const dropzone = document.getElementById(dropzoneId);
+    const input = document.getElementById(inputId);
+    if (!dropzone || !input) return;
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.style.borderColor = '#042A70';
+            dropzone.style.backgroundColor = '#EFF6FF';
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.style.borderColor = '#CBD5E1';
+            dropzone.style.backgroundColor = '#F8FAFC';
+        });
+    });
+
+    dropzone.addEventListener('drop', function (e) {
+        const dt = e.dataTransfer;
+        if (dt && dt.files && dt.files.length > 0) {
+            input.files = dt.files;
+            previewEvidenceImage(input);
+        }
+    });
+}
+
 // Keyboard & Backdrop Listener
 document.addEventListener('DOMContentLoaded', function () {
+    initDropzoneEvents('dropzone_hasil', 'evidence_file_input');
+    initDropzoneEvents('dropzone_susut', 'susut_evidence_file_input');
+
     // Escape key listener to close modals
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
