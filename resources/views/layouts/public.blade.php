@@ -21,17 +21,25 @@
                 <!-- Brand / Logo dari folder public -->
                 <div class="flex items-center gap-3">
                     <a href="{{ route('public.home') }}" class="flex items-center gap-3 group">
-                        <img src="{{ asset('images/LogoLensa.png') }}" alt="Logo Lensa MBG" class="h-10 sm:h-12 w-auto object-contain">
+                        <img src="{{ asset('images/logo-trimmed.png') }}" alt="Logo Lensa MBG" class="h-9 sm:h-11 w-auto object-contain">
+                        <div>
+                            <div class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none flex items-center">
+                                Lensa<span class="text-[#071E49]">MBG</span>
+                            </div>
+                            <div class="text-[10px] sm:text-[11px] font-medium text-slate-500 leading-tight mt-1">
+                                Transparansi Nutrisi & Makan Bergizi Generasi Emas
+                            </div>
+                        </div>
                     </a>
                 </div>
 
                 <!-- Tombol ke Halaman Login -->
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-[#071E49] text-white hover:bg-[#042A70] shadow-sm hover:shadow transition-all duration-150">
-                        <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#071E49] text-white hover:bg-[#042A70] shadow-sm hover:shadow transition-all duration-150">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                         </svg>
-                        <span>Masuk</span>
+                        <span>Masuk Petugas</span>
                     </a>
                 </div>
             </div>
@@ -45,48 +53,8 @@
 
     <!-- Clean Footer -->
     <footer class="bg-white border-t border-slate-200 mt-16 text-slate-600 text-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div class="md:col-span-2">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-8 h-8 rounded-lg bg-[#071E49] flex items-center justify-center text-white font-bold text-sm">
-                            MBG
-                        </div>
-                        <span class="text-base font-bold text-[#071E49]">Radar & Lensa MBG</span>
-                    </div>
-                    <p class="text-slate-500 text-sm leading-relaxed max-w-md">
-                        Platform transparansi dan pemantauan distribusi Makan Bergizi Gratis (MBG) dari hulu ke hilir. Menjamin pangan anak bangsa higienis, bergizi seimbang, dan terserap dari produsen pangan lokal.
-                    </p>
-                </div>
-                <div>
-                    <h4 class="font-bold text-slate-900 mb-3 text-sm uppercase tracking-wider">Akses Cepat</h4>
-                    <ul class="space-y-2 text-sm text-slate-500">
-                        <li><a href="{{ route('public.home') }}" class="hover:text-blue-600 transition">Cari Sekolah Penerima</a></li>
-                        <li><a href="{{ route('public.trace') }}" class="hover:text-blue-600 transition">Telusur Riwayat Batch</a></li>
-                        <li><a href="{{ route('login') }}" class="hover:text-blue-600 transition">Login Staf / Kepala SPPG</a></li>
-                        <li><a href="{{ route('register') }}" class="hover:text-blue-600 transition">Pendaftaran Dapur SPPG Baru</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-slate-900 mb-3 text-sm uppercase tracking-wider">Standar Kualitas</h4>
-                    <ul class="space-y-2 text-sm text-slate-500">
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            <span>Bahan Baku Petani Lokal (FEFO)</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            <span>Dapur Higienis & Uji Sampel Saji</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            <span>Audit Trail Data Terkunci</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
                 <p>&copy; {{ date('Y') }} Badan Gizi Nasional Republik Indonesia. Seluruh hak cipta dilindungi.</p>
                 <div class="flex items-center gap-6">
                     <span>Sistem Terenkripsi & Audit Digital</span>

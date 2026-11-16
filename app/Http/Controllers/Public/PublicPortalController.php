@@ -98,9 +98,12 @@ class PublicPortalController extends Controller
             $allDestinations = $destinationsQuery->orderBy('nama')->get();
         }
 
+        // Filter jadwal: 'today', 'yesterday', '7days'
+        $jadwal = (string) $request->query('jadwal', 'today');
+
         // Jika selectedDestination ditemukan, muat activeDistribution-nya
         if ($selectedDestination) {
-            $activeDistribution = Distribution::with([
+            $distQuery = Distribution::with([
                 'destination.sppg',
                 'batch.menu',
                 'batch.recipe.nutritions.nutritionType',
@@ -110,9 +113,20 @@ class PublicPortalController extends Controller
                 'batch.materialUsages.lot.supplier',
             ])
                 ->where('destination_id', $selectedDestination->id)
-                ->whereIn('status', ['sent', 'received'])
-                ->latest('distributed_at')
-                ->first();
+                ->whereIn('status', ['sent', 'received']);
+
+            if ($jadwal === 'yesterday') {
+                $distQuery->whereDate('distributed_at', Carbon::yesterday());
+            } elseif ($jadwal === '7days') {
+                $distQuery->whereDate('distributed_at', Carbon::now()->subDays(7));
+            } elseif ($jadwal === 'today') {
+                $todayQuery = (clone $distQuery)->whereDate('distributed_at', Carbon::today());
+                if ($todayQuery->exists()) {
+                    $distQuery = $todayQuery;
+                }
+            }
+
+            $activeDistribution = $distQuery->latest('distributed_at')->first();
         }
 
         // Ambil bukti publik terkait batch / distribusi aktif
@@ -173,7 +187,8 @@ class PublicPortalController extends Controller
             'selectedDestination',
             'activeDistribution',
             'publicEvidences',
-            'sppgList'
+            'sppgList',
+            'jadwal'
         ));
     }
 

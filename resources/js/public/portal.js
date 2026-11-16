@@ -168,6 +168,38 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Event Klik Tombol Jadwal (Hari Ini, Kemarin, 7 Hari Lalu)
+    const jadwalBtns = document.querySelectorAll('.jadwal-btn');
+    const inputJadwal = document.getElementById('inputJadwal');
+
+    jadwalBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const selectedJadwal = this.dataset.jadwal;
+            if (inputJadwal) {
+                inputJadwal.value = selectedJadwal;
+            }
+
+            // Update class visual aktif pada tombol
+            jadwalBtns.forEach(b => {
+                b.classList.remove('bg-[#071E49]', 'text-white', 'shadow-xs', 'font-bold');
+                b.classList.add('font-medium', 'text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-100');
+                const svg = b.querySelector('svg');
+                if (svg) svg.classList.replace('text-emerald-400', 'text-slate-400');
+            });
+
+            this.classList.remove('font-medium', 'text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-100');
+            this.classList.add('font-bold', 'bg-[#071E49]', 'text-white', 'shadow-xs');
+            const activeSvg = this.querySelector('svg');
+            if (activeSvg) activeSvg.classList.replace('text-slate-400', 'text-emerald-400');
+
+            // Jika sekolah sudah dipilih, auto submit form untuk muat data jadwal
+            if (instansiSelect && instansiSelect.value && filterForm) {
+                showLoadingState();
+                filterForm.submit();
+            }
+        });
+    });
+
     function resetRegencies() {
         regencySelect.innerHTML = '<option value="">Pilih provinsi dahulu</option>';
         regencySelect.disabled = true;
@@ -185,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function resetInstansi() {
         instansiSelect.innerHTML = '<option value="">Pilih kecamatan terlebih dahulu</option>';
         instansiSelect.disabled = true;
-        instansiSelect.className = 'w-full pl-10 pr-8 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-sm font-bold shadow-2xs transition';
+        instansiSelect.className = 'w-full pl-10 pr-8 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-xs font-bold shadow-2xs transition';
     }
 
     // Helper untuk memfilter isi dropdown Instansi via AJAX
@@ -214,10 +246,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     opt.disabled = true;
                     instansiSelect.appendChild(opt);
                     instansiSelect.disabled = true;
-                    instansiSelect.className = 'w-full pl-10 pr-8 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-sm font-bold shadow-2xs transition';
+                    instansiSelect.className = 'w-full pl-10 pr-8 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-xs font-bold shadow-2xs transition';
                 } else {
                     instansiSelect.disabled = false;
-                    instansiSelect.className = 'w-full pl-10 pr-8 py-3 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-2xs transition';
+                    instansiSelect.className = 'w-full pl-10 pr-8 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-xs font-bold focus:ring-2 focus:ring-blue-500 shadow-2xs transition';
                     data.forEach(item => {
                         const opt = document.createElement('option');
                         opt.value = item.id;
@@ -241,10 +273,14 @@ window.showLoadingState = function () {
     const emptyState = document.getElementById('emptyState');
     const loadingState = document.getElementById('loadingState');
     const transparencyResult = document.getElementById('transparencyResult');
+    const nationalStats = document.getElementById('nationalStats');
+    const transparencySteps = document.getElementById('transparencySteps');
     const submitBtn = document.getElementById('submitBtn');
 
     if (emptyState) emptyState.classList.add('hidden');
     if (transparencyResult) transparencyResult.classList.add('hidden');
+    if (nationalStats) nationalStats.classList.add('hidden');
+    if (transparencySteps) transparencySteps.classList.add('hidden');
     if (loadingState) {
         loadingState.classList.remove('hidden');
     }
