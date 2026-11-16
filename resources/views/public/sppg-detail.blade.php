@@ -69,52 +69,6 @@
             </div>
         </div>
 
-        <!-- Menu Aktif & Informasi Gizi -->
-        <div class="pt-8 space-y-6">
-            <div>
-                <h3 class="text-xl font-bold text-slate-900 tracking-tight">Daftar Menu & Kepatuhan Gizi</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Komposisi nutrisi telah dikonfigurasi berdasarkan takaran porsi kebutuhan gizi anak sekolah.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                @forelse($activeMenus as $m)
-                    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700">
-                                    {{ $m->kategori_label }}
-                                </span>
-                                <h4 class="font-bold text-slate-900 text-base mt-1.5">{{ $m->nama }}</h4>
-                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">{{ $m->deskripsi ?: 'Menu bergizi terpadu dengan bahan segar pilihan.' }}</p>
-                            </div>
-                        </div>
-
-                        <!-- Nilai Gizi jika ada resep aktif -->
-                        @php
-                            $activeRecipe = $m->recipes->first();
-                        @endphp
-                        @if($activeRecipe && $activeRecipe->nutritions->isNotEmpty())
-                            <div class="pt-3 border-t border-slate-100">
-                                <div class="text-[11px] font-semibold text-slate-600 mb-2">Nilai Gizi per Porsi (Ukuran {{ ucfirst($activeRecipe->ukuran_porsi) }}):</div>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach($activeRecipe->nutritions as $nut)
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
-                                            <span class="font-medium text-slate-500">{{ $nut->nutritionType?->nama ?? 'Gizi' }}:</span>
-                                            <strong class="text-slate-900">{{ (float)$nut->nilai }} {{ $nut->nutritionType?->satuan ?? '' }}</strong>
-                                        </span>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                @empty
-                    <div class="col-span-2 py-8 text-center text-slate-400 text-sm">
-                        Belum ada menu yang dipublikasikan oleh unit dapur ini.
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
         <!-- Sekolah / Sasaran yang Dilayani -->
         <div class="pt-8 space-y-4 border-t border-slate-100 mt-8">
             <div>

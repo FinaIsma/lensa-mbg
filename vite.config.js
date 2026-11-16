@@ -33,6 +33,7 @@ export default defineConfig({
                 'resources/css/staff/limbah.css',
                 'resources/css/staff/pengiriman.css',
                 'resources/css/staff/dashboard.css',
+                'resources/css/public/portal.css',
                 'resources/js/app.js',
                 'resources/js/auth/login.js',
                 'resources/js/auth/register.js',
@@ -54,6 +55,7 @@ export default defineConfig({
                 'resources/js/staff/tujuan.js',
                 'resources/js/staff/pengiriman.js',
                 'resources/js/staff/dashboard.js',
+                'resources/js/public/portal.js',
             ],
             refresh: true,
             fonts: [
