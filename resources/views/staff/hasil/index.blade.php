@@ -104,34 +104,34 @@
         </div>
     @endif
 
-    {{-- Unified Table Card Container --}}
-    <div class="hasil-table-card">
-        <form method="GET" action="{{ route('staff.hasil.index') }}" class="hasil-filter-bar">
+    {{-- Unified Table Card Container Sesuai Standar Modul Pemasok --}}
+    <div class="pemasok-table-card hasil-table-card">
+        <form method="GET" action="{{ route('staff.hasil.index') }}" class="pemasok-filter-bar hasil-filter-bar">
             {{-- Search Box (Kiri) --}}
-            <div class="hasil-search-box">
-                <svg class="hasil-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="pemasok-search-box hasil-search-box">
+                <svg class="pemasok-search-icon hasil-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" name="q" value="{{ $q }}" placeholder="Cari kode batch, menu..." class="hasil-search-input">
+                <input type="text" name="q" value="{{ $q }}" placeholder="Cari kode batch, menu..." class="pemasok-search-input hasil-search-input">
             </div>
 
-            <div class="hasil-actions-right">
+            <div class="pemasok-actions-right hasil-actions-right">
                 {{-- Dropdown Status Filter: Semua / Ada Susut / Tanpa Susut / Hari Ini --}}
-                <div class="hasil-select-wrapper">
-                    <select name="status" class="hasil-select" onchange="this.form.submit()">
+                <div class="pemasok-select-wrapper hasil-select-wrapper">
+                    <select name="status" class="pemasok-select hasil-select" onchange="this.form.submit()">
                         <option value="" {{ in_array(strtolower($status ?? ''), ['', 'semua'], true) ? 'selected' : '' }}>Semua</option>
                         <option value="susut" {{ ($status ?? '') === 'susut' ? 'selected' : '' }}>Ada Susut</option>
                         <option value="sesuai" {{ ($status ?? '') === 'sesuai' ? 'selected' : '' }}>Tanpa Susut</option>
                         <option value="hari_ini" {{ ($status ?? '') === 'hari_ini' ? 'selected' : '' }}>Hari Ini</option>
                     </select>
-                    <svg class="hasil-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="pemasok-select-chevron hasil-select-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </div>
 
                 {{-- Tombol + Catat Hasil Baru (Kanan) --}}
-                <button type="button" class="btn-catat-hasil" onclick="openAddHasilModal()">
+                <button type="button" class="btn-tambah-pemasok btn-catat-hasil" onclick="openAddHasilModal()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -141,9 +141,9 @@
             </div>
         </form>
 
-        {{-- Table Content: daftar hasil (batch, menu, target, porsi siap, susut, kondisi, pencatat, waktu) --}}
-        <div class="hasil-table-responsive">
-            <table class="hasil-table">
+        {{-- Table Container Sesuai Standar Modul Pemasok (Fit 100%, Tanpa Scroll Horizontal) --}}
+        <div class="pemasok-table-responsive hasil-table-responsive">
+            <table class="pemasok-table hasil-table">
                 <thead>
                     <tr>
                         <th class="col-batch">Batch</th>
@@ -153,7 +153,9 @@
                         <th class="col-susut is-center">Susut</th>
                         <th class="col-kondisi">Kondisi</th>
                         <th class="col-pencatat">Pencatat</th>
-                        <th class="col-waktu is-center">Waktu</th>
+                        <th class="col-waktu">Waktu</th>
+                        <th class="col-status is-center">Status</th>
+                        <th class="col-aksi is-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -167,73 +169,41 @@
                         @endphp
                         <tr>
                             {{-- 1. Batch --}}
-                            <td>
-                                <div class="hasil-cell-stack">
-                                    <a href="{{ route('staff.batches.show', $batch->id) }}" class="hasil-batch-link">
-                                        {{ $batch->batch_code }}
-                                    </a>
-                                    <span class="badge-status {{ $batch->status_badge_class }}">
-                                        <span class="status-dot"></span>
-                                        <span>{{ $batch->status_label }}</span>
-                                    </span>
-                                </div>
+                            <td class="col-batch">
+                                <a href="{{ route('staff.batches.show', $batch->id) }}" class="pemasok-name-link hasil-batch-link">
+                                    {{ $batch->batch_code }}
+                                </a>
                             </td>
 
                             {{-- 2. Menu --}}
-                            <td>
-                                <div class="hasil-cell-stack">
-                                    <div class="hasil-menu-name">{{ $batch->menu?->nama ?? '-' }}</div>
-                                    <span class="chip-porsi {{ $batch->recipe?->ukuran_porsi === 'besar' ? 'chip-porsi-besar' : 'chip-porsi-kecil' }}">
-                                        Porsi {{ ucfirst($batch->recipe?->ukuran_porsi ?? 'Standar') }}
-                                    </span>
-                                </div>
-                            </td>
-
-                            {{-- 3. Target --}}
-                            <td class="is-center">
-                                <span class="hasil-qty-target">
-                                    {{ number_format($batch->target_porsi, 0, ',', '.') }} ps
+                            <td class="col-menu">
+                                <div class="hasil-menu-name">{{ $batch->menu?->nama ?? '-' }}</div>
+                                <span class="chip-porsi {{ $batch->recipe?->ukuran_porsi === 'besar' ? 'chip-porsi-besar' : 'chip-porsi-kecil' }}" style="margin-top: 3px; display: inline-block;">
+                                    Porsi {{ ucfirst($batch->recipe?->ukuran_porsi ?? 'Standar') }}
                                 </span>
                             </td>
 
-                            {{-- 4. Porsi Siap (portions_ready) --}}
-                            <td class="is-center">
-                                <div class="hasil-cell-stack is-center">
-                                    <span class="hasil-qty-ready">
-                                        {{ number_format($porsiSiap, 0, ',', '.') }} ps
-                                    </span>
-                                    @if ($porsiSiap > $batch->target_porsi)
-                                        <span class="hasil-surplus-tag" title="Porsi siap melebihi target awal">
-                                            +{{ number_format($porsiSiap - $batch->target_porsi, 0, ',', '.') }} surplus
-                                        </span>
-                                    @endif
-                                </div>
+                            {{-- 3. Target --}}
+                            <td class="col-target is-center" style="color: #475569;">
+                                {{ number_format($batch->target_porsi, 0, ',', '.') }} ps
                             </td>
 
-                            {{-- 5. Susut (Info otomatis: tidak boleh negatif + tombol Catat susut jika susut > 0) --}}
-                            <td class="is-center">
-                                @if ($susut > 0)
-                                    <div class="hasil-cell-stack is-center">
-                                        <span class="chip-susut-loss">
-                                            {{ number_format($susut, 0, ',', '.') }} ps
-                                        </span>
-                                        @if (! $hasRecordedLoss)
-                                            <button type="button" onclick="openCatatSusutModal({{ $batch->id }}, '{{ $batch->batch_code }}', {{ $susut }})" class="btn-catat-susut-inline" title="Buka form Limbah tipe PRODUCTION_LOSS">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                </svg>
-                                                <span>Catat Susut</span>
-                                            </button>
-                                        @else
-                                            <span class="badge-susut-recorded" title="Susut telah tercatat di modul limbah">
-                                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                                </svg>
-                                                <span>Limbah Dicatat</span>
-                                            </span>
-                                        @endif
+                            {{-- 4. Porsi Siap --}}
+                            <td class="col-ready is-center" style="font-weight: 600; color: #0F172A;">
+                                <span>{{ number_format($porsiSiap, 0, ',', '.') }} ps</span>
+                                @if ($porsiSiap > $batch->target_porsi)
+                                    <div class="hasil-surplus-tag" style="margin-top: 2px;" title="Porsi siap melebihi target awal">
+                                        +{{ number_format($porsiSiap - $batch->target_porsi, 0, ',', '.') }}
                                     </div>
+                                @endif
+                            </td>
+
+                            {{-- 5. Susut --}}
+                            <td class="col-susut is-center">
+                                @if ($susut > 0)
+                                    <span class="chip-susut-loss">
+                                        {{ number_format($susut, 0, ',', '.') }} ps
+                                    </span>
                                 @else
                                     <span class="chip-susut-zero">
                                         0 ps
@@ -241,62 +211,81 @@
                                 @endif
                             </td>
 
-                            {{-- 6. Kondisi (reported_condition + note + foto bukti) --}}
-                            <td>
-                                <div class="hasil-cell-stack">
-                                    <div class="hasil-condition-text">
-                                        {{ $check?->reported_condition ?? '-' }}
+                            {{-- 6. Kondisi --}}
+                            <td class="col-kondisi">
+                                <div style="color: #1E293B; line-height: 1.35;">{{ $check?->reported_condition ?? '-' }}</div>
+                                @if ($check?->note)
+                                    <div style="font-size: 11.5px; color: #64748B; margin-top: 2px; line-height: 1.3;">
+                                        {{ $check->note }}
                                     </div>
-                                    @if ($check?->note)
-                                        <div class="hasil-condition-note">
-                                            <em>Catatan:</em> {{ $check->note }}
-                                        </div>
-                                    @endif
-                                    @if ($evidence)
-                                        <button type="button" class="btn-hasil-evidence" onclick="showEvidencePreview('{{ asset('storage/' . $evidence->file_path) }}', '{{ $batch->batch_code }}', '{{ addslashes($evidence->description ?? '') }}', {{ $evidence->is_public ? 'true' : 'false' }})">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                                                <circle cx="12" cy="13" r="4"></circle>
-                                            </svg>
-                                            <span>Foto Bukti{{ $evidence->is_public ? ' (Publik)' : '' }}</span>
-                                        </button>
-                                    @endif
-                                </div>
+                                @endif
                             </td>
 
                             {{-- 7. Pencatat --}}
-                            <td>
-                                <span class="hasil-checker-name">
-                                    {{ $check?->checker?->nama ?? 'Staff' }}
-                                </span>
+                            <td class="col-pencatat" style="color: #475569;">
+                                {{ $check?->checker?->nama ?? 'Staff' }}
                             </td>
 
                             {{-- 8. Waktu --}}
-                            <td class="is-center">
-                                <div class="hasil-time-stack">
-                                    <span class="hasil-time-date">
-                                        {{ $check?->checked_at ? $check->checked_at->format('d/m/Y') : '-' }}
-                                    </span>
-                                    @if ($check?->checked_at)
-                                        <span class="hasil-time-hour">
-                                            {{ $check->checked_at->format('H:i') }} WIB
-                                        </span>
+                            <td class="col-waktu">
+                                <div style="font-size: 12.5px; color: #1E293B; line-height: 1.25;">
+                                    {{ $check?->checked_at ? $check->checked_at->format('d/m/Y') : '-' }}
+                                </div>
+                                @if ($check?->checked_at)
+                                    <div style="font-size: 11px; color: #64748B; margin-top: 2px;">
+                                        {{ $check->checked_at->format('H:i') }} WIB
+                                    </div>
+                                @endif
+                            </td>
+
+                            {{-- 9. Status Badge (Persis seperti Pemasok) --}}
+                            <td class="col-status is-center">
+                                <span class="chip-status badge-status {{ $batch->status_badge_class }}">
+                                    <span class="chip-dot status-dot"></span>
+                                    <span>{{ $batch->status_label }}</span>
+                                </span>
+                            </td>
+
+                            {{-- 10. Aksi: Hanya Lihat Detail Saja (Tanpa Tombol Centang) --}}
+                            <td class="col-aksi is-center" style="white-space: nowrap;">
+                                <div class="pemasok-actions-group action-buttons-group" style="justify-content: center;">
+                                    @if ($evidence)
+                                        <button type="button" 
+                                                class="btn-pemasok-detail btn-action-icon" 
+                                                onclick="showEvidencePreview('{{ asset('storage/' . $evidence->file_path) }}', '{{ $batch->batch_code }}', '{{ addslashes($evidence->description ?? '') }}', {{ $evidence->is_public ? 'true' : 'false' }})"
+                                                title="Lihat Detail Hasil & Foto Bukti"
+                                                aria-label="Lihat Detail">
+                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
+                                    @else
+                                        <a href="{{ route('staff.batches.show', $batch->id) }}" 
+                                           class="btn-pemasok-detail btn-action-icon" 
+                                           title="Lihat Detail Batch" 
+                                           aria-label="Lihat Detail Batch">
+                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </a>
                                     @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="hasil-empty-cell">
+                            <td colspan="10" class="hasil-empty-cell" style="text-align: center; padding: 40px 20px;">
                                 <div class="hasil-empty-state">
-                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="hasil-empty-icon">
+                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="hasil-empty-icon" style="color: #94A3B8; margin: 0 auto 8px;">
                                         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
                                         <rect x="14" y="3" width="7" height="7" rx="1"></rect>
                                         <rect x="14" y="14" width="7" height="7" rx="1"></rect>
                                         <rect x="3" y="14" width="7" height="7" rx="1"></rect>
                                     </svg>
-                                    <span class="hasil-empty-title">Belum ada hasil produksi yang dicatat.</span>
-                                    <span class="hasil-empty-desc">Klik tombol "Catat Hasil Baru" di atas untuk mencatat porsi dari batch yang telah selesai diolah.</span>
+                                    <div style="font-size: 14px; font-weight: 600; color: #334155;">Belum ada hasil produksi yang dicatat.</div>
+                                    <div style="font-size: 12px; color: #94A3B8; margin-top: 2px;">Klik tombol "Catat Hasil Baru" di atas untuk mencatat porsi dari batch yang telah selesai diolah.</div>
                                 </div>
                             </td>
                         </tr>

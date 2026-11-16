@@ -176,18 +176,205 @@
 }
 
 /* ==========================================================================
-   Chip 4 Warna untuk Tipe Limbah
+   Table Limbah (Rapi, Konsisten dengan Pemasok & Hasil)
    ========================================================================== */
+/* Container tabel: Matikan scroll horizontal agar tidak bisa digilir kanan/kiri */
+.limbah-table-card .limbah-table-responsive,
+.limbah-table-card .pemasok-table-responsive,
+.limbah-table-responsive {
+    width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+}
+
+.limbah-table-card .limbah-table,
+.limbah-table-card .pemasok-table,
+.limbah-table {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: auto !important;
+    border-collapse: collapse !important;
+    text-align: left;
+    font-family: inherit;
+}
+
+.limbah-table thead th {
+    background: #FFFFFF !important;
+    color: #071E49 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    letter-spacing: normal !important;
+    padding: 14px 10px !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+}
+
+.limbah-table tbody td {
+    padding: 14px 10px !important;
+    border-bottom: 1px solid #F1F5F9 !important;
+    color: #1E293B !important;
+    font-size: 13px !important;
+    vertical-align: middle !important;
+}
+
+.limbah-table th:first-child,
+.limbah-table td:first-child {
+    padding-left: 20px !important;
+}
+
+.limbah-table th:last-child,
+.limbah-table td:last-child {
+    padding-right: 20px !important;
+}
+
+.limbah-table tbody tr {
+    background: #FFFFFF;
+    transition: background-color 0.15s ease;
+}
+
+.limbah-table tbody tr:hover td {
+    background-color: #F8FAFC !important;
+}
+
+.limbah-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.limbah-table .is-center {
+    text-align: center !important;
+}
+
+/* Lebar Kolom Proporsional */
+.limbah-table th.col-waktu,
+.limbah-table td.col-waktu {
+    width: 95px;
+    white-space: nowrap !important;
+}
+
+.limbah-table th.col-tipe,
+.limbah-table td.col-tipe {
+    width: 120px;
+    white-space: nowrap !important;
+}
+
+.limbah-table th.col-batch,
+.limbah-table td.col-batch {
+    min-width: 170px;
+}
+
+.limbah-table th.col-jumlah,
+.limbah-table td.col-jumlah {
+    width: 80px;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.limbah-table th.col-alasan,
+.limbah-table td.col-alasan {
+    min-width: 150px;
+}
+
+.limbah-table th.col-pencatat,
+.limbah-table td.col-pencatat {
+    width: 95px;
+    white-space: nowrap !important;
+}
+
+.limbah-table th.col-status,
+.limbah-table td.col-status {
+    width: 105px;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.limbah-table th.col-aksi,
+.limbah-table td.col-aksi {
+    width: 130px;
+    min-width: 120px;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.limbah-batch-link {
+    font-weight: 600;
+    font-size: 13px;
+    color: #071E49;
+    text-decoration: none;
+    transition: color 0.15s ease;
+    cursor: pointer;
+}
+
+.limbah-batch-link:hover {
+    color: #2563EB;
+    text-decoration: underline;
+}
+
+/* Action Button Detail & Koreksi */
+.limbah-table .btn-action-icon,
+.limbah-table .btn-pemasok-detail {
+    width: 32px !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    border: 1.5px solid #CBD5E1 !important;
+    background: #FFFFFF !important;
+    color: #071E49 !important;
+    transition: all 0.2s ease !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+.limbah-table .btn-action-icon:hover,
+.limbah-table .btn-pemasok-detail:hover {
+    background: #EFF6FF !important;
+    border-color: #3B82F6 !important;
+    color: #2563EB !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.12) !important;
+}
+
+/* Badge Status Active & Voided Selaras Modul Lain */
+.limbah-table .badge-status,
+.limbah-table .chip-status {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 3px 8px !important;
+    border-radius: 9999px !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    border: none !important;
+}
+
+.limbah-table .badge-status .status-dot,
+.limbah-table .chip-status .chip-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    display: inline-block !important;
+    flex-shrink: 0 !important;
+}
+
+/* Chip 4 Warna untuk Tipe Limbah */
 .chip-type-loss {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 10px;
+    padding: 4px 11px;
     border-radius: 9999px;
     background: #FEF3C7;
     color: #D97706;
     font-size: 11.5px;
-    font-weight: 700;
+    font-weight: 600;
     border: 1px solid #FDE68A;
 }
 
@@ -195,12 +382,12 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 10px;
+    padding: 4px 11px;
     border-radius: 9999px;
     background: #FEE2E2;
     color: #DC2626;
     font-size: 11.5px;
-    font-weight: 700;
+    font-weight: 600;
     border: 1px solid #FECACA;
 }
 
@@ -208,12 +395,12 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 10px;
+    padding: 4px 11px;
     border-radius: 9999px;
     background: #EFF6FF;
     color: #2563EB;
     font-size: 11.5px;
-    font-weight: 700;
+    font-weight: 600;
     border: 1px solid #BFDBFE;
 }
 
@@ -221,12 +408,12 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 10px;
+    padding: 4px 11px;
     border-radius: 9999px;
     background: #F3E8FF;
     color: #7E22CE;
     font-size: 11.5px;
-    font-weight: 700;
+    font-weight: 600;
     border: 1px solid #E9D5FF;
 }
 
@@ -245,50 +432,30 @@ tr.row-voided .voided-text {
     color: #94A3B8;
 }
 
-/* Badge Status Active & Voided */
-.badge-limbah-active {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 9px;
-    border-radius: 6px;
-    background: #DCFCE7;
-    color: #15803D;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.badge-limbah-voided {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 9px;
-    border-radius: 6px;
-    background: #F1F5F9;
-    color: #64748B;
-    font-size: 11px;
-    font-weight: 600;
-}
-
 .btn-ajukan-koreksi {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     background: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    color: #475569;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
+    border: 1.5px solid #CBD5E1;
+    color: #071E49;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 11.5px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .btn-ajukan-koreksi:hover {
-    background: #F8FAFC;
-    border-color: #94A3B8;
-    color: #0F172A;
+    background: #EFF6FF;
+    border-color: #3B82F6;
+    color: #2563EB;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.12);
 }
 
 /* Helper Box Form Modal */

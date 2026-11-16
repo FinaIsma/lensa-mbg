@@ -10,6 +10,7 @@ use App\Models\ProductionBatch;
 use App\Models\Staff;
 use App\Models\WasteSurplusRecord;
 use App\Support\Keys;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -58,7 +59,11 @@ class HasilController extends Controller
         } elseif ($status === 'sesuai') {
             $query->whereColumn('actual_porsi', '>=', 'target_porsi');
         } elseif ($status === 'hari_ini') {
-            $query->whereDate('production_date', Carbon::today());
+            $today = Carbon::today();
+            $query->where(function ($subQ) use ($today) {
+                $subQ->whereDate('production_date', $today)
+                    ->orWhereHas('preDistributionCheck', fn ($cQ) => $cQ->whereDate('checked_at', $today));
+            });
         }
 
         $batches = $query->orderBy('production_date', 'desc')
@@ -229,23 +234,20 @@ class HasilController extends Controller
             $batch->save();
 
             // 4. Audit Trail
-            AuditTrail::create([
-                'id_sppg' => $idSppg,
-                'actor_id' => $staff?->id,
-                'action' => 'CREATE_RESULT',
-                'auditable_type' => 'production_batches',
-                'auditable_id' => $batch->id,
-                'old_values' => ['status' => 'processing', 'actual_porsi' => null],
-                'new_values' => [
+            AuditTrail::catat(
+                'update',
+                $batch,
+                ['status' => 'processing', 'actual_porsi' => null],
+                [
                     'status' => 'ready',
                     'actual_porsi' => $batch->actual_porsi,
                     'portions_ready' => $check->portions_ready,
                     'reported_condition' => $check->reported_condition,
                     'is_excess' => $isExcess,
                 ],
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
+                null,
+                $idSppg
+            );
         });
 
         // Hitung susut (tidak boleh negatif, minimal 0)
@@ -318,21 +320,19 @@ class HasilController extends Controller
                 ]);
             }
 
-            AuditTrail::create([
-                'id_sppg' => $idSppg,
-                'actor_id' => $staff?->id,
-                'action' => 'RECORD_PRODUCTION_LOSS',
-                'auditable_type' => 'waste_surplus_records',
-                'auditable_id' => $record->id,
-                'new_values' => [
+            AuditTrail::catat(
+                'create',
+                $record,
+                null,
+                [
                     'batch_code' => $batch->batch_code,
                     'record_type' => 'PRODUCTION_LOSS',
                     'qty' => $record->qty,
                     'reason' => $record->reason,
                 ],
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
+                null,
+                $idSppg
+            );
         });
 
         return redirect()->route('staff.hasil.index')
