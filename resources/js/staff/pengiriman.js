@@ -131,6 +131,11 @@ window.onBatchChange = function (selectEl) {
         sisaEl.textContent = `${formatNumber(data.sisa_porsi)} Porsi`;
         sisaEl.style.color = data.sisa_porsi > 0 ? '#10B981' : '#EF4444';
 
+        const consumeEl = document.getElementById('sum_consume_by');
+        if (consumeEl) {
+            consumeEl.textContent = data.consume_by || 'Maks. 4 Jam';
+        }
+
         if (portionInput) {
             portionInput.max = data.sisa_porsi;
             if (data.sisa_porsi <= 0) {

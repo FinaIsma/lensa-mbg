@@ -141,6 +141,36 @@
             </div>
         </form>
 
+        {{-- Legend Keterangan Warna Status Produksi --}}
+        <div class="hasil-legend-bar">
+            <div class="hasil-legend-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Keterangan Status:</span>
+            </div>
+            <div class="hasil-legend-list">
+                <div class="hasil-legend-item" title="Batch dalam tahap pengolahan atau siap didistribusikan">
+                    <span class="legend-color-dot is-ordered"></span>
+                    <span class="legend-text"><strong>Kuning:</strong> Pengolahan / Siap Distribusi</span>
+                </div>
+                <div class="hasil-legend-item" title="Batch telah selesai diproduksi dan didistribusikan">
+                    <span class="legend-color-dot is-received"></span>
+                    <span class="legend-text"><strong>Hijau:</strong> Selesai</span>
+                </div>
+                <div class="hasil-legend-item" title="Draft batch produksi baru">
+                    <span class="legend-color-dot is-draft"></span>
+                    <span class="legend-text"><strong>Abu-abu:</strong> Draft</span>
+                </div>
+                <div class="hasil-legend-item" title="Batch produksi dibatalkan">
+                    <span class="legend-color-dot is-cancelled"></span>
+                    <span class="legend-text"><strong>Merah:</strong> Dibatalkan</span>
+                </div>
+            </div>
+        </div>
+
         {{-- Table Container Sesuai Standar Modul Pemasok (Fit 100%, Tanpa Scroll Horizontal) --}}
         <div class="pemasok-table-responsive hasil-table-responsive">
             <table class="pemasok-table hasil-table">
@@ -151,9 +181,9 @@
                         <th class="col-target is-center">Target</th>
                         <th class="col-ready is-center">Porsi Siap</th>
                         <th class="col-susut is-center">Susut</th>
-                        <th class="col-kondisi">Kondisi</th>
-                        <th class="col-pencatat">Pencatat</th>
-                        <th class="col-waktu">Waktu</th>
+                        <th class="col-kondisi">Uji Fisik &amp; Kondisi</th>
+                        <th class="col-ahli-gizi">Ahli Gizi</th>
+                        <th class="col-waktu">Waktu QC &amp;<br>Batas Kritis</th>
                         <th class="col-status is-center">Status</th>
                         <th class="col-aksi is-center">Aksi</th>
                     </tr>
@@ -166,12 +196,17 @@
                             $susut = max(0, $batch->target_porsi - $porsiSiap);
                             $evidence = $check?->evidences->first();
                             $hasRecordedLoss = isset($recordedLossBatchIds[$batch->id]);
+                            $nutritionistName = $check?->effective_nutritionist_name ?? ($check?->checker?->nama ?? 'Tenaga Gizi');
+                            $checkedAtStr = $check?->checked_at ? $check->checked_at->format('d/m/Y, H:i') . ' WIB' : '-';
+                            $estimatedDistStr = $check?->estimated_distribution_at ? $check->estimated_distribution_at->format('H:i') . ' WIB' : '-';
+                            $consumeByStr = $check?->consume_by ? $check->consume_by->format('H:i') . ' WIB' : 'Maks. 4 Jam Pasca Masak';
+                            $formTypeLabel = $check?->form_type_label ?? 'Makanan Siap Santap';
                         @endphp
                         <tr>
-                            {{-- 1. Batch --}}
+                            {{-- 1. Batch (Format Sempit & Adaptif) --}}
                             <td class="col-batch">
-                                <a href="{{ route('staff.batches.show', $batch->id) }}" class="pemasok-name-link hasil-batch-link">
-                                    {{ $batch->batch_code }}
+                                <a href="{{ route('staff.batches.show', $batch->id) }}" class="pemasok-name-link hasil-batch-link" title="Detail Batch: {{ $batch->batch_code }}">
+                                    {!! str_replace('-', '-<wbr>', e($batch->batch_code)) !!}
                                 </a>
                             </td>
 
@@ -211,66 +246,91 @@
                                 @endif
                             </td>
 
-                            {{-- 6. Kondisi --}}
+                            {{-- 6. Uji Fisik & Kondisi --}}
                             <td class="col-kondisi">
-                                <div style="color: #1E293B; line-height: 1.35;">{{ $check?->reported_condition ?? '-' }}</div>
-                                @if ($check?->note)
-                                    <div style="font-size: 11.5px; color: #64748B; margin-top: 2px; line-height: 1.3;">
-                                        {{ $check->note }}
+                                <div class="hasil-qc-card">
+                                    <div class="hasil-qc-badges">
+                                        <span class="hasil-qc-status-badge {{ $check?->physical_test_status === 'failed' ? 'is-failed' : ($check?->physical_test_status === 'warning' ? 'is-warning' : 'is-passed') }}">
+                                            {{ ($check?->physical_test_status === 'failed') ? 'Tidak Lolos' : (($check?->physical_test_status === 'warning') ? 'Bersyarat' : 'Lolos Uji Fisik') }}
+                                        </span>
+                                        <span class="hasil-qc-category-tag" title="{{ $formTypeLabel }}">
+                                            {{ $formTypeLabel }}
+                                        </span>
                                     </div>
-                                @endif
-                            </td>
-
-                            {{-- 7. Pencatat --}}
-                            <td class="col-pencatat" style="color: #475569;">
-                                {{ $check?->checker?->nama ?? 'Staff' }}
-                            </td>
-
-                            {{-- 8. Waktu --}}
-                            <td class="col-waktu">
-                                <div style="font-size: 12.5px; color: #1E293B; line-height: 1.25;">
-                                    {{ $check?->checked_at ? $check->checked_at->format('d/m/Y') : '-' }}
+                                    <div class="hasil-qc-condition-text" title="{{ $check?->reported_condition ?? '-' }}">
+                                        {{ $check?->reported_condition ?? '-' }}
+                                    </div>
+                                    @if ($check?->note)
+                                        <div class="hasil-qc-note-box" title="{{ $check->note }}">
+                                            <span class="hasil-qc-note-label">Catatan:</span> {{ $check->note }}
+                                        </div>
+                                    @endif
                                 </div>
+                            </td>
+
+                            {{-- 7. Ahli Gizi (Sempit & Ke Bawah jika panjang) --}}
+                            <td class="col-ahli-gizi">
+                                <div class="hasil-nutritionist-name" title="{{ $nutritionistName }}">
+                                    {{ $nutritionistName }}
+                                </div>
+                                <div class="hasil-checker-sub" title="Pencatat QC: {{ $check?->checker?->nama ?? '-' }}">
+                                    QC: {{ $check?->checker?->nama ?? '-' }}
+                                </div>
+                            </td>
+
+                            {{-- 8. Waktu QC & Batas Kritis --}}
+                            <td class="col-waktu">
+                                <div style="font-size: 11.5px; color: #1E293B; line-height: 1.25;">
+                                    <span style="color: #64748B;">QC:</span> {{ $check?->checked_at ? $check->checked_at->format('H:i') . ' WIB' : '-' }}
+                                </div>
+                                @if ($check?->consume_by)
+                                    <div style="margin-top: 2px;">
+                                        <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 700; color: #B91C1C; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 4px; padding: 1px 5px;">
+                                            <span>Maks:</span> {{ $check->consume_by->format('H:i') }} WIB
+                                        </span>
+                                    </div>
+                                @endif
                                 @if ($check?->checked_at)
-                                    <div style="font-size: 11px; color: #64748B; margin-top: 2px;">
-                                        {{ $check->checked_at->format('H:i') }} WIB
+                                    <div style="font-size: 10px; color: #94A3B8; margin-top: 2px;">
+                                        {{ $check->checked_at->format('d/m/Y') }}
                                     </div>
                                 @endif
                             </td>
 
-                            {{-- 9. Status Badge (Persis seperti Pemasok) --}}
+                            {{-- 9. Status (Compact Indicator dengan Keterangan di Atas Tabel) --}}
                             <td class="col-status is-center">
-                                <span class="chip-status badge-status {{ $batch->status_badge_class }}">
-                                    <span class="chip-dot status-dot"></span>
-                                    <span>{{ $batch->status_label }}</span>
-                                </span>
+                                <div style="display: flex; justify-content: center; align-items: center;">
+                                    <span class="chip-status badge-status badge-compact {{ $batch->status_badge_class }}" title="Status: {{ $batch->status_label }}" aria-label="{{ $batch->status_label }}">
+                                        <span class="chip-dot status-dot"></span>
+                                        <span class="sr-only">{{ $batch->status_label }}</span>
+                                    </span>
+                                </div>
                             </td>
 
-                            {{-- 10. Aksi: Hanya Lihat Detail Saja (Tanpa Tombol Centang) --}}
+                            {{-- 10. Aksi: Lihat Detail QC & Bukti --}}
                             <td class="col-aksi is-center" style="white-space: nowrap;">
                                 <div class="pemasok-actions-group action-buttons-group" style="justify-content: center;">
-                                    @if ($evidence)
-                                        <button type="button" 
-                                                class="btn-pemasok-detail btn-action-icon" 
-                                                onclick="showEvidencePreview('{{ asset('storage/' . $evidence->file_path) }}', '{{ $batch->batch_code }}', '{{ addslashes($evidence->description ?? '') }}', {{ $evidence->is_public ? 'true' : 'false' }})"
-                                                title="Lihat Detail Hasil & Foto Bukti"
-                                                aria-label="Lihat Detail">
-                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                        </button>
-                                    @else
-                                        <a href="{{ route('staff.batches.show', $batch->id) }}" 
-                                           class="btn-pemasok-detail btn-action-icon" 
-                                           title="Lihat Detail Batch" 
-                                           aria-label="Lihat Detail Batch">
-                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                        </a>
-                                    @endif
+                                    <button type="button" 
+                                            class="btn-pemasok-detail btn-action-icon" 
+                                            onclick="showEvidencePreview(
+                                                '{{ $evidence ? asset('storage/' . $evidence->file_path) : '' }}',
+                                                '{{ $batch->batch_code }}',
+                                                '{{ addslashes($check?->reported_condition ?? '') }}',
+                                                {{ ($evidence && $evidence->is_public) ? 'true' : 'false' }},
+                                                '{{ $checkedAtStr }}',
+                                                '{{ $estimatedDistStr }}',
+                                                '{{ $consumeByStr }}',
+                                                '{{ addslashes($nutritionistName) }}',
+                                                '{{ addslashes($formTypeLabel) }}',
+                                                '{{ addslashes($check?->note ?? '') }}'
+                                            )"
+                                            title="Lihat Detail Hasil, Uji Fisik &amp; Batas Kritis"
+                                            aria-label="Lihat Detail">
+                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
                                 </div>
                             </td>
                         </tr>

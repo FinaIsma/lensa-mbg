@@ -101,12 +101,12 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    padding: 4px 12px;
+    padding: 3px 8px;
     border-radius: 9999px;
     background-color: #FEE2E2 !important;
     color: #DC2626 !important;
     border: none !important;
-    font-size: 12.5px;
+    font-size: 11.5px;
     font-weight: 600;
     line-height: 1.2;
     white-space: nowrap;
@@ -118,12 +118,12 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    padding: 4px 12px;
+    padding: 3px 8px;
     border-radius: 9999px;
     background-color: #DCFCE7 !important;
     color: #15803D !important;
     border: none !important;
-    font-size: 12.5px;
+    font-size: 11.5px;
     font-weight: 600;
     line-height: 1.2;
     white-space: nowrap;
@@ -385,6 +385,89 @@
 /* ==========================================================================
    Hasil Produksi Table (Rapi, Selaras dengan Pemasok & Bahan)
    ========================================================================== */
+/* Keterangan / Legend Status Produksi di Atas Tabel */
+.hasil-legend-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    padding: 10px 20px;
+    background: #F8FAFC;
+    border-top: 1px solid #F1F5F9;
+    border-bottom: 1px solid #E2E8F0;
+    font-size: 12px;
+    color: #475569;
+}
+
+.hasil-legend-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: #071E49;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.hasil-legend-title svg {
+    color: #0284C7;
+    flex-shrink: 0;
+}
+
+.hasil-legend-list {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+}
+
+.hasil-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.3;
+}
+
+.hasil-legend-item .legend-color-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.hasil-legend-item .legend-color-dot.is-ordered {
+    background-color: #D97706;
+    box-shadow: 0 0 0 2px #FEF3C7;
+}
+
+.hasil-legend-item .legend-color-dot.is-received {
+    background-color: #16A34A;
+    box-shadow: 0 0 0 2px #DCFCE7;
+}
+
+.hasil-legend-item .legend-color-dot.is-draft {
+    background-color: #64748B;
+    box-shadow: 0 0 0 2px #F1F5F9;
+}
+
+.hasil-legend-item .legend-color-dot.is-cancelled {
+    background-color: #EF4444;
+    box-shadow: 0 0 0 2px #FEE2E2;
+}
+
+.hasil-legend-item .legend-text {
+    color: #334155;
+    font-size: 11.5px;
+}
+
+.hasil-legend-item .legend-text strong {
+    color: #0F172A;
+    font-weight: 600;
+}
+
 /* Container tabel: Matikan scroll horizontal agar tidak bisa digilir kanan/kiri */
 .hasil-table-card .hasil-table-responsive,
 .hasil-table-card .pemasok-table-responsive,
@@ -418,11 +501,11 @@
 }
 
 .hasil-table tbody td {
-    padding: 14px 10px !important;
+    padding: 12px 10px !important;
     border-bottom: 1px solid #F1F5F9 !important;
     color: #1E293B !important;
     font-size: 13px !important;
-    vertical-align: middle !important;
+    vertical-align: top !important;
 }
 
 .hasil-table th:first-child,
@@ -452,71 +535,218 @@
     text-align: center !important;
 }
 
-/* Proporsi Kolom yang Seimbang & Tidak Menumpuk */
+/* Proporsi Kolom yang Seimbang, Rapi & Tidak Menumpuk */
 .hasil-table th.col-batch,
 .hasil-table td.col-batch {
-    width: 140px;
-    white-space: nowrap !important;
+    width: 95px !important;
+    min-width: 85px !important;
+    max-width: 105px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    vertical-align: top !important;
 }
 
 .hasil-table th.col-menu,
 .hasil-table td.col-menu {
-    min-width: 170px;
+    min-width: 135px !important;
+    max-width: 170px !important;
+    vertical-align: top !important;
 }
 
 .hasil-table th.col-target,
 .hasil-table td.col-target {
-    width: 60px;
+    width: 55px !important;
     white-space: nowrap !important;
     text-align: center !important;
+    vertical-align: top !important;
+    font-size: 12px !important;
 }
 
 .hasil-table th.col-ready,
 .hasil-table td.col-ready {
-    width: 70px;
+    width: 65px !important;
     white-space: nowrap !important;
     text-align: center !important;
+    vertical-align: top !important;
+    font-size: 12.5px !important;
 }
 
 .hasil-table th.col-susut,
 .hasil-table td.col-susut {
-    width: 65px;
+    width: 60px !important;
     white-space: nowrap !important;
     text-align: center !important;
+    vertical-align: top !important;
 }
 
 .hasil-table th.col-kondisi,
 .hasil-table td.col-kondisi {
-    min-width: 150px;
+    width: 200px !important;
+    min-width: 175px !important;
+    max-width: 235px !important;
+    white-space: normal !important;
+    vertical-align: top !important;
 }
 
 .hasil-table th.col-pencatat,
 .hasil-table td.col-pencatat {
-    width: 95px;
+    min-width: 100px;
     white-space: nowrap !important;
+}
+
+.hasil-table th.col-ahli-gizi,
+.hasil-table td.col-ahli-gizi {
+    width: 85px !important;
+    min-width: 80px !important;
+    max-width: 95px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.3 !important;
+    vertical-align: top !important;
 }
 
 .hasil-table th.col-waktu,
 .hasil-table td.col-waktu {
-    width: 95px;
-    white-space: nowrap !important;
+    width: 95px !important;
+    min-width: 90px !important;
+    max-width: 105px !important;
+    white-space: normal !important;
     text-align: center !important;
+    vertical-align: top !important;
+    line-height: 1.25 !important;
+}
+
+/* Styling Khusus Kolom Uji Fisik & Ahli Gizi */
+.hasil-qc-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 100%;
+}
+
+.hasil-qc-badges {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    line-height: 1.2;
+}
+
+.hasil-qc-status-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 1.5px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+.hasil-qc-status-badge.is-passed {
+    background: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+}
+
+.hasil-qc-status-badge.is-warning {
+    background: #FFFBEB;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+
+.hasil-qc-status-badge.is-failed {
+    background: #FEF2F2;
+    color: #991B1B;
+    border: 1px solid #FECACA;
+}
+
+.hasil-qc-category-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    color: #64748B;
+    background: #F1F5F9;
+    padding: 1.5px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hasil-qc-condition-text {
+    font-size: 12px;
+    color: #1E293B;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    margin-top: 1px;
+}
+
+.hasil-qc-note-box {
+    font-size: 11px;
+    color: #475569;
+    background: #F8FAFC;
+    border-left: 2.5px solid #CBD5E1;
+    border-radius: 0 4px 4px 0;
+    padding: 2px 6px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    margin-top: 2px;
+}
+
+.hasil-qc-note-label {
+    font-weight: 600;
+    color: #64748B;
+}
+
+.hasil-nutritionist-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #166534;
+    line-height: 1.3;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.hasil-checker-sub {
+    font-size: 10px;
+    color: #64748B;
+    margin-top: 2px;
+    line-height: 1.25;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .hasil-table th.col-status,
 .hasil-table td.col-status {
-    width: 140px;
-    min-width: 130px;
+    width: 55px !important;
+    min-width: 50px !important;
+    max-width: 65px !important;
     white-space: nowrap !important;
     text-align: center !important;
+    vertical-align: middle !important;
 }
 
 .hasil-table th.col-aksi,
 .hasil-table td.col-aksi {
-    width: 60px;
-    min-width: 60px;
+    width: 50px !important;
+    min-width: 48px !important;
+    max-width: 55px !important;
     white-space: nowrap !important;
     text-align: center !important;
+    vertical-align: middle !important;
 }
 
 /* Stack Konten Sel Tabel */
@@ -533,10 +763,13 @@
 
 .hasil-batch-link {
     font-weight: 600;
-    font-size: 13.5px;
+    font-size: 12px !important;
     color: #071E49;
     text-decoration: none;
-    white-space: nowrap;
+    line-height: 1.25;
+    letter-spacing: -0.2px;
+    display: inline-block;
+    word-break: break-word;
     transition: color 0.15s ease;
     cursor: pointer;
 }
@@ -647,6 +880,44 @@
 
 .hasil-table .badge-status.badge-cancelled .status-dot {
     background-color: #EF4444 !important;
+}
+
+/* Badge Status Compact (Hanya Warna / Indikator + Tooltip) */
+.hasil-table .badge-status.badge-compact {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    cursor: help !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.hasil-table .badge-status.badge-compact:hover {
+    transform: scale(1.2) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.hasil-table .badge-status.badge-compact .status-dot {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    margin: 0 !important;
+}
+
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border-width: 0 !important;
 }
 
 .hasil-menu-name {

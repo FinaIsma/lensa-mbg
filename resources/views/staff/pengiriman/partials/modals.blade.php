@@ -48,6 +48,10 @@
                             <span class="batch-summary-label">Sisa Siap Kirim</span>
                             <span class="batch-summary-val" id="sum_sisa_porsi" style="color: #10B981;">-</span>
                         </div>
+                        <div class="batch-summary-item" style="background: #FEF2F2; border-radius: 6px; padding: 4px 6px;">
+                            <span class="batch-summary-label" style="color: #991B1B;">Batas Maks. Dimakan</span>
+                            <span class="batch-summary-val" id="sum_consume_by" style="color: #DC2626; font-weight: 700;">-</span>
+                        </div>
                     </div>
                 </div>
 
