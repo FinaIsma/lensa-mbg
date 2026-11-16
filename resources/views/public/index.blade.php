@@ -1,43 +1,20 @@
 @extends('layouts.public')
 
-@section('title', 'Transparansi Penuh Asupan Gizi Sekolah Anak Bangsa - Lensa MBG')
+@section('title', 'Pantau Menu & Kualitas Makanan Bergizi Hari Ini - Lensa MBG')
 
 @section('content')
 <div class="space-y-10 pb-16">
 
-    <!-- Hero Section Banner (Contained Rounded Card persis Gambar 2 dengan warna Primary #071E49) -->
+    <!-- Hero Section Banner (Gradasi dengan base warna utama #071E49) -->
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8">
-        <div class="bg-[#071E49] text-white rounded-3xl p-6 sm:p-8 lg:p-10 shadow-md border border-[#042A70]/50">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                <!-- Sisi Kiri -->
-                <div class="max-w-2xl space-y-3">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-medium bg-white/10 text-emerald-300 border border-white/15">
-                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                        <span>Pilar Keterbukaan Informasi Publik RI No. 14/2008</span>
-                    </div>
-                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
-                        Transparansi Penuh Asupan Gizi Sekolah Anak Bangsa
-                    </h1>
-                    <p class="text-blue-100/90 text-xs sm:text-sm leading-relaxed">
-                        Setiap porsi makanan siswa diawasi secara hulu ke hilir. Pantau kepatuhan nutrisi, kesegaran bahan pangan, proses masak dapur SPPG, hingga bukti serah terima sekolah tanpa perlu membuat akun.
-                    </p>
-                </div>
-
-                <!-- Sisi Kanan: Target Distribusi Hari Ini Box -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/15 shrink-0 min-w-[250px] space-y-2">
-                    <div class="flex items-center justify-between text-xs text-blue-100 font-medium">
-                        <span>Target Distribusi Hari Ini</span>
-                        <span class="font-bold text-emerald-300">99.8%</span>
-                    </div>
-                    <div class="w-full bg-white/20 h-1.5 rounded-full overflow-hidden">
-                        <div class="bg-emerald-400 h-full rounded-full" style="width: 99.8%"></div>
-                    </div>
-                    <div class="text-[11px] text-blue-200 font-medium text-right pt-1">
-                        38 Provinsi / {{ number_format($totalDestinations, 0, ',', '.') }} Satuan Sekolah
-                    </div>
-                </div>
+        <div class="bg-gradient-to-r from-[#071E49] via-[#09255B] to-[#0E3A88] text-white rounded-3xl p-6 sm:p-8 lg:p-10 shadow-md border border-blue-900/40 relative overflow-hidden">
+            <div class="relative z-10 space-y-2.5">
+                <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-extrabold tracking-tight text-white leading-tight">
+                    Pantau Menu & Kualitas Makanan Bergizi Hari Ini
+                </h1>
+                <p class="text-blue-100/90 text-xs sm:text-sm md:text-base leading-relaxed max-w-4xl">
+                    Cari tahu apa yang disantap siswa hari ini. Mulai dari menu dan kandungan gizinya, bahan segar yang digunakan, hingga pengantaran ke sekolah secara mudah dan terbuka.
+                </p>
             </div>
         </div>
     </div>
@@ -74,7 +51,7 @@
             </div>
 
             <!-- Form Wilayah & Instansi -->
-            <form id="filterForm" method="GET" action="{{ route('public.home') }}" class="pt-5 space-y-5">
+            <form id="filterForm" method="GET" action="{{ route('public.home') }}" data-provinsi="{{ request('provinsi', '') }}" data-kabupaten="{{ request('kabupaten_kota', '') }}" data-kecamatan="{{ request('kecamatan', '') }}" data-destination="{{ request('destination_id', '') }}" class="pt-5 space-y-5">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <!-- 1. Provinsi -->
                     <div>
@@ -127,7 +104,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                             </svg>
                         </div>
-                        <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm bg-[#071E49] hover:bg-[#042A70] text-white shadow-sm hover:shadow transition flex items-center justify-center gap-2 shrink-0">
+                        <button type="submit" id="submitBtn" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm bg-[#071E49] hover:bg-[#042A70] text-white shadow-sm hover:shadow transition flex items-center justify-center gap-2 shrink-0">
                             <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                             <span>Muat Transparansi</span>
                         </button>
@@ -136,7 +113,7 @@
 
                 <!-- STATE KOSONG: Belum pilih apa-apa, data tidak muncul -->
                 @if(!$selectedDestination)
-                    <div class="rounded-2xl border-2 border-dashed border-slate-200 p-10 text-center bg-slate-50/50 mt-6">
+                    <div id="emptyState" class="rounded-2xl border-2 border-dashed border-slate-200 p-10 text-center bg-slate-50/50 mt-6 transition-all duration-300">
                         <div class="w-12 h-12 rounded-full bg-white text-slate-400 shadow-2xs flex items-center justify-center mx-auto mb-3 border border-slate-100">
                             <svg class="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -147,6 +124,47 @@
                         <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Tentukan wilayah sampai kecamatan, lalu pilih sekolah untuk melihat menu & data transparansi hari ini.</p>
                     </div>
                 @endif
+
+                <!-- LOADING STATE: Tampil dengan animasi jelas saat data sedang dimuat -->
+                <div id="loadingState" class="hidden rounded-2xl border border-blue-100 p-8 sm:p-12 text-center bg-gradient-to-b from-blue-50/50 to-white mt-6 transition-all duration-300 shadow-xs">
+                    <div class="relative w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                        <span class="absolute inset-0 rounded-2xl bg-blue-500/20 animate-ping"></span>
+                        <div class="relative w-14 h-14 rounded-2xl bg-[#071E49] text-white flex items-center justify-center shadow-lg shadow-blue-900/20">
+                            <svg class="w-7 h-7 text-emerald-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">Memuat Data Transparansi MBG...</h3>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1.5 max-w-md mx-auto">
+                        Mengambil informasi porsi makanan, nilai gizi teruji, dan sertifikasi dapur penyedia.
+                    </p>
+
+                    <!-- Skeleton Cards Preview -->
+                    <div class="space-y-4 max-w-3xl mx-auto mt-8 pt-8 border-t border-slate-200/60 text-left">
+                        <div class="h-20 rounded-2xl bg-slate-100 animate-pulse p-4 flex items-center justify-between">
+                            <div class="space-y-2">
+                                <div class="h-3 w-32 bg-slate-200 rounded"></div>
+                                <div class="h-5 w-48 bg-slate-200 rounded"></div>
+                            </div>
+                            <div class="h-8 w-24 bg-slate-200 rounded-xl"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="h-44 rounded-2xl bg-slate-100 animate-pulse"></div>
+                            <div class="md:col-span-2 h-44 rounded-2xl bg-slate-100 animate-pulse p-4 space-y-3">
+                                <div class="h-4 w-40 bg-slate-200 rounded"></div>
+                                <div class="h-7 w-3/4 bg-slate-200 rounded"></div>
+                                <div class="grid grid-cols-4 gap-2 pt-3">
+                                    <div class="h-12 bg-slate-200 rounded-xl"></div>
+                                    <div class="h-12 bg-slate-200 rounded-xl"></div>
+                                    <div class="h-12 bg-slate-200 rounded-xl"></div>
+                                    <div class="h-12 bg-slate-200 rounded-xl"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
@@ -164,7 +182,7 @@
             $mainPhoto = $publicEvidences->first() ? asset('storage/' . $publicEvidences->first()->file_path) : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
         @endphp
 
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div id="transparencyResult" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             
             <!-- KONTEN 1: HEADER BANNER INSTANSI (PERSIS GAMBAR 3) -->
             <div class="bg-[#071E49] text-white rounded-3xl p-6 sm:p-7 shadow-xs">
@@ -542,48 +560,6 @@
                 </div>
             @endif
 
-            <!-- KONTEN 5: PUSAT ASPIRASI & LAPORAN -->
-            <div class="space-y-3">
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-slate-400 inline-block shadow-2xs"></span>
-                    <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">Pusat Aspirasi & Laporan Masyarakat</h3>
-                </div>
-
-                <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <a href="https://www.lapor.go.id" target="_blank" class="p-4 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/30 transition flex items-start gap-3 group">
-                            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-sm text-slate-900 group-hover:text-blue-700 transition">SP4N-LAPOR!</h5>
-                                <p class="text-xs text-slate-500 mt-0.5">Kanal resmi pengaduan pelayanan publik nasional</p>
-                            </div>
-                        </a>
-
-                        <div class="p-4 rounded-2xl border border-slate-200 flex items-start gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-sm text-slate-900">WhatsApp Satgas MBG</h5>
-                                <p class="text-xs text-slate-500 mt-0.5">0811-9213-990 (Respons cepat 24 jam)</p>
-                            </div>
-                        </div>
-
-                        <div class="p-4 rounded-2xl border border-slate-200 flex items-start gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-sm text-slate-900">Surel Aduan Mutu</h5>
-                                <p class="text-xs text-slate-500 mt-0.5">pengaduan@lensambg.go.id</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     @endif
 
@@ -603,239 +579,4 @@
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const provSelect = document.getElementById('select-provinsi');
-    const regencySelect = document.getElementById('select-regency');
-    const districtSelect = document.getElementById('select-district');
-    const instansiSelect = document.getElementById('select-instansi');
-
-    const currentProv = "{{ request('provinsi', '') }}";
-    const currentKab = "{{ request('kabupaten_kota', '') }}";
-    const currentKec = "{{ request('kecamatan', '') }}";
-
-    // 1. Muat Daftar Provinsi
-    fetch('/api/wilayah/provinces')
-        .then(res => res.json())
-        .then(data => {
-            provSelect.innerHTML = '<option value="">Pilih Provinsi</option>';
-            data.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item.name;
-                opt.dataset.id = item.id;
-                opt.textContent = item.name;
-                if (currentProv && (currentProv.toLowerCase() === item.name.toLowerCase())) {
-                    opt.selected = true;
-                }
-                provSelect.appendChild(opt);
-            });
-
-            // Jika ada initial value dari URL query
-            if (currentProv && provSelect.selectedOptions[0]?.dataset?.id) {
-                loadRegencies(provSelect.selectedOptions[0].dataset.id, currentKab, currentKec);
-            }
-        })
-        .catch(err => console.error('Error load provinces:', err));
-
-    // Event Provinsi Change -> Muat Kota / Kabupaten
-    provSelect.addEventListener('change', function () {
-        const selectedOpt = this.options[this.selectedIndex];
-        const provId = selectedOpt ? selectedOpt.dataset.id : null;
-        const provName = this.value;
-
-        resetRegencies();
-        resetDistricts();
-
-        if (!provId) {
-            filterInstansiDropdown('', '', '');
-            return;
-        }
-
-        loadRegencies(provId, '', '');
-        filterInstansiDropdown(provName, '', '');
-    });
-
-    // Helper Load Regencies
-    function loadRegencies(provId, preselectKab, preselectKec) {
-        regencySelect.innerHTML = '<option value="">Memuat...</option>';
-        regencySelect.disabled = true;
-
-        fetch(`/api/wilayah/regencies/${provId}`)
-            .then(res => res.json())
-            .then(data => {
-                regencySelect.disabled = false;
-                regencySelect.className = 'w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 transition';
-                regencySelect.innerHTML = '<option value="">Pilih Kota / Kabupaten</option>';
-                data.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.name;
-                    opt.dataset.id = item.id;
-                    opt.textContent = item.name;
-                    if (preselectKab && (preselectKab.toLowerCase() === item.name.toLowerCase())) {
-                        opt.selected = true;
-                    }
-                    regencySelect.appendChild(opt);
-                });
-
-                if (preselectKab && regencySelect.selectedOptions[0]?.dataset?.id) {
-                    loadDistricts(regencySelect.selectedOptions[0].dataset.id, preselectKec);
-                }
-            })
-            .catch(() => {
-                resetRegencies();
-            });
-    }
-
-    // Event Regency Change -> Muat Kecamatan
-    regencySelect.addEventListener('change', function () {
-        const selectedOpt = this.options[this.selectedIndex];
-        const regencyId = selectedOpt ? selectedOpt.dataset.id : null;
-        const provName = provSelect.value;
-        const regencyName = this.value;
-
-        resetDistricts();
-
-        if (!regencyId) {
-            filterInstansiDropdown(provName, '', '');
-            return;
-        }
-
-        loadDistricts(regencyId, '');
-        filterInstansiDropdown(provName, regencyName, '');
-    });
-
-    // Helper Load Districts
-    function loadDistricts(regencyId, preselectKec) {
-        districtSelect.innerHTML = '<option value="">Memuat...</option>';
-        districtSelect.disabled = true;
-
-        fetch(`/api/wilayah/districts/${regencyId}`)
-            .then(res => res.json())
-            .then(data => {
-                districtSelect.disabled = false;
-                districtSelect.className = 'w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 transition';
-                districtSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
-                data.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.name;
-                    opt.dataset.id = item.id;
-                    opt.textContent = item.name;
-                    if (preselectKec && (preselectKec.toLowerCase() === item.name.toLowerCase())) {
-                        opt.selected = true;
-                    }
-                    districtSelect.appendChild(opt);
-                });
-            })
-            .catch(() => {
-                resetDistricts();
-            });
-    }
-
-    // Event District Change -> Filter Instansi (Pilihan 1: sampai kecamatan saja)
-    districtSelect.addEventListener('change', function () {
-        const provName = provSelect.value;
-        const regencyName = regencySelect.value;
-        const districtName = this.value;
-
-        if (!districtName) {
-            resetInstansi();
-            return;
-        }
-
-        filterInstansiDropdown(provName, regencyName, districtName);
-    });
-
-    // Auto load data saat sekolah / instansi dipilih
-    instansiSelect.addEventListener('change', function () {
-        if (this.value) {
-            document.getElementById('filterForm').submit();
-        }
-    });
-
-    function resetRegencies() {
-        regencySelect.innerHTML = '<option value="">Pilih provinsi dahulu</option>';
-        regencySelect.disabled = true;
-        regencySelect.className = 'w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-500 focus:ring-2 focus:ring-blue-500 transition';
-        resetDistricts();
-    }
-
-    function resetDistricts() {
-        districtSelect.innerHTML = '<option value="">Pilih kota/kabupaten dahulu</option>';
-        districtSelect.disabled = true;
-        districtSelect.className = 'w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-500 focus:ring-2 focus:ring-blue-500 transition';
-        resetInstansi();
-    }
-
-    function resetInstansi() {
-        instansiSelect.innerHTML = '<option value="">Pilih kecamatan terlebih dahulu</option>';
-        instansiSelect.disabled = true;
-        instansiSelect.className = 'w-full pl-10 pr-8 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-sm font-bold shadow-2xs transition';
-    }
-
-    // Helper untuk memfilter isi dropdown Instansi via AJAX
-    function filterInstansiDropdown(prov, kab, kec) {
-        if (!kec) {
-            resetInstansi();
-            return;
-        }
-
-        let params = new URLSearchParams();
-        if (prov) params.append('provinsi', prov);
-        if (kab) params.append('kabupaten_kota', kab);
-        if (kec) params.append('kecamatan', kec);
-
-        instansiSelect.disabled = true;
-        instansiSelect.innerHTML = '<option value="">Memuat instansi sasaran...</option>';
-
-        fetch(`/api/public/destinations?${params.toString()}`)
-            .then(res => res.json())
-            .then(data => {
-                instansiSelect.innerHTML = '<option value="">-- Pilih Sekolah / Instansi Sasaran --</option>';
-                if (!data || data.length === 0) {
-                    const opt = document.createElement('option');
-                    opt.value = '';
-                    opt.textContent = 'Tidak ada instansi terdaftar di wilayah ini';
-                    opt.disabled = true;
-                    instansiSelect.appendChild(opt);
-                    instansiSelect.disabled = true;
-                    instansiSelect.className = 'w-full pl-10 pr-8 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-sm font-bold shadow-2xs transition';
-                } else {
-                    instansiSelect.disabled = false;
-                    instansiSelect.className = 'w-full pl-10 pr-8 py-3 rounded-xl border border-slate-300 bg-white text-slate-800 text-sm font-bold focus:ring-2 focus:ring-blue-500 shadow-2xs transition';
-                    data.forEach(item => {
-                        const opt = document.createElement('option');
-                        opt.value = item.id;
-                        opt.textContent = `${item.nama} (${item.sppg_nama})`;
-                        instansiSelect.appendChild(opt);
-                    });
-                }
-            })
-            .catch(err => {
-                console.error('Error load destinations:', err);
-                resetInstansi();
-            });
-    }
-});
-
-function openPhotoModal(imgSrc, caption) {
-    const modal = document.getElementById('photoModal');
-    const img = document.getElementById('modalImg');
-    const cap = document.getElementById('modalCaption');
-    img.src = imgSrc;
-    cap.innerText = caption || 'Foto Verifikasi Porsi';
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-        modal.classList.remove('opacity-0');
-    }, 10);
-}
-
-function closePhotoModal() {
-    const modal = document.getElementById('photoModal');
-    modal.classList.add('opacity-0');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 200);
-}
-</script>
 @endsection

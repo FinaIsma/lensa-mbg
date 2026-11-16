@@ -9,38 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif;
-            background-color: #F8FAFC;
-            color: #0F172A;
-        }
-        
-        .brand-navy {
-            background-color: #071E49;
-        }
-
-        .brand-navy-accent {
-            background-color: #042A70;
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #F1F5F9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94A3B8;
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/css/public/portal.css', 'resources/js/app.js', 'resources/js/public/portal.js'])
     @stack('styles')
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
