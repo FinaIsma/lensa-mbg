@@ -341,7 +341,12 @@
                     <h3>Bukti</h3>
                     <div class="au-bukti">
                         @foreach ($bkt as $b)
-                            @php $url = asset('storage/' . ltrim($b->file_path, '/')); @endphp
+                            @php 
+                                $filePath = $b->file_path ?? '';
+                                $url = (str_starts_with($filePath, 'http://') || str_starts_with($filePath, 'https://'))
+                                    ? $filePath 
+                                    : asset('storage/' . ltrim($filePath, '/'));
+                            @endphp
                             <a href="{{ $url }}" target="_blank" rel="noopener">
                                 @if (str_starts_with((string) $b->file_type, 'image/'))
                                     <img src="{{ $url }}" alt="{{ $b->description ?? 'Bukti' }}">

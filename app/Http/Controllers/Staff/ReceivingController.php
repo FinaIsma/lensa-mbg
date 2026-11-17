@@ -13,6 +13,7 @@ use App\Models\Receiving;
 use App\Models\ReceivingItem;
 use App\Models\Staff;
 use App\Models\StockMovement;
+use App\Services\SupabaseStorageService;
 use App\Support\Keys;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -220,7 +221,7 @@ class ReceivingController extends Controller
             $evidences = $receiving->evidences->map(function (Evidence $ev) {
                 return [
                     'id' => $ev->id,
-                    'url' => asset('storage/'.$ev->file_path),
+                    'url' => $ev->url,
                     'file_name' => basename($ev->file_path),
                     'description' => $ev->description,
                 ];
@@ -352,7 +353,7 @@ class ReceivingController extends Controller
             // Simpan foto bukti jika diunggah
             if ($request->hasFile('evidence_files')) {
                 foreach ($request->file('evidence_files') as $file) {
-                    $path = $file->store('evidences/receivings', 'public');
+                    $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'receivings');
                     Evidence::create([
                         'uploaded_by' => $staff?->id,
                         'evidenceable_type' => 'receivings',
@@ -486,7 +487,7 @@ class ReceivingController extends Controller
             // Simpan foto baru jika ada
             if ($request->hasFile('evidence_files')) {
                 foreach ($request->file('evidence_files') as $file) {
-                    $path = $file->store('evidences/receivings', 'public');
+                    $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'receivings');
                     Evidence::create([
                         'uploaded_by' => $staff?->id,
                         'evidenceable_type' => 'receivings',
@@ -720,6 +721,4 @@ class ReceivingController extends Controller
 
         return (int) $idSppg;
     }
-
-
 }

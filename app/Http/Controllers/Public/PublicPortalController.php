@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PublicPortalController extends Controller
@@ -102,6 +103,7 @@ class PublicPortalController extends Controller
         $jadwal = (string) $request->query('jadwal', 'today');
 
         // Jika selectedDestination ditemukan, muat activeDistribution-nya
+        $activeBatch = null;
         if ($selectedDestination) {
             $distQuery = Distribution::with([
                 'destination.sppg',
@@ -127,33 +129,98 @@ class PublicPortalController extends Controller
             }
 
             $activeDistribution = $distQuery->latest('distributed_at')->first();
+            // Hanya aktifkan batch jika sekolah/tujuan ini memiliki catatan distribusi nyata
+            $activeBatch = $activeDistribution?->batch;
         }
 
-        // Ambil bukti publik terkait batch / distribusi aktif
+        // Ambil bukti riil database & tahapan alur rantai pasok (Petualangan Bekal)
         $publicEvidences = collect();
-        if ($activeDistribution && $activeDistribution->batch) {
-            $batchId = $activeDistribution->batch->id;
+        $stageEvidences = [
+            'tahap1' => null,
+            'tahap2' => null,
+            'tahap3' => null,
+            'tahap4' => null,
+        ];
+
+        if ($activeDistribution && $activeBatch) {
+            $batchId = $activeBatch->id;
             $distId = $activeDistribution->id;
 
-            $publicEvidences = Evidence::where('is_public', true)
-                ->where(function ($q) use ($batchId, $distId) {
-                    $q->where(function ($sub) use ($batchId) {
-                        $sub->where('evidenceable_type', 'production_batches')
-                            ->where('evidenceable_id', $batchId);
-                    })->orWhere(function ($sub) use ($distId) {
-                        $sub->where('evidenceable_type', 'distributions')
-                            ->where('evidenceable_id', $distId);
-                    })->orWhere(function ($sub) use ($batchId) {
-                        $sub->where('evidenceable_type', 'pre_distribution_checks')
-                            ->whereIn('evidenceable_id', function ($checkQuery) use ($batchId) {
-                                $checkQuery->select('id')
-                                    ->from('pre_distribution_checks')
-                                    ->where('production_batch_id', $batchId);
-                            });
+            // Tahap 1: Evidence dari receivings bahan baku batch ini
+            $receivingIds = DB::table('material_usages')
+                ->join('material_lots', 'material_usages.material_lot_id', '=', 'material_lots.id')
+                ->join('receiving_items', 'material_lots.receiving_item_id', '=', 'receiving_items.id')
+                ->where('material_usages.production_batch_id', $batchId)
+                ->pluck('receiving_items.receiving_id')
+                ->filter()
+                ->unique();
+
+            if ($receivingIds->isNotEmpty()) {
+                $stageEvidences['tahap1'] = Evidence::where('evidenceable_type', 'receivings')
+                    ->whereIn('evidenceable_id', $receivingIds)
+                    ->latest('uploaded_at')
+                    ->first();
+            }
+
+            // Tahap 2: Evidence dari processing_steps batch ini
+            $stepIds = $activeBatch->processingSteps->pluck('id');
+            if ($stepIds->isNotEmpty()) {
+                $stageEvidences['tahap2'] = Evidence::where('evidenceable_type', 'processing_steps')
+                    ->whereIn('evidenceable_id', $stepIds)
+                    ->latest('uploaded_at')
+                    ->first();
+            }
+
+            // Tahap 3: Evidence dari pre_distribution_checks batch ini
+            $qcId = $activeBatch->preDistributionCheck?->id;
+            if ($qcId) {
+                $stageEvidences['tahap3'] = Evidence::where('evidenceable_type', 'pre_distribution_checks')
+                    ->where('evidenceable_id', $qcId)
+                    ->latest('uploaded_at')
+                    ->first();
+            }
+
+            // Tahap 4: Evidence dari pengiriman / penerimaan distribusi ini
+            $stageEvidences['tahap4'] = Evidence::where('evidenceable_type', 'distributions')
+                ->where('evidenceable_id', $distId)
+                ->latest('uploaded_at')
+                ->first();
+
+            // Koleksi semua bukti foto terkait batch & distribusi untuk galeri bukti riil
+            $publicEvidences = Evidence::where(function ($q) use ($batchId, $distId, $receivingIds, $stepIds, $qcId) {
+                $q->where(function ($sub) use ($batchId) {
+                    $sub->where('evidenceable_type', 'production_batches')
+                        ->where('evidenceable_id', $batchId);
+                })->orWhere(function ($sub) use ($distId) {
+                    $sub->where('evidenceable_type', 'distributions')
+                        ->where('evidenceable_id', $distId);
+                })->when($qcId, function ($sub) use ($qcId) {
+                    $sub->orWhere(function ($s) use ($qcId) {
+                        $s->where('evidenceable_type', 'pre_distribution_checks')
+                            ->where('evidenceable_id', $qcId);
                     });
-                })
+                })->when($stepIds->isNotEmpty(), function ($sub) use ($stepIds) {
+                    $sub->orWhere(function ($s) use ($stepIds) {
+                        $s->where('evidenceable_type', 'processing_steps')
+                            ->whereIn('evidenceable_id', $stepIds);
+                    });
+                })->when($receivingIds->isNotEmpty(), function ($sub) use ($receivingIds) {
+                    $sub->orWhere(function ($s) use ($receivingIds) {
+                        $s->where('evidenceable_type', 'receivings')
+                            ->whereIn('evidenceable_id', $receivingIds);
+                    });
+                });
+            })
                 ->latest('uploaded_at')
                 ->get();
+            // Porsi Photo Evidence spesifik (uji mutu porsi hasil saji batch ini)
+            $porsiPhotoEvidence = $stageEvidences['tahap3']
+                ?? Evidence::where('evidenceable_type', 'pre_distribution_checks')->where('evidenceable_id', $qcId)->first()
+                ?? Evidence::where('evidenceable_type', 'production_batches')->where('evidenceable_id', $batchId)->first()
+                ?? $stageEvidences['tahap4']
+                ?? $publicEvidences->first();
+        } else {
+            $porsiPhotoEvidence = null;
         }
 
         // Daftar Dapur SPPG Terverifikasi untuk direktori bawah
@@ -186,6 +253,9 @@ class PublicPortalController extends Controller
             'allDestinations',
             'selectedDestination',
             'activeDistribution',
+            'activeBatch',
+            'porsiPhotoEvidence',
+            'stageEvidences',
             'publicEvidences',
             'sppgList',
             'jadwal'

@@ -304,7 +304,7 @@
     @foreach ($rows as $row)
         @php
             $firstEvidence = $row->evidences->first();
-            $evidenceUrl = $firstEvidence ? asset('storage/' . ltrim($firstEvidence->file_path, '/')) : '#';
+            $evidenceUrl = $firstEvidence ? $firstEvidence->url : '#';
             $evidenceName = $firstEvidence ? basename($firstEvidence->file_path) : 'Bukti_koreksi_' . strtolower($row->jenis_data) . '.pdf';
         @endphp
         <template id="detail-{{ $row->id }}">

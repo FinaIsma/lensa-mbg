@@ -313,7 +313,7 @@
                                     <button type="button" 
                                             class="btn-pemasok-detail btn-action-icon" 
                                             onclick="showEvidencePreview(
-                                                '{{ $evidence ? asset('storage/' . $evidence->file_path) : '' }}',
+                                                '{{ $evidence ? $evidence->url : '' }}',
                                                 '{{ $batch->batch_code }}',
                                                 '{{ addslashes($check?->reported_condition ?? '') }}',
                                                 {{ ($evidence && $evidence->is_public) ? 'true' : 'false' }},

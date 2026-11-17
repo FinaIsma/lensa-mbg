@@ -471,17 +471,45 @@
     <!-- HASIL TRANSPARANSI: HANYA MUNCUL JIKA SUDAH PILIH INSTANSI (PERSIS DESAIN DETAIL SEKOLAH) -->
     @if($selectedDestination)
         @php
-            $batch = $activeDistribution?->batch;
+            $batch = $activeDistribution?->batch ?? $activeBatch ?? null;
             $recipe = $batch?->recipe;
             $menu = $batch?->menu;
             $sppg = $selectedDestination->sppg;
             $qc = $batch?->preDistributionCheck;
             $distStatus = $activeDistribution?->status ?? 'none';
             $distTime = $activeDistribution?->distributed_at ? \Carbon\Carbon::parse($activeDistribution->distributed_at)->format('H:i') : null;
-            $mainPhoto = $publicEvidences->first() ? asset('storage/' . $publicEvidences->first()->file_path) : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
-            $porsiTarget = $selectedDestination->jumlah_penerima ?? 250;
-            $porsiRealisasi = $activeDistribution?->portions_sent ?? $porsiTarget;
-            $persenRealisasi = $porsiTarget > 0 ? min(100, round(($porsiRealisasi / $porsiTarget) * 100)) : 100;
+
+            // Prioritas Foto Porsi Utama: Evidence uji mutu pre-distribution check / hasil porsi
+            $porsiEvidence = $porsiPhotoEvidence 
+                ?? $stageEvidences['tahap3'] 
+                ?? $stageEvidences['tahap4'] 
+                ?? $publicEvidences->first();
+            $mainPhoto = $porsiEvidence ? $porsiEvidence->url : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+
+            $porsiTarget = (int) ($selectedDestination->jumlah_penerima ?? 0);
+            $porsiRealisasi = $activeDistribution ? (int) $activeDistribution->portions_sent : 0;
+            $persenRealisasi = ($porsiTarget > 0 && $activeDistribution) ? min(100, round(($porsiRealisasi / $porsiTarget) * 100)) : 0;
+
+            // Foto & Keterangan Riil 4 Tahapan Petualangan Bekal
+            $tahap1Photo = $stageEvidences['tahap1'] 
+                ? $stageEvidences['tahap1']->url 
+                : 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';
+            $tahap1Caption = $stageEvidences['tahap1']?->description ?? 'Foto Penerimaan Bahan Baku di Dapur SPPG';
+
+            $tahap2Photo = $stageEvidences['tahap2'] 
+                ? $stageEvidences['tahap2']->url 
+                : 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';
+            $tahap2Caption = $stageEvidences['tahap2']?->description ?? 'Foto Pemorsian di Baki Stainless Food-Grade';
+
+            $tahap3Photo = $stageEvidences['tahap3'] 
+                ? $stageEvidences['tahap3']->url 
+                : 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';
+            $tahap3Caption = $stageEvidences['tahap3']?->description ?? 'Foto Pemeriksaan Suhu & Muat Armada Khusus';
+
+            $tahap4Photo = $stageEvidences['tahap4'] 
+                ? $stageEvidences['tahap4']->url 
+                : 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80';
+            $tahap4Caption = $stageEvidences['tahap4']?->description ?? 'Foto Serah Terima di Lokasi Sasaran';
         @endphp
 
         <div id="transparencyResult" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -524,15 +552,17 @@
                     <!-- Identitas Sekolah & Program -->
                     <div class="space-y-1.5">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
-                                <svg class="w-3 h-3 text-amber-500 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <span>Akreditasi A</span>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                <span>{{ $selectedDestination->tipe_label }} Sasaran Program</span>
                             </span>
-                            <span class="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                                Sekolah Penerima Program
+                            <span class="px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-slate-50 text-slate-600 font-mono border border-slate-200">
+                                ID: #TJ-{{ str_pad($selectedDestination->id, 3, '0', STR_PAD_LEFT) }}
                             </span>
-                            <span class="px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-slate-50 text-slate-500 font-mono border border-slate-200">
-                                NPSN: {{ 20100000 + ($selectedDestination->id * 317) % 900000 }}
+                            <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                Kuota: {{ number_format($porsiTarget, 0, ',', '.') }} Sasaran
                             </span>
                         </div>
                         <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -541,10 +571,12 @@
                         <p class="text-xs text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-1">
                             <span class="flex items-center gap-1 text-slate-600 font-medium">
                                 <svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                                <span>{{ $selectedDestination->alamat ?? 'Kecamatan Lowokwaru, Kota Malang' }}</span>
+                                <span>{{ $selectedDestination->alamat ?? '-' }}</span>
                             </span>
-                            <span class="text-slate-300">&bull;</span>
-                            <span>Koordinator: <strong class="text-slate-700">{{ $selectedDestination->penanggung_jawab ?? 'Ibu Ratna Dewi, S.Pd' }}</strong></span>
+                            @if($sppg)
+                                <span class="text-slate-300">&bull;</span>
+                                <span>Unit Dapur: <strong class="text-slate-700">{{ $sppg->nama_sppg }}</strong></span>
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -563,17 +595,32 @@
                                 <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
                                 <span>Dalam Pengantaran Armada</span>
                             </span>
+                        @elseif($activeDistribution && $distStatus === 'planned')
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+                                <span>{{ $porsiRealisasi }} Porsi Terjadwal</span>
+                            </span>
                         @else
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">
-                                <span>{{ $porsiTarget }} Porsi Terjadwal</span>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700 border border-slate-300">
+                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Belum Ada Catatan Pengiriman</span>
                             </span>
                         @endif
                     </div>
                     <div class="text-xs font-semibold text-slate-700">
-                        Realisasi Distribusi: <span class="font-bold text-[#071E49]">{{ $porsiRealisasi }} / {{ $porsiTarget }} Porsi ({{ $persenRealisasi }}%)</span>
+                        @if($activeDistribution)
+                            Realisasi Distribusi: <span class="font-bold text-[#071E49]">{{ $porsiRealisasi }} / {{ $porsiTarget }} Porsi ({{ $persenRealisasi }}%)</span>
+                        @else
+                            Realisasi Distribusi: <span class="font-bold text-slate-500">0 / {{ number_format($porsiTarget, 0, ',', '.') }} Porsi (0%)</span>
+                        @endif
                     </div>
                     <div class="text-[11px] text-slate-400 mt-1">
-                        Tersalur ke rombel kelas 1 s.d 6
+                        @if($activeDistribution && $distStatus === 'received')
+                            Porsi telah diserahterimakan lengkap di lokasi sasaran
+                        @elseif($activeDistribution && $distStatus === 'sent')
+                            Armada distribusi sedang dalam perjalanan menuju lokasi
+                        @else
+                            Belum ada catatan pengiriman MBG untuk {{ $selectedDestination->nama }} pada tanggal yang dipilih.
+                        @endif
                     </div>
                 </div>
             </div>
@@ -605,446 +652,512 @@
                 </div>
             </div>
 
-            <!-- 4. SECTION: MENU UTAMA HARIAN -->
-            <div class="space-y-3">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 border border-blue-100">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">Menu Utama Harian</h3>
-                            <p class="text-xs text-slate-400">Baki saji higienis stainless steel standar operasional</p>
-                        </div>
-                    </div>
-
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                        <span>Menu Terverifikasi Gizi</span>
-                    </span>
-                </div>
-
-                <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-6 sm:p-8">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                        
-                        <!-- Kolom Kiri: Foto Porsi Aktual Hari Ini -->
-                        <div class="lg:col-span-5 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    Foto Porsi Aktual Hari Ini
-                                </span>
-                                <span class="text-[11px] text-slate-400">Klik foto untuk perbesar</span>
-                            </div>
-
-                            <!-- Showcase Foto Baki Saji -->
-                            <div onclick="openPhotoModal('{{ $mainPhoto }}', 'Foto Porsi Makanan Standar Food-Grade 304')" class="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 aspect-4/3 group shadow-xs cursor-pointer">
-                                <img src="{{ $mainPhoto }}" alt="Foto Porsi Aktual" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <span class="px-3 py-1.5 rounded-xl bg-white/95 text-slate-900 font-bold text-xs shadow-md flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                        Lihat Ukuran Penuh
-                                    </span>
-                                </div>
-                                <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-3 text-white text-xs flex items-center justify-between">
-                                    <span class="font-medium truncate">Porsi Higienis Standar Food-Grade 304</span>
-                                    <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded backdrop-blur-xs font-mono">BTH: {{ $batch->batch_code ?? 'BTH-20261116-001' }}</span>
-                                </div>
-                            </div>
-
-                            <!-- Thumbnail Bukti Pendukung jika ada -->
-                            @if($publicEvidences->count() > 1)
-                                <div class="grid grid-cols-3 gap-2">
-                                    @foreach($publicEvidences->skip(1)->take(3) as $ev)
-                                        @php
-                                            $evUrl = asset('storage/' . $ev->file_path);
-                                        @endphp
-                                        <div onclick="openPhotoModal('{{ $evUrl }}', '{{ $ev->description ?? 'Dokumentasi Lapangan' }}')" class="rounded-xl overflow-hidden border border-slate-200 aspect-video bg-slate-100 cursor-pointer hover:ring-2 hover:ring-blue-500 transition">
-                                            <img src="{{ $evUrl }}" alt="{{ $ev->description ?? 'Bukti Publik' }}" class="w-full h-full object-cover">
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Kolom Kanan: Rincian Menu & Nutrisi Seimbang (Palet Seragam & Rapi) -->
-                        <div class="lg:col-span-7 space-y-5">
-                            <div>
-                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200 mb-2">
-                                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    <span>KOMPOSISI PORSI SEIMBANG</span>
-                                </div>
-                                <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">
-                                    {{ $menu->nama ?? 'Nasi Ayam Teriyaki, Tumis Brokoli Wortel & Pisang' }}
-                                </h3>
-                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mt-2.5">
-                                    {{ $menu->deskripsi ?? 'Penyajian porsi lengkap terdiri dari karbohidrat pulen, sumber protein hewani dari daging dada ayam segar berbumbu teriyaki rendah gula dan natrium, serat sayuran kukus matang pas untuk menjaga kadar vitamin, serta buah pisang segar sebagai sumber kalium alami.' }}
-                                </p>
-                            </div>
-
-                            <!-- 4 KARTU NUTRISI: WARNA SERAGAM ELEGAN (TIDAK PELANGI) -->
-                            <div>
-                                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-                                    Nilai Gizi Terverifikasi per Porsi
-                                </h4>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                    <!-- 1. Kalori Total -->
-                                    <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 text-center hover:bg-white hover:shadow-xs transition">
-                                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
-                                            32% AKG
-                                        </span>
-                                        <div class="text-xl sm:text-2xl font-black text-[#071E49] mt-1.5">
-                                            @php
-                                                $kalori = $recipe?->nutritions->first(fn($n) => str_contains(strtolower($n->nutritionType?->nama ?? ''), 'kalori') || str_contains(strtolower($n->nutritionType?->nama ?? ''), 'energi'));
-                                            @endphp
-                                            {{ $kalori ? (int)$kalori->nilai : '650' }}
-                                            <span class="text-xs font-medium text-slate-400">kkal</span>
-                                        </div>
-                                        <div class="text-xs font-bold text-slate-800 mt-0.5">Kalori Total</div>
-                                        <div class="text-[10px] text-slate-400 mt-0.5">Energi aktivitas belajar</div>
-                                    </div>
-
-                                    <!-- 2. Protein Ayam -->
-                                    <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 text-center hover:bg-white hover:shadow-xs transition">
-                                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
-                                            45% AKG
-                                        </span>
-                                        <div class="text-xl sm:text-2xl font-black text-[#071E49] mt-1.5">
-                                            @php
-                                                $protein = $recipe?->nutritions->first(fn($n) => str_contains(strtolower($n->nutritionType?->nama ?? ''), 'protein'));
-                                            @endphp
-                                            {{ $protein ? (float)$protein->nilai : '24' }}
-                                            <span class="text-xs font-medium text-slate-400">g</span>
-                                        </div>
-                                        <div class="text-xs font-bold text-slate-800 mt-0.5">Protein Ayam</div>
-                                        <div class="text-[10px] text-slate-400 mt-0.5">Pertumbuhan otot & sel</div>
-                                    </div>
-
-                                    <!-- 3. Karbohidrat -->
-                                    <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 text-center hover:bg-white hover:shadow-xs transition">
-                                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-200/80 text-slate-700 border border-slate-300">
-                                            Kompleks
-                                        </span>
-                                        <div class="text-xl sm:text-2xl font-black text-[#071E49] mt-1.5">
-                                            @php
-                                                $karbo = $recipe?->nutritions->first(fn($n) => str_contains(strtolower($n->nutritionType?->nama ?? ''), 'karbo'));
-                                            @endphp
-                                            {{ $karbo ? (float)$karbo->nilai : '88' }}
-                                            <span class="text-xs font-medium text-slate-400">g</span>
-                                        </div>
-                                        <div class="text-xs font-bold text-slate-800 mt-0.5">Karbohidrat</div>
-                                        <div class="text-[10px] text-slate-400 mt-0.5">Fokus kognitif siswa</div>
-                                    </div>
-
-                                    <!-- 4. Serat Pangan -->
-                                    <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 text-center hover:bg-white hover:shadow-xs transition">
-                                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-100">
-                                            Alami
-                                        </span>
-                                        <div class="text-xl sm:text-2xl font-black text-[#071E49] mt-1.5">
-                                            @php
-                                                $serat = $recipe?->nutritions->first(fn($n) => str_contains(strtolower($n->nutritionType?->nama ?? ''), 'serat'));
-                                            @endphp
-                                            {{ $serat ? (float)$serat->nilai : '7' }}
-                                            <span class="text-xs font-medium text-slate-400">g</span>
-                                        </div>
-                                        <div class="text-xs font-bold text-slate-800 mt-0.5">Serat Pangan</div>
-                                        <div class="text-[10px] text-slate-400 mt-0.5">Pencernaan sehat</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Jaminan Standar Mutu Saji -->
-                            <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700">
-                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    Bebas Pengawet Berbahaya
-                                </span>
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700">
-                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    Lolos Uji Organoleptik Saji
-                                </span>
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700">
-                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    Suhu Hangat Terjaga
-                                </span>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. SECTION: PETUALANGAN BEKAL (ALUR 4 TAHAP INTERAKTIF) -->
-            <div class="space-y-4 pt-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div class="space-y-1">
+            @if($activeDistribution && $batch && $menu)
+                <!-- 4. SECTION: MENU UTAMA HARIAN -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 border border-blue-100">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                                 </svg>
                             </div>
-                            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
-                                Petualangan Bekal
-                            </h3>
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                Alur Perjalanan
-                            </span>
-                        </div>
-                        <p class="text-xs text-slate-500">
-                            Ikuti 4 tahapan perjalanan menu bekal hari ini dari pasar hingga ke meja makan siswa.
-                        </p>
-                    </div>
-
-                    <div class="inline-flex items-center gap-1.5 text-xs text-blue-700 font-semibold bg-blue-50/60 px-3 py-1.5 rounded-xl border border-blue-100 self-start sm:self-auto">
-                        <svg class="w-3.5 h-3.5 text-blue-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
-                        </svg>
-                        <span>Klik kartu untuk buka bukti nyata</span>
-                    </div>
-                </div>
-
-                <!-- 4 KARTU TAHAPAN BERURUTAN (TERHUBUNG GARIS HALUS) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
-                    
-                    <!-- Tahap 1: Pengadaan Bahan -->
-                    <div data-tahap="1" 
-                         data-title="Pengadaan & Pembelian Bahan"
-                         data-subtitle="Dokumentasi nyata verifikasi lapangan di titik rantai pasok mitra petani lokal."
-                         data-photo="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80"
-                         data-photo-caption="Foto Pembelian & Bahan Masuk Subuh"
-                         data-desc="Bahan baku segar dibeli langsung pada subuh hari sesuai takaran menu hari ini: Daging Ayam Segar, Beras Putih varietas lokal, Sayur Brokoli & Wortel pilihan, Tempe Kedelai, dan Pisang Ambon matang merata tanpa karbit kimia."
-                         data-waktu="Pukul 05.30 WIB"
-                         data-kondisi="Segar, lolos sortir fisik harian"
-                         data-bahan="Ayam dada, sayur petik subuh, tempe"
-                         data-petugas="Tim Pengadaan SPPG {{ $sppg?->kecamatan ?? 'Lowokwaru' }}"
-                         class="tahap-card active bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition cursor-pointer relative ring-2 ring-[#071E49] bg-slate-50/50">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-[#071E49] text-white">
-                                Tahap 1
-                            </span>
-                            <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-                                <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                05.30 WIB
-                            </span>
-                        </div>
-                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-2.5 border border-blue-100">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                        </div>
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pasar & Mitra Tani</div>
-                        <h4 class="font-extrabold text-slate-900 text-sm mt-0.5">Pengadaan Bahan</h4>
-                        <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
-                            Ayam dada segar, beras pulen lokal, wortel brokoli petik pagi, tempe...
-                        </p>
-                        <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-blue-700 font-bold">
-                            <span>Rincian & Bukti Foto</span>
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
-                    </div>
-
-                    <!-- Tahap 2: Pengolahan Dapur -->
-                    <div data-tahap="2"
-                         data-title="Pengolahan Higienis di Dapur SPPG"
-                         data-subtitle="Pemasakan matang sempurna dengan standar sanitasi ketat dan air steril bersertifikasi."
-                         data-photo="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80"
-                         data-photo-caption="Foto Pemorsian di Baki Stainless Food-Grade"
-                         data-desc="Proses memasak dilakukan serentak menggunakan standar higienitas SNI, air tersaring membran steril, suhu inti makanan di atas 75°C untuk mematikan mikroba berbahaya, lalu diporsi ke dalam baki saji stainless steel food-grade 304."
-                         data-waktu="Pukul 07.15 WIB"
-                         data-kondisi="Steril, suhu masak inti 82°C"
-                         data-bahan="Dapur Utama & Baki Food-Grade"
-                         data-petugas="Koki & Tim Produksi SPPG"
-                         class="tahap-card bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition cursor-pointer relative">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">
-                                Tahap 2
-                            </span>
-                            <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-                                <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                07.15 WIB
-                            </span>
-                        </div>
-                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-2.5 border border-blue-100">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
-                            </svg>
-                        </div>
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Dapur SPPG Bersih</div>
-                        <h4 class="font-extrabold text-slate-900 text-sm mt-0.5">Pengolahan Dapur</h4>
-                        <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
-                            Masak higienis serentak, pengawasan suhu >75°C, dan pemorsian stainless...
-                        </p>
-                        <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600 font-bold">
-                            <span>Rincian & Bukti Foto</span>
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
-                    </div>
-
-                    <!-- Tahap 3: Pengecekan & Distribusi -->
-                    <div data-tahap="3"
-                         data-title="Pemeriksaan Mutu & Distribusi Termal"
-                         data-subtitle="Uji sensoris organoleptik, validasi suhu hangat saji, dan armada tertutup khusus."
-                         data-photo="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80"
-                         data-photo-caption="Foto Pemeriksaan Suhu & Muat Armada Khusus"
-                         data-desc="Pemeriksaan akhir oleh nutrisionis meliputi uji rasa sampel, uji porsi gramatur, dan pengecekan suhu termal box. Makanan dimuat ke dalam armada tertutup insulated khusus agar tiba di sekolah tetap dalam kondisi hangat dan segar."
-                         data-waktu="Pukul 09.30 WIB"
-                         data-kondisi="Hangat prima (>65°C), baki bersegel rapat"
-                         data-bahan="Box Insulated & Armada Pengantar"
-                         data-petugas="Nutrisionis & Pengemudi Logistik"
-                         class="tahap-card bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition cursor-pointer relative">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">
-                                Tahap 3
-                            </span>
-                            <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-                                <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                09.30 WIB
-                            </span>
-                        </div>
-                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-2.5 border border-blue-100">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
-                            </svg>
-                        </div>
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Insulated Van</div>
-                        <h4 class="font-extrabold text-slate-900 text-sm mt-0.5">Pengecekan & Distribusi</h4>
-                        <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
-                            Uji organoleptik rasa & aroma, validasi suhu hangat saji, dan armada khusus...
-                        </p>
-                        <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600 font-bold">
-                            <span>Rincian & Bukti Foto</span>
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
-                    </div>
-
-                    <!-- Tahap 4: Serah Terima Sekolah -->
-                    <div data-tahap="4"
-                         data-title="Serah Terima & Santap Bersama di Sekolah"
-                         data-subtitle="Verifikasi penerimaan porsi utuh oleh komite sekolah dan santap sehat bergizi."
-                         data-photo="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80"
-                         data-photo-caption="Foto Serah Terima Bersama Koordinator Sekolah"
-                         data-desc="Baki makanan tiba di sekolah dan diterima langsung oleh guru koordinator serta perwakilan komite sekolah. Jumlah baki dihitung lengkap ({{ $porsiRealisasi }} baki), segel diperiksa utuh, lalu dibagikan ke ruang kelas untuk disantap bersama secara tertib."
-                         data-waktu="Pukul 10.15 WIB"
-                         data-kondisi="Diterima lengkap, kondisi prima & utuh"
-                         data-bahan="Baki Saji Food-Grade & Ruang Kelas"
-                         data-petugas="{{ $selectedDestination->penanggung_jawab ?? 'Guru Koordinator MBG Sekolah' }}"
-                         class="tahap-card bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition cursor-pointer relative">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">
-                                Tahap 4
-                            </span>
-                            <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-                                <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                10.15 WIB
-                            </span>
-                        </div>
-                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-2.5 border border-emerald-100">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
-                            </svg>
-                        </div>
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate">{{ $selectedDestination->nama }}</div>
-                        <h4 class="font-extrabold text-slate-900 text-sm mt-0.5">Serah Terima Sekolah</h4>
-                        <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
-                            Penerimaan resmi guru koordinator, validasi {{ $porsiRealisasi }} baki utuh sebelum makan...
-                        </p>
-                        <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600 font-bold">
-                            <span>Rincian & Bukti Foto</span>
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- 6. DETAIL PERJALANAN & DOKUMENTASI RIIL (PANEL INTERAKTIF BERUBAH SESUAI TAHAP) -->
-                <div id="tahapDetailPanel" class="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-6 sm:p-8 mt-4 transition-all duration-200">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span id="tahapDetailBadge" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#071E49] text-white">
-                                    Tahap 1
-                                </span>
-                                <h4 id="tahapDetailTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                                    Detail Perjalanan & Dokumentasi Riil: Pengadaan & Pembelian Bahan
-                                </h4>
+                            <div>
+                                <h3 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">Menu Utama Harian</h3>
+                                <p class="text-xs text-slate-400">Baki saji higienis stainless steel standar operasional</p>
                             </div>
-                            <p id="tahapDetailSubtitle" class="text-xs text-slate-500">
-                                Dokumentasi nyata verifikasi lapangan di titik rantai pasok.
-                            </p>
                         </div>
 
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
-                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                            <span>Data Telah Diverifikasi</span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            <span>Menu Terverifikasi Gizi</span>
                         </span>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-6">
-                        <!-- Foto Dokumentasi Tahap -->
-                        <div class="lg:col-span-5 space-y-2">
-                            <div onclick="openPhotoModal(document.getElementById('tahapDetailImg').src, document.getElementById('tahapDetailCaption').innerText)" class="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 aspect-4/3 group shadow-xs cursor-pointer">
-                                <img id="tahapDetailImg" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" alt="Dokumentasi Tahap" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <span class="px-3 py-1.5 rounded-xl bg-white/95 text-slate-900 font-bold text-xs shadow-md flex items-center gap-1.5">
-                                        <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                        Buka Foto Penuh
+                    <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-6 sm:p-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                            
+                            <!-- Kolom Kiri: Foto Porsi Aktual Hari Ini -->
+                            <div class="lg:col-span-5 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        Foto Porsi Aktual Hari Ini
+                                    </span>
+                                    <span class="text-[11px] text-slate-400">Klik foto untuk perbesar</span>
+                                </div>
+
+                                <!-- Showcase Foto Baki Saji -->
+                                <div onclick="openPhotoModal('{{ $mainPhoto }}', 'Foto Porsi Makanan Standar Food-Grade 304')" class="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 aspect-4/3 group shadow-xs cursor-pointer">
+                                    <img src="{{ $mainPhoto }}" alt="Foto Porsi Aktual" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span class="px-3 py-1.5 rounded-xl bg-white/95 text-slate-900 font-bold text-xs shadow-md flex items-center gap-1.5">
+                                            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                            Lihat Ukuran Penuh
+                                        </span>
+                                    </div>
+                                    <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-3 text-white text-xs flex items-center justify-between">
+                                        <span class="font-medium truncate">Porsi Higienis Standar Food-Grade 304</span>
+                                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded backdrop-blur-xs font-mono">BTH: {{ $batch->batch_code }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Thumbnail Bukti Pendukung jika ada -->
+                                @if($publicEvidences->count() > 1)
+                                    <div class="grid grid-cols-3 gap-2">
+                                        @foreach($publicEvidences->skip(1)->take(3) as $ev)
+                                            @php
+                                                $evUrl = $ev->url;
+                                            @endphp
+                                            <div onclick="openPhotoModal('{{ $evUrl }}', '{{ $ev->description ?? 'Dokumentasi Lapangan' }}')" class="rounded-xl overflow-hidden border border-slate-200 aspect-video bg-slate-100 cursor-pointer hover:ring-2 hover:ring-blue-500 transition">
+                                                <img src="{{ $evUrl }}" alt="{{ $ev->description ?? 'Bukti Publik' }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';" class="w-full h-full object-cover">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Kolom Kanan: Rincian Menu & Nutrisi Seimbang (Palet Seragam & Rapi) -->
+                            <div class="lg:col-span-7 space-y-5">
+                                <div>
+                                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200 mb-2">
+                                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>KOMPOSISI PORSI SEIMBANG</span>
+                                    </div>
+                                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">
+                                        {{ $menu->nama }}
+                                    </h3>
+                                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mt-2.5">
+                                        {{ $menu->deskripsi ?? 'Penyajian menu bergizi seimbang sesuai standar pedoman pemenuhan gizi siswa.' }}
+                                    </p>
+                                </div>
+
+                                <!-- 4 KARTU NUTRISI: REAL DARI DATABASE -->
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
+                                        Nilai Gizi Terverifikasi per Porsi
+                                    </h4>
+                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                        @php
+                                            $kalori = $recipe?->nutritions->first(fn($n) => str_contains(strtolower($n->nutritionType?->nama ?? ''), 'kalori') || str_contains(strtolower($n->nutritionType?->nama ?? ''), 'energi'));
+                                            $protein = $recipe?->nutritions->first(fn($n) => str_contains(strtolower($n->nutritionType?->nama ?? ''), 'protein'));
+                                            $karbo = $recipe?->nutritions->first(fn($n) => str_contains(strtolower($n->nutritionType?->nama ?? ''), 'karbo'));
+                                            $serat = $recipe?->nutritions->first(fn($n) => str_contains(strtolower($n->nutritionType?->nama ?? ''), 'serat'));
+                                        @endphp
+                                        <!-- 1. Kalori Total -->
+                                        <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 text-center hover:bg-white hover:shadow-xs transition">
+                                            <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                                                Standar AKG
+                                            </span>
+                                            <div class="text-xl sm:text-2xl font-black text-[#071E49] mt-1.5">
+                                                {{ $kalori ? (int)$kalori->nilai : '-' }}
+                                                <span class="text-xs font-medium text-slate-400">kkal</span>
+                                            </div>
+                                            <div class="text-xs font-bold text-slate-800 mt-0.5">Kalori Total</div>
+                                            <div class="text-[10px] text-slate-400 mt-0.5">Energi aktivitas belajar</div>
+                                        </div>
+
+                                        <!-- 2. Protein -->
+                                        <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 text-center hover:bg-white hover:shadow-xs transition">
+                                            <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                                                Nutrisi Utama
+                                            </span>
+                                            <div class="text-xl sm:text-2xl font-black text-[#071E49] mt-1.5">
+                                                {{ $protein ? (float)$protein->nilai : '-' }}
+                                                <span class="text-xs font-medium text-slate-400">g</span>
+                                            </div>
+                                            <div class="text-xs font-bold text-slate-800 mt-0.5">Protein</div>
+                                            <div class="text-[10px] text-slate-400 mt-0.5">Pertumbuhan otot & sel</div>
+                                        </div>
+
+                                        <!-- 3. Karbohidrat -->
+                                        <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 text-center hover:bg-white hover:shadow-xs transition">
+                                            <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-200/80 text-slate-700 border border-slate-300">
+                                                Kompleks
+                                            </span>
+                                            <div class="text-xl sm:text-2xl font-black text-[#071E49] mt-1.5">
+                                                {{ $karbo ? (float)$karbo->nilai : '-' }}
+                                                <span class="text-xs font-medium text-slate-400">g</span>
+                                            </div>
+                                            <div class="text-xs font-bold text-slate-800 mt-0.5">Karbohidrat</div>
+                                            <div class="text-[10px] text-slate-400 mt-0.5">Fokus kognitif siswa</div>
+                                        </div>
+
+                                        <!-- 4. Serat Pangan -->
+                                        <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 text-center hover:bg-white hover:shadow-xs transition">
+                                            <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-100">
+                                                Alami
+                                            </span>
+                                            <div class="text-xl sm:text-2xl font-black text-[#071E49] mt-1.5">
+                                                {{ $serat ? (float)$serat->nilai : '-' }}
+                                                <span class="text-xs font-medium text-slate-400">g</span>
+                                            </div>
+                                            <div class="text-xs font-bold text-slate-800 mt-0.5">Serat Pangan</div>
+                                            <div class="text-[10px] text-slate-400 mt-0.5">Pencernaan sehat</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Jaminan Standar Mutu Saji -->
+                                <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Bebas Pengawet Berbahaya
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Lolos Uji Mutu Saji
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Kemasan Food-Grade Higienis
                                     </span>
                                 </div>
-                                <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-3 text-white text-xs">
-                                    <span id="tahapDetailCaption" class="font-medium truncate block">Foto Pembelian & Bahan Masuk Subuh</span>
-                                </div>
+
                             </div>
-                            <p class="text-[11px] text-slate-400 text-center italic">
-                                Setiap baki saji terhubung dengan rekam jejak digital petugas berwenang
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. SECTION: PETUALANGAN BEKAL (ALUR 4 TAHAP INTERAKTIF) -->
+                <div class="space-y-4 pt-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 border border-blue-100">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
+                                    Petualangan Bekal
+                                </h3>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                    Alur Perjalanan
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500">
+                                Ikuti 4 tahapan perjalanan menu bekal hari ini dari pasar hingga ke meja makan siswa.
                             </p>
                         </div>
 
-                        <!-- Keterangan & Rincian Proses -->
-                        <div class="lg:col-span-7 space-y-5">
-                            <div>
-                                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
-                                    RINCIAN PROSES TAHAPAN:
+                        <div class="inline-flex items-center gap-1.5 text-xs text-blue-700 font-semibold bg-blue-50/60 px-3 py-1.5 rounded-xl border border-blue-100 self-start sm:self-auto">
+                            <svg class="w-3.5 h-3.5 text-blue-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+                            </svg>
+                            <span>Klik kartu untuk buka bukti nyata</span>
+                        </div>
+                    </div>
+
+                    @php
+                        // Data Rantai Pasok Dinamis dari Database
+                        $bahanNames = $batch?->materialUsages?->map(fn($u) => $u->lot?->material?->nama)->filter()->unique()->values();
+                        $tahap1Bahan = ($bahanNames && $bahanNames->isNotEmpty()) ? $bahanNames->take(4)->implode(', ') : 'Bahan segar terverifikasi FEFO';
+                        $tahap1Desc = ($bahanNames && $bahanNames->isNotEmpty())
+                            ? "Bahan baku segar disiapkan sesuai takaran resep aktif hari ini: " . $bahanNames->implode(', ') . "."
+                            : "Bahan baku segar dipasok langsung oleh mitra lokal berstandar mutu dan FEFO.";
+                        $tahap1Petugas = "Tim Pengadaan " . ($sppg?->nama_sppg ?? 'SPPG');
+                        $tahap1Time = $stageEvidences['tahap1']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap1']->uploaded_at)->format('H:i') . ' WIB' : '05.30 WIB';
+
+                        $stepFirst = $batch?->processingSteps?->sortBy('started_at')->first();
+                        $cookTime = $stepFirst?->started_at ? \Carbon\Carbon::parse($stepFirst->started_at)->format('H:i') . ' WIB' : ($stageEvidences['tahap2']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap2']->uploaded_at)->format('H:i') . ' WIB' : '07.00 WIB');
+                        $stepNames = $batch?->processingSteps?->pluck('step_name')->filter()->unique();
+                        $tahap2Desc = ($stepNames && $stepNames->isNotEmpty())
+                            ? "Proses memasak di dapur SPPG meliputi tahapan: " . $stepNames->implode(', ') . " dengan standar sanitasi ketat dan wadah baki stainless food-grade."
+                            : "Proses memasak dilakukan di dapur SPPG dengan standar sanitasi ketat, suhu matang terjamin, dan pemorsian stainless steel food-grade.";
+                        $tahap2Petugas = "Tim Dapur " . ($sppg?->nama_sppg ?? 'SPPG');
+
+                        $qcNutrName = $qc?->effective_nutritionist_name ?? $qc?->nutritionist_name ?? 'Tenaga Gizi SPPG';
+                        $qcCondText = $qc?->reported_condition ?? 'Makanan matang sempurna, aroma segar khas rempah, baki tertutup rapat dan higienis';
+                        $qcCheckedTime = $qc?->checked_at ? \Carbon\Carbon::parse($qc->checked_at)->format('H:i') . ' WIB' : ($stageEvidences['tahap3']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap3']->uploaded_at)->format('H:i') . ' WIB' : '09.30 WIB');
+
+                        $distReceived = $activeDistribution && $distStatus === 'received';
+                        $distSent = $activeDistribution && $distStatus === 'sent';
+                        $tahap4Time = $distTime ? 'Pukul ' . $distTime . ' WIB' : ($stageEvidences['tahap4']?->uploaded_at ? 'Pukul ' . \Carbon\Carbon::parse($stageEvidences['tahap4']->uploaded_at)->format('H:i') . ' WIB' : 'Terjadwal Hari Ini');
+                        $tahap4TimeBadge = $distTime ? $distTime . ' WIB' : ($stageEvidences['tahap4']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap4']->uploaded_at)->format('H:i') . ' WIB' : 'Hari Ini');
+                        $tahap4Cond = $distReceived ? 'Diterima lengkap, kondisi prima & utuh' : ($distSent ? 'Dalam perjalanan armada pengantar' : 'Menunggu pengiriman armada dapur');
+                        $tahap4Desc = $distReceived
+                            ? "Baki makanan telah tiba di {$selectedDestination->nama} dan diserahterimakan lengkap sebanyak {$porsiRealisasi} baki saji dalam kondisi prima."
+                            : ($distSent
+                                ? "Sebanyak {$porsiRealisasi} porsi makanan sedang dalam pengantaran menuju {$selectedDestination->nama}."
+                                : "Alokasi sebanyak {$porsiTarget} porsi telah disiapkan dan dijadwalkan untuk didistribusikan ke {$selectedDestination->nama}.");
+                        $tahap4Petugas = $distReceived ? "Petugas Penerima {$selectedDestination->nama}" : "Tim Armada " . ($sppg?->nama_sppg ?? 'SPPG');
+                    @endphp
+
+                    <!-- 4 KARTU TAHAPAN BERURUTAN (TERHUBUNG GARIS HALUS) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
+                        
+                        <!-- Tahap 1: Pengadaan Bahan -->
+                        <div data-tahap="1" 
+                             data-title="Pengadaan & Pembelian Bahan"
+                             data-subtitle="Dokumentasi nyata verifikasi lapangan di titik rantai pasok mitra petani lokal."
+                             data-photo="{{ $tahap1Photo }}"
+                             data-photo-caption="{{ $tahap1Caption }}"
+                             data-desc="{{ $tahap1Desc }}"
+                             data-waktu="Pukul {{ $tahap1Time }}"
+                             data-kondisi="Segar, lolos sortir fisik harian"
+                             data-bahan="{{ $tahap1Bahan }}"
+                             data-petugas="{{ $tahap1Petugas }}"
+                             class="tahap-card active bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition cursor-pointer relative ring-2 ring-[#071E49] bg-slate-50/50">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-[#071E49] text-white">
+                                    Tahap 1
                                 </span>
-                                <p id="tahapDetailDesc" class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                                    Bahan baku segar dibeli langsung pada subuh hari sesuai takaran menu hari ini: Daging Ayam Segar, Beras Putih varietas lokal, Sayur Brokoli & Wortel pilihan, Tempe Kedelai, dan Pisang Ambon matang merata tanpa karbit kimia.
+                                <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    {{ $tahap1Time }}
+                                </span>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-2.5 border border-blue-100">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pasar & Mitra Tani</div>
+                            <h4 class="font-extrabold text-slate-900 text-sm mt-0.5">Pengadaan Bahan</h4>
+                            <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                                {{ $tahap1Bahan }}
+                            </p>
+                            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-blue-700 font-bold">
+                                <span>Rincian & Bukti Foto</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+
+                        <!-- Tahap 2: Pengolahan Dapur -->
+                        <div data-tahap="2"
+                             data-title="Pengolahan Higienis di Dapur SPPG"
+                             data-subtitle="Pemasakan matang sempurna dengan standar sanitasi ketat dan air steril bersertifikasi."
+                             data-photo="{{ $tahap2Photo }}"
+                             data-photo-caption="{{ $tahap2Caption }}"
+                             data-desc="{{ $tahap2Desc }}"
+                             data-waktu="{{ $cookTime }}"
+                             data-kondisi="Steril, higienis & matang sempurna"
+                             data-bahan="Dapur SPPG & Baki Food-Grade"
+                             data-petugas="{{ $tahap2Petugas }}"
+                             class="tahap-card bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition cursor-pointer relative">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">
+                                    Tahap 2
+                                </span>
+                                <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    {{ $cookTime }}
+                                </span>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-2.5 border border-blue-100">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
+                                </svg>
+                            </div>
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Dapur SPPG Bersih</div>
+                            <h4 class="font-extrabold text-slate-900 text-sm mt-0.5">Pengolahan Dapur</h4>
+                            <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                                {{ $stepNames && $stepNames->isNotEmpty() ? $stepNames->implode(', ') : 'Pemasakan higienis food-grade' }}
+                            </p>
+                            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600 font-bold">
+                                <span>Rincian & Bukti Foto</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+
+                        <!-- Tahap 3: Pengecekan & Distribusi -->
+                        <div data-tahap="3"
+                             data-title="Pemeriksaan Mutu & Distribusi Termal"
+                             data-subtitle="Uji sensoris organoleptik, validasi suhu hangat saji, dan armada tertutup khusus."
+                             data-photo="{{ $tahap3Photo }}"
+                             data-photo-caption="{{ $tahap3Caption }}"
+                             data-desc="{{ $qcCondText }}"
+                             data-waktu="Pukul {{ $qcCheckedTime }}"
+                             data-kondisi="Lolos uji organoleptik & higienis"
+                             data-bahan="Box Insulated & Armada Pengantar"
+                             data-petugas="{{ $qcNutrName }}"
+                             class="tahap-card bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition cursor-pointer relative">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">
+                                    Tahap 3
+                                </span>
+                                <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    {{ $qcCheckedTime }}
+                                </span>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-2.5 border border-blue-100">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                                </svg>
+                            </div>
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Uji Mutu & Armada</div>
+                            <h4 class="font-extrabold text-slate-900 text-sm mt-0.5">Pemeriksaan & Pengiriman</h4>
+                            <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                                Uji organoleptik oleh {{ $qcNutrName }}, baki bersegel rapat...
+                            </p>
+                            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600 font-bold">
+                                <span>Rincian & Bukti Foto</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+
+                        <!-- Tahap 4: Serah Terima Lokasi -->
+                        <div data-tahap="4"
+                             data-title="Serah Terima & Penyaluran di Lokasi"
+                             data-subtitle="Verifikasi penerimaan porsi utuh oleh pihak sekolah sasaran."
+                             data-photo="{{ $tahap4Photo }}"
+                             data-photo-caption="{{ $tahap4Caption }}"
+                             data-desc="{{ $tahap4Desc }}"
+                             data-waktu="{{ $tahap4Time }}"
+                             data-kondisi="{{ $tahap4Cond }}"
+                             data-bahan="Baki Saji Food-Grade & Ruang Penerima"
+                             data-petugas="{{ $tahap4Petugas }}"
+                             class="tahap-card bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition cursor-pointer relative">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold {{ $distReceived ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700' }}">
+                                    Tahap 4
+                                </span>
+                                <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    {{ $tahap4TimeBadge }}
+                                </span>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl {{ $distReceived ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-blue-50 text-blue-700 border-blue-100' }} flex items-center justify-center mb-2.5 border">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                                </svg>
+                            </div>
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate">{{ $selectedDestination->nama }}</div>
+                            <h4 class="font-extrabold text-slate-900 text-sm mt-0.5">Serah Terima Lokasi</h4>
+                            <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-relaxed">
+                                @if($distReceived)
+                                    Diterima lengkap {{ $porsiRealisasi }} porsi di lokasi sasaran...
+                                @elseif($distSent)
+                                    Sedang dalam perjalanan pengantaran ke lokasi...
+                                @else
+                                    Alokasi {{ $porsiTarget }} porsi terjadwal untuk sekolah ini...
+                                @endif
+                            </p>
+                            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600 font-bold">
+                                <span>Rincian & Bukti Foto</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 6. DETAIL PERJALANAN & DOKUMENTASI RIIL (PANEL INTERAKTIF BERUBAH SESUAI TAHAP) -->
+                    <div id="tahapDetailPanel" class="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-6 sm:p-8 mt-4 transition-all duration-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span id="tahapDetailBadge" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#071E49] text-white">
+                                        Tahap 1
+                                    </span>
+                                    <h4 id="tahapDetailTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                                        Detail Perjalanan & Dokumentasi Riil: Pengadaan & Pembelian Bahan
+                                    </h4>
+                                </div>
+                                <p id="tahapDetailSubtitle" class="text-xs text-slate-500">
+                                    Dokumentasi nyata verifikasi lapangan di titik rantai pasok.
                                 </p>
                             </div>
 
-                            <!-- 4 Box Info Tahapan (Warna Seragam & Rapi) -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                                <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">WAKTU PELAKSANAAN</span>
-                                    <span id="tahapDetailWaktu" class="text-xs font-bold text-slate-800 mt-1 block">Pukul 05.30 WIB</span>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                <span>Data Telah Diverifikasi</span>
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-6">
+                            <!-- Foto Dokumentasi Tahap -->
+                            <div class="lg:col-span-5 space-y-2">
+                                <div onclick="openPhotoModal(document.getElementById('tahapDetailImg').src, document.getElementById('tahapDetailCaption').innerText)" class="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 aspect-4/3 group shadow-xs cursor-pointer">
+                                    <img id="tahapDetailImg" src="{{ $tahap1Photo }}" alt="Dokumentasi Tahap" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span class="px-3 py-1.5 rounded-xl bg-white/95 text-slate-900 font-bold text-xs shadow-md flex items-center gap-1.5">
+                                            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                            Buka Foto Penuh
+                                        </span>
+                                    </div>
+                                    <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-3 text-white text-xs">
+                                        <span id="tahapDetailCaption" class="font-medium truncate block">{{ $tahap1Caption }}</span>
+                                    </div>
                                 </div>
-                                <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">KONDISI BAHAN BAKU</span>
-                                    <span id="tahapDetailKondisi" class="text-xs font-bold text-slate-800 mt-1 block">Segar, lolos sortir fisik harian</span>
+                                <p class="text-[11px] text-slate-400 text-center italic">
+                                    Setiap baki saji terhubung dengan rekam jejak digital petugas berwenang
+                                </p>
+                            </div>
+
+                            <!-- Keterangan & Rincian Proses -->
+                            <div class="lg:col-span-7 space-y-5">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
+                                        RINCIAN PROSES TAHAPAN:
+                                    </span>
+                                    <p id="tahapDetailDesc" class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                                        {{ $tahap1Desc }}
+                                    </p>
                                 </div>
-                                <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">BAHAN TERPILIH HARI INI</span>
-                                    <span id="tahapDetailBahan" class="text-xs font-bold text-slate-800 mt-1 block">Ayam dada, sayur petik subuh, tempe</span>
-                                </div>
-                                <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">PETUGAS VERIFIKASI</span>
-                                    <span id="tahapDetailPetugas" class="text-xs font-bold text-slate-800 mt-1 block">Tim Pengadaan SPPG {{ $sppg?->kecamatan ?? 'Lowokwaru' }}</span>
+
+                                <!-- 4 Box Info Tahapan (Warna Seragam & Rapi) -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                                    <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">WAKTU PELAKSANAAN</span>
+                                        <span id="tahapDetailWaktu" class="text-xs font-bold text-slate-800 mt-1 block">Pukul {{ $tahap1Time }}</span>
+                                    </div>
+                                    <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">KONDISI BAHAN BAKU</span>
+                                        <span id="tahapDetailKondisi" class="text-xs font-bold text-slate-800 mt-1 block">Segar, lolos sortir fisik harian</span>
+                                    </div>
+                                    <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">BAHAN TERPILIH HARI INI</span>
+                                        <span id="tahapDetailBahan" class="text-xs font-bold text-slate-800 mt-1 block">{{ $tahap1Bahan }}</span>
+                                    </div>
+                                    <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">PETUGAS VERIFIKASI</span>
+                                        <span id="tahapDetailPetugas" class="text-xs font-bold text-slate-800 mt-1 block">{{ $tahap1Petugas }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @else
+                <!-- TAMPILAN JIKA BELUM ADA CATATAN PENGIRIMAN MBG -->
+                <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-8 sm:p-12 text-center space-y-4">
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 mx-auto flex items-center justify-center">
+                        <img src="{{ asset('images/bingung-trimmed.png') }}" alt="Belum Ada Catatan" class="w-full h-full object-contain">
+                    </div>
+                    <div class="max-w-md mx-auto space-y-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                            <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Status: Belum Terdistribusi</span>
+                        </span>
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                            Belum Ada Catatan Pengiriman MBG
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                            Instansi <strong class="text-slate-700">{{ $selectedDestination->nama }}</strong> belum memiliki catatan pengiriman Program Makan Bergizi Gratis pada jadwal yang dipilih. Rincian menu harian dan alur perjalanan makanan (Petualangan Bekal) akan ditampilkan secara transparan ketika distribusi telah dimulai.
+                        </p>
+                    </div>
+                    <div class="pt-4 flex flex-wrap items-center justify-center gap-3 text-xs">
+                        <div class="px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-600">
+                            Target Sasaran: <strong class="text-[#071E49]">{{ number_format($porsiTarget, 0, ',', '.') }} Siswa/Porsi</strong>
+                        </div>
+                        @if($sppg)
+                            <div class="px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-600">
+                                Unit Dapur Pengampu: <strong class="text-[#071E49]">{{ $sppg->nama_sppg }}</strong>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
 
             <!-- 7. SPPG PENYEDIA (KARTU MINIMALIS ELEGAN) -->
             @if($sppg)

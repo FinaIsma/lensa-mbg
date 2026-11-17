@@ -8,6 +8,7 @@ use App\Models\Evidence;
 use App\Models\ProcessingStep;
 use App\Models\ProductionBatch;
 use App\Models\Staff;
+use App\Services\SupabaseStorageService;
 use App\Support\Keys;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -121,7 +122,7 @@ class PengolahanController extends Controller
                 // Simpan bukti foto jika ada
                 if ($request->hasFile('evidence_file')) {
                     $file = $request->file('evidence_file');
-                    $path = $file->store('evidences/processing', 'public');
+                    $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'processing');
 
                     Evidence::create([
                         'uploaded_by' => $staff?->id,
@@ -205,7 +206,7 @@ class PengolahanController extends Controller
                 // Simpan foto bukti jika diunggah saat penyelesaian
                 if ($request->hasFile('evidence_file')) {
                     $file = $request->file('evidence_file');
-                    $path = $file->store('evidences/processing', 'public');
+                    $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'processing');
 
                     Evidence::create([
                         'uploaded_by' => $staff?->id,

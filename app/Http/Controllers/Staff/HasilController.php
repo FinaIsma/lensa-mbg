@@ -9,6 +9,7 @@ use App\Models\PreDistributionCheck;
 use App\Models\ProductionBatch;
 use App\Models\Staff;
 use App\Models\WasteSurplusRecord;
+use App\Services\SupabaseStorageService;
 use App\Support\Keys;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -290,7 +291,7 @@ class HasilController extends Controller
             // 2. Simpan foto bukti porsi siap saji
             if ($request->hasFile('evidence_file')) {
                 $file = $request->file('evidence_file');
-                $path = $file->store('evidences/hasil', 'public');
+                $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'hasil');
 
                 Evidence::create([
                     'uploaded_by' => $staff?->id,
@@ -384,7 +385,7 @@ class HasilController extends Controller
 
             if ($request->hasFile('evidence_file')) {
                 $file = $request->file('evidence_file');
-                $path = $file->store('evidences/waste', 'public');
+                $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'waste');
 
                 Evidence::create([
                     'uploaded_by' => $staff?->id,

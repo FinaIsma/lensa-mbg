@@ -183,7 +183,7 @@
                 <div class="evidence-photo-box">
                     @if ($i < $evList->count())
                         @php $ev = $evList[$i]; @endphp
-                        <img src="{{ asset('storage/' . $ev->file_path) }}" alt="{{ $ev->description ?? 'Foto Bukti' }}" class="evidence-photo-img" title="Klik untuk melihat foto penuh" onclick="window.open('{{ asset('storage/' . $ev->file_path) }}', '_blank')">
+                        <img src="{{ $ev->url }}" alt="{{ $ev->description ?? 'Foto Bukti' }}" class="evidence-photo-img" title="Klik untuk melihat foto penuh" onclick="window.open('{{ $ev->url }}', '_blank')">
                     @endif
                 </div>
             @endfor

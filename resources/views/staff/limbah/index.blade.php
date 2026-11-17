@@ -245,7 +245,7 @@
                                     @if ($evidence)
                                         <button type="button" 
                                                 class="btn-pemasok-detail btn-action-icon" 
-                                                onclick="showEvidencePreview('{{ asset('storage/' . $evidence->file_path) }}', 'Bukti {{ $record->type_label }}', '{{ addslashes($record->reason ?? '') }}')" 
+                                                onclick="showEvidencePreview('{{ $evidence->url }}', 'Bukti {{ $record->type_label }}', '{{ addslashes($record->reason ?? '') }}')" 
                                                 title="Lihat Foto Bukti" 
                                                 aria-label="Lihat Foto Bukti">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">

@@ -12,6 +12,7 @@ use App\Models\ProductionBatch;
 use App\Models\Staff;
 use App\Models\StockMovement;
 use App\Models\WasteSurplusRecord;
+use App\Services\SupabaseStorageService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -281,7 +282,7 @@ class LimbahController extends Controller
             // 3. Simpan foto bukti jika diunggah
             if ($request->hasFile('evidence_file')) {
                 $file = $request->file('evidence_file');
-                $path = $file->store('evidences/limbah', 'public');
+                $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'limbah');
 
                 Evidence::create([
                     'uploaded_by' => $staff?->id,
@@ -387,4 +388,3 @@ class LimbahController extends Controller
         return Auth::guard('staff')->user();
     }
 }
-

@@ -362,8 +362,8 @@
                                 @if ($step->evidences->isNotEmpty())
                                     <div style="display: flex; gap: 10px; margin-top: 10px;">
                                         @foreach ($step->evidences as $ev)
-                                            <a href="{{ asset('storage/' . $ev->file_path) }}" target="_blank" style="display: inline-block; border-radius: 6px; overflow: hidden; border: 1px solid #CBD5E1;">
-                                                <img src="{{ asset('storage/' . $ev->file_path) }}" alt="Bukti" style="width: 70px; height: 50px; object-fit: cover;">
+                                            <a href="{{ $ev->url }}" target="_blank" style="display: inline-block; border-radius: 6px; overflow: hidden; border: 1px solid #CBD5E1;">
+                                                <img src="{{ $ev->url }}" alt="Bukti" style="width: 70px; height: 50px; object-fit: cover;">
                                             </a>
                                         @endforeach
                                     </div>
