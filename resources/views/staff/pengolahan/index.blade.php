@@ -229,10 +229,10 @@
                                 @if ($step->evidences->isNotEmpty())
                                     <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
                                         @foreach ($step->evidences as $ev)
-                                            <div onclick="previewEvidence('{{ asset('storage/' . $ev->file_path) }}', '{{ $step->step_name }}')" 
+                                            <div onclick="previewEvidence('{{ $ev->url }}', '{{ $step->step_name }}')" 
                                                  style="cursor: pointer; border-radius: 6px; overflow: hidden; border: 1px solid #CBD5E1; width: 60px; height: 46px;" 
                                                  title="Klik untuk memperbesar bukti">
-                                                <img src="{{ asset('storage/' . $ev->file_path) }}" alt="Bukti" style="width: 100%; height: 100%; object-fit: cover;">
+                                                <img src="{{ $ev->url }}" alt="Bukti" style="width: 100%; height: 100%; object-fit: cover;">
                                             </div>
                                         @endforeach
                                     </div>

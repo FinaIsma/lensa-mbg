@@ -14,7 +14,7 @@
         <h1 class="page-title">
             Selamat datang di Dashboard & Analytics
         </h1>
-        <p class="page-subtitle">
+        <p class="page-subtitle"> 
             Ringkasan data dan aktivitas sistem Lensa MBG secara real-time.
         </p>
     </div>

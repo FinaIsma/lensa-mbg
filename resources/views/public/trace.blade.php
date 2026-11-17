@@ -230,7 +230,7 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         @foreach($publicEvidences as $pic)
                             <div class="rounded-2xl overflow-hidden border border-slate-200 aspect-video bg-slate-100">
-                                <img src="{{ asset('storage/' . $pic->file_path) }}" alt="{{ $pic->description ?? 'Foto Lapangan' }}" class="w-full h-full object-cover">
+                                <img src="{{ $pic->url }}" alt="{{ $pic->description ?? 'Foto Lapangan' }}" class="w-full h-full object-cover">
                             </div>
                         @endforeach
                     </div>

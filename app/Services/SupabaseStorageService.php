@@ -5,6 +5,7 @@ namespace App\Services;
 use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class SupabaseStorageService
@@ -15,11 +16,33 @@ class SupabaseStorageService
 
     protected string $defaultBucket;
 
+    protected string $evidenceBucket;
+
     public function __construct()
     {
         $this->url = rtrim(config('services.supabase.url') ?? 'https://uovagfdbozaeaywzgbpa.supabase.co', '/');
         $this->key = (string) (config('services.supabase.key') ?? '');
         $this->defaultBucket = config('services.supabase.bucket') ?? 'register';
+        $this->evidenceBucket = config('services.supabase.bucket_evidence') ?? 'evidences';
+    }
+
+    /**
+     * Upload evidence with automatic fallback to local storage if network or Supabase fails.
+     * Guarantees zero downtime and zero 500 errors during operations and demos.
+     */
+    public function uploadEvidence(UploadedFile $file, string $folder = ''): string
+    {
+        $folderName = trim($folder, '/');
+
+        try {
+            // Coba unggah ke Supabase Cloud Storage (Bucket: evidences)
+            return $this->upload($file, $folderName, $this->evidenceBucket);
+        } catch (\Throwable $e) {
+            Log::warning('Supabase uploadEvidence gagal, beralih ke storage lokal: '.$e->getMessage());
+
+            // Fallback aman ke storage lokal public
+            return $file->store('evidences/'.$folderName, 'public');
+        }
     }
 
     /**

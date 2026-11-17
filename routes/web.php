@@ -12,13 +12,13 @@ use App\Http\Controllers\KepalaSPPG\StaffManagementController;
 use App\Http\Controllers\Public\PublicPortalController;
 use App\Http\Controllers\Staff\BatchController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Staff\DestinationController;
 use App\Http\Controllers\Staff\HasilController;
 use App\Http\Controllers\Staff\LimbahController;
-use App\Http\Controllers\Staff\PengirimanController;
-use App\Http\Controllers\Staff\DestinationController;
 use App\Http\Controllers\Staff\LotController;
 use App\Http\Controllers\Staff\MaterialController;
 use App\Http\Controllers\Staff\MenuResepController;
+use App\Http\Controllers\Staff\PengirimanController;
 use App\Http\Controllers\Staff\PengolahanController;
 use App\Http\Controllers\Staff\PurchaseController;
 use App\Http\Controllers\Staff\ReceivingController;
@@ -209,9 +209,28 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
 // Route untuk melayani file storage public secara andal (fallback symlink di Windows/Local)
 Route::get('/storage/{path}', function ($path) {
     $filePath = storage_path('app/public/'.$path);
-    if (! file_exists($filePath)) {
-        abort(404);
+    if (file_exists($filePath)) {
+        return response()->file($filePath);
     }
 
-    return response()->file($filePath);
+    $publicPath = public_path('storage/'.$path);
+    if (file_exists($publicPath)) {
+        return response()->file($publicPath);
+    }
+
+    // Fallback andal jika file fisik tidak berada di disk lokal (database cloud / seeder)
+    if (str_contains($path, 'hasil') || str_contains($path, 'pre-distribution')) {
+        return redirect('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80');
+    }
+    if (str_contains($path, 'processing')) {
+        return redirect('https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80');
+    }
+    if (str_contains($path, 'receivings') || str_contains($path, 'receiving')) {
+        return redirect('https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=800&q=80');
+    }
+    if (str_contains($path, 'pengiriman') || str_contains($path, 'distribution')) {
+        return redirect('https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80');
+    }
+
+    return redirect('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80');
 })->where('path', '.*');

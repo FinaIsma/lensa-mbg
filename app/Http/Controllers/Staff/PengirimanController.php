@@ -9,6 +9,7 @@ use App\Models\DistributionDestination;
 use App\Models\Evidence;
 use App\Models\ProductionBatch;
 use App\Models\Staff;
+use App\Services\SupabaseStorageService;
 use App\Support\Keys;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +17,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class PengirimanController extends Controller
@@ -213,7 +213,7 @@ class PengirimanController extends Controller
         $evidences = $distribution->evidences->map(function ($ev) {
             return [
                 'id' => $ev->id,
-                'file_url' => Storage::url($ev->file_path),
+                'file_url' => $ev->url,
                 'file_type' => $ev->file_type,
                 'description' => $ev->description,
                 'uploader' => $ev->uploader?->nama ?? 'Staff',
@@ -321,7 +321,7 @@ class PengirimanController extends Controller
             // Simpan foto bukti jika diunggah
             if ($request->hasFile('evidence_file')) {
                 $file = $request->file('evidence_file');
-                $path = $file->store('evidences/pengiriman', 'public');
+                $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'pengiriman');
 
                 Evidence::create([
                     'uploaded_by' => $staff?->id,
@@ -478,7 +478,7 @@ class PengirimanController extends Controller
             // Simpan foto bukti jika disertakan
             if ($request->hasFile('evidence_file')) {
                 $file = $request->file('evidence_file');
-                $path = $file->store('evidences/pengiriman', 'public');
+                $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'pengiriman');
 
                 Evidence::create([
                     'uploaded_by' => $staff?->id,
@@ -558,7 +558,7 @@ class PengirimanController extends Controller
             // Simpan foto bukti serah terima jika disertakan
             if ($request->hasFile('evidence_file')) {
                 $file = $request->file('evidence_file');
-                $path = $file->store('evidences/pengiriman', 'public');
+                $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'pengiriman');
 
                 Evidence::create([
                     'uploaded_by' => $staff?->id,
