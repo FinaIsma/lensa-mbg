@@ -5,6 +5,9 @@ PORT="${PORT:-80}"
 echo "Configuring Nginx to listen on port ${PORT}..."
 sed -i "s/listen 80;/listen ${PORT};/g" /etc/nginx/http.d/default.conf
 
+echo "Discovering Laravel packages..."
+php artisan package:discover --ansi
+
 echo "Creating storage symlink..."
 php artisan storage:link --force || true
 

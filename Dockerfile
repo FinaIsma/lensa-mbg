@@ -13,14 +13,17 @@ RUN npm run build
 # ==========================================
 # Stage 2: Production PHP-FPM + Nginx Environment
 # ==========================================
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
-# Install system dependencies
+# Install system dependencies (including git, unzip, zip required by Composer)
 RUN apk add --no-cache \
     nginx \
     supervisor \
     curl \
     bash \
+    git \
+    unzip \
+    zip \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
@@ -61,9 +64,9 @@ COPY . /var/www/html
 # Copy built frontend assets from Stage 1
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
-# Install Composer dependencies (production only)
+# Install Composer dependencies (use --no-scripts to prevent artisan discovery during image build without env vars)
 ENV COMPOSER_ALLOW_SUPERUSER 1
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction
 
 # Copy configs
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
