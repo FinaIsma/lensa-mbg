@@ -125,7 +125,7 @@
                                 <select name="status_verif" class="select-status-verif" onchange="this.form.submit()">
                                     <option value="semua" {{ !request('status_verif') || request('status_verif') == 'semua' ? 'selected' : '' }}>Status Verif</option>
                                     <option value="Terverifikasi" {{ request('status_verif') == 'Terverifikasi' ? 'selected' : '' }}>Terverifikasi</option>
-                                    <option value="Belum Diverifikasi" {{ request('status_verif') == 'Belum Diverifikasi' ? 'selected' : '' }}>Belum Diverifikasi</option>
+                                    <option value="Menunggu Verifikasi" {{ request('status_verif') == 'Menunggu Verifikasi' || request('status_verif') == 'Belum Diverifikasi' ? 'selected' : '' }}>Menunggu Verifikasi</option>
                                     <option value="Perubahan" {{ request('status_verif') == 'Perubahan' ? 'selected' : '' }}>Perubahan</option>
                                     <option value="Ditolak" {{ request('status_verif') == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
                                 </select>
@@ -165,13 +165,15 @@
                                         $tgl = $item->created_at ? \Carbon\Carbon::parse($item->created_at) : now();
                                         $tglFormatted = $tgl->format('d') . ' ' . ($bulanIndo[(int)$tgl->format('n')] ?? $tgl->format('F')) . ' ' . $tgl->format('Y');
 
+                                        $isNewRegistration = ($item->status_verifikasi === 'menunggu_verifikasi' || $item->status === 'menunggu_verifikasi');
                                         $pendingStaffs = $item->staffs ? $item->staffs->whereIn('status', ['menunggu', 'menunggu_persetujuan'])->values() : collect();
                                         $pendingStaffCount = $pendingStaffs->count();
                                         $hasPendingStaffs = $pendingStaffCount > 0;
-                                        $hasChanges = !empty($item->proposed) || ($item->status_verifikasi === 'perubahan') || $hasPendingStaffs;
+                                        $hasProposed = !empty($item->proposed);
+                                        $hasChanges = $hasProposed || ($item->status_verifikasi === 'perubahan') || (!$isNewRegistration && $hasPendingStaffs);
 
                                         $activeStaff = $item->staffs ? $item->staffs->where('status', 'aktif')->sortByDesc('id')->first() : null;
-                                        $staffLama = $activeStaff ?: $item->staff;
+                                        $staffLama = $activeStaff ?: $item->staff ?: ($item->staffs ? $item->staffs->first() : null);
 
                                         $itemJson = json_encode([
                                             'id_sppg' => $idFormatted,
@@ -196,6 +198,8 @@
                                             'foto_surat_resmi' => $item->foto_surat_resmi ? (str_starts_with($item->foto_surat_resmi, 'http') ? $item->foto_surat_resmi : asset($item->foto_surat_resmi)) : null,
                                             'has_changes' => $hasChanges,
                                             'has_pending_staffs' => $hasPendingStaffs,
+                                            'is_new_registration' => $isNewRegistration,
+                                            'is_staff_addition' => (!$isNewRegistration && $hasPendingStaffs),
                                             'pending_staffs' => $pendingStaffs->map(fn ($st) => [
                                                 'id' => $st->id,
                                                 'nama' => $st->nama,
@@ -222,7 +226,7 @@
                                         <td class="font-medium text-dark">
                                             <div class="staff-cell-wrapper">
                                                 <span class="staff-cell-name">{{ $staffLama?->nama ?? '-' }}</span>
-                                                @if ($pendingStaffCount > 0)
+                                                @if (!$isNewRegistration && $pendingStaffCount > 0)
                                                     <span class="badge-staff-pending-count" title="{{ $pendingStaffCount }} staf baru menunggu verifikasi">
                                                         <span class="badge-staff-dot"></span>
                                                         <span>+{{ $pendingStaffCount }} baru</span>
@@ -231,12 +235,12 @@
                                             </div>
                                         </td>
                                         <td>
-                                            @if ($item->status_verifikasi === 'terverifikasi' && $pendingStaffCount === 0)
-                                                <span class="badge-verif badge-terverifikasi">Terverifikasi</span>
-                                            @elseif ($item->status_verifikasi === 'perubahan' || $pendingStaffCount > 0)
+                                            @if ($isNewRegistration)
+                                                <span class="badge-verif badge-belum">Menunggu Verifikasi</span>
+                                            @elseif ($item->status_verifikasi === 'perubahan' || $hasPendingStaffs || $hasProposed)
                                                 <span class="badge-verif badge-perubahan">Perubahan</span>
-                                            @elseif ($item->status_verifikasi === 'menunggu_verifikasi')
-                                                <span class="badge-verif badge-belum">Belum Diverifikasi</span>
+                                            @elseif ($item->status_verifikasi === 'terverifikasi')
+                                                <span class="badge-verif badge-terverifikasi">Terverifikasi</span>
                                             @else
                                                 <span class="badge-verif badge-ditolak">Ditolak</span>
                                             @endif

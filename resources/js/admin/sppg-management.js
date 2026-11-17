@@ -8,6 +8,16 @@ window.renderSppgModalContent = function (item) {
     const hasPendingStaffs = pendingStaffs.length > 0;
     const hasChanges = Boolean(item.has_changes || hasProposed || item.status_verifikasi === 'perubahan' || hasPendingStaffs);
 
+    const isNewRegistration = Boolean(
+        item.is_new_registration ||
+        item.status_verifikasi === 'menunggu_verifikasi' ||
+        item.status === 'menunggu_verifikasi'
+    );
+    const isStaffAddition = Boolean(
+        item.is_staff_addition ||
+        (hasPendingStaffs && !isNewRegistration && !hasProposed)
+    );
+
     // Update modal dialog width class dynamically
     document.querySelectorAll('.modal-dialog').forEach(dialog => {
         if (hasProposed) {
@@ -20,39 +30,43 @@ window.renderSppgModalContent = function (item) {
     // Update modal title dynamically
     const detailTitle = document.querySelector('#modalDetail .modal-title');
     if (detailTitle) {
-        if (hasPendingStaffs && !hasProposed) {
-            detailTitle.textContent = 'Detail SPPG & Staff';
-        } else if (hasChanges) {
-            detailTitle.textContent = 'Detail Perubahan SPPG';
-        } else {
-            detailTitle.textContent = 'Detail SPPG';
+            if (isNewRegistration) {
+                detailTitle.textContent = 'Detail SPPG';
+            } else if (isStaffAddition) {
+                detailTitle.textContent = 'Detail Penambahan Staff';
+            } else if (hasProposed || hasChanges) {
+                detailTitle.textContent = 'Detail Perubahan SPPG';
+            } else {
+                detailTitle.textContent = 'Detail SPPG';
+            }
         }
-    }
-    const verifTitle = document.querySelector('#modalVerifikasi .modal-title');
-    if (verifTitle) {
-        if (hasPendingStaffs && !hasProposed) {
-            verifTitle.textContent = 'Verifikasi Penambahan Staff';
-        } else if (hasChanges) {
-            verifTitle.textContent = 'Verifikasi Perubahan SPPG';
-        } else {
-            verifTitle.textContent = 'Verifikasi SPPG';
-        }
-    }
+        const verifTitle = document.querySelector('#modalVerifikasi .modal-title');
+        if (verifTitle) {
+                if (isNewRegistration) {
+                    verifTitle.textContent = 'Verifikasi SPPG';
+                } else if (isStaffAddition) {
+                    verifTitle.textContent = 'Verifikasi Penambahan Staff';
+                } else if (hasProposed || hasChanges) {
+                    verifTitle.textContent = 'Verifikasi Perubahan SPPG';
+                } else {
+                    verifTitle.textContent = 'Verifikasi SPPG';
+                }
+            }
 
-    // SVG icon paths matching reference design
-    const icons = {
-        user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-        email: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
-        phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
-        store: '<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="22" x2="9" y2="18"/><line x1="15" y1="22" x2="15" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="10" x2="16.01" y2="10"/><line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/>',
-        id: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/>',
-        pin: '<path d="M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
-        nav: '<polygon points="12 2 19 21 12 17 5 21 12 2"/>',
-        cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
-    };
+            // SVG icon paths matching reference design
+            const icons = {
+                user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+                email: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+                phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+                store: '<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="22" x2="9" y2="18"/><line x1="15" y1="22" x2="15" y2="18"/><line x1="9" y1="18" x2="15" y2="18"/><line x1="8" y1="6" x2="8.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="16" y1="6" x2="16.01" y2="6"/><line x1="8" y1="10" x2="8.01" y2="10"/><line x1="12" y1="10" x2="12.01" y2="10"/><line x1="16" y1="10" x2="16.01" y2="10"/><line x1="8" y1="14" x2="8.01" y2="14"/><line x1="12" y1="14" x2="12.01" y2="14"/><line x1="16" y1="14" x2="16.01" y2="14"/>',
+                id: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><line x1="15" y1="8" x2="17" y2="8"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="17" y2="16"/>',
+                pin: '<path d="M12 21s-7-4.5-7-11a7 7 0 0 1 14 0c0 6.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+                nav: '<polygon points="12 2 19 21 12 17 5 21 12 2"/>',
+                cal: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+            };
 
-    function renderRow(iconSvg, label, value, isModified = false) {
-        return `
+            function renderRow(iconSvg, label, value, isModified = false) {
+                return `
             <div class="cr-kv-row ${isModified ? 'is-modified' : ''}">
                 <span class="cr-kv-label">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconSvg}</svg>
@@ -62,20 +76,20 @@ window.renderSppgModalContent = function (item) {
                 ${isModified ? '<span class="badge-diubah">DIUBAH</span>' : ''}
             </div>
         `;
-    }
-
-    function renderDocCard(label, fileUrl, isModified = false) {
-        const isPdf = fileUrl && /\.pdf($|\?)/i.test(fileUrl);
-        let previewHtml = '';
-
-        if (fileUrl) {
-            if (isPdf) {
-                previewHtml = `<canvas class="mv2-pdf-canvas" data-pdf="${fileUrl}"></canvas>`;
-            } else {
-                previewHtml = `<img src="${fileUrl}" alt="${label}">`;
             }
-        } else {
-            previewHtml = `
+
+            function renderDocCard(label, fileUrl, isModified = false) {
+                const isPdf = fileUrl && /\.pdf($|\?)/i.test(fileUrl);
+                let previewHtml = '';
+
+                if (fileUrl) {
+                    if (isPdf) {
+                        previewHtml = `<canvas class="mv2-pdf-canvas" data-pdf="${fileUrl}"></canvas>`;
+                    } else {
+                        previewHtml = `<img src="${fileUrl}" alt="${label}">`;
+                    }
+                } else {
+                    previewHtml = `
                 <div class="mv2-doc-empty">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.8">
                         <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -84,9 +98,9 @@ window.renderSppgModalContent = function (item) {
                     </svg>
                 </div>
             `;
-        }
+                }
 
-        return `
+                return `
             <div class="diff-doc-card ${isModified ? 'is-modified' : ''}">
                 <div class="diff-doc-preview">
                     ${previewHtml}
@@ -98,83 +112,103 @@ window.renderSppgModalContent = function (item) {
                 </a>
             </div>
         `;
-    }
+            }
 
-    // ── KONDISI 1: TIDAK ADA PERUBAHAN PROFIL (1 KOLOM BERSIH) ────────────────
-    if (!hasProposed) {
-        const staffNama = item.staff_nama || '-';
-        const staffEmail = item.staff_email || '-';
-        const staffTelp = item.staff_no_telepon || '-';
+                // ── KONDISI 1A: PENAMBAHAN STAFF BARU (Fokus Verifikasi Staff Baru) ──────────────
+                if (isStaffAddition && !hasProposed) {
+                    const staffNama = item.staff_nama || '-';
+                    const staffEmail = item.staff_email || '-';
+                    const staffTelp = item.staff_no_telepon || '-';
+                    const hasStaffLama = staffNama && staffNama !== '-' && !pendingStaffs.some(st => st.nama === staffNama || st.email === staffEmail);
 
-        let staffSectionHtml = '';
+                    const staffLamaHtml = hasStaffLama ? `
+            <div class="cr-info-card">
+                <div class="cr-card-header">
+                    <h3 class="cr-card-title">Staff Aktif Saat Ini</h3>
+                    <span class="cr-badge-aktif-tag">
+                        <span class="cr-badge-aktif-dot"></span>
+                        <span>Aktif</span>
+                    </span>
+                </div>
+                <div class="cr-card-body">
+                    ${renderRow(icons.user, 'Nama Lengkap', staffNama)}
+                    ${renderRow(icons.email, 'Email', staffEmail)}
+                    ${renderRow(icons.phone, 'No Telepon', staffTelp)}
+                </div>
+            </div>
+        ` : '';
 
-        // 1. Informasi Staff Lama (jika ada staff aktif/lama dan bukan staff yang sedang pending)
-        const hasStaffLama = staffNama && staffNama !== '-' && !pendingStaffs.some(st => st.nama === staffNama || st.email === staffEmail);
+                    const pendingStaffHtml = pendingStaffs.map((st, idx) => {
+                        const title = pendingStaffs.length > 1
+                            ? `Pengajuan Staff Baru #${idx + 1}`
+                            : 'Pengajuan Staff Baru';
 
-        if (hasStaffLama) {
-            staffSectionHtml += `
-                <!-- Section 2A: Informasi Staff SPPG (Lama) -->
-                <div class="cr-info-card">
+            return `
+                                < div class="cr-info-card is-pending-card" >
                     <div class="cr-card-header">
-                        <h3 class="cr-card-title">Informasi Staff SPPG</h3>
-                        <span class="cr-badge-aktif-tag">
-                            <span class="cr-badge-aktif-dot"></span>
-                            <span>Aktif</span>
+                        <h3 class="cr-card-title">${title}</h3>
+                        <span class="cr-badge-verifikasi-tag">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span>Perlu Verifikasi</span>
                         </span>
                     </div>
                     <div class="cr-card-body">
-                        ${renderRow(icons.user, 'Nama Lengkap', staffNama)}
-                        ${renderRow(icons.email, 'Email', staffEmail)}
-                        ${renderRow(icons.phone, 'No Telepon', staffTelp)}
+                        ${renderRow(icons.user, 'Nama Lengkap', st.nama)}
+                        ${renderRow(icons.email, 'Email', st.email)}
+                        ${renderRow(icons.phone, 'No Telepon', st.no_telepon || '-')}
+                        ${st.created_at ? renderRow(icons.cal, 'Tanggal Pengajuan', st.created_at) : ''}
                     </div>
-                </div>
-            `;
-        }
-
-        // 2. Informasi Staff Baru yang Butuh Verifikasi (Tepat di bawahnya, desain persis sama)
-        if (hasPendingStaffs) {
-            staffSectionHtml += pendingStaffs.map((st, idx) => {
-                const title = hasStaffLama
-                    ? (pendingStaffs.length > 1 ? `Informasi Staff SPPG (Staff Baru #${idx + 1})` : 'Informasi Staff SPPG (Staff Baru)')
-                    : (pendingStaffs.length > 1 ? `Informasi Staff SPPG (${idx + 1})` : 'Informasi Staff SPPG');
-
-                return `
-                    <!-- Section 2B: Informasi Staff SPPG (Staff Baru yang butuh verifikasi) -->
-                    <div class="cr-info-card is-pending-card">
-                        <div class="cr-card-header">
-                            <h3 class="cr-card-title">${title}</h3>
-                            <span class="cr-badge-verifikasi-tag">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                </svg>
-                                <span>Perlu Verifikasi</span>
-                            </span>
-                        </div>
-                        <div class="cr-card-body">
-                            ${renderRow(icons.user, 'Nama Lengkap', st.nama)}
-                            ${renderRow(icons.email, 'Email', st.email)}
-                            ${renderRow(icons.phone, 'No Telepon', st.no_telepon || '-')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        } else if (!hasStaffLama) {
-            staffSectionHtml = `
-                <div class="cr-info-card">
-                    <h3 class="cr-card-title">Informasi Staff SPPG</h3>
-                    <div class="cr-card-body">
-                        ${renderRow(icons.user, 'Nama Lengkap', staffNama)}
-                        ${renderRow(icons.email, 'Email', staffEmail)}
-                        ${renderRow(icons.phone, 'No Telepon', staffTelp)}
-                    </div>
-                </div>
-            `;
-        }
+                </div >
+                        `;
+        }).join('');
 
         return `
-            <!-- Entity Profile Header -->
+                < !--Entity Profile Header-- >
+                    <div class="cr-entity-header">
+                        <div class="cr-entity-left">
+                            <div class="cr-entity-avatar" aria-hidden="true">${(item.nama_sppg || 'S').trim().charAt(0).toUpperCase()}</div>
+                            <div>
+                                <div class="cr-entity-title">${item.nama_sppg || '-'}</div>
+                                <div class="cr-entity-subtitle">${item.id_sppg || '-'} &bull; Penambahan Staff</div>
+                            </div>
+                        </div>
+                    </div>
+
+            <div class="single-col-cards">
+                <!-- Section 1: Informasi Unit SPPG & Kepala SPPG -->
+                <div class="cr-info-card">
+                    <h3 class="cr-card-title">Informasi Unit SPPG</h3>
+                    <div class="cr-card-body">
+                        ${renderRow(icons.store, 'Nama SPPG', item.nama_sppg)}
+                        ${renderRow(icons.id, 'ID SPPG', item.id_sppg)}
+                        ${renderRow(icons.user, 'Kepala SPPG', item.nama_pegawai)}
+                        ${renderRow(icons.email, 'Email Kepala SPPG', item.email)}
+                        ${renderRow(icons.phone, 'No Telepon Kepala SPPG', item.no_telepon)}
+                    </div>
+                </div>
+
+                < !--Section 2: Staf Baru yang Diajukan-- >
+        ${ pendingStaffHtml }
+
+                < !--Section 3: Staf Aktif Saat Ini-- >
+        ${ staffLamaHtml }
+            </div >
+        `;
+    }
+
+    // ── KONDISI 1B: REGISTRASI SPPG BARU ATAU DETAIL NORMAL (1 KOLOM BERSIH) ───
+    if (!hasProposed) {
+        const initialStaff = pendingStaffs[0] || {};
+        const staffNama = item.staff_nama && item.staff_nama !== '-' ? item.staff_nama : (initialStaff.nama || '-');
+        const staffEmail = item.staff_email && item.staff_email !== '-' ? item.staff_email : (initialStaff.email || '-');
+        const staffTelp = item.staff_no_telepon && item.staff_no_telepon !== '-' ? item.staff_no_telepon : (initialStaff.no_telepon || '-');
+
+        return `
+        < !--Entity Profile Header-- >
             <div class="cr-entity-header">
                 <div class="cr-entity-left">
                     <div class="cr-entity-avatar" aria-hidden="true">${(item.nama_sppg || 'S').trim().charAt(0).toUpperCase()}</div>
@@ -196,8 +230,15 @@ window.renderSppgModalContent = function (item) {
                     </div>
                 </div>
 
-                <!-- Section 2: Informasi Staff SPPG (Lama & Baru di bawahnya) -->
-                ${staffSectionHtml}
+                <!-- Section 2: Informasi Staff SPPG -->
+                <div class="cr-info-card">
+                    <h3 class="cr-card-title">Informasi Staff SPPG</h3>
+                    <div class="cr-card-body">
+                        ${renderRow(icons.user, 'Nama Lengkap', staffNama)}
+                        ${renderRow(icons.email, 'Email', staffEmail)}
+                        ${renderRow(icons.phone, 'No Telepon', staffTelp)}
+                    </div>
+                </div>
 
                 <!-- Section 3: Informasi SPPG -->
                 <div class="cr-info-card">
@@ -223,7 +264,7 @@ window.renderSppgModalContent = function (item) {
                     </div>
                 </div>
             </div>
-        `;
+    `;
     }
 
     // ── KONDISI 2: ADA PERUBAHAN DIAJUKAN (2 KOLOM DIFF SEBELUM VS SESUDAH) ──
@@ -262,7 +303,7 @@ window.renderSppgModalContent = function (item) {
     const isModSurat = !!(after.foto_surat_resmi && after.foto_surat_resmi !== before.foto_surat_resmi);
 
     return `
-        <!-- Entity Profile Header -->
+        < !--Entity Profile Header-- >
         <div class="cr-entity-header">
             <div class="cr-entity-left">
                 <div class="cr-entity-avatar" aria-hidden="true">${(before.nama_sppg || 'S').trim().charAt(0).toUpperCase()}</div>
@@ -273,7 +314,7 @@ window.renderSppgModalContent = function (item) {
             </div>
         </div>
 
-        <!-- 2 Column Diff Header Indicator -->
+        <!--2 Column Diff Header Indicator-- >
         <div class="diff-header-bar">
             <div class="diff-col-heading diff-col-before">
                 <span class="diff-dot diff-dot-before"></span>
@@ -285,7 +326,7 @@ window.renderSppgModalContent = function (item) {
             </div>
         </div>
 
-        <!-- Two Column Diff Grid -->
+        <!--Two Column Diff Grid-- >
         <div class="diff-grid">
             <!-- KOLOM KIRI (SEBELUM) -->
             <div class="diff-col">
@@ -362,7 +403,7 @@ window.renderSppgModalContent = function (item) {
             </div>
         </div>
 
-        <!-- Section 4: Dokumen (Grid 2 Kolom: Sebelum vs Sesudah) -->
+        <!--Section 4: Dokumen(Grid 2 Kolom: Sebelum vs Sesudah)-- >
         <div class="cr-info-card diff-docs-card">
             <h3 class="cr-card-title">Dokumen</h3>
             <div class="diff-grid">
@@ -422,7 +463,7 @@ window.renderPdfPreview = function (container) {
                 console.warn('Gagal me-render preview halaman 1 PDF:', err);
                 if (canvas.parentElement) {
                     canvas.parentElement.innerHTML = `
-                        <div class="mv2-doc-pdf-fallback">
+        < div class="mv2-doc-pdf-fallback" >
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14 2 14 8 20 8"></polyline>
@@ -430,8 +471,8 @@ window.renderPdfPreview = function (container) {
                                 <line x1="16" y1="17" x2="8" y2="17"></line>
                             </svg>
                             <span class="mv2-doc-pdf-tag">PDF</span>
-                        </div>
-                    `;
+                        </div >
+        `;
                 }
             });
         }
@@ -455,7 +496,7 @@ window.openDetailModal = function (item) {
     const form = document.getElementById('formDetail');
     if (form) {
         const baseUpdateUrl = window.adminSppgUpdateBase || '/admin/sppg';
-        form.action = `${baseUpdateUrl}/${item.raw_id}/status`;
+        form.action = `${ baseUpdateUrl } /${item.raw_id}/status`;
     }
 
     const inputStatus = document.getElementById('inputDetailStatusVal');
@@ -466,25 +507,25 @@ window.openDetailModal = function (item) {
             inputStatus.value = 'aktif';
             btn.className = 'btn-modal-action-activate';
             btn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        < svg width = "20" height = "20" viewBox = "0 0 24 24" fill = "none" stroke = "currentColor" stroke - width="2" stroke - linecap="round" stroke - linejoin="round" >
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="8.5" cy="7" r="4"></circle>
                     <polyline points="17 11 19 13 23 9"></polyline>
-                </svg>
-                <span id="btnDetailText">Aktifkan</span>
-            `;
+                </svg >
+        <span id="btnDetailText">Aktifkan</span>
+    `;
         } else {
             inputStatus.value = 'nonaktif';
             btn.className = 'btn-modal-action-deactivate';
             btn.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        < svg width = "20" height = "20" viewBox = "0 0 24 24" fill = "none" stroke = "currentColor" stroke - width="2" stroke - linecap="round" stroke - linejoin="round" >
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="8.5" cy="7" r="4"></circle>
                     <line x1="18" y1="8" x2="23" y2="13"></line>
                     <line x1="23" y1="8" x2="18" y2="13"></line>
-                </svg>
-                <span id="btnDetailText">Nonaktifkan</span>
-            `;
+                </svg >
+        <span id="btnDetailText">Nonaktifkan</span>
+    `;
         }
     }
 
@@ -506,7 +547,7 @@ window.openVerifikasiModal = function (item) {
     if (!form || !content) return;
 
     const baseUpdateUrl = window.adminSppgUpdateBase || '/admin/sppg';
-    form.action = `${baseUpdateUrl}/${item.raw_id}/status`;
+    form.action = `${ baseUpdateUrl } /${item.raw_id}/status`;
     content.innerHTML = window.renderSppgModalContent(item);
 
     document.getElementById('modalVerifikasi').classList.remove('hidden');

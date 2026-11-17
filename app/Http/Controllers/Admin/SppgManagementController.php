@@ -61,7 +61,7 @@ class SppgManagementController extends Controller
                             ->where('kepala_change_requests.status', 'pending');
                     });
                 }
-            } elseif ($statusVerif === 'Belum Diverifikasi') {
+            } elseif ($statusVerif === 'Belum Diverifikasi' || $statusVerif === 'Menunggu Verifikasi') {
                 $query->where('status_verifikasi', 'menunggu_verifikasi');
             } elseif ($statusVerif === 'Perubahan') {
                 $query->where(function ($q) {

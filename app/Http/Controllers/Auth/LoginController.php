@@ -40,7 +40,8 @@ class LoginController extends Controller
                     ]);
                 }
 
-                if (($sppg && $sppg->status_verifikasi === 'perubahan') || $hasPendingChange) {
+                // Blokir login Kepala SPPG hanya jika ada pengajuan perubahan data Ketua SPPG / Profil SPPG yang pending
+                if ($hasPendingChange) {
                     Auth::logout();
                     request()->session()->invalidate();
                     request()->session()->regenerateToken();
@@ -109,7 +110,7 @@ class LoginController extends Controller
                 ])->withInput();
             }
 
-            // 2. Cek jika Kepala SPPG sedang menunggu verifikasi perubahan profil
+            // 2. Cek jika Kepala SPPG sedang menunggu verifikasi perubahan profil Ketua SPPG (tabel kepala_change_requests)
             $hasPendingChange = false;
             if (Schema::hasTable('kepala_change_requests') && $sppg) {
                 $hasPendingChange = DB::table('kepala_change_requests')
@@ -118,7 +119,7 @@ class LoginController extends Controller
                     ->exists();
             }
 
-            if (($sppg && $sppg->status_verifikasi === 'perubahan') || $hasPendingChange) {
+            if ($hasPendingChange) {
                 Auth::logout();
 
                 return back()->withErrors([
