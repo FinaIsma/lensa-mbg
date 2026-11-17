@@ -241,8 +241,8 @@
                 <table class="table-modern">
                     <thead>
                         <tr>
-                            <th>Batch &amp; Menu</th>
-                            <th>Tujuan Sasaran</th>
+                            <th>Batch &amp; menu</th>
+                            <th>Tujuan sasaran</th>
                             <th class="text-center">Porsi</th>
                             <th>Status</th>
                             <th class="text-right">Aksi</th>
@@ -253,23 +253,26 @@
                             <tr>
                                 <td>
                                     <div class="font-bold text-[#071E49]">{{ $dist->batch?->batch_code ?? '-' }}</div>
-                                    <div class="text-[11px] text-slate-500">{{ $dist->batch?->menu?->nama ?? '-' }}</div>
+                                    <div class="text-[12px] text-slate-500 mt-0.5">{{ $dist->batch?->menu?->nama ?? '-' }}</div>
                                 </td>
                                 <td>
                                     <div class="font-semibold text-slate-800">{{ $dist->destination?->nama ?? '-' }}</div>
-                                    <div class="text-[11px] text-slate-400 capitalize">{{ $dist->destination?->tipe_label ?? 'Tujuan' }}</div>
+                                    <div class="text-[12px] text-slate-400 capitalize mt-0.5">{{ $dist->destination?->tipe_label ?? 'Tujuan' }}</div>
                                 </td>
                                 <td class="text-center font-bold text-[#071E49]">
                                     {{ number_format($dist->portions_sent, 0, ',', '.') }}
                                 </td>
                                 <td>
-                                    <span class="status-chip {{ $dist->status_badge_class }}">
-                                        {{ $dist->status_label }}
+                                    <span class="badge-status {{ $dist->status_badge_class }}">
+                                        <span class="status-dot"></span>
+                                        <span>{{ $dist->status_label }}</span>
                                     </span>
                                 </td>
                                 <td class="text-right">
-                                    <a href="{{ route('staff.pengiriman.index') }}" class="btn-detail-link py-1 px-2.5 text-[11px]" title="Buka Detail di Modul Pengiriman">
-                                        Buka
+                                    <a href="{{ route('staff.pengiriman.index') }}" class="btn-table-icon" title="Buka Detail di Modul Pengiriman">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
                                     </a>
                                 </td>
                             </tr>
@@ -302,14 +305,17 @@
             </div>
 
             {{-- Bahan Kritis --}}
-            <div class="mb-4">
-                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    Bahan Baku Menipis / Kritis ({{ $criticalMaterials->count() }})
+            <div class="mb-5">
+                <div class="flex items-center justify-between mb-2.5">
+                    <span class="text-xs font-bold text-[#071E49]">Bahan Baku Menipis / Kritis</span>
+                    <span class="text-[11px] font-semibold text-red-600 bg-red-50 px-2.5 py-0.5 rounded-full border border-red-100">
+                        {{ $criticalMaterials->count() }} Bahan
+                    </span>
                 </div>
                 @forelse ($criticalMaterials->take(4) as $mat)
                     <div class="material-critical-item">
                         <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                            <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-100">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                                     <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -319,11 +325,11 @@
                             <div>
                                 <div class="font-bold text-slate-800 text-xs">{{ $mat->nama }} ({{ $mat->kode }})</div>
                                 <div class="text-[11px] text-red-600 font-medium">
-                                    Sisa: {{ number_format($mat->total_qty, 1, ',', '.') }} {{ $mat->satuan }} (Min: {{ number_format($mat->min_stock, 1, ',', '.') }} {{ $mat->satuan }})
+                                    Sisa: {{ number_format($mat->total_qty, 1, ',', '.') }} {{ $mat->satuan }} <span class="text-slate-400 font-normal">(Min: {{ number_format($mat->min_stock, 1, ',', '.') }} {{ $mat->satuan }})</span>
                                 </div>
                             </div>
                         </div>
-                        <a href="{{ route('staff.purchases.create') }}" class="btn-detail-link py-1 px-2.5 text-[11px]" title="Buat Pengadaan Bahan">
+                        <a href="{{ route('staff.purchases.create') }}" class="btn-detail-link py-1 px-3 text-[11px]" title="Buat Pengadaan Bahan">
                             Restock
                         </a>
                     </div>
@@ -337,14 +343,17 @@
 
             {{-- PO Menunggu Barang Masuk / Riwayat PO --}}
             <div>
-                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    PO Terkini &amp; Pengadaan Barang ({{ $waitingPurchases->count() }})
+                <div class="flex items-center justify-between mb-2.5">
+                    <span class="text-xs font-bold text-[#071E49]">PO Terkini &amp; Pengadaan Barang</span>
+                    <span class="text-[11px] font-semibold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                        {{ $waitingPurchases->count() }} PO
+                    </span>
                 </div>
                 @forelse ($waitingPurchases as $po)
-                    <a href="{{ route('staff.purchases.index') }}" class="flex items-center justify-between p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-100 rounded-lg mb-2 transition-colors no-underline block" title="Buka Modul Pembelian">
+                    <a href="{{ route('staff.purchases.index') }}" class="po-dashboard-item" title="Buka Modul Pembelian">
                         <div>
                             <div class="font-bold text-[#071E49] text-xs">{{ $po->purchase_no }}</div>
-                            <div class="text-[11px] text-slate-500">{{ $po->supplier?->nama ?? 'Pemasok' }} • {{ $po->purchase_date ? \Carbon\Carbon::parse($po->purchase_date)->format('d M Y') : '-' }}</div>
+                            <div class="text-[11.5px] text-slate-500 mt-0.5">{{ $po->supplier?->nama ?? 'Pemasok' }} <span class="text-slate-300">•</span> {{ $po->purchase_date ? \Carbon\Carbon::parse($po->purchase_date)->format('d M Y') : '-' }}</div>
                         </div>
                         @php
                             $badgeCls = match($po->status) {
@@ -361,12 +370,13 @@
                                 default => 'Draft',
                             };
                         @endphp
-                        <span class="status-chip {{ $badgeCls }} text-[10px]">
-                            {{ $labelCls }}
+                        <span class="badge-status {{ $badgeCls }}">
+                            <span class="status-dot"></span>
+                            <span>{{ $labelCls }}</span>
                         </span>
                     </a>
                 @empty
-                    <div class="text-xs text-slate-400 py-2">
+                    <div class="text-xs text-slate-400 py-3 text-center border border-dashed border-slate-200 rounded-lg">
                         Tidak ada transaksi PO tercatat.
                     </div>
                 @endforelse

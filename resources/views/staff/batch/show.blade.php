@@ -377,32 +377,116 @@
 
         {{-- Hasil Porsi Jadi (Pre-Distribution Check) --}}
         <div class="detail-card">
-            <h2 class="detail-card-title">Hasil Porsi & Uji Kualitas</h2>
+            <h2 class="detail-card-title">Hasil Porsi &amp; Uji Kualitas (Kelayakan Saji)</h2>
             @if ($batch->actual_porsi !== null)
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 20px;">
-                    <div>
-                        <span style="font-size: 12px; color: #166534; font-weight: 500;">Porsi Siap Distribusi:</span>
-                        <div style="font-size: 24px; font-weight: 800; color: #15803D; margin-top: 4px;">
-                            {{ number_format($batch->actual_porsi, 0, ',', '.') }} porsi
+                @php
+                    $qcCheck = $batch->preDistributionCheck;
+                    $qcEvidence = $qcCheck?->evidences->first();
+                    $matrix = $qcCheck?->physical_test_matrix ?? \App\Models\PreDistributionCheck::DEFAULT_PHYSICAL_MATRIX;
+                @endphp
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    {{-- 1. KPI Bar Hasil & Waktu Kritis --}}
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 18px;">
+                        <div>
+                            <span style="font-size: 11.5px; color: #166534; font-weight: 600; text-transform: uppercase;">Porsi Siap Saji</span>
+                            <div style="font-size: 22px; font-weight: 800; color: #15803D; margin-top: 4px;">
+                                {{ number_format($batch->actual_porsi, 0, ',', '.') }} ps
+                            </div>
+                            <span style="font-size: 11px; color: #4ADE80;">Target: {{ number_format($batch->target_porsi, 0, ',', '.') }} ps</span>
+                        </div>
+
+                        <div>
+                            <span style="font-size: 11.5px; color: #166534; font-weight: 600; text-transform: uppercase;">Susut Produksi</span>
+                            <div style="font-size: 20px; font-weight: 700; color: {{ ($batch->susut_produksi ?? 0) > 0 ? '#DC2626' : '#15803D' }}; margin-top: 4px;">
+                                {{ number_format($batch->susut_produksi ?? 0, 0, ',', '.') }} ps
+                            </div>
+                            <span style="font-size: 11px; color: #64748B;">{{ ($batch->susut_produksi ?? 0) > 0 ? 'Tercatat Susut' : 'Sesuai 100%' }}</span>
+                        </div>
+
+                        <div style="background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 10px 12px;">
+                            <span style="font-size: 11px; color: #991B1B; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
+                                Batas Maks. Dimakan
+                            </span>
+                            <div style="font-size: 18px; font-weight: 800; color: #B91C1C; margin-top: 2px;">
+                                {{ $qcCheck?->consume_by ? $qcCheck->consume_by->format('H:i') . ' WIB' : 'Maks. 4 Jam' }}
+                            </div>
+                            <span style="font-size: 10.5px; color: #DC2626;">Waktu Kritis Keamanan Pangan</span>
+                        </div>
+
+                        <div>
+                            <span style="font-size: 11.5px; color: #166534; font-weight: 600; text-transform: uppercase;">Tenaga Ahli Gizi</span>
+                            <div style="font-size: 14px; font-weight: 700; color: #166534; margin-top: 4px;">
+                                {{ $qcCheck?->effective_nutritionist_name ?? 'Tenaga Gizi' }}
+                            </div>
+                            <span style="font-size: 11px; color: #64748B;">Staff: {{ $qcCheck?->checker?->nama ?? 'Pengawas' }}</span>
                         </div>
                     </div>
-                    <div>
-                        <span style="font-size: 12px; color: #166534; font-weight: 500;">Susut Produksi:</span>
-                        <div style="font-size: 20px; font-weight: 700; color: #B45309; margin-top: 4px;">
-                            {{ number_format($batch->susut_produksi ?? 0, 0, ',', '.') }} porsi
+
+                    {{-- 2. Detail Waktu Operasional Terpisah --}}
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px;">
+                        <div>
+                            <span style="font-size: 11.5px; color: #64748B;">Kategori Form:</span>
+                            <div style="font-size: 13px; font-weight: 700; color: #071E49; margin-top: 2px;">
+                                {{ $qcCheck?->form_type_label ?? 'Makanan Siap Santap' }}
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size: 11.5px; color: #64748B;">Waktu Pengecekan / Uji Fisik:</span>
+                            <div style="font-size: 13px; font-weight: 700; color: #071E49; margin-top: 2px;">
+                                {{ $qcCheck?->checked_at ? $qcCheck->checked_at->format('d/m/Y, H:i') . ' WIB' : '-' }}
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size: 11.5px; color: #64748B;">Estimasi Jam Distribusi:</span>
+                            <div style="font-size: 13px; font-weight: 700; color: #071E49; margin-top: 2px;">
+                                {{ $qcCheck?->estimated_distribution_at ? $qcCheck->estimated_distribution_at->format('H:i') . ' WIB' : 'Menyesuaikan Jadwal' }}
+                            </div>
+                        </div>
+                        <div>
+                            <span style="font-size: 11.5px; color: #64748B;">Status Uji Fisik:</span>
+                            <div style="margin-top: 2px;">
+                                <span style="font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0;">
+                                    ✓ Lolos Uji Fisik (Layak Saji)
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <span style="font-size: 12px; color: #166534; font-weight: 500;">Kondisi Dilaporkan:</span>
-                        <div style="font-size: 14px; font-weight: 600; color: #1E293B; margin-top: 4px;">
-                            {{ $batch->preDistributionCheck?->reported_condition ?? 'Baik / Siap Saji' }}
+
+                    {{-- 3. Matriks Uji Fisik (Organoleptik) 6 Parameter --}}
+                    @if (is_array($matrix) && count($matrix) > 0)
+                        <div style="border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; background: #FFFFFF;">
+                            <div style="font-size: 13px; font-weight: 700; color: #071E49; margin-bottom: 10px;">
+                                Matriks Hasil Uji Fisik Organoleptik
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+                                @foreach ($matrix as $key => $param)
+                                    <div style="border: 1px solid #F1F5F9; background: #F8FAFC; border-radius: 8px; padding: 10px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                            <strong style="font-size: 12px; color: #1E293B;">{{ $param['label'] ?? ucfirst($key) }}</strong>
+                                            <span style="font-size: 11px; font-weight: 700; color: #059669; background: #ECFDF5; padding: 1px 6px; border-radius: 4px;">
+                                                ✓ {{ ucfirst($param['status'] ?? 'Sesuai') }}
+                                            </span>
+                                        </div>
+                                        <div style="font-size: 11.5px; color: #64748B;">
+                                            {{ $param['keterangan'] ?? 'Sesuai standar mutu resep' }}
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <span style="font-size: 12px; color: #166534; font-weight: 500;">Pemeriksa:</span>
+                    @endif
+
+                    {{-- 4. Ringkasan Kondisi & Catatan --}}
+                    <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px;">
+                        <span style="font-size: 12px; color: #64748B; font-weight: 600;">Ringkasan Kondisi Dilaporkan:</span>
                         <div style="font-size: 13.5px; font-weight: 600; color: #1E293B; margin-top: 4px;">
-                            {{ $batch->preDistributionCheck?->checker?->nama ?? 'Staff Pengawas' }}
+                            {{ $qcCheck?->reported_condition ?? 'Baik / Siap Saji' }}
                         </div>
+                        @if ($qcCheck?->note)
+                            <div style="font-size: 12px; color: #64748B; margin-top: 6px; background: #F8FAFC; padding: 8px 12px; border-radius: 6px;">
+                                <em>Catatan Pemeriksa:</em> {{ $qcCheck->note }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             @else

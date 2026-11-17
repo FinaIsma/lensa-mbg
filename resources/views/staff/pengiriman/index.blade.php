@@ -179,17 +179,17 @@
         </form>
 
         {{-- Tabel Pengiriman --}}
-        <div class="overflow-x-auto">
+        <div class="pengiriman-table-wrapper">
             <table class="pengiriman-table">
                 <thead>
                     <tr>
-                        <th>Kode Batch & Menu</th>
-                        <th>Tujuan Distribusi</th>
-                        <th>Porsi Dikirim</th>
-                        <th>Status</th>
-                        <th>Waktu Berangkat</th>
-                        <th>Petugas</th>
-                        <th class="text-right">Aksi</th>
+                        <th style="min-width: 180px;">Kode batch & menu</th>
+                        <th style="min-width: 200px;">Tujuan distribusi</th>
+                        <th style="min-width: 140px;">Porsi dikirim</th>
+                        <th style="min-width: 150px;">Status</th>
+                        <th style="min-width: 150px;">Waktu berangkat</th>
+                        <th style="min-width: 120px;">Petugas</th>
+                        <th style="min-width: 160px; text-align: right;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -197,21 +197,21 @@
                         <tr>
                             {{-- Kode Batch & Menu --}}
                             <td>
-                                <div class="font-bold text-[#071E49]">
+                                <div class="pengiriman-batch-code">
                                     {{ $dist->batch?->batch_code ?? '-' }}
                                 </div>
-                                <div class="text-xs text-slate-500 mt-0.5">
+                                <div class="pengiriman-menu-name">
                                     {{ $dist->batch?->menu?->nama ?? '-' }}
                                 </div>
                             </td>
 
                             {{-- Tujuan Distribusi --}}
                             <td>
-                                <div class="font-semibold text-slate-800">
+                                <div class="pengiriman-dest-name">
                                     {{ $dist->destination?->nama ?? '-' }}
                                 </div>
-                                <div class="flex items-center gap-1.5 mt-0.5 text-xs text-slate-500">
-                                    <span class="inline-block px-1.5 py-0.2 text-[10px] bg-slate-100 rounded text-slate-600 font-medium">
+                                <div class="pengiriman-dest-meta">
+                                    <span class="badge-tipe-sm">
                                         {{ $dist->destination?->tipe_label ?? 'Tujuan' }}
                                     </span>
                                     <span>Target: {{ number_format($dist->destination?->jumlah_penerima ?? 0, 0, ',', '.') }}</span>
@@ -220,38 +220,39 @@
 
                             {{-- Porsi Dikirim --}}
                             <td>
-                                <span class="font-bold text-slate-800">
+                                <span class="pengiriman-portion-value">
                                     {{ number_format($dist->portions_sent, 0, ',', '.') }}
                                 </span>
-                                <span class="text-xs text-slate-500">porsi</span>
+                                <span class="pengiriman-portion-unit">porsi</span>
 
                                 @if ($dist->is_over_quota)
-                                    <span class="ml-1 inline-flex items-center text-[11px] text-amber-600 font-medium" title="Porsi melebihi target penerima standar tujuan">
+                                    <span class="pengiriman-over-quota" title="Porsi melebihi target penerima standar tujuan">
                                         (Kelebihan)
                                     </span>
                                 @endif
                             </td>
 
-                            {{-- Status Chip --}}
+                            {{-- Status Chip (Pill dengan Status Dot sesuai halaman Staff lain) --}}
                             <td>
-                                <span class="status-chip {{ $dist->status_badge_class }}">
-                                    {{ $dist->status_label }}
+                                <span class="badge-status {{ $dist->status_badge_class }}">
+                                    <span class="status-dot"></span>
+                                    <span>{{ $dist->status_label }}</span>
                                 </span>
                             </td>
 
                             {{-- Waktu Berangkat --}}
                             <td>
-                                <div class="text-sm text-slate-700">
+                                <div class="pengiriman-date-main">
                                     {{ $dist->distributed_at ? $dist->distributed_at->translatedFormat('d M Y') : '-' }}
                                 </div>
-                                <div class="text-xs text-slate-400">
+                                <div class="pengiriman-date-sub">
                                     {{ $dist->distributed_at ? $dist->distributed_at->format('H:i') . ' WIB' : '' }}
                                 </div>
                             </td>
 
                             {{-- Petugas Pencatat --}}
                             <td>
-                                <span class="text-sm text-slate-600">
+                                <span class="pengiriman-staff-name">
                                     {{ $dist->recorder?->nama ?? 'Staff' }}
                                 </span>
                             </td>
@@ -344,17 +345,39 @@
             </table>
         </div>
 
-        {{-- Pagination --}}
-        @if ($distributions->hasPages())
-            <div class="pengiriman-pagination-wrapper">
-                <div class="text-xs text-slate-500">
-                    Menampilkan <b>{{ $distributions->firstItem() ?? 0 }}</b> - <b>{{ $distributions->lastItem() ?? 0 }}</b> dari <b>{{ $distributions->total() }}</b> pengiriman
+        {{-- Footer & Pagination Sesuai Mockup Master --}}
+        <div class="pengiriman-footer">
+            <p class="pengiriman-footer-text">
+                Menampilkan {{ $distributions->firstItem() ?? 0 }}-{{ $distributions->lastItem() ?? 0 }} dari {{ $distributions->total() }} pengiriman
+            </p>
+
+            @if ($distributions->hasPages())
+                <div class="pengiriman-pagination">
+                    {{-- Previous Page Link --}}
+                    @if ($distributions->onFirstPage())
+                        <span class="pengiriman-page-btn disabled" aria-disabled="true">&lt;</span>
+                    @else
+                        <a href="{{ $distributions->previousPageUrl() }}" class="pengiriman-page-btn" rel="prev">&lt;</a>
+                    @endif
+
+                    {{-- Pagination Elements --}}
+                    @foreach ($distributions->getUrlRange(1, $distributions->lastPage()) as $page => $url)
+                        @if ($page == $distributions->currentPage())
+                            <span class="pengiriman-page-btn active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="pengiriman-page-btn">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    {{-- Next Page Link --}}
+                    @if ($distributions->hasMorePages())
+                        <a href="{{ $distributions->nextPageUrl() }}" class="pengiriman-page-btn" rel="next">&gt;</a>
+                    @else
+                        <span class="pengiriman-page-btn disabled" aria-disabled="true">&gt;</span>
+                    @endif
                 </div>
-                <div>
-                    {{ $distributions->links() }}
-                </div>
-            </div>
-        @endif
+            @endif
+        </div>
     </div>
 </div>
 

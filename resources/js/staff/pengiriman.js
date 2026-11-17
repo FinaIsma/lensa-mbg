@@ -131,6 +131,11 @@ window.onBatchChange = function (selectEl) {
         sisaEl.textContent = `${formatNumber(data.sisa_porsi)} Porsi`;
         sisaEl.style.color = data.sisa_porsi > 0 ? '#10B981' : '#EF4444';
 
+        const consumeEl = document.getElementById('sum_consume_by');
+        if (consumeEl) {
+            consumeEl.textContent = data.consume_by || 'Maks. 4 Jam';
+        }
+
         if (portionInput) {
             portionInput.max = data.sisa_porsi;
             if (data.sisa_porsi <= 0) {
@@ -294,8 +299,8 @@ window.openDrawerDetail = function (id) {
         
         const badgeEl = document.getElementById('drawer_status_badge');
         if (badgeEl) {
-            badgeEl.textContent = d.status_label || '-';
-            badgeEl.className = `status-chip ${d.status_badge_class || 'badge-planned'}`;
+            badgeEl.innerHTML = `<span class="status-dot"></span><span>${d.status_label || '-'}</span>`;
+            badgeEl.className = `badge-status ${d.status_badge_class || 'badge-planned'}`;
         }
 
         // Timeline Step: 1=planned, 2=sent, 3=received

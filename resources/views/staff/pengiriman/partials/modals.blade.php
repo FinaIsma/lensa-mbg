@@ -48,6 +48,10 @@
                             <span class="batch-summary-label">Sisa Siap Kirim</span>
                             <span class="batch-summary-val" id="sum_sisa_porsi" style="color: #10B981;">-</span>
                         </div>
+                        <div class="batch-summary-item" style="background: #FEF2F2; border-radius: 6px; padding: 4px 6px;">
+                            <span class="batch-summary-label" style="color: #991B1B;">Batas Maks. Dimakan</span>
+                            <span class="batch-summary-val" id="sum_consume_by" style="color: #DC2626; font-weight: 700;">-</span>
+                        </div>
                     </div>
                 </div>
 
@@ -375,7 +379,10 @@
                 <span class="text-xs text-slate-500" id="drawer_shipment_id">#KRM-0000</span>
             </div>
             <div class="flex items-center gap-3">
-                <span id="drawer_status_badge" class="status-chip badge-planned">Direncanakan</span>
+                <span id="drawer_status_badge" class="badge-status badge-planned">
+                    <span class="status-dot"></span>
+                    <span id="drawer_status_text">Direncanakan</span>
+                </span>
                 <button type="button" class="pengiriman-drawer-close" onclick="closeDrawerDetail()" aria-label="Tutup drawer">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>

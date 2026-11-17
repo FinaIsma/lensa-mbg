@@ -2,6 +2,12 @@
    Modul Data Tujuan Distribusi - Staff SPPG Styles
    ========================================================================== */
 
+.tujuan-container,
+.tujuan-modal-dialog,
+.tujuan-drawer-dialog {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 .tujuan-container {
     display: flex;
     flex-direction: column;
@@ -235,22 +241,21 @@
 }
 
 .tujuan-table th {
-    background-color: #F8FAFC;
-    color: #64748B;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 14px 20px;
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #071E49;
+    background: #FFFFFF;
     border-bottom: 1px solid #E2E8F0;
     white-space: nowrap;
 }
 
 .tujuan-table td {
-    padding: 16px 20px;
+    padding: 18px 20px;
     border-bottom: 1px solid #F1F5F9;
-    color: #334155;
+    color: #1E293B;
     vertical-align: middle;
+    font-size: 13.5px;
 }
 
 .tujuan-table tbody tr {
@@ -286,34 +291,80 @@
     color: #94A3B8;
 }
 
-/* Badges for Tipe */
+.tujuan-alamat-text {
+    font-size: 13.5px;
+    color: #475569;
+}
+
+.tujuan-target-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: #071E49;
+}
+
+.tujuan-target-unit {
+    font-size: 12px;
+    color: #64748B;
+    margin-left: 2px;
+}
+
+/* Badges for Tipe - Matching rounded pill with dot */
 .badge-tipe {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
+    gap: 7px;
+    padding: 4px 12px;
     border-radius: 9999px;
     font-size: 12px;
     font-weight: 600;
+    line-height: 1.2;
     white-space: nowrap;
+    border: none;
+}
+
+.badge-tipe .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.badge-tipe:not(:has(.status-dot))::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: currentColor;
+    display: inline-block;
+    flex-shrink: 0;
 }
 
 .badge-tipe-sekolah {
     background-color: #EFF6FF;
     color: #1D4ED8;
-    border: 1px solid #BFDBFE;
+}
+
+.badge-tipe-sekolah .status-dot {
+    background-color: #2563EB;
 }
 
 .badge-tipe-posyandu {
-    background-color: #ECFDF5;
-    color: #047857;
-    border: 1px solid #A7F3D0;
+    background-color: #DCFCE7;
+    color: #15803D;
+}
+
+.badge-tipe-posyandu .status-dot {
+    background-color: #16A34A;
 }
 
 .badge-tipe-lainnya {
     background-color: #F3E8FF;
     color: #7E22CE;
-    border: 1px solid #E9D5FF;
+}
+
+.badge-tipe-lainnya .status-dot {
+    background-color: #9333EA;
 }
 
 .badge-count {
@@ -328,7 +379,89 @@
     font-weight: 600;
 }
 
-/* Action Buttons */
+/* Action Buttons - Matching Master Mitra & Master Bahan */
+.tujuan-actions-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-tujuan-detail {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    border: 1.5px solid #CBD5E1 !important;
+    background: #FFFFFF !important;
+    color: #071E49 !important;
+    border-radius: 8px !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.btn-tujuan-detail:hover {
+    background: #EFF6FF !important;
+    border-color: #3B82F6 !important;
+    color: #2563EB !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.12);
+}
+
+.btn-tujuan-edit {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    border: 1.5px solid #16A34A !important;
+    background: #FFFFFF !important;
+    color: #16A34A !important;
+    border-radius: 8px !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.btn-tujuan-edit:hover {
+    background: #DCFCE7 !important;
+    border-color: #15803D !important;
+    color: #15803D !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(22, 163, 74, 0.12);
+}
+
+.btn-tujuan-delete {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    border: 1.5px solid #FECACA !important;
+    background: #FFFFFF !important;
+    color: #DC2626 !important;
+    border-radius: 8px !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.btn-tujuan-delete:hover {
+    background: #FEF2F2 !important;
+    border-color: #DC2626 !important;
+    color: #B91C1C !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.12);
+}
+
 .tujuan-actions-cell {
     display: flex;
     align-items: center;
@@ -406,7 +539,68 @@
     margin: 0 0 18px 0;
 }
 
-/* Pagination Wrapper */
+/* Footer & Pagination - Matching Master Mitra & Master Bahan */
+.tujuan-footer {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid #F1F5F9;
+    flex-wrap: wrap;
+}
+
+.tujuan-footer-text {
+    font-size: 13px;
+    color: #64748B;
+    margin: 0;
+}
+
+.tujuan-pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tujuan-page-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.tujuan-page-btn:hover:not(.disabled) {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+    color: #071E49;
+}
+
+.tujuan-page-btn.active {
+    background: #071E49;
+    border-color: #071E49;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.tujuan-page-btn.disabled {
+    color: #CBD5E1;
+    border-color: #F1F5F9;
+    background: #F8FAFC;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Pagination Wrapper (fallback) */
 .tujuan-pagination-wrapper {
     padding: 16px 24px;
     border-top: 1px solid #F1F5F9;
@@ -624,6 +818,74 @@
     border-bottom: none;
 }
 
+/* Status Badges in Drawer Riwayat */
+.drawer-history-table .badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    border: none;
+}
+
+.drawer-history-table .badge-status .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.drawer-history-table .badge-status:not(:has(.status-dot))::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.drawer-history-table .badge-planned {
+    background-color: #FEF3C7;
+    color: #B45309;
+}
+
+.drawer-history-table .badge-planned .status-dot {
+    background-color: #D97706;
+}
+
+.drawer-history-table .badge-sent {
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+}
+
+.drawer-history-table .badge-sent .status-dot {
+    background-color: #2563EB;
+}
+
+.drawer-history-table .badge-received {
+    background-color: #DCFCE7;
+    color: #15803D;
+}
+
+.drawer-history-table .badge-received .status-dot {
+    background-color: #16A34A;
+}
+
+.drawer-history-table .badge-cancelled {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+}
+
+.drawer-history-table .badge-cancelled .status-dot {
+    background-color: #EF4444;
+}
+
 /* ==========================================================================
    MODAL POPUP (TAMBAH & UBAH TUJUAN)
    ========================================================================== */
@@ -820,4 +1082,3 @@
         grid-template-columns: 1fr;
     }
 }
-
