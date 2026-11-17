@@ -225,6 +225,7 @@
         opacity: 0;
         transform: translateY(-6px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -314,6 +315,7 @@
         transform: scale(0.92);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -429,5 +431,3 @@
 .logout-btn-confirm:active {
     transform: scale(0.98);
 }
-
-

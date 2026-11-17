@@ -12,7 +12,7 @@
     {{-- Title & Subtitle --}}
     <div class="page-title-section">
         <h1 class="page-title">
-            Selamat datang {{ Auth::user()->nama ?? 'Admin' }} di Dashboard & Analytics
+            Selamat datang di Dashboard & Analytics
         </h1>
         <p class="page-subtitle">
             Ringkasan data dan aktivitas sistem Lensa MBG secara real-time.
@@ -226,6 +226,11 @@
                                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-[#DCFCE7] text-[#16A34A]">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
                                                     Aktif
+                                                </span>
+                                            @elseif(strtolower($item['status_operasional']) === 'belum aktif')
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-[#FEF3C7] text-[#D97706]">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-[#D97706]"></span>
+                                                    Belum Aktif
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-[#FEE2E2] text-[#DC2626]">

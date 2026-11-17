@@ -32,7 +32,11 @@ class DashboardController extends Controller
             }
         })->count();
         $dbActiveSppg = Sppg::where('status', 'aktif')->count();
-        $dbInactiveSppg = Sppg::where('status', 'nonaktif')->count();
+        $dbInactiveSppg = Sppg::where('status', 'nonaktif')
+            ->when($hasStatusVerifikasi, function ($q) {
+                $q->whereNotIn('status_verifikasi', ['menunggu_verifikasi', 'perubahan']);
+            })
+            ->count();
 
         $stats = [
             'total_sppg' => $dbTotalSppg > 0 ? $dbTotalSppg : 128,
@@ -103,6 +107,15 @@ class DashboardController extends Controller
             $sppgPreview = $realSppgs->map(function ($sppg) {
                 $isVerified = ($sppg->status_verifikasi ?? '') === 'terverifikasi'
                     || ($sppg->status !== 'menunggu_verifikasi' && empty($sppg->status_verifikasi));
+                $isPending = in_array($sppg->status_verifikasi, ['menunggu_verifikasi', 'perubahan'], true)
+                    || $sppg->status === 'menunggu_verifikasi';
+
+                $statusOperasional = 'Nonaktif';
+                if ($sppg->status === 'aktif') {
+                    $statusOperasional = 'Aktif';
+                } elseif ($isPending) {
+                    $statusOperasional = 'Belum Aktif';
+                }
 
                 return [
                     'sppg' => $sppg->nama_sppg ?? 'SPPG Wilayah',
@@ -110,7 +123,7 @@ class DashboardController extends Controller
                     'staff_sppg' => $sppg->staff->nama ?? ($sppg->staffs->first()->nama ?? '-'),
                     'is_verified' => $isVerified,
                     'status_verifikasi' => $isVerified ? 'Terverifikasi' : 'Belum Diverifikasi',
-                    'status_operasional' => $sppg->status === 'aktif' ? 'Aktif' : 'Nonaktif',
+                    'status_operasional' => $statusOperasional,
                 ];
             });
         } else {
