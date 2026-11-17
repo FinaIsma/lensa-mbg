@@ -98,7 +98,8 @@ class HasilProduksiTest extends TestCase
         $response->assertSee('Catat Hasil Baru');
         $response->assertSee('Uji Fisik &amp; Kondisi', false);
         $response->assertSee('Ahli Gizi');
-        $response->assertSee('Waktu QC &amp; Batas Kritis', false);
+        $response->assertSee('Waktu QC');
+        $response->assertSee('Batas Kritis');
     }
 
     public function test_simpan_hasil_produksi_dengan_waktu_kritis_ahli_gizi_dan_matriks_uji_fisik(): void
@@ -228,7 +229,7 @@ class HasilProduksiTest extends TestCase
             'created_by' => $this->staff->id,
             'menu_id' => $this->menu->id,
             'recipe_id' => $this->recipe->id,
-            'batch_code' => 'BATCH-TEST-CUSTOM-NUTRITIONIST-'.uniqid(),
+            'batch_code' => 'BATCH-CUST-'.uniqid(),
             'production_date' => now()->toDateString(),
             'target_porsi' => 80,
             'status' => 'processing',

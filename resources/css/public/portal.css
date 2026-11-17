@@ -67,3 +67,45 @@ body {
     animation: floatGentle 3.5s ease-in-out infinite;
 }
 
+/* Animasi Maskot Playful & Hidup */
+@keyframes mascotFloat {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg) scale(1);
+    }
+    25% {
+        transform: translateY(-8px) rotate(-1.2deg) scale(1.02);
+    }
+    50% {
+        transform: translateY(-14px) rotate(0deg) scale(1.03);
+    }
+    75% {
+        transform: translateY(-6px) rotate(1.2deg) scale(1.01);
+    }
+}
+
+@keyframes mascotShadowPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+    50% {
+        transform: scale(0.75);
+        opacity: 0.12;
+    }
+}
+
+.animate-mascot-float {
+    animation: mascotFloat 4s ease-in-out infinite;
+    will-change: transform;
+}
+
+.animate-mascot-shadow {
+    animation: mascotShadowPulse 4s ease-in-out infinite;
+    will-change: transform, opacity;
+}
+
+/* Transisi Akordion Membuka ke Bawah */
+.tahap-accordion-content {
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease, padding 0.3s ease;
+}
+
