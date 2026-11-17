@@ -22,12 +22,13 @@ class AdminDashboardTest extends TestCase
     {
         parent::setUp();
 
-        $this->adminUser = User::where('email', 'admin1@gmail.com')->first()
+        $this->adminUser = User::where('email', env('ADMIN_DEFAULT_EMAIL', 'admin@lensambg.com'))->first()
+            ?: User::where('email', 'admin1@gmail.com')->first()
             ?: User::where('role', 'admin')->first()
             ?: new User([
                 'id_user' => 1,
-                'nama' => 'Nanda',
-                'email' => 'admin1@gmail.com',
+                'nama' => 'Admin Sistem',
+                'email' => 'admin@lensambg.com',
                 'role' => 'admin',
                 'status' => 'aktif',
             ]);

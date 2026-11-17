@@ -74,7 +74,7 @@ test.describe('Audit Trail - Integration & E2E Testing (JavaScript)', () => {
   });
 
   test('1.4 Akun Admin Sistem dapat membuka Audit Trail Seluruh SPPG', async ({ page }) => {
-    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin1@gmail.com';
+    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin@lensambg.com';
     const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'password123';
 
     await loginAs(page, 'admin', adminEmail, adminPassword);
@@ -93,7 +93,7 @@ test.describe('Audit Trail - Integration & E2E Testing (JavaScript)', () => {
   // ===========================================================================
 
   test('2.1 Filter riwayat audit berdasarkan modul (misal: Modul Menu)', async ({ page }) => {
-    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin1@gmail.com';
+    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin@lensambg.com';
     const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'password123';
 
     await loginAs(page, 'admin', adminEmail, adminPassword);
@@ -118,7 +118,7 @@ test.describe('Audit Trail - Integration & E2E Testing (JavaScript)', () => {
   });
 
   test('2.2 Filter tanggal menggunakan popover datepicker', async ({ page }) => {
-    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin1@gmail.com';
+    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin@lensambg.com';
     const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'password123';
 
     await loginAs(page, 'admin', adminEmail, adminPassword);
@@ -142,7 +142,7 @@ test.describe('Audit Trail - Integration & E2E Testing (JavaScript)', () => {
   });
 
   test('2.3 Pencarian log aktivitas berdasarkan kata kunci', async ({ page }) => {
-    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin1@gmail.com';
+    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin@lensambg.com';
     const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'password123';
 
     await loginAs(page, 'admin', adminEmail, adminPassword);
@@ -160,7 +160,7 @@ test.describe('Audit Trail - Integration & E2E Testing (JavaScript)', () => {
   });
 
   test('2.4 Berpindah halaman (pagination) dengan mempertahankan query filter aktif', async ({ page }) => {
-    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin1@gmail.com';
+    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin@lensambg.com';
     const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'password123';
 
     await loginAs(page, 'admin', adminEmail, adminPassword);
@@ -186,7 +186,7 @@ test.describe('Audit Trail - Integration & E2E Testing (JavaScript)', () => {
   // ===========================================================================
 
   test('3.1 Membuka dan menutup panel drawer detail mutasi data', async ({ page }) => {
-    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin1@gmail.com';
+    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin@lensambg.com';
     const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'password123';
 
     await loginAs(page, 'admin', adminEmail, adminPassword);
@@ -225,7 +225,7 @@ test.describe('Audit Trail - Integration & E2E Testing (JavaScript)', () => {
   // ===========================================================================
 
   test('4.1 Mengunduh riwayat audit trail ke format CSV melalui browser', async ({ page }) => {
-    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin1@gmail.com';
+    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin@lensambg.com';
     const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'password123';
 
     await loginAs(page, 'admin', adminEmail, adminPassword);
@@ -251,7 +251,7 @@ test.describe('Audit Trail - Integration & E2E Testing (JavaScript)', () => {
   });
 
   test('4.2 Membuka laporan resmi audit trail untuk dicetak / PDF di tab baru', async ({ page }) => {
-    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin1@gmail.com';
+    const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin@lensambg.com';
     const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'password123';
 
     await loginAs(page, 'admin', adminEmail, adminPassword);
