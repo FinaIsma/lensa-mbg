@@ -642,6 +642,11 @@
 
 @push('scripts')
 <script>
+    function formatBatchQty(val) {
+        const num = parseFloat(val) || 0;
+        return Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(3)).toString();
+    }
+
     let currentBlocks = [];
     let editCurrentBlocks = [];
     let editBatchData = null;
@@ -899,7 +904,7 @@
                                                        min="0"
                                                        max="${lot.current_qty}"
                                                        step="0.001"
-                                                       placeholder="0.000"
+                                                       placeholder="0"
                                                        ${isExpired ? 'disabled' : ''}
                                                        oninput="onModalQtyInput(this, ${block.material_id}, ${lot.current_qty})"
                                                        style="width: 100%; height: 32px; font-size: 12.5px; font-weight: 600; padding: 0 8px; border-radius: 6px; border: 1px solid #CBD5E1;">
@@ -925,9 +930,9 @@
                         </div>
                     </div>
                     <div class="material-pills-group">
-                        <span class="pill-info" style="font-size: 11.5px; padding: 3px 8px;">Kebutuhan: <strong>${block.kebutuhan} ${block.satuan}</strong></span>
-                        <span class="pill-info" id="mselected_${block.material_id}" style="font-size: 11.5px; padding: 3px 8px;">Terpilih: <strong>0.000 ${block.satuan}</strong></span>
-                        <span class="pill-kurang" id="mstatusPill_${block.material_id}" style="font-size: 11.5px; padding: 3px 10px;">Kurang ${block.kebutuhan} ${block.satuan}</span>
+                        <span class="pill-info" style="font-size: 11.5px; padding: 3px 8px;">Kebutuhan: <strong>${formatBatchQty(block.kebutuhan)} ${block.satuan}</strong></span>
+                        <span class="pill-info" id="mselected_${block.material_id}" style="font-size: 11.5px; padding: 3px 8px;">Terpilih: <strong>0 ${block.satuan}</strong></span>
+                        <span class="pill-kurang" id="mstatusPill_${block.material_id}" style="font-size: 11.5px; padding: 3px 10px;">Kurang ${formatBatchQty(block.kebutuhan)} ${block.satuan}</span>
                         ${block.lots && block.lots.length > 0 ? `
                             <button type="button" class="btn-fefo" onclick="autoFillModalFefo(${block.material_id})" style="font-size: 11.5px; padding: 4px 10px;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
@@ -974,7 +979,7 @@
         const pillSelected = document.getElementById(`mselected_${materialId}`);
         const pillStatus = document.getElementById(`mstatusPill_${materialId}`);
 
-        if (pillSelected) pillSelected.innerHTML = `Terpilih: <strong>${totalUsed.toFixed(3)} ${block.satuan}</strong>`;
+        if (pillSelected) pillSelected.innerHTML = `Terpilih: <strong>${formatBatchQty(totalUsed)} ${block.satuan}</strong>`;
 
         const diff = Math.round((block.kebutuhan - totalUsed) * 1000) / 1000;
         if (pillStatus) {
@@ -983,7 +988,7 @@
                 pillStatus.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Terpenuhi</span>`;
             } else {
                 pillStatus.className = 'pill-kurang';
-                pillStatus.innerHTML = `Kurang ${diff.toFixed(3)} ${block.satuan}`;
+                pillStatus.innerHTML = `Kurang ${formatBatchQty(diff)} ${block.satuan}`;
             }
         }
     }
@@ -1002,10 +1007,10 @@
             if (needed <= 0) {
                 input.value = '';
             } else if (max <= needed) {
-                input.value = max.toFixed(3);
+                input.value = formatBatchQty(max);
                 needed = Math.round((needed - max) * 1000) / 1000;
             } else {
-                input.value = needed.toFixed(3);
+                input.value = formatBatchQty(needed);
                 needed = 0;
             }
             input.dispatchEvent(new Event('input'));
@@ -1244,7 +1249,7 @@
                                                        min="0"
                                                        max="${lot.current_qty}"
                                                        step="0.001"
-                                                       placeholder="0.000"
+                                                       placeholder="0"
                                                        ${isExpired ? 'disabled' : ''}
                                                        oninput="onEditQtyInput(this, ${block.material_id}, ${lot.current_qty})"
                                                        style="width: 100%; height: 32px; font-size: 12.5px; font-weight: 600; padding: 0 8px; border-radius: 6px; border: 1px solid #CBD5E1;">
@@ -1270,9 +1275,9 @@
                         </div>
                     </div>
                     <div class="material-pills-group">
-                        <span class="pill-info" style="font-size: 11.5px; padding: 3px 8px;">Kebutuhan: <strong>${block.kebutuhan} ${block.satuan}</strong></span>
-                        <span class="pill-info" id="edit_mselected_${block.material_id}" style="font-size: 11.5px; padding: 3px 8px;">Terpilih: <strong>0.000 ${block.satuan}</strong></span>
-                        <span class="pill-kurang" id="edit_mstatusPill_${block.material_id}" style="font-size: 11.5px; padding: 3px 10px;">Kurang ${block.kebutuhan} ${block.satuan}</span>
+                        <span class="pill-info" style="font-size: 11.5px; padding: 3px 8px;">Kebutuhan: <strong>${formatBatchQty(block.kebutuhan)} ${block.satuan}</strong></span>
+                        <span class="pill-info" id="edit_mselected_${block.material_id}" style="font-size: 11.5px; padding: 3px 8px;">Terpilih: <strong>0 ${block.satuan}</strong></span>
+                        <span class="pill-kurang" id="edit_mstatusPill_${block.material_id}" style="font-size: 11.5px; padding: 3px 10px;">Kurang ${formatBatchQty(block.kebutuhan)} ${block.satuan}</span>
                         ${block.lots && block.lots.length > 0 ? `
                             <button type="button" class="btn-fefo" onclick="autoFillEditFefo(${block.material_id})" style="font-size: 11.5px; padding: 4px 10px;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
@@ -1320,7 +1325,7 @@
         const pillSelected = document.getElementById(`edit_mselected_${materialId}`);
         const pillStatus = document.getElementById(`edit_mstatusPill_${materialId}`);
 
-        if (pillSelected) pillSelected.innerHTML = `Terpilih: <strong>${totalUsed.toFixed(3)} ${block.satuan}</strong>`;
+        if (pillSelected) pillSelected.innerHTML = `Terpilih: <strong>${formatBatchQty(totalUsed)} ${block.satuan}</strong>`;
 
         const diff = Math.round((block.kebutuhan - totalUsed) * 1000) / 1000;
         if (pillStatus) {
@@ -1329,7 +1334,7 @@
                 pillStatus.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Terpenuhi</span>`;
             } else {
                 pillStatus.className = 'pill-kurang';
-                pillStatus.innerHTML = `Kurang ${diff.toFixed(3)} ${block.satuan}`;
+                pillStatus.innerHTML = `Kurang ${formatBatchQty(diff)} ${block.satuan}`;
             }
         }
     }
@@ -1348,10 +1353,10 @@
             if (needed <= 0) {
                 input.value = '';
             } else if (max <= needed) {
-                input.value = max.toFixed(3);
+                input.value = formatBatchQty(max);
                 needed = Math.round((needed - max) * 1000) / 1000;
             } else {
-                input.value = needed.toFixed(3);
+                input.value = formatBatchQty(needed);
                 needed = 0;
             }
             input.dispatchEvent(new Event('input'));
@@ -1511,7 +1516,7 @@
                                                min="0"
                                                max="${lot.current_qty}"
                                                step="0.001"
-                                               placeholder="0.000"
+                                               placeholder="0"
                                                style="width: 100%; height: 32px; font-size: 12.5px; font-weight: 600; padding: 0 8px; border-radius: 6px; border: 1px solid #CBD5E1;">
                                         <input type="hidden" name="usages[${lot.id}][material_lot_id]" value="${lot.id}">
                                     </td>

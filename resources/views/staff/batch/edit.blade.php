@@ -180,6 +180,11 @@
 
 @push('scripts')
 <script>
+    function formatBatchQty(val) {
+        const num = parseFloat(val) || 0;
+        return Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(3)).toString();
+    }
+
     const existingUsages = @json($batch->materialUsages->mapWithKeys(fn ($u) => [$u->material_lot_id => (float) $u->qty_used]));
     const menuId = {{ $batch->menu_id }};
     const ukuranPorsi = '{{ $batch->recipe?->ukuran_porsi ?? "besar" }}';
@@ -261,7 +266,7 @@
                                                        max="${lot.current_qty}"
                                                        step="0.001"
                                                        value="${prefilledVal}"
-                                                       placeholder="0.000"
+                                                       placeholder="0"
                                                        oninput="onQtyInput(this, ${block.material_id}, ${lot.current_qty})"
                                                        style="width: 100%; height: 36px; font-size: 13px; font-weight: 600; padding: 0 8px; border-radius: 6px; border: 1px solid #CBD5E1;">
                                                 <input type="hidden" name="usages[${lot.id}][material_lot_id]" value="${lot.id}">
@@ -286,9 +291,9 @@
                         </div>
                     </div>
                     <div class="material-pills-group">
-                        <span class="pill-info">Kebutuhan: <strong>${block.kebutuhan} ${block.satuan}</strong></span>
-                        <span class="pill-info" id="selected_${block.material_id}">Terpilih: <strong>0.000 ${block.satuan}</strong></span>
-                        <span class="pill-kurang" id="statusPill_${block.material_id}">Kurang ${block.kebutuhan} ${block.satuan}</span>
+                        <span class="pill-info">Kebutuhan: <strong>${formatBatchQty(block.kebutuhan)} ${block.satuan}</strong></span>
+                        <span class="pill-info" id="selected_${block.material_id}">Terpilih: <strong>0 ${block.satuan}</strong></span>
+                        <span class="pill-kurang" id="statusPill_${block.material_id}">Kurang ${formatBatchQty(block.kebutuhan)} ${block.satuan}</span>
                         ${block.lots && block.lots.length > 0 ? `
                             <button type="button" class="btn-fefo" onclick="autoFillFefo(${block.material_id})">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
@@ -336,7 +341,7 @@
         const pillSelected = document.getElementById(`selected_${materialId}`);
         const pillStatus = document.getElementById(`statusPill_${materialId}`);
 
-        if (pillSelected) pillSelected.innerHTML = `Terpilih: <strong>${totalUsed.toFixed(3)} ${block.satuan}</strong>`;
+        if (pillSelected) pillSelected.innerHTML = `Terpilih: <strong>${formatBatchQty(totalUsed)} ${block.satuan}</strong>`;
 
         const diff = Math.round((block.kebutuhan - totalUsed) * 1000) / 1000;
         if (pillStatus) {
@@ -345,7 +350,7 @@
                 pillStatus.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Terpenuhi</span>`;
             } else {
                 pillStatus.className = 'pill-kurang';
-                pillStatus.innerHTML = `Kurang ${diff.toFixed(3)} ${block.satuan}`;
+                pillStatus.innerHTML = `Kurang ${formatBatchQty(diff)} ${block.satuan}`;
             }
         }
     }
@@ -362,10 +367,10 @@
             if (needed <= 0) {
                 input.value = '';
             } else if (max <= needed) {
-                input.value = max.toFixed(3);
+                input.value = formatBatchQty(max);
                 needed = Math.round((needed - max) * 1000) / 1000;
             } else {
-                input.value = needed.toFixed(3);
+                input.value = formatBatchQty(needed);
                 needed = 0;
             }
             input.dispatchEvent(new Event('input'));

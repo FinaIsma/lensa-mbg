@@ -222,15 +222,65 @@ window.closeModalSent = function () {
 /* ==========================================================================
    4. MODAL TANDAI DITERIMA (SENT -> RECEIVED)
    ========================================================================== */
+window.previewReceivedImage = function (input) {
+    const previewBox = document.getElementById('recv_image_preview_box');
+    const placeholder = document.getElementById('recv_upload_placeholder');
+    const previewImg = document.getElementById('recv_preview_img');
+    const fileNameLabel = document.getElementById('recv_file_name_label');
+
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+
+        // Validasi ukuran maks 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Ukuran file maksimal adalah 5MB.');
+            input.value = '';
+            clearReceivedPreview();
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            if (previewImg) previewImg.src = e.target.result;
+            if (fileNameLabel) fileNameLabel.textContent = file.name;
+            if (placeholder) placeholder.style.display = 'none';
+            if (previewBox) previewBox.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+window.clearReceivedPreview = function () {
+    const input = document.getElementById('recv_evidence_file');
+    const previewBox = document.getElementById('recv_image_preview_box');
+    const placeholder = document.getElementById('recv_upload_placeholder');
+    const previewImg = document.getElementById('recv_preview_img');
+    const fileNameLabel = document.getElementById('recv_file_name_label');
+
+    if (input) input.value = '';
+    if (previewImg) previewImg.src = '';
+    if (fileNameLabel) fileNameLabel.textContent = '';
+    if (previewBox) previewBox.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'flex';
+};
+
 window.openModalReceived = function (id, destinationName, batchCode, portions) {
     const modal = document.getElementById('modalReceivedPengiriman');
     const form = document.getElementById('formReceivedPengiriman');
     if (!modal || !form) return;
 
+    form.reset();
+    clearReceivedPreview();
     form.action = `/staff/pengiriman/${id}/terima`;
-    document.getElementById('recv_dest_label').textContent = destinationName;
-    document.getElementById('recv_batch_label').textContent = batchCode;
-    document.getElementById('recv_portions_label').textContent = `${formatNumber(portions)} Porsi`;
+
+    const destLabel = document.getElementById('recv_dest_label');
+    if (destLabel) destLabel.textContent = destinationName || '-';
+
+    const batchLabel = document.getElementById('recv_batch_label');
+    if (batchLabel) batchLabel.textContent = batchCode || '-';
+
+    const portionsLabel = document.getElementById('recv_portions_label');
+    if (portionsLabel) portionsLabel.textContent = `${formatNumber(portions)} Porsi`;
 
     modal.classList.add('show');
 };
@@ -238,6 +288,7 @@ window.openModalReceived = function (id, destinationName, batchCode, portions) {
 window.closeModalReceived = function () {
     const modal = document.getElementById('modalReceivedPengiriman');
     if (modal) modal.classList.remove('show');
+    clearReceivedPreview();
 };
 
 /* ==========================================================================

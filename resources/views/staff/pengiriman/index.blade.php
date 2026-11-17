@@ -189,7 +189,7 @@
                         <th style="min-width: 150px;">Status</th>
                         <th style="min-width: 150px;">Waktu berangkat</th>
                         <th style="min-width: 120px;">Petugas</th>
-                        <th style="min-width: 160px; text-align: right;">Aksi</th>
+                        <th style="min-width: 170px; text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -258,8 +258,8 @@
                             </td>
 
                             {{-- Aksi --}}
-                            <td>
-                                <div class="pengiriman-actions-cell justify-end">
+                            <td style="text-align: center;">
+                                <div class="pengiriman-actions-cell" style="justify-content: center;">
                                     {{-- Tombol Detail (Buka Slide-over Drawer) --}}
                                     <button type="button" class="btn-act btn-act-detail" onclick="openDrawerDetail({{ $dist->id }})" title="Lihat detail lengkap">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

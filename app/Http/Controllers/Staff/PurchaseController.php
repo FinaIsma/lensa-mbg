@@ -25,7 +25,6 @@ class PurchaseController extends Controller
     public function index(Request $request): View
     {
         $idSppg = $this->resolveSppgId();
-        $this->ensureSampleSuppliersAndMaterials($idSppg);
 
         $q = trim((string) $request->input('q', ''));
         $status = trim((string) $request->input('status', ''));
@@ -464,59 +463,5 @@ class PurchaseController extends Controller
         return (int) $idSppg;
     }
 
-    /**
-     * Pastikan data pemasok dan bahan sample tersedia jika masih kosong.
-     */
-    private function ensureSampleSuppliersAndMaterials(int $idSppg): void
-    {
-        // Pembersihan otomatis jika ada duplikasi record dari double-submit sebelumnya
-        $duplicateNoList = Purchase::where('id_sppg', $idSppg)
-            ->select('purchase_no', DB::raw('COUNT(*) as total'))
-            ->groupBy('purchase_no')
-            ->havingRaw('COUNT(*) > 1')
-            ->pluck('purchase_no');
 
-        if ($duplicateNoList->isNotEmpty()) {
-            foreach ($duplicateNoList as $pNo) {
-                $keepId = Purchase::where('id_sppg', $idSppg)->where('purchase_no', $pNo)->min('id');
-                $removeIds = Purchase::where('id_sppg', $idSppg)->where('purchase_no', $pNo)->where('id', '!=', $keepId)->pluck('id');
-                PurchaseItem::whereIn('purchase_id', $removeIds)->delete();
-                Purchase::whereIn('id', $removeIds)->delete();
-            }
-        }
-
-        if (Supplier::where('id_sppg', $idSppg)->count() === 0) {
-            Supplier::create([
-                'id_sppg' => $idSppg,
-                'nama' => 'Toko Berkah Sayur',
-                'kontak' => '081234567890',
-                'alamat' => 'Jl. Pasar Induk No. 26',
-                'status' => 'active',
-            ]);
-
-            Supplier::create([
-                'id_sppg' => $idSppg,
-                'nama' => 'UD Pangan Makmur',
-                'kontak' => '089876543210',
-                'alamat' => 'Komplek Pergudangan Cikupa Blok B3',
-                'status' => 'active',
-            ]);
-        }
-
-        $sampleMaterials = [
-            ['kode' => 'AYM-BRL', 'nama' => 'Daging Ayam Broiler', 'satuan' => 'kg', 'kategori' => 'Lauk Hewani'],
-            ['kode' => 'BRS-RMS', 'nama' => 'Beras Ramos', 'satuan' => 'kg', 'kategori' => 'Bahan Pokok'],
-            ['kode' => 'TLR-AYM', 'nama' => 'Telur Ayam Negeri', 'satuan' => 'kg', 'kategori' => 'Lauk Hewani'],
-            ['kode' => 'BYM-HJU', 'nama' => 'Bayam Segar Hijau', 'satuan' => 'kg', 'kategori' => 'Sayuran'],
-            ['kode' => 'WRT-LKL', 'nama' => 'Wortel Lokal', 'satuan' => 'kg', 'kategori' => 'Sayuran'],
-            ['kode' => 'MNY-GRG', 'nama' => 'Minyak Goreng Sawit', 'satuan' => 'liter', 'kategori' => 'Bumbu & Minyak'],
-        ];
-
-        foreach ($sampleMaterials as $m) {
-            Material::firstOrCreate(
-                ['id_sppg' => $idSppg, 'kode' => $m['kode']],
-                ['nama' => $m['nama'], 'satuan' => $m['satuan'], 'kategori' => $m['kategori'], 'min_stock' => 10, 'is_active' => true]
-            );
-        }
-    }
 }

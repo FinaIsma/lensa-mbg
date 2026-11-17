@@ -26,7 +26,6 @@ class MenuResepController extends Controller
     public function index(): View
     {
         $idSppg = $this->resolveSppgId();
-        $this->ensureSampleData($idSppg);
 
         $totalMenuActive = Menu::where('id_sppg', $idSppg)->where('is_active', true)->count();
         $totalMenuInactive = Menu::where('id_sppg', $idSppg)->where('is_active', false)->count();
@@ -69,7 +68,6 @@ class MenuResepController extends Controller
     public function recipes(Request $request): View
     {
         $idSppg = $this->resolveSppgId();
-        $this->ensureSampleData($idSppg);
 
         $query = Recipe::with(['menu', 'items.material', 'nutritions.nutritionType'])
             ->whereHas('menu', fn ($q) => $q->where('id_sppg', $idSppg));
@@ -463,7 +461,6 @@ class MenuResepController extends Controller
     public function menus(Request $request): View
     {
         $idSppg = $this->resolveSppgId();
-        $this->ensureSampleData($idSppg);
 
         $query = Menu::where('id_sppg', $idSppg);
 
@@ -616,121 +613,5 @@ class MenuResepController extends Controller
         return (int) $idSppg;
     }
 
-    /**
-     * Menjamin data sample sesuai gambar tersedia jika belum ada data di database
-     */
-    private function ensureSampleData(int $idSppg): void
-    {
-        $materialsData = [
-            ['kode' => 'BRS', 'nama' => 'Beras putih', 'satuan' => 'kg', 'kategori' => 'Bahan Pokok'],
-            ['kode' => 'TMP', 'nama' => 'Tempe', 'satuan' => 'kg', 'kategori' => 'Lauk Nabati'],
-            ['kode' => 'BYM', 'nama' => 'Sayur Bayam', 'satuan' => 'kg', 'kategori' => 'Sayuran'],
-            ['kode' => 'AYM', 'nama' => 'Daging Ayam', 'satuan' => 'kg', 'kategori' => 'Lauk Hewani'],
-            ['kode' => 'MNY', 'nama' => 'Minyak Goreng', 'satuan' => 'liter', 'kategori' => 'Bumbu & Minyak'],
-        ];
 
-        $matMap = [];
-        foreach ($materialsData as $m) {
-            $row = Material::firstOrCreate(
-                ['id_sppg' => $idSppg, 'kode' => $m['kode']],
-                ['nama' => $m['nama'], 'satuan' => $m['satuan'], 'kategori' => $m['kategori'], 'min_stock' => 5, 'is_active' => true]
-            );
-            $matMap[$m['kode']] = $row->id;
-        }
-
-        if (Menu::where('id_sppg', $idSppg)->count() === 0) {
-            $m1 = Menu::create([
-                'id_sppg' => $idSppg,
-                'nama' => 'Nasi Tempe Orek Sayur Bayam',
-                'kategori' => 'makanan_siap_santap',
-                'deskripsi' => 'Nasi putih, tempe orek manis gurih, sayur bayam bening',
-                'is_active' => true,
-            ]);
-
-            $m2 = Menu::create([
-                'id_sppg' => $idSppg,
-                'nama' => 'Nasi Ayam Goreng Bayam',
-                'kategori' => 'makanan_siap_santap',
-                'deskripsi' => 'Nasi putih, ayam goreng, sayur bayam bening',
-                'is_active' => true,
-            ]);
-
-            $sampleList = [
-                ['nama' => 'Nasi Ayam Goreng Sayur Bayam', 'kategori' => 'makanan_siap_santap', 'deskripsi' => 'Nasi putih, ayam goreng, sayur bayam bening'],
-                ['nama' => 'Paket Bento Ayam Teriyaki', 'kategori' => 'paket_siap_konsumsi', 'deskripsi' => 'Nasi putih, ayam fillet teriyaki, tumis brokoli wortel'],
-                ['nama' => 'Nasi Daging Sapi Lada Hitam', 'kategori' => 'makanan_siap_santap', 'deskripsi' => 'Nasi putih, daging sapi lada hitam, sayur capcay'],
-                ['nama' => 'Paket Sayur Sop Komplit Siap Olah', 'kategori' => 'pangan_siap_olah', 'deskripsi' => 'Potongan wortel, kubis, kentang, buncis, dan bumbu kaldu sop'],
-                ['nama' => 'Nasi Ikan Gurame Bakar Madu', 'kategori' => 'makanan_siap_santap', 'deskripsi' => 'Nasi putih, ikan gurame bakar madu, lalapan dan sambal manis'],
-                ['nama' => 'Paket Sayur Asem & Tahu Tempe', 'kategori' => 'pangan_siap_olah', 'deskripsi' => 'Bahan sayur asem mentah, labu siam, jagung, kacang panjang, bumbu siap masak'],
-                ['nama' => 'Nasi Opor Ayam Telur Rebus', 'kategori' => 'makanan_siap_santap', 'deskripsi' => 'Nasi putih, opor ayam kuah santan gurih, telur rebus, kerupuk'],
-            ];
-
-            foreach ($sampleList as $s) {
-                Menu::firstOrCreate(
-                    ['id_sppg' => $idSppg, 'nama' => $s['nama']],
-                    ['kategori' => $s['kategori'], 'deskripsi' => $s['deskripsi'], 'is_active' => true]
-                );
-            }
-
-            // Resep
-            $r1 = Recipe::create([
-                'menu_id' => $m1->id,
-                'ukuran_porsi' => 'kecil',
-                'version' => 1,
-                'status' => 'active',
-            ]);
-
-            if (isset($matMap['BRS'])) {
-                RecipeItem::create(['recipe_id' => $r1->id, 'material_id' => $matMap['BRS'], 'qty_per_porsi' => 0.09, 'satuan' => 'kg']);
-            }
-            if (isset($matMap['TMP'])) {
-                RecipeItem::create(['recipe_id' => $r1->id, 'material_id' => $matMap['TMP'], 'qty_per_porsi' => 0.05, 'satuan' => 'kg']);
-            }
-            if (isset($matMap['BYM'])) {
-                RecipeItem::create(['recipe_id' => $r1->id, 'material_id' => $matMap['BYM'], 'qty_per_porsi' => 0.04, 'satuan' => 'kg']);
-            }
-
-            // Gizi awal
-            $energiType = NutritionType::where('nama', 'Energi')->first();
-            $proteinType = NutritionType::where('nama', 'Protein')->first();
-            $lemakType = NutritionType::where('nama', 'Lemak')->first();
-
-            if ($energiType) {
-                RecipeNutrition::create(['recipe_id' => $r1->id, 'nutrition_type_id' => $energiType->id, 'nilai' => 550]);
-            }
-            if ($proteinType) {
-                RecipeNutrition::create(['recipe_id' => $r1->id, 'nutrition_type_id' => $proteinType->id, 'nilai' => 22]);
-            }
-            if ($lemakType) {
-                RecipeNutrition::create(['recipe_id' => $r1->id, 'nutrition_type_id' => $lemakType->id, 'nilai' => 14]);
-            }
-
-            $r2 = Recipe::create([
-                'menu_id' => $m2->id,
-                'ukuran_porsi' => 'besar',
-                'version' => 1,
-                'status' => 'active',
-            ]);
-
-            if (isset($matMap['BRS'])) {
-                RecipeItem::create(['recipe_id' => $r2->id, 'material_id' => $matMap['BRS'], 'qty_per_porsi' => 0.12, 'satuan' => 'kg']);
-            }
-            if (isset($matMap['AYM'])) {
-                RecipeItem::create(['recipe_id' => $r2->id, 'material_id' => $matMap['AYM'], 'qty_per_porsi' => 0.10, 'satuan' => 'kg']);
-            }
-            if (isset($matMap['BYM'])) {
-                RecipeItem::create(['recipe_id' => $r2->id, 'material_id' => $matMap['BYM'], 'qty_per_porsi' => 0.05, 'satuan' => 'kg']);
-            }
-
-            if ($energiType) {
-                RecipeNutrition::create(['recipe_id' => $r2->id, 'nutrition_type_id' => $energiType->id, 'nilai' => 680]);
-            }
-            if ($proteinType) {
-                RecipeNutrition::create(['recipe_id' => $r2->id, 'nutrition_type_id' => $proteinType->id, 'nilai' => 32]);
-            }
-            if ($lemakType) {
-                RecipeNutrition::create(['recipe_id' => $r2->id, 'nutrition_type_id' => $lemakType->id, 'nilai' => 18]);
-            }
-        }
-    }
 }

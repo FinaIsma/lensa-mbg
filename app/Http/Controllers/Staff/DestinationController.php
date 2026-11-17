@@ -24,7 +24,6 @@ class DestinationController extends Controller
     public function index(Request $request): View
     {
         $idSppg = $this->resolveSppgId();
-        $this->ensureSampleDestinations($idSppg);
 
         $q = trim((string) $request->input('q', ''));
         $tipe = trim((string) $request->input('tipe', ''));
@@ -301,24 +300,5 @@ class DestinationController extends Controller
         return (int) ($idSppg ?? 1);
     }
 
-    /**
-     * Pastikan minimal ada data sampel jika tabel masih kosong.
-     */
-    protected function ensureSampleDestinations(int $idSppg): void
-    {
-        if (DistributionDestination::where('id_sppg', $idSppg)->exists()) {
-            return;
-        }
 
-        $samples = [
-            ['nama' => 'SDN 1 Sukamaju', 'tipe' => 'sekolah', 'alamat' => 'Jl. Pendidikan No. 12, Sukamaju', 'jumlah_penerima' => 320],
-            ['nama' => 'SMPN 2 Sukamaju', 'tipe' => 'sekolah', 'alamat' => 'Jl. Merdeka No. 45, Sukamaju', 'jumlah_penerima' => 280],
-            ['nama' => 'PAUD Melati', 'tipe' => 'sekolah', 'alamat' => 'Gang Melati No. 8, Sukamaju', 'jumlah_penerima' => 80],
-            ['nama' => 'Posyandu Mawar', 'tipe' => 'posyandu', 'alamat' => 'Balai RW 03, Sukamaju', 'jumlah_penerima' => 60],
-        ];
-
-        foreach ($samples as $sample) {
-            DistributionDestination::create(array_merge($sample, ['id_sppg' => $idSppg]));
-        }
-    }
 }

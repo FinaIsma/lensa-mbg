@@ -272,7 +272,7 @@
 <div class="pengiriman-modal-backdrop" id="modalReceivedPengiriman" role="dialog" aria-modal="true" aria-labelledby="modalRecvTitle">
     <div class="pengiriman-modal-dialog">
         <div class="pengiriman-modal-header">
-            <h3 class="pengiriman-modal-title" id="modalRecvTitle">Konfirmasi Penerimaan Makanan</h3>
+            <h3 class="pengiriman-modal-title" id="modalRecvTitle">Bukti Penerimaan Makanan MBG</h3>
             <button type="button" class="pengiriman-modal-close" onclick="closeModalReceived()" aria-label="Tutup modal">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -284,28 +284,86 @@
         <form action="" method="POST" enctype="multipart/form-data" id="formReceivedPengiriman">
             @csrf
             <div class="pengiriman-modal-body">
-                <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between text-xs text-emerald-900">
-                    <div>
-                        <span class="text-emerald-700">Tujuan Penerima:</span>
-                        <strong class="ml-1" id="recv_dest_label">-</strong>
+                {{-- Info Ringkasan Pengiriman (Spacious & Clean) --}}
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: #EFF6FF; color: #1D4ED8; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 21h18M3 7v14M21 7v14M6 11h12M6 15h12M9 21v-4h6v4M4 7l8-4 8 4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748B; display: block;">Tujuan Distribusi</span>
+                                <span id="recv_dest_label" style="font-size: 15px; font-weight: 700; color: #071E49;">-</span>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <span class="text-emerald-700">Jumlah:</span>
-                        <strong class="ml-1" id="recv_portions_label">-</strong>
+
+                    <div style="height: 1px; background: #E2E8F0; margin-bottom: 12px;"></div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <span style="font-size: 11.5px; color: #64748B; display: block; margin-bottom: 3px;">Kode Batch:</span>
+                            <span id="recv_batch_label" class="batch-code-badge" style="font-size: 13px; font-weight: 700;">-</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 11.5px; color: #64748B; display: block; margin-bottom: 3px;">Jumlah Porsi:</span>
+                            <span id="recv_portions_label" style="font-size: 14px; font-weight: 700; color: #16A34A;">-</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="pengiriman-form-group">
-                    <label for="recv_evidence_file" class="pengiriman-form-label">
-                        Foto Bukti Serah Terima / Tanda Tangan (Opsional)
+                    <label for="recv_nama_penerima" class="pengiriman-form-label">
+                        Nama Penerima di Lokasi MBG <span class="required text-red-500">*</span>
                     </label>
-                    <input type="file" name="evidence_file" id="recv_evidence_file" class="pengiriman-form-input" accept="image/*">
-                    <span class="pengiriman-form-help">Unggah foto saat makanan diserahkan kepada pihak sekolah/posyandu.</span>
+                    <input type="text" name="nama_penerima" id="recv_nama_penerima" class="pengiriman-form-input" placeholder="Cth: Bpk. Bambang (Kepala Sekolah) / Ibu Siti" required>
+                    <span class="pengiriman-form-help">Nama perwakilan / guru / petugas penerima makanan di lokasi tujuan.</span>
+                </div>
+
+                <div class="pengiriman-form-group">
+                    <label class="pengiriman-form-label">
+                        Foto Bukti Serah Terima / Dokumentasi (Opsional)
+                    </label>
+
+                    {{-- Hidden Real File Input --}}
+                    <input type="file" name="evidence_file" id="recv_evidence_file" accept="image/*" style="display: none;" onchange="previewReceivedImage(this)">
+
+                    {{-- Visual Upload Dropzone --}}
+                    <div id="recv_dropzone" class="pengiriman-upload-dropzone" onclick="document.getElementById('recv_evidence_file').click()">
+                        <div id="recv_upload_placeholder" class="pengiriman-upload-content">
+                            <div class="pengiriman-upload-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <div style="margin-top: 8px;">
+                                <span style="font-size: 13.5px; font-weight: 600; color: #042A70;">Pilih atau unggah foto bukti</span>
+                                <div style="font-size: 11.5px; color: #64748B; margin-top: 2px;">Format JPG, PNG, atau WEBP · Maks. 5MB</div>
+                            </div>
+                        </div>
+
+                        {{-- Preview Box saat foto dipilih --}}
+                        <div id="recv_image_preview_box" style="display: none; padding: 6px;">
+                            <img id="recv_preview_img" src="" alt="Preview Bukti Penerimaan" style="max-height: 160px; width: auto; max-width: 100%; border-radius: 8px; border: 1px solid #CBD5E1; object-fit: contain; margin: 0 auto; display: block;">
+                            <div style="margin-top: 8px; font-size: 12px; color: #475569; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <span id="recv_file_name_label" style="font-weight: 600; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+                                <button type="button" onclick="event.stopPropagation(); clearReceivedPreview();" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; color: #DC2626; background: none; border: none; font-size: 12px; font-weight: 600;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    Hapus
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="pengiriman-form-help">Foto penyerahan makanan kepada pihak sekolah/posyandu sebagai arsip fisik.</span>
                 </div>
 
                 <div class="pengiriman-form-group">
                     <label for="recv_notes" class="pengiriman-form-label">Catatan Penerimaan (Opsional)</label>
-                    <textarea name="notes" id="recv_notes" rows="2" class="pengiriman-form-textarea" placeholder="Cth: Diterima langsung oleh kepala sekolah dalam kondisi hangat dan baik"></textarea>
+                    <textarea name="notes" id="recv_notes" rows="2" class="pengiriman-form-textarea" placeholder="Cth: Diterima lengkap, kondisi hangat dan kemasan rapi"></textarea>
                 </div>
             </div>
 
@@ -315,7 +373,7 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    <span>Konfirmasi Telah Diterima</span>
+                    <span>Simpan & Tandai Diterima</span>
                 </button>
             </div>
         </form>

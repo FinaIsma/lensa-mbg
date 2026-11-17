@@ -191,6 +191,11 @@
 
 @push('scripts')
 <script>
+    function formatBatchQty(val) {
+        const num = parseFloat(val) || 0;
+        return Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(3)).toString();
+    }
+
     let currentBlocks = [];
     let extraBlocks = [];
     let materialInRecipeIds = new Set();
@@ -340,7 +345,7 @@
                                                        min="0"
                                                        max="${lot.current_qty}"
                                                        step="0.001"
-                                                       placeholder="0.000"
+                                                       placeholder="0"
                                                        ${isExpired ? 'disabled' : ''}
                                                        oninput="onQtyInput(this, ${block.material_id}, ${lot.current_qty}, ${lIdx})"
                                                        style="width: 100%; height: 36px; font-size: 13px; font-weight: 600; padding: 0 8px; border-radius: 6px; border: 1px solid #CBD5E1;">
@@ -367,7 +372,7 @@
                     </div>
                     <div class="material-pills-group">
                         <span class="pill-info">Kebutuhan: <strong>${block.kebutuhan} ${block.satuan}</strong></span>
-                        <span class="pill-info" id="selected_${block.material_id}">Terpilih: <strong>0.000 ${block.satuan}</strong></span>
+                        <span class="pill-info" id="selected_${block.material_id}">Terpilih: <strong>0 ${block.satuan}</strong></span>
                         <span class="pill-kurang" id="statusPill_${block.material_id}">Kurang ${block.kebutuhan} ${block.satuan}</span>
                         ${block.lots && block.lots.length > 0 ? `
                             <button type="button" class="btn-fefo" onclick="autoFillFefo(${block.material_id})">
@@ -454,7 +459,7 @@
         const pillSelected = document.getElementById(`selected_${materialId}`);
         const pillStatus = document.getElementById(`statusPill_${materialId}`);
 
-        pillSelected.innerHTML = `Terpilih: <strong>${totalUsed.toFixed(3)} ${block.satuan}</strong>`;
+        pillSelected.innerHTML = `Terpilih: <strong>${formatBatchQty(totalUsed)} ${block.satuan}</strong>`;
 
         const diff = Math.round((block.kebutuhan - totalUsed) * 1000) / 1000;
 
@@ -466,7 +471,7 @@
             }
         } else {
             pillStatus.className = 'pill-kurang';
-            pillStatus.innerHTML = `Kurang ${diff.toFixed(3)} ${block.satuan}`;
+            pillStatus.innerHTML = `Kurang ${formatBatchQty(diff)} ${block.satuan}`;
         }
     }
 
@@ -484,10 +489,10 @@
             if (needed <= 0) {
                 input.value = '';
             } else if (max <= needed) {
-                input.value = max.toFixed(3);
+                input.value = formatBatchQty(max);
                 needed = Math.round((needed - max) * 1000) / 1000;
             } else {
-                input.value = needed.toFixed(3);
+                input.value = formatBatchQty(needed);
                 needed = 0;
             }
 
@@ -593,7 +598,7 @@
                                                min="0"
                                                max="${lot.current_qty}"
                                                step="0.001"
-                                               placeholder="0.000"
+                                               placeholder="0"
                                                style="width: 100%; height: 36px; font-size: 13px; font-weight: 600; padding: 0 8px; border-radius: 6px; border: 1px solid #CBD5E1;">
                                         <input type="hidden" name="usages[${lot.id}][material_lot_id]" value="${lot.id}">
                                     </td>

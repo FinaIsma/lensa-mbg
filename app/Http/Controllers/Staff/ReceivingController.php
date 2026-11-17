@@ -30,7 +30,6 @@ class ReceivingController extends Controller
     public function index(Request $request): View
     {
         $idSppg = $this->resolveSppgId();
-        $this->ensureSampleReceivings($idSppg);
 
         $q = trim((string) $request->input('q', ''));
         $status = trim((string) $request->input('status', ''));
@@ -722,11 +721,5 @@ class ReceivingController extends Controller
         return (int) $idSppg;
     }
 
-    /**
-     * Pastikan contoh data penerimaan tersedia agar tampilan langsung berisi data sesuai mockup.
-     */
-    private function ensureSampleReceivings(int $idSppg): void
-    {
-        // Auto-seeding dinonaktifkan untuk mencegah UniqueConstraintViolationException di lingkungan multi-SPPG.
-    }
+
 }

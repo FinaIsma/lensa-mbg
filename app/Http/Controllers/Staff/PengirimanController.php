@@ -531,6 +531,7 @@ class PengirimanController extends Controller
         }
 
         $request->validate([
+            'nama_penerima' => 'nullable|string|max:150',
             'evidence_file' => 'nullable|file|image|max:5120',
             'notes' => 'nullable|string|max:500',
         ]);
@@ -540,6 +541,19 @@ class PengirimanController extends Controller
             $distribution->update([
                 'status' => 'received',
             ]);
+
+            $penerima = trim((string) $request->input('nama_penerima'));
+            $notes = trim((string) $request->input('notes'));
+            $descParts = [];
+            if ($penerima !== '') {
+                $descParts[] = "Penerima: {$penerima}";
+            }
+            if ($notes !== '') {
+                $descParts[] = $notes;
+            }
+            $fullDesc = ! empty($descParts)
+                ? implode('. ', $descParts)
+                : "Bukti serah terima pengiriman #{$distribution->id} di lokasi {$distribution->destination?->nama}";
 
             // Simpan foto bukti serah terima jika disertakan
             if ($request->hasFile('evidence_file')) {
@@ -552,7 +566,7 @@ class PengirimanController extends Controller
                     'evidenceable_id' => $distribution->id,
                     'file_path' => $path,
                     'file_type' => $file->getClientMimeType(),
-                    'description' => $request->input('notes') ?: "Bukti serah terima pengiriman #{$distribution->id} di lokasi {$distribution->destination?->nama}",
+                    'description' => $fullDesc,
                     'is_public' => false,
                     'uploaded_at' => now(),
                 ]);
