@@ -144,7 +144,7 @@ window.renderSppgModalContent = function (item) {
                             : 'Pengajuan Staff Baru';
 
             return `
-                                < div class="cr-info-card is-pending-card" >
+                <div class="cr-info-card is-pending-card">
                     <div class="cr-card-header">
                         <h3 class="cr-card-title">${title}</h3>
                         <span class="cr-badge-verifikasi-tag">
@@ -162,21 +162,21 @@ window.renderSppgModalContent = function (item) {
                         ${renderRow(icons.phone, 'No Telepon', st.no_telepon || '-')}
                         ${st.created_at ? renderRow(icons.cal, 'Tanggal Pengajuan', st.created_at) : ''}
                     </div>
-                </div >
-                        `;
+                </div>
+            `;
         }).join('');
 
         return `
-                < !--Entity Profile Header-- >
-                    <div class="cr-entity-header">
-                        <div class="cr-entity-left">
-                            <div class="cr-entity-avatar" aria-hidden="true">${(item.nama_sppg || 'S').trim().charAt(0).toUpperCase()}</div>
-                            <div>
-                                <div class="cr-entity-title">${item.nama_sppg || '-'}</div>
-                                <div class="cr-entity-subtitle">${item.id_sppg || '-'} &bull; Penambahan Staff</div>
-                            </div>
-                        </div>
+            <!-- Entity Profile Header -->
+            <div class="cr-entity-header">
+                <div class="cr-entity-left">
+                    <div class="cr-entity-avatar" aria-hidden="true">${(item.nama_sppg || 'S').trim().charAt(0).toUpperCase()}</div>
+                    <div>
+                        <div class="cr-entity-title">${item.nama_sppg || '-'}</div>
+                        <div class="cr-entity-subtitle">${item.id_sppg || '-'} &bull; Penambahan Staff</div>
                     </div>
+                </div>
+            </div>
 
             <div class="single-col-cards">
                 <!-- Section 1: Informasi Unit SPPG & Kepala SPPG -->
@@ -191,12 +191,12 @@ window.renderSppgModalContent = function (item) {
                     </div>
                 </div>
 
-                < !--Section 2: Staf Baru yang Diajukan-- >
-        ${ pendingStaffHtml }
+                <!-- Section 2: Staf Baru yang Diajukan -->
+                ${pendingStaffHtml}
 
-                < !--Section 3: Staf Aktif Saat Ini-- >
-        ${ staffLamaHtml }
-            </div >
+                <!-- Section 3: Staf Aktif Saat Ini -->
+                ${staffLamaHtml}
+            </div>
         `;
     }
 
@@ -208,7 +208,7 @@ window.renderSppgModalContent = function (item) {
         const staffTelp = item.staff_no_telepon && item.staff_no_telepon !== '-' ? item.staff_no_telepon : (initialStaff.no_telepon || '-');
 
         return `
-        < !--Entity Profile Header-- >
+            <!-- Entity Profile Header -->
             <div class="cr-entity-header">
                 <div class="cr-entity-left">
                     <div class="cr-entity-avatar" aria-hidden="true">${(item.nama_sppg || 'S').trim().charAt(0).toUpperCase()}</div>
@@ -303,7 +303,7 @@ window.renderSppgModalContent = function (item) {
     const isModSurat = !!(after.foto_surat_resmi && after.foto_surat_resmi !== before.foto_surat_resmi);
 
     return `
-        < !--Entity Profile Header-- >
+        <!-- Entity Profile Header -->
         <div class="cr-entity-header">
             <div class="cr-entity-left">
                 <div class="cr-entity-avatar" aria-hidden="true">${(before.nama_sppg || 'S').trim().charAt(0).toUpperCase()}</div>
@@ -314,7 +314,7 @@ window.renderSppgModalContent = function (item) {
             </div>
         </div>
 
-        <!--2 Column Diff Header Indicator-- >
+        <!-- 2 Column Diff Header Indicator -->
         <div class="diff-header-bar">
             <div class="diff-col-heading diff-col-before">
                 <span class="diff-dot diff-dot-before"></span>
@@ -326,7 +326,7 @@ window.renderSppgModalContent = function (item) {
             </div>
         </div>
 
-        <!--Two Column Diff Grid-- >
+        <!-- Two Column Diff Grid -->
         <div class="diff-grid">
             <!-- KOLOM KIRI (SEBELUM) -->
             <div class="diff-col">
@@ -403,7 +403,7 @@ window.renderSppgModalContent = function (item) {
             </div>
         </div>
 
-        <!--Section 4: Dokumen(Grid 2 Kolom: Sebelum vs Sesudah)-- >
+        <!-- Section 4: Dokumen (Grid 2 Kolom: Sebelum vs Sesudah) -->
         <div class="cr-info-card diff-docs-card">
             <h3 class="cr-card-title">Dokumen</h3>
             <div class="diff-grid">
@@ -463,7 +463,7 @@ window.renderPdfPreview = function (container) {
                 console.warn('Gagal me-render preview halaman 1 PDF:', err);
                 if (canvas.parentElement) {
                     canvas.parentElement.innerHTML = `
-        < div class="mv2-doc-pdf-fallback" >
+                        <div class="mv2-doc-pdf-fallback">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14 2 14 8 20 8"></polyline>
@@ -471,8 +471,8 @@ window.renderPdfPreview = function (container) {
                                 <line x1="16" y1="17" x2="8" y2="17"></line>
                             </svg>
                             <span class="mv2-doc-pdf-tag">PDF</span>
-                        </div >
-        `;
+                        </div>
+                    `;
                 }
             });
         }
@@ -496,7 +496,7 @@ window.openDetailModal = function (item) {
     const form = document.getElementById('formDetail');
     if (form) {
         const baseUpdateUrl = window.adminSppgUpdateBase || '/admin/sppg';
-        form.action = `${ baseUpdateUrl } /${item.raw_id}/status`;
+        form.action = `${baseUpdateUrl}/${item.raw_id}/status`;
     }
 
     const inputStatus = document.getElementById('inputDetailStatusVal');
@@ -507,25 +507,25 @@ window.openDetailModal = function (item) {
             inputStatus.value = 'aktif';
             btn.className = 'btn-modal-action-activate';
             btn.innerHTML = `
-        < svg width = "20" height = "20" viewBox = "0 0 24 24" fill = "none" stroke = "currentColor" stroke - width="2" stroke - linecap="round" stroke - linejoin="round" >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="8.5" cy="7" r="4"></circle>
                     <polyline points="17 11 19 13 23 9"></polyline>
-                </svg >
-        <span id="btnDetailText">Aktifkan</span>
-    `;
+                </svg>
+                <span id="btnDetailText">Aktifkan</span>
+            `;
         } else {
             inputStatus.value = 'nonaktif';
             btn.className = 'btn-modal-action-deactivate';
             btn.innerHTML = `
-        < svg width = "20" height = "20" viewBox = "0 0 24 24" fill = "none" stroke = "currentColor" stroke - width="2" stroke - linecap="round" stroke - linejoin="round" >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="8.5" cy="7" r="4"></circle>
                     <line x1="18" y1="8" x2="23" y2="13"></line>
                     <line x1="23" y1="8" x2="18" y2="13"></line>
-                </svg >
-        <span id="btnDetailText">Nonaktifkan</span>
-    `;
+                </svg>
+                <span id="btnDetailText">Nonaktifkan</span>
+            `;
         }
     }
 
@@ -547,7 +547,7 @@ window.openVerifikasiModal = function (item) {
     if (!form || !content) return;
 
     const baseUpdateUrl = window.adminSppgUpdateBase || '/admin/sppg';
-    form.action = `${ baseUpdateUrl } /${item.raw_id}/status`;
+    form.action = `${baseUpdateUrl}/${item.raw_id}/status`;
     content.innerHTML = window.renderSppgModalContent(item);
 
     document.getElementById('modalVerifikasi').classList.remove('hidden');
