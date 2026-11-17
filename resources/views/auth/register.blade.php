@@ -215,7 +215,7 @@
                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
                                 </svg>
-                                <input type="text" id="alamat_sppg" name="alamat_sppg" value="{{ old('alamat_sppg') }}" placeholder="Masukkan Nama SPPG" required>
+                                <input type="text" id="alamat_sppg" name="alamat_sppg" value="{{ old('alamat_sppg') }}" placeholder="Masukkan Alamat SPPG" required>
                             </div>
                             <div class="error" id="error_alamat_sppg">@error('alamat_sppg') {{ $message }} @enderror</div>
                         </div>
@@ -337,7 +337,7 @@
                     <div class="terms-wrapper">
                         <input type="checkbox" id="syarat_ketentuan" name="syarat_ketentuan" class="terms-checkbox" value="1" {{ old('syarat_ketentuan') ? 'checked' : '' }} required>
                         <label for="syarat_ketentuan" class="terms-label">
-                            Saya menyetujui <strong>syarat dan ketentuan</strong> yang berlaku
+                            Saya menyetujui <a href="javascript:void(0)" id="btnOpenTerms" class="terms-link">syarat dan ketentuan</a> yang berlaku
                         </label>
                     </div>
                     <div class="error" id="error_syarat_ketentuan" style="margin-top: -16px; margin-bottom: 16px;">@error('syarat_ketentuan') {{ $message }} @enderror</div>
@@ -350,5 +350,72 @@
                 </form>
             </div>
         </main>
+
+        <!-- Pop-up Modal Syarat & Ketentuan Layanan Dapur SPPG -->
+        <div id="termsModal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div class="modal-title-wrap">
+                        <div class="modal-badge">Badan Gizi Nasional RI</div>
+                        <h3 id="termsModalTitle" class="modal-title">Syarat & Ketentuan Pendaftaran Dapur SPPG</h3>
+                        <p class="modal-subtitle">Harap baca dan pahami seluruh komitmen kepatuhan sebelum mendaftar.</p>
+                    </div>
+                    <button type="button" class="modal-close-btn" id="btnCloseTerms" aria-label="Tutup Modal">&times;</button>
+                </div>
+
+                <div class="modal-body custom-scrollbar">
+                    <div class="terms-section">
+                        <h4>1. Keabsahan Data & Dokumen Legalitas</h4>
+                        <p>Pendaftar menyatakan dengan sesungguhnya bahwa seluruh data profil, identitas e-KTP Penanggung Jawab, kontak aktif, alamat fasilitas dapur, dan dokumen legalitas/SK yang diunggah adalah sah, asli, mutakhir, serta dapat dipertanggungjawabkan di hadapan hukum Republik Indonesia.</p>
+                    </div>
+
+                    <div class="terms-section">
+                        <h4>2. Standar Higienitas & Keamanan Pangan (Food Safety)</h4>
+                        <p>Dapur SPPG berkewajiban mematuhi standar sanitasi ketat yang ditetapkan Badan Gizi Nasional (BGN), mencakup:</p>
+                        <ul>
+                            <li>Penggunaan wadah dan baki saji bersertifikasi <em>food-grade 304 (stainless steel)</em>.</li>
+                            <li>Penyaringan air bersih pengolahan dan sanitasi menggunakan membran filter higienis.</li>
+                            <li>Pemasakan matang sempurna dengan suhu inti masakan minimal 75&deg;C untuk eliminasi cemaran mikroba.</li>
+                            <li>Pemeriksaan uji sensoris harian (organoleptik rasa, aroma, warna, dan tekstur) sebelum makanan didistribusikan.</li>
+                        </ul>
+                    </div>
+
+                    <div class="terms-section">
+                        <h4>3. Penyerapan Bahan Baku dari Produsen Pangan Lokal</h4>
+                        <p>SPPG berkomitmen memprioritaskan penyerapan bahan pangan bergizi (beras, sayuran segar, protein hewani/nabati, dan buah lokal) dari kelompok tani, koperasi, serta UMKM daerah sekitar dengan tata kelola penyimpanan <em>First Expired, First Out (FEFO)</em>.</p>
+                    </div>
+
+                    <div class="terms-section">
+                        <h4>4. Keterbukaan Informasi & Audit Digital Publik (Lensa MBG)</h4>
+                        <p>SPPG menyetujui bahwa seluruh catatan nomor batch produksi, takaran gizi teruji, waktu keberangkatan distribusi armada, dan bukti foto serah terima di sekolah sasaran akan dipublikasikan secara transparan kepada masyarakat melalui portal publik <strong>Lensa MBG</strong>.</p>
+                    </div>
+
+                    <div class="terms-section">
+                        <h4>5. Integritas Akun & Tanggung Jawab Petugas</h4>
+                        <p>Kepala SPPG dan Staf Operasional bertanggung jawab penuh menjaga kerahasiaan kredensial akses akun masing-masing, serta tidak memindahtangankan otorisasi pencatatan data kepada pihak ketiga yang tidak berwenang.</p>
+                    </div>
+
+                    <div class="terms-section">
+                        <h4>6. Penonaktifan & Sanksi Operasional</h4>
+                        <p>Badan Gizi Nasional berhak melakukan verifikasi lapangan sewaktu-waktu, membekukan akun, hingga mencabut izin operasional penyaluran makanan bilamana ditemukan indikasi manipulasi data, kelalaian mutu gizi, atau pelanggaran ketentuan hukum yang berlaku.</p>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="modal-footer-note">
+                        Dengan menekan tombol setuju, Anda menyatakan tunduk pada seluruh ketentuan di atas.
+                    </div>
+                    <div class="modal-footer-actions">
+                        <button type="button" class="btn-modal-cancel" id="btnCancelTerms">Batal</button>
+                        <button type="button" class="btn-modal-agree" id="btnAgreeTerms">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>Saya Mengerti & Setujui</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

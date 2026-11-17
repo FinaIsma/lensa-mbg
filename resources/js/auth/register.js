@@ -550,11 +550,88 @@ function initAjaxFormSubmission() {
 function initTermsAgreement() {
     const termsCheckbox = document.getElementById('syarat_ketentuan');
     const submitBtn = document.getElementById('submitBtn');
+    const btnOpenTerms = document.getElementById('btnOpenTerms');
+    const termsModal = document.getElementById('termsModal');
+    const btnCloseTerms = document.getElementById('btnCloseTerms');
+    const btnCancelTerms = document.getElementById('btnCancelTerms');
+    const btnAgreeTerms = document.getElementById('btnAgreeTerms');
+
     if (!termsCheckbox || !submitBtn) return;
 
     const updateSubmitState = () => {
         submitBtn.disabled = !termsCheckbox.checked;
     };
+
+    const openTermsModal = () => {
+        if (!termsModal) return;
+        termsModal.style.display = 'flex';
+        // Trigger reflow agar animasi transisi CSS berjalan mulus
+        void termsModal.offsetWidth;
+        termsModal.classList.add('is-active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeTermsModal = () => {
+        if (!termsModal) return;
+        termsModal.classList.remove('is-active');
+        setTimeout(() => {
+            if (!termsModal.classList.contains('is-active')) {
+                termsModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }, 250);
+    };
+
+    // 1. Klik tautan teks "syarat dan ketentuan" -> Buka Pop-up Modal
+    if (btnOpenTerms) {
+        btnOpenTerms.addEventListener('click', (e) => {
+            e.preventDefault();
+            openTermsModal();
+        });
+    }
+
+    // 2. Klik langsung pada kotak checkbox: jika belum centang, wajibkan buka modal dulu
+    termsCheckbox.addEventListener('click', (e) => {
+        if (termsCheckbox.checked) {
+            // Pengguna mencoba mencentang langsung -> tahan & buka pop-up dulu
+            termsCheckbox.checked = false;
+            updateSubmitState();
+            openTermsModal();
+        } else {
+            // Jika pengguna sengaja uncheck centang yang sudah ada -> izinkan
+            updateSubmitState();
+        }
+    });
+
+    // 3. Tombol Tutup & Batal pada Modal
+    if (btnCloseTerms) btnCloseTerms.addEventListener('click', closeTermsModal);
+    if (btnCancelTerms) btnCancelTerms.addEventListener('click', closeTermsModal);
+
+    // Tutup jika klik area latar belakang (overlay) di luar kartu
+    if (termsModal) {
+        termsModal.addEventListener('click', (e) => {
+            if (e.target === termsModal) {
+                closeTermsModal();
+            }
+        });
+    }
+
+    // Tutup jika tekan tombol ESC pada keyboard
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && termsModal && termsModal.classList.contains('is-active')) {
+            closeTermsModal();
+        }
+    });
+
+    // 4. Tombol "Saya Mengerti & Setujui" pada Modal -> Otomatis Centang & Aktifkan Daftar
+    if (btnAgreeTerms) {
+        btnAgreeTerms.addEventListener('click', () => {
+            termsCheckbox.checked = true;
+            updateSubmitState();
+            clearFieldError('syarat_ketentuan');
+            closeTermsModal();
+        });
+    }
 
     termsCheckbox.addEventListener('change', updateSubmitState);
     updateSubmitState();
