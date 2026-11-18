@@ -27,78 +27,27 @@ class DashboardController extends Controller
         $todayStr = $now->translatedFormat('l, d F Y');
 
         // ==========================================
-        // 1. STAT CARDS UTAMA (KPI Operasional Riil)
+        // 1. STAT CARDS UTAMA (KPI Operasional Riil - Murni Per Hari Ini)
         // ==========================================
 
-        // Card 1: Porsi Siap & Target Hari Ini (atau batch operasional terkini)
+        // Card 1: Porsi Siap & Target Hari Ini
         $batchesToday = DB::table('production_batches')
             ->where('id_sppg', $idSppg)
             ->whereDate('production_date', Carbon::today())
             ->get();
 
-        if ($batchesToday->isNotEmpty()) {
-            $porsiSiap = (int) $batchesToday->sum(fn ($b) => $b->actual_porsi ?? 0);
-            $porsiTarget = (int) $batchesToday->sum('target_porsi');
-            $batchCount = $batchesToday->count();
-        } else {
-            // Ambil data batch operasional terkini di database
-            $latestBatchDate = DB::table('production_batches')
-                ->where('id_sppg', $idSppg)
-                ->orderByDesc('production_date')
-                ->value('production_date');
+        $porsiSiap = (int) $batchesToday->sum(fn ($b) => $b->actual_porsi ?? 0);
+        $porsiTarget = (int) $batchesToday->sum('target_porsi');
+        $batchCount = $batchesToday->count();
 
-            if ($latestBatchDate) {
-                $batchesLatest = DB::table('production_batches')
-                    ->where('id_sppg', $idSppg)
-                    ->whereDate('production_date', $latestBatchDate)
-                    ->get();
-                $porsiSiap = (int) $batchesLatest->sum(fn ($b) => $b->actual_porsi ?? 0);
-                $porsiTarget = (int) $batchesLatest->sum('target_porsi');
-                $batchCount = $batchesLatest->count();
-            } else {
-                $porsiSiap = 0;
-                $porsiTarget = 0;
-                $batchCount = 0;
-            }
-        }
-
-        // Card 2: Porsi Terdistribusi & Tingkat Capaian
-        $distributionsToday = (int) DB::table('distributions')
+        // Card 2: Porsi Terdistribusi & Tingkat Capaian Hari Ini
+        $porsiTerdistribusi = (int) DB::table('distributions')
             ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
             ->where('production_batches.id_sppg', $idSppg)
             ->whereDate('distributions.distributed_at', Carbon::today())
             ->sum('distributions.portions_sent');
 
-        if ($distributionsToday > 0) {
-            $porsiTerdistribusi = $distributionsToday;
-            $distribusiPct = $porsiTarget > 0 ? min(100, (int) round(($porsiTerdistribusi / $porsiTarget) * 100)) : 100;
-        } else {
-            // Cek distribusi terkini di database
-            $latestDist = DB::table('distributions')
-                ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
-                ->where('production_batches.id_sppg', $idSppg)
-                ->orderByDesc('distributions.distributed_at')
-                ->first(['distributions.distributed_at']);
-
-            if ($latestDist) {
-                $latestDate = Carbon::parse($latestDist->distributed_at)->toDateString();
-                $porsiTerdistribusi = (int) DB::table('distributions')
-                    ->join('production_batches', 'distributions.production_batch_id', '=', 'production_batches.id')
-                    ->where('production_batches.id_sppg', $idSppg)
-                    ->whereDate('distributions.distributed_at', $latestDate)
-                    ->sum('distributions.portions_sent');
-
-                $targetOnDate = (int) DB::table('production_batches')
-                    ->where('id_sppg', $idSppg)
-                    ->whereDate('production_date', $latestDate)
-                    ->sum('target_porsi');
-
-                $distribusiPct = $targetOnDate > 0 ? min(100, (int) round(($porsiTerdistribusi / $targetOnDate) * 100)) : 100;
-            } else {
-                $porsiTerdistribusi = 0;
-                $distribusiPct = 0;
-            }
-        }
+        $distribusiPct = $porsiTarget > 0 ? min(100, (int) round(($porsiTerdistribusi / $porsiTarget) * 100)) : 0;
 
         // Card 3 & Donut Chart: Kondisi Kesehatan Stok Bahan
         $materialStats = DB::table('materials')
@@ -161,16 +110,7 @@ class DashboardController extends Controller
         // ==========================================
         // 2. GRAFIK 1: TREN PRODUKSI & DISTRIBUSI (Line Chart Murni Database)
         // ==========================================
-        $hasRecentBatch = DB::table('production_batches')
-            ->where('id_sppg', $idSppg)
-            ->whereDate('production_date', '>=', Carbon::today()->subDays(6))
-            ->exists();
-
-        $anchorDate = $hasRecentBatch
-            ? Carbon::today()
-            : (DB::table('production_batches')->where('id_sppg', $idSppg)->max('production_date')
-                ? Carbon::parse(DB::table('production_batches')->where('id_sppg', $idSppg)->max('production_date'))
-                : Carbon::today());
+        $anchorDate = Carbon::today();
 
         // A. 7 Hari Terakhir
         $days7 = collect(range(6, 0))->map(fn ($ago) => (clone $anchorDate)->subDays($ago));
@@ -280,16 +220,31 @@ class DashboardController extends Controller
         ];
 
         // ==========================================
-        // 4. LIVE PIPELINE ALUR DAPUR
+        // 4. LIVE PIPELINE ALUR DAPUR (MURNI HARI INI)
         // ==========================================
-        $purchasesToday = DB::table('purchases')->where('id_sppg', $idSppg)->whereDate('purchase_date', Carbon::today())->count();
-        $receivingsToday = DB::table('receivings')->where('id_sppg', $idSppg)->whereDate('received_at', Carbon::today())->count();
-        $productionsToday = DB::table('production_batches')->where('id_sppg', $idSppg)->whereDate('production_date', Carbon::today())->count();
+        $purchasesToday = DB::table('purchases')
+            ->where('id_sppg', $idSppg)
+            ->whereDate('purchase_date', Carbon::today())
+            ->count();
+
+        $receivingsToday = DB::table('receivings')
+            ->where('id_sppg', $idSppg)
+            ->where('status', 'confirmed')
+            ->whereDate('received_at', Carbon::today())
+            ->count();
+
+        $productionsToday = DB::table('production_batches')
+            ->where('id_sppg', $idSppg)
+            ->whereDate('production_date', Carbon::today())
+            ->count();
 
         $hasilToday = DB::table('pre_distribution_checks')
             ->join('production_batches', 'pre_distribution_checks.production_batch_id', '=', 'production_batches.id')
             ->where('production_batches.id_sppg', $idSppg)
-            ->whereDate('pre_distribution_checks.created_at', Carbon::today())
+            ->where(function ($q) {
+                $q->whereDate('pre_distribution_checks.checked_at', Carbon::today())
+                    ->orWhereDate('production_batches.production_date', Carbon::today());
+            })
             ->count();
 
         $distributionsCountToday = DB::table('distributions')
@@ -297,6 +252,18 @@ class DashboardController extends Controller
             ->where('production_batches.id_sppg', $idSppg)
             ->whereDate('distributions.distributed_at', Carbon::today())
             ->count();
+
+        $batchProcessingCount = DB::table('production_batches')
+            ->where('id_sppg', $idSppg)
+            ->whereDate('production_date', Carbon::today())
+            ->whereIn('status', ['draft', 'confirmed', 'processing'])
+            ->count();
+
+        $pengolahanState = match (true) {
+            $productionsToday === 0 => 'pending',
+            $hasilToday > 0 || $distributionsCountToday > 0 || $batchProcessingCount === 0 => 'completed',
+            default => 'active',
+        };
 
         $alurProses = [
             [
@@ -313,9 +280,9 @@ class DashboardController extends Controller
             ],
             [
                 'step' => 3,
-                'name' => 'Pemasakan',
-                'desc' => $productionsToday > 0 ? "$productionsToday batch aktif" : '0 batch aktif',
-                'state' => $productionsToday > 0 ? 'active' : 'pending',
+                'name' => 'Pengolahan',
+                'desc' => $productionsToday > 0 ? ($pengolahanState === 'completed' ? "$productionsToday batch selesai" : "$productionsToday batch aktif") : '0 batch aktif',
+                'state' => $pengolahanState,
             ],
             [
                 'step' => 4,
