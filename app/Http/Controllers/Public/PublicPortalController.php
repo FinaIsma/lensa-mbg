@@ -115,17 +115,14 @@ class PublicPortalController extends Controller
                 'batch.materialUsages.lot.supplier',
             ])
                 ->where('destination_id', $selectedDestination->id)
-                ->whereIn('status', ['sent', 'received']);
+                ->whereIn('status', ['planned', 'sent', 'received']);
 
             if ($jadwal === 'yesterday') {
                 $distQuery->whereDate('distributed_at', Carbon::yesterday());
             } elseif ($jadwal === '7days') {
                 $distQuery->whereDate('distributed_at', Carbon::now()->subDays(7));
-            } elseif ($jadwal === 'today') {
-                $todayQuery = (clone $distQuery)->whereDate('distributed_at', Carbon::today());
-                if ($todayQuery->exists()) {
-                    $distQuery = $todayQuery;
-                }
+            } else {
+                $distQuery->whereDate('distributed_at', Carbon::today());
             }
 
             $activeDistribution = $distQuery->latest('distributed_at')->first();
