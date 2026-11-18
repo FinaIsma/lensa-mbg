@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const regencySelect = document.getElementById('select-regency');
     const districtSelect = document.getElementById('select-district');
     const instansiSelect = document.getElementById('select-instansi');
-    const submitBtn = document.getElementById('submitBtn');
 
     if (!provSelect) return;
 
@@ -38,16 +37,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!trigger) {
             trigger = document.createElement('button');
             trigger.type = 'button';
-            trigger.className = 'custom-select-trigger w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border text-xs font-semibold shadow-2xs transition select-none';
+            trigger.className = 'custom-select-trigger w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg border text-xs font-medium shadow-2xs transition select-none';
             trigger.dataset.for = selectId;
             container.appendChild(trigger);
         }
 
-        // Buat Panel Dropdown (Diposisikan SELALU ke bawah dengan top-full mt-1.5)
+        // Buat Panel Dropdown (Diposisikan SELALU ke bawah dengan top-full mt-1)
         let menu = container.querySelector(`.custom-select-menu[data-for="${selectId}"]`);
         if (!menu) {
             menu = document.createElement('div');
-            menu.className = 'custom-select-menu hidden absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200/90 rounded-2xl shadow-xl z-50 overflow-hidden';
+            menu.className = 'custom-select-menu hidden absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 overflow-hidden';
             menu.dataset.for = selectId;
             container.appendChild(menu);
         }
@@ -58,15 +57,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
             trigger.disabled = isDisabled;
             if (isDisabled) {
-                trigger.className = 'custom-select-trigger w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-xs font-medium shadow-2xs transition select-none';
+                trigger.className = 'custom-select-trigger w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-xs font-medium transition select-none';
             } else {
-                trigger.className = 'custom-select-trigger w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 hover:border-blue-400 focus:ring-2 focus:ring-blue-500 text-xs font-semibold shadow-2xs transition cursor-pointer select-none';
+                trigger.className = 'custom-select-trigger w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 hover:border-slate-400 focus:outline-none focus:ring-1 focus:ring-[#071E49] text-xs font-medium shadow-2xs transition cursor-pointer select-none';
             }
 
             const label = (selectedOption && selectedOption.textContent.trim()) ? selectedOption.textContent.trim() : (placeholderText || 'Pilih');
             trigger.innerHTML = `
                 <span class="truncate pr-2">${label}</span>
-                <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${!menu.classList.contains('hidden') ? 'rotate-180 text-blue-600' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-150 ${!menu.classList.contains('hidden') ? 'rotate-180 text-[#071E49]' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             `;
@@ -76,15 +75,15 @@ document.addEventListener('DOMContentLoaded', function () {
             menu.innerHTML = '';
             const options = Array.from(select.options);
 
-            // Kotak pencarian jika item lebih dari 5 (sangat praktis untuk 30+ kecamatan)
+            // Kotak pencarian jika item lebih dari 5
             if (options.length > 5) {
                 const searchWrap = document.createElement('div');
-                searchWrap.className = 'p-2 border-b border-slate-100 bg-slate-50/80 sticky top-0 z-10';
+                searchWrap.className = 'p-2 border-b border-slate-100 bg-slate-50/90 sticky top-0 z-10';
                 const searchInput = document.createElement('input');
                 searchInput.type = 'text';
                 searchInput.placeholder = 'Ketik nama untuk mencari...';
                 searchInput.value = filterText;
-                searchInput.className = 'w-full px-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500';
+                searchInput.className = 'w-full px-3 py-1.5 text-xs rounded-md border border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#071E49]';
                 
                 searchInput.addEventListener('input', function(e) {
                     const q = e.target.value.toLowerCase();
@@ -115,12 +114,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 const isSelected = (select.selectedIndex === idx);
                 const itemBtn = document.createElement('button');
                 itemBtn.type = 'button';
-                itemBtn.className = `w-full text-left px-3.5 py-2.5 text-xs flex items-center justify-between transition cursor-pointer ${
-                    isSelected ? 'bg-blue-50 font-bold text-[#071E49]' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600 font-medium'
+                itemBtn.className = `w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition cursor-pointer ${
+                    isSelected ? 'bg-slate-100 font-semibold text-[#071E49]' : 'text-slate-700 hover:bg-slate-50 hover:text-[#071E49] font-medium'
                 }`;
                 itemBtn.innerHTML = `
                     <span class="truncate pr-2">${text}</span>
-                    ${isSelected ? '<svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : ''}
+                    ${isSelected ? '<svg class="w-3.5 h-3.5 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : ''}
                 `;
 
                 itemBtn.addEventListener('click', function(e) {
@@ -220,7 +219,6 @@ document.addEventListener('DOMContentLoaded', function () {
     provSelect.addEventListener('change', function () {
         const selectedOpt = this.options[this.selectedIndex];
         const provId = selectedOpt ? selectedOpt.dataset.id : null;
-        const provName = this.value;
 
         resetRegencies();
         resetDistricts();
@@ -242,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json())
             .then(data => {
                 regencySelect.disabled = false;
-                regencySelect.className = 'w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 transition';
+                regencySelect.className = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#071E49] transition';
                 regencySelect.innerHTML = '<option value="">Pilih Kota / Kabupaten</option>';
                 data.forEach(item => {
                     const opt = document.createElement('option');
@@ -288,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json())
             .then(data => {
                 districtSelect.disabled = false;
-                districtSelect.className = 'w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 transition';
+                districtSelect.className = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#071E49] transition';
                 districtSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
                 data.forEach(item => {
                     const opt = document.createElement('option');
@@ -357,14 +355,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Update class visual aktif pada tombol
             jadwalBtns.forEach(b => {
-                b.classList.remove('bg-[#071E49]', 'text-white', 'shadow-xs', 'font-bold');
-                b.classList.add('font-medium', 'text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-100');
+                b.classList.remove('bg-[#071E49]', 'text-white', 'shadow-xs', 'shadow-2xs', 'font-bold', 'font-semibold', 'border-[#071E49]');
+                b.classList.add('font-medium', 'text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-200/60');
                 const svg = b.querySelector('svg');
                 if (svg) svg.classList.replace('text-emerald-400', 'text-slate-400');
             });
 
-            this.classList.remove('font-medium', 'text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-100');
-            this.classList.add('font-bold', 'bg-[#071E49]', 'text-white', 'shadow-xs');
+            this.classList.remove('font-medium', 'text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-200/60');
+            this.classList.add('font-semibold', 'bg-[#071E49]', 'text-white', 'shadow-2xs');
             const activeSvg = this.querySelector('svg');
             if (activeSvg) activeSvg.classList.replace('text-slate-400', 'text-emerald-400');
 
@@ -379,21 +377,21 @@ document.addEventListener('DOMContentLoaded', function () {
     function resetRegencies() {
         regencySelect.innerHTML = '<option value="">Pilih provinsi dahulu</option>';
         regencySelect.disabled = true;
-        regencySelect.className = 'w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-500 focus:ring-2 focus:ring-blue-500 transition';
+        regencySelect.className = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-medium text-slate-400 focus:outline-none transition';
         resetDistricts();
     }
 
     function resetDistricts() {
         districtSelect.innerHTML = '<option value="">Pilih kota/kabupaten dahulu</option>';
         districtSelect.disabled = true;
-        districtSelect.className = 'w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-500 focus:ring-2 focus:ring-blue-500 transition';
+        districtSelect.className = 'w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-medium text-slate-400 focus:outline-none transition';
         resetInstansi();
     }
 
     function resetInstansi() {
         instansiSelect.innerHTML = '<option value="">Pilih kecamatan terlebih dahulu</option>';
         instansiSelect.disabled = true;
-        instansiSelect.className = 'w-full pl-10 pr-8 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-xs font-bold shadow-2xs transition';
+        instansiSelect.className = 'w-full pl-10 pr-8 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-xs font-medium shadow-2xs transition';
     }
 
     // Helper untuk memfilter isi dropdown Instansi via AJAX
@@ -422,10 +420,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     opt.disabled = true;
                     instansiSelect.appendChild(opt);
                     instansiSelect.disabled = true;
-                    instansiSelect.className = 'w-full pl-10 pr-8 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-xs font-bold shadow-2xs transition';
+                    instansiSelect.className = 'w-full pl-10 pr-8 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed text-xs font-medium shadow-2xs transition';
                 } else {
                     instansiSelect.disabled = false;
-                    instansiSelect.className = 'w-full pl-10 pr-8 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-800 text-xs font-bold focus:ring-2 focus:ring-blue-500 shadow-2xs transition';
+                    instansiSelect.className = 'w-full pl-10 pr-8 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#071E49] shadow-2xs transition';
                     data.forEach(item => {
                         const opt = document.createElement('option');
                         opt.value = item.id;
@@ -457,62 +455,197 @@ document.addEventListener('DOMContentLoaded', function () {
     const tahapDetailBahan = document.getElementById('tahapDetailBahan');
     const tahapDetailPetugas = document.getElementById('tahapDetailPetugas');
 
-    if (tahapCards.length > 0 && tahapDetailPanel) {
-        tahapCards.forEach(card => {
-            card.addEventListener('click', function () {
-                const tahap = this.dataset.tahap;
-                const title = this.dataset.title;
-                const subtitle = this.dataset.subtitle;
-                const photo = this.dataset.photo;
-                const photoCaption = this.dataset.photoCaption;
-                const desc = this.dataset.desc;
-                const waktu = this.dataset.waktu;
-                const kondisi = this.dataset.kondisi;
-                const bahan = this.dataset.bahan;
-                const petugas = this.dataset.petugas;
+    // Fungsi sinkronisasi tahap aktif (mendukung Desktop Cards & Mobile Step Tabs)
+    function setActiveTahap(tahap) {
+        const tahapStr = String(tahap);
+        const desktopCard = document.querySelector(`.desktop-tahap-card[data-tahap="${tahapStr}"]`);
+        const tahapDetailPanel = document.getElementById('tahapDetailPanel');
+        if (!desktopCard || !tahapDetailPanel) return;
 
-                // Reset kelas aktif pada semua kartu
-                tahapCards.forEach(c => {
-                    c.classList.remove('active', 'ring-2', 'ring-[#071E49]', 'bg-slate-50/50');
-                    const footerLink = c.querySelector('.mt-3');
-                    if (footerLink) {
-                        footerLink.classList.remove('text-blue-700');
-                        footerLink.classList.add('text-slate-600');
-                    }
-                });
-
-                // Tambahkan kelas aktif pada kartu yang diklik
-                this.classList.add('active', 'ring-2', 'ring-[#071E49]', 'bg-slate-50/50');
-                const activeFooterLink = this.querySelector('.mt-3');
-                if (activeFooterLink) {
-                    activeFooterLink.classList.remove('text-slate-600');
-                    activeFooterLink.classList.add('text-blue-700');
+        // 1. Sinkronisasi status aktif Desktop Cards
+        document.querySelectorAll('.desktop-tahap-card').forEach(c => {
+            const isCurrent = c.dataset.tahap === tahapStr;
+            if (isCurrent) {
+                c.classList.remove('border-slate-200/90', 'bg-white');
+                c.classList.add('active', 'ring-1', 'ring-[#071E49]', 'border-[#071E49]', 'bg-slate-50/70');
+                const badge = c.querySelector('.tahap-badge');
+                if (badge) {
+                    badge.classList.remove('bg-slate-100', 'text-slate-700');
+                    badge.classList.add('bg-[#071E49]', 'text-white');
                 }
-
-                // Update konten detail panel
-                if (tahapDetailBadge) tahapDetailBadge.textContent = `Tahap ${tahap}`;
-                if (tahapDetailTitle) tahapDetailTitle.textContent = `Detail Perjalanan & Dokumentasi Riil: ${title}`;
-                if (tahapDetailSubtitle) tahapDetailSubtitle.textContent = subtitle;
-                if (tahapDetailImg && photo) tahapDetailImg.src = photo;
-                if (tahapDetailCaption && photoCaption) tahapDetailCaption.textContent = photoCaption;
-                if (tahapDetailDesc) tahapDetailDesc.textContent = desc;
-                if (tahapDetailWaktu) tahapDetailWaktu.textContent = waktu;
-                if (tahapDetailKondisi) tahapDetailKondisi.textContent = kondisi;
-                if (tahapDetailBahan) tahapDetailBahan.textContent = bahan;
-                if (tahapDetailPetugas) tahapDetailPetugas.textContent = petugas;
-
-                // Animasi lembut saat berganti konten
-                tahapDetailPanel.classList.add('ring-2', 'ring-blue-100');
-                setTimeout(() => {
-                    tahapDetailPanel.classList.remove('ring-2', 'ring-blue-100');
-                }, 300);
-            });
+                const footerLink = c.querySelector('.tahap-footer');
+                if (footerLink) {
+                    footerLink.classList.remove('text-slate-600');
+                    footerLink.classList.add('text-[#071E49]');
+                }
+            } else {
+                c.classList.remove('active', 'ring-1', 'ring-[#071E49]', 'border-[#071E49]', 'bg-slate-50/70');
+                c.classList.add('border-slate-200/90', 'bg-white');
+                const badge = c.querySelector('.tahap-badge');
+                if (badge) {
+                    badge.classList.remove('bg-[#071E49]', 'text-white');
+                    badge.classList.add('bg-slate-100', 'text-slate-700');
+                }
+                const footerLink = c.querySelector('.tahap-footer');
+                if (footerLink) {
+                    footerLink.classList.remove('text-[#071E49]');
+                    footerLink.classList.add('text-slate-600');
+                }
+            }
         });
+
+        // 2. Sinkronisasi status aktif Mobile Step Tabs
+        document.querySelectorAll('.mobile-tahap-tab').forEach(tab => {
+            const isCurrent = tab.dataset.tahap === tahapStr;
+            const num = tab.querySelector('.tab-num');
+            const time = tab.querySelector('.tab-time');
+            if (isCurrent) {
+                tab.classList.remove('bg-transparent', 'text-slate-600', 'hover:bg-slate-200/70');
+                tab.classList.add('active', 'bg-[#071E49]', 'text-white', 'shadow-xs');
+                if (num) {
+                    num.classList.remove('bg-slate-200', 'text-slate-600');
+                    num.classList.add('bg-white/20', 'text-white');
+                }
+                if (time) {
+                    time.classList.remove('text-slate-400');
+                    time.classList.add('text-slate-200');
+                }
+            } else {
+                tab.classList.remove('active', 'bg-[#071E49]', 'text-white', 'shadow-xs');
+                tab.classList.add('bg-transparent', 'text-slate-600', 'hover:bg-slate-200/70');
+                if (num) {
+                    num.classList.remove('bg-white/20', 'text-white');
+                    num.classList.add('bg-slate-200', 'text-slate-600');
+                }
+                if (time) {
+                    time.classList.remove('text-slate-200');
+                    time.classList.add('text-slate-400');
+                }
+            }
+        });
+
+        // 3. Update Konten Detail Panel
+        const title = desktopCard.dataset.title;
+        const subtitle = desktopCard.dataset.subtitle;
+        const photo = desktopCard.dataset.photo;
+        const photoCaption = desktopCard.dataset.photoCaption;
+        const desc = desktopCard.dataset.desc;
+        const waktu = desktopCard.dataset.waktu;
+        const kondisi = desktopCard.dataset.kondisi;
+        const bahan = desktopCard.dataset.bahan;
+        const petugas = desktopCard.dataset.petugas;
+
+        const tahapDetailBadge = document.getElementById('tahapDetailBadge');
+        const tahapDetailEyebrow = document.getElementById('tahapDetailEyebrow');
+        const tahapDetailTitle = document.getElementById('tahapDetailTitle');
+        const tahapDetailSubtitle = document.getElementById('tahapDetailSubtitle');
+        const tahapDetailImg = document.getElementById('tahapDetailImg');
+        const tahapDetailCaption = document.getElementById('tahapDetailCaption');
+        const tahapDetailDesc = document.getElementById('tahapDetailDesc');
+        const tahapDetailWaktu = document.getElementById('tahapDetailWaktu');
+        const tahapDetailKondisi = document.getElementById('tahapDetailKondisi');
+        const tahapDetailBahan = document.getElementById('tahapDetailBahan');
+        const tahapDetailPetugas = document.getElementById('tahapDetailPetugas');
+
+        const eyebrowMap = {
+            '1': 'Titik Pasokan Bahan',
+            '2': 'Dapur Higienis SPPG',
+            '3': 'Quality Control & Uji Mutu',
+            '4': 'Hilir & Serah Terima Sekolah'
+        };
+
+        if (tahapDetailBadge) tahapDetailBadge.textContent = `Tahap 0${tahapStr}`;
+        if (tahapDetailEyebrow) tahapDetailEyebrow.textContent = eyebrowMap[tahapStr] || 'Proses MBG';
+        if (tahapDetailTitle) tahapDetailTitle.textContent = title;
+        if (tahapDetailSubtitle) tahapDetailSubtitle.textContent = subtitle;
+        if (tahapDetailImg && photo) tahapDetailImg.src = photo;
+        if (tahapDetailCaption && photoCaption) tahapDetailCaption.textContent = photoCaption;
+        if (tahapDetailDesc) tahapDetailDesc.textContent = desc;
+        if (tahapDetailWaktu) tahapDetailWaktu.textContent = waktu;
+        if (tahapDetailKondisi) tahapDetailKondisi.textContent = kondisi;
+        if (tahapDetailBahan) tahapDetailBahan.textContent = bahan;
+        if (tahapDetailPetugas) tahapDetailPetugas.textContent = petugas;
+
+        // 4. Update visibilitas galeri multi-foto sesuai tahap yang aktif
+        ['1', '2', '3', '4'].forEach(t => {
+            const gal = document.getElementById(`tahap${t}MultiGallery`);
+            if (gal) {
+                if (t === tahapStr) {
+                    gal.classList.remove('hidden');
+                } else {
+                    gal.classList.add('hidden');
+                }
+            }
+        });
+
+        // 5. Animasi lembut panel
+        tahapDetailPanel.classList.add('ring-1', 'ring-slate-300');
+        setTimeout(() => {
+            tahapDetailPanel.classList.remove('ring-1', 'ring-slate-300');
+        }, 250);
     }
+    window.setActiveTahap = setActiveTahap;
+
+    // Pasang listener pada kartu desktop
+    document.querySelectorAll('.desktop-tahap-card').forEach(card => {
+        card.addEventListener('click', function () {
+            setActiveTahap(this.dataset.tahap);
+        });
+    });
+
+    // Pasang listener pada tab mobile
+    document.querySelectorAll('.mobile-tahap-tab').forEach(tab => {
+        tab.addEventListener('click', function () {
+            setActiveTahap(this.dataset.tahap);
+        });
+    });
 });
 
+// Pilih & Buka Foto dari Strip Galeri Tahapan (Tahap 1, 2, 3, 4)
+function selectTahapPhoto(tahap, idx, url, caption, btn) {
+    const mainImg = document.getElementById('tahapDetailImg');
+    const cap = document.getElementById('tahapDetailCaption');
+    if (mainImg) mainImg.src = url;
+    if (cap) cap.textContent = caption;
+
+    document.querySelectorAll(`.tahap${tahap}-thumb-btn`).forEach(b => {
+        b.classList.remove('ring-2', 'ring-[#071E49]', 'border-[#071E49]');
+        b.classList.add('border-slate-200');
+    });
+    if (btn) {
+        btn.classList.remove('border-slate-200');
+        btn.classList.add('ring-2', 'ring-[#071E49]', 'border-[#071E49]');
+    }
+
+    const gallery = (window.tahapGalleries && window.tahapGalleries[tahap]) ? window.tahapGalleries[tahap] : null;
+    openPhotoModal(url, caption, gallery, idx);
+}
+window.selectTahapPhoto = selectTahapPhoto;
+
+// Backward compatibility untuk pemanggilan lama
+function selectTahap1Photo(url, caption, btn) {
+    selectTahapPhoto('1', 0, url, caption, btn);
+}
+window.selectTahap1Photo = selectTahap1Photo;
+
+// Buka Modal Foto untuk Tahapan yang Sedang Aktif
+function openActiveTahapPhoto() {
+    const activeCard = document.querySelector('.desktop-tahap-card.active') || document.querySelector('.mobile-tahap-tab.active');
+    const tahap = activeCard ? activeCard.dataset.tahap : '1';
+    const gallery = (window.tahapGalleries && window.tahapGalleries[tahap]) ? window.tahapGalleries[tahap] : [];
+    const currentSrc = document.getElementById('tahapDetailImg')?.src || '';
+    const currentCap = document.getElementById('tahapDetailCaption')?.innerText || '';
+    let idx = 0;
+    if (gallery.length > 0) {
+        const found = gallery.findIndex(g => g.url === currentSrc);
+        if (found !== -1) idx = found;
+    }
+    openPhotoModal(currentSrc, currentCap, gallery, idx);
+}
+window.openActiveTahapPhoto = openActiveTahapPhoto;
+
 // Tampilkan Loading State dengan Animasi Jelas
-window.showLoadingState = function () {
+function showLoadingState() {
     const emptyState = document.getElementById('emptyState');
     const loadingState = document.getElementById('loadingState');
     const transparencyResult = document.getElementById('transparencyResult');
@@ -538,29 +671,126 @@ window.showLoadingState = function () {
             <span>Memuat Data...</span>
         `;
     }
-};
+}
+window.showLoadingState = showLoadingState;
 
-// Lightbox Modal Foto
-window.openPhotoModal = function (imgSrc, caption) {
+// State Gallery untuk Lightbox Modal dengan Tombol Geser (Slider Navigasi)
+let currentGallery = [];
+let currentGalleryIndex = 0;
+
+function updateModalView() {
+    const img = document.getElementById('modalImg');
+    const cap = document.getElementById('modalCaption');
+    const counter = document.getElementById('modalCounter');
+    const prevBtn = document.getElementById('modalPrevBtn');
+    const nextBtn = document.getElementById('modalNextBtn');
+
+    if (!currentGallery || currentGallery.length === 0) return;
+    const current = currentGallery[currentGalleryIndex];
+    if (!current) return;
+
+    if (img) img.src = current.url;
+    if (cap) cap.innerText = current.caption || 'Foto Verifikasi Porsi';
+
+    if (currentGallery.length > 1) {
+        if (counter) {
+            counter.innerText = `${currentGalleryIndex + 1} / ${currentGallery.length}`;
+            counter.classList.remove('hidden');
+        }
+        if (prevBtn) prevBtn.classList.remove('hidden');
+        if (nextBtn) nextBtn.classList.remove('hidden');
+    } else {
+        if (counter) counter.classList.add('hidden');
+        if (prevBtn) prevBtn.classList.add('hidden');
+        if (nextBtn) nextBtn.classList.add('hidden');
+    }
+}
+
+// Lightbox Modal Foto dengan Dukungan Slider Navigasi
+function openPhotoModal(imgSrc, caption, galleryList = null, startIndex = 0) {
     const modal = document.getElementById('photoModal');
     const img = document.getElementById('modalImg');
     const cap = document.getElementById('modalCaption');
     if (!modal || !img || !cap) return;
 
-    img.src = imgSrc;
-    cap.innerText = caption || 'Foto Verifikasi Porsi';
+    if (Array.isArray(galleryList) && galleryList.length > 0) {
+        currentGallery = galleryList;
+        currentGalleryIndex = Math.max(0, Math.min(startIndex, galleryList.length - 1));
+    } else {
+        currentGallery = [{ url: imgSrc, caption: caption || 'Foto Verifikasi Porsi' }];
+        currentGalleryIndex = 0;
+    }
+
+    updateModalView();
+
     modal.classList.remove('hidden');
     setTimeout(() => {
         modal.classList.remove('opacity-0');
     }, 10);
-};
+}
+window.openPhotoModal = openPhotoModal;
 
-window.closePhotoModal = function () {
+function prevPhotoModal(e) {
+    if (e) e.stopPropagation();
+    if (!currentGallery || currentGallery.length <= 1) return;
+    currentGalleryIndex = (currentGalleryIndex - 1 + currentGallery.length) % currentGallery.length;
+    updateModalView();
+}
+window.prevPhotoModal = prevPhotoModal;
+
+function nextPhotoModal(e) {
+    if (e) e.stopPropagation();
+    if (!currentGallery || currentGallery.length <= 1) return;
+    currentGalleryIndex = (currentGalleryIndex + 1) % currentGallery.length;
+    updateModalView();
+}
+window.nextPhotoModal = nextPhotoModal;
+
+function closePhotoModal() {
     const modal = document.getElementById('photoModal');
     if (!modal) return;
 
     modal.classList.add('opacity-0');
     setTimeout(() => {
         modal.classList.add('hidden');
-    }, 200);
-};
+    }, 150);
+}
+window.closePhotoModal = closePhotoModal;
+
+// Navigasi Keyboard: Panah Kiri (Prev), Panah Kanan (Next), Escape (Tutup)
+document.addEventListener('keydown', function (e) {
+    const modal = document.getElementById('photoModal');
+    if (!modal || modal.classList.contains('hidden')) return;
+
+    if (e.key === 'ArrowLeft') {
+        prevPhotoModal();
+    } else if (e.key === 'ArrowRight') {
+        nextPhotoModal();
+    } else if (e.key === 'Escape') {
+        closePhotoModal();
+    }
+});
+
+// Dukungan Gestur Geser Layar Sentuh (Mobile Touch Swipe)
+let touchStartX = 0;
+let touchEndX = 0;
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('photoModal');
+    if (modal) {
+        modal.addEventListener('touchstart', function (e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        modal.addEventListener('touchend', function (e) {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchEndX - touchStartX;
+            if (Math.abs(diff) > 40) {
+                if (diff > 0) {
+                    prevPhotoModal();
+                } else {
+                    nextPhotoModal();
+                }
+            }
+        }, { passive: true });
+    }
+});

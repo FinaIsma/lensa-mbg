@@ -132,6 +132,11 @@ class PublicPortalController extends Controller
 
         // Ambil bukti riil database & tahapan alur rantai pasok (Petualangan Bekal)
         $publicEvidences = collect();
+        $tahap1Materials = collect();
+        $tahap1PhotoGallery = collect();
+        $tahap2PhotoGallery = collect();
+        $tahap3PhotoGallery = collect();
+        $tahap4PhotoGallery = collect();
         $stageEvidences = [
             'tahap1' => null,
             'tahap2' => null,
@@ -143,48 +148,120 @@ class PublicPortalController extends Controller
             $batchId = $activeBatch->id;
             $distId = $activeDistribution->id;
 
-            // Tahap 1: Evidence dari receivings bahan baku batch ini
-            $receivingIds = DB::table('material_usages')
-                ->join('material_lots', 'material_usages.material_lot_id', '=', 'material_lots.id')
-                ->join('receiving_items', 'material_lots.receiving_item_id', '=', 'receiving_items.id')
-                ->where('material_usages.production_batch_id', $batchId)
-                ->pluck('receiving_items.receiving_id')
-                ->filter()
-                ->unique();
+            // Tahap 1: Rincian bahan baku terpakai difilter per item bahan dari Menu ID yang aktif (unik per material)
+            if ($activeBatch->materialUsages->isNotEmpty()) {
+                $tahap1Materials = $activeBatch->materialUsages
+                    ->groupBy(function ($mu) {
+                        $lot = $mu->lot ?? $mu->materialLot;
 
-            if ($receivingIds->isNotEmpty()) {
-                $stageEvidences['tahap1'] = Evidence::where('evidenceable_type', 'receivings')
-                    ->whereIn('evidenceable_id', $receivingIds)
-                    ->latest('uploaded_at')
-                    ->first();
+                        return $lot?->material_id ?? $mu->id;
+                    })
+                    ->map(function ($usages) {
+                        $mu = $usages->first();
+                        $lot = $mu->lot ?? $mu->materialLot;
+                        $receiving = $lot?->receivingItem?->receiving;
+                        $ev = $receiving?->evidences?->first();
+
+                        return [
+                            'material_id' => $lot?->material_id,
+                            'nama' => $lot?->material?->nama ?? 'Bahan Pangan Segar',
+                            'kategori' => $lot?->material?->kategori ?? '-',
+                            'supplier' => $lot?->supplier?->nama ?? 'Mitra Petani Lokal',
+                            'received_date' => $lot?->received_date,
+                            'expiry_date' => $lot?->expiry_date,
+                            'photo_url' => $ev?->url,
+                            'photo_desc' => $ev?->description ?? ('Bukti Fisik Timbangan: '.($lot?->material?->nama ?? 'Bahan')),
+                        ];
+                    })
+                    ->values();
+
+                $tahap1PhotoGallery = $tahap1Materials->filter(fn ($m) => ! empty($m['photo_url']))->values();
+
+                if ($tahap1PhotoGallery->isNotEmpty()) {
+                    $firstGalleryItem = $tahap1PhotoGallery->first();
+                    $stageEvidences['tahap1'] = (object) [
+                        'url' => $firstGalleryItem['photo_url'],
+                        'description' => $firstGalleryItem['photo_desc'],
+                        'uploaded_at' => null,
+                    ];
+                }
             }
 
-            // Tahap 2: Evidence dari processing_steps batch ini
+            // Tahap 2: Evidence dari processing_steps batch ini (multi-foto: persiapan, pencucian, pemasakan)
             $stepIds = $activeBatch->processingSteps->pluck('id');
             if ($stepIds->isNotEmpty()) {
-                $stageEvidences['tahap2'] = Evidence::where('evidenceable_type', 'processing_steps')
+                $tahap2Evidences = Evidence::where('evidenceable_type', 'processing_steps')
                     ->whereIn('evidenceable_id', $stepIds)
-                    ->latest('uploaded_at')
-                    ->first();
+                    ->orderBy('uploaded_at', 'asc')
+                    ->get();
+
+                if ($tahap2Evidences->isNotEmpty()) {
+                    $stageEvidences['tahap2'] = $tahap2Evidences->first();
+                    $tahap2PhotoGallery = $tahap2Evidences->map(function ($ev) {
+                        $desc = $ev->description ?? 'Proses Pengolahan Dapur SPPG';
+                        $cleanTitle = trim(str_ireplace([
+                            'Foto bukti penyelesaian tahap: ', 'Foto bukti penyelesaian tahap:',
+                            'Foto bukti tahap: ', 'Foto bukti tahap:',
+                            'Foto bukti tahap', 'Foto bukti penyelesaian',
+                        ], '', $desc));
+
+                        return [
+                            'url' => $ev->url,
+                            'caption' => $desc,
+                            'title' => ! empty($cleanTitle) ? $cleanTitle : 'Dapur SPPG',
+                        ];
+                    })->values();
+                }
             }
 
-            // Tahap 3: Evidence dari pre_distribution_checks batch ini
+            // Tahap 3: Evidence dari pre_distribution_checks batch ini (QC kelayakan saji & porsi saji)
             $qcId = $activeBatch->preDistributionCheck?->id;
-            if ($qcId) {
-                $stageEvidences['tahap3'] = Evidence::where('evidenceable_type', 'pre_distribution_checks')
-                    ->where('evidenceable_id', $qcId)
-                    ->latest('uploaded_at')
-                    ->first();
+            $tahap3Evidences = Evidence::where(function ($q) use ($qcId, $batchId) {
+                if ($qcId) {
+                    $q->where('evidenceable_type', 'pre_distribution_checks')->where('evidenceable_id', $qcId);
+                }
+                if ($batchId) {
+                    $q->orWhere(function ($s) use ($batchId) {
+                        $s->where('evidenceable_type', 'production_batches')->where('evidenceable_id', $batchId);
+                    });
+                }
+            })->orderBy('uploaded_at', 'asc')->get();
+
+            if ($tahap3Evidences->isNotEmpty()) {
+                $stageEvidences['tahap3'] = $tahap3Evidences->first();
+                $tahap3PhotoGallery = $tahap3Evidences->map(function ($ev) {
+                    return [
+                        'url' => $ev->url,
+                        'caption' => $ev->description ?? 'Uji Kelayakan Saji & Standar Mutu Gizi',
+                        'title' => 'Uji Mutu Gizi',
+                    ];
+                })->values();
             }
 
-            // Tahap 4: Evidence dari pengiriman / penerimaan distribusi ini
-            $stageEvidences['tahap4'] = Evidence::where('evidenceable_type', 'distributions')
+            // Tahap 4: Evidence dari pengiriman / penerimaan distribusi ini (multi-foto: armada pendingin & serah terima sekolah)
+            $tahap4Evidences = Evidence::where('evidenceable_type', 'distributions')
                 ->where('evidenceable_id', $distId)
-                ->latest('uploaded_at')
-                ->first();
+                ->orderBy('uploaded_at', 'asc')
+                ->get();
 
-            // Koleksi semua bukti foto terkait batch & distribusi untuk galeri bukti riil
-            $publicEvidences = Evidence::where(function ($q) use ($batchId, $distId, $receivingIds, $stepIds, $qcId) {
+            if ($tahap4Evidences->isNotEmpty()) {
+                $stageEvidences['tahap4'] = $tahap4Evidences->first();
+                $tahap4PhotoGallery = $tahap4Evidences->map(function ($ev) {
+                    $desc = $ev->description ?? 'Dokumentasi Distribusi Lapangan';
+                    $title = str_contains(strtolower($desc), 'terima') || str_contains(strtolower($desc), 'penerima')
+                        ? 'Serah Terima'
+                        : (str_contains(strtolower($desc), 'box') || str_contains(strtolower($desc), 'armada') || str_contains(strtolower($desc), 'mobil') ? 'Armada Pengantar' : 'Distribusi');
+
+                    return [
+                        'url' => $ev->url,
+                        'caption' => $desc,
+                        'title' => $title,
+                    ];
+                })->values();
+            }
+
+            // Koleksi bukti foto porsi sajian, QC kelayakan, dan distribusi (khusus porsi sajian batch/menu aktif)
+            $publicEvidences = Evidence::where(function ($q) use ($batchId, $distId, $qcId) {
                 $q->where(function ($sub) use ($batchId) {
                     $sub->where('evidenceable_type', 'production_batches')
                         ->where('evidenceable_id', $batchId);
@@ -196,20 +273,11 @@ class PublicPortalController extends Controller
                         $s->where('evidenceable_type', 'pre_distribution_checks')
                             ->where('evidenceable_id', $qcId);
                     });
-                })->when($stepIds->isNotEmpty(), function ($sub) use ($stepIds) {
-                    $sub->orWhere(function ($s) use ($stepIds) {
-                        $s->where('evidenceable_type', 'processing_steps')
-                            ->whereIn('evidenceable_id', $stepIds);
-                    });
-                })->when($receivingIds->isNotEmpty(), function ($sub) use ($receivingIds) {
-                    $sub->orWhere(function ($s) use ($receivingIds) {
-                        $s->where('evidenceable_type', 'receivings')
-                            ->whereIn('evidenceable_id', $receivingIds);
-                    });
                 });
             })
                 ->latest('uploaded_at')
                 ->get();
+
             // Porsi Photo Evidence spesifik (uji mutu porsi hasil saji batch ini)
             $porsiPhotoEvidence = $stageEvidences['tahap3']
                 ?? Evidence::where('evidenceable_type', 'pre_distribution_checks')->where('evidenceable_id', $qcId)->first()
@@ -253,6 +321,11 @@ class PublicPortalController extends Controller
             'activeBatch',
             'porsiPhotoEvidence',
             'stageEvidences',
+            'tahap1Materials',
+            'tahap1PhotoGallery',
+            'tahap2PhotoGallery',
+            'tahap3PhotoGallery',
+            'tahap4PhotoGallery',
             'publicEvidences',
             'sppgList',
             'jadwal'
@@ -540,53 +613,85 @@ class PublicPortalController extends Controller
                 'sppg',
                 'materialUsages.lot.material',
                 'materialUsages.lot.supplier',
-                'processingSteps' => fn ($q) => $q->orderBy('started_at', 'asc')->orderBy('id', 'asc'),
-                'preDistributionCheck',
-                'distributions' => fn ($q) => $q->whereIn('status', ['sent', 'received'])->with('destination'),
+                'materialUsages.lot.receivingItem.receiving.evidences',
+                'processingSteps' => fn ($q) => $q->with('evidences')->orderBy('started_at', 'asc')->orderBy('id', 'asc'),
+                'preDistributionCheck.evidences',
+                'distributions' => fn ($q) => $q->whereIn('status', ['sent', 'received'])->with(['destination', 'evidences']),
             ])
                 ->where('batch_code', $cleanCode)
                 ->whereIn('status', ['distributed', 'completed', 'ready'])
                 ->first();
 
             if ($batch) {
-                // Ambil daftar bahan & supplier unik
-                $materials = $batch->materialUsages->map(function ($mu) {
-                    $lot = $mu->lot ?? $mu->materialLot;
+                // Ambil daftar bahan unik per material ID dari resep menu ini beserta bukti foto timbangan
+                $materials = $batch->materialUsages
+                    ->groupBy(function ($mu) {
+                        $lot = $mu->lot ?? $mu->materialLot;
 
-                    return [
-                        'material_nama' => $lot?->material?->nama ?? 'Bahan Makanan',
-                        'kategori' => $lot?->material?->kategori ?? '-',
-                        'supplier_nama' => $lot?->supplier?->nama ?? 'Mitra Petani / Pemasok Lokal',
-                        'received_date' => $lot?->received_date,
-                        'expiry_date' => $lot?->expiry_date,
-                    ];
-                });
+                        return $lot?->material_id ?? $mu->id;
+                    })
+                    ->map(function ($usages) {
+                        $mu = $usages->first();
+                        $lot = $mu->lot ?? $mu->materialLot;
+                        $receiving = $lot?->receivingItem?->receiving;
+                        $ev = $receiving?->evidences?->first();
+
+                        return [
+                            'material_id' => $lot?->material_id,
+                            'material_nama' => $lot?->material?->nama ?? 'Bahan Makanan',
+                            'kategori' => $lot?->material?->kategori ?? '-',
+                            'supplier_nama' => $lot?->supplier?->nama ?? 'Mitra Petani / Pemasok Lokal',
+                            'received_date' => $lot?->received_date,
+                            'expiry_date' => $lot?->expiry_date,
+                            'photo_url' => $ev?->url,
+                            'photo_desc' => $ev?->description ?? ('Bukti Fisik Timbangan: '.($lot?->material?->nama ?? 'Bahan')),
+                        ];
+                    })
+                    ->values();
 
                 $steps = $batch->processingSteps;
                 $qcCheck = $batch->preDistributionCheck;
                 $distributions = $batch->distributions;
 
-                // Ambil foto bukti publik
+                // Ambil semua foto bukti riil (dari penerimaan bahan, pengolahan dapur, QC saji, hingga serah terima sekolah)
                 $batchId = $batch->id;
                 $distIds = $distributions->pluck('id')->toArray();
+                $stepIds = $steps->pluck('id')->toArray();
+                $qcId = $qcCheck?->id;
 
-                $publicEvidences = Evidence::where('is_public', true)
-                    ->where(function ($q) use ($batchId, $distIds) {
-                        $q->where(function ($sub) use ($batchId) {
-                            $sub->where('evidenceable_type', 'production_batches')
-                                ->where('evidenceable_id', $batchId);
-                        })->orWhere(function ($sub) use ($distIds) {
-                            $sub->where('evidenceable_type', 'distributions')
-                                ->whereIn('evidenceable_id', $distIds);
-                        })->orWhere(function ($sub) use ($batchId) {
-                            $sub->where('evidenceable_type', 'pre_distribution_checks')
-                                ->whereIn('evidenceable_id', function ($checkQuery) use ($batchId) {
-                                    $checkQuery->select('id')
-                                        ->from('pre_distribution_checks')
-                                        ->where('production_batch_id', $batchId);
-                                });
+                $receivingIds = DB::table('material_usages')
+                    ->join('material_lots', 'material_usages.material_lot_id', '=', 'material_lots.id')
+                    ->join('receiving_items', 'material_lots.receiving_item_id', '=', 'receiving_items.id')
+                    ->where('material_usages.production_batch_id', $batchId)
+                    ->pluck('receiving_items.receiving_id')
+                    ->filter()
+                    ->unique()
+                    ->toArray();
+
+                $publicEvidences = Evidence::where(function ($q) use ($batchId, $distIds, $qcId, $stepIds, $receivingIds) {
+                    $q->where(function ($sub) use ($batchId) {
+                        $sub->where('evidenceable_type', 'production_batches')
+                            ->where('evidenceable_id', $batchId);
+                    })->orWhere(function ($sub) use ($distIds) {
+                        $sub->where('evidenceable_type', 'distributions')
+                            ->whereIn('evidenceable_id', $distIds);
+                    })->when($qcId, function ($sub) use ($qcId) {
+                        $sub->orWhere(function ($s) use ($qcId) {
+                            $s->where('evidenceable_type', 'pre_distribution_checks')
+                                ->where('evidenceable_id', $qcId);
                         });
-                    })
+                    })->when(! empty($stepIds), function ($sub) use ($stepIds) {
+                        $sub->orWhere(function ($s) use ($stepIds) {
+                            $s->where('evidenceable_type', 'processing_steps')
+                                ->whereIn('evidenceable_id', $stepIds);
+                        });
+                    })->when(! empty($receivingIds), function ($sub) use ($receivingIds) {
+                        $sub->orWhere(function ($s) use ($receivingIds) {
+                            $s->where('evidenceable_type', 'receivings')
+                                ->whereIn('evidenceable_id', $receivingIds);
+                        });
+                    });
+                })
                     ->latest('uploaded_at')
                     ->get();
             }
