@@ -5,7 +5,7 @@
     <div class="pengiriman-modal-dialog">
         <div class="pengiriman-modal-header">
             <h3 class="pengiriman-modal-title" id="modalCatatTitle">Catat Pengiriman Makanan</h3>
-            <button type="button" class="pengiriman-modal-close" onclick="closeModalCatat()" aria-label="Tutup modal">
+            <button type="button" class="pengiriman-modal-close" onclick="closeModalCatatPengiriman()" aria-label="Tutup modal">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -141,7 +141,7 @@
     <div class="pengiriman-modal-dialog">
         <div class="pengiriman-modal-header">
             <h3 class="pengiriman-modal-title" id="modalEditTitle">Ubah Alokasi Pengiriman</h3>
-            <button type="button" class="pengiriman-modal-close" onclick="closeModalEdit()" aria-label="Tutup modal">
+            <button type="button" class="pengiriman-modal-close" onclick="closeModalEditPengiriman()" aria-label="Tutup modal">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -194,7 +194,7 @@
             </div>
 
             <div class="pengiriman-modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModalEdit()">Batal</button>
+                <button type="button" class="btn-secondary" onclick="closeModalEditPengiriman()">Batal</button>
                 <button type="submit" class="btn-primary">
                     <span>Simpan Perubahan</span>
                 </button>
@@ -210,7 +210,7 @@
     <div class="pengiriman-modal-dialog">
         <div class="pengiriman-modal-header">
             <h3 class="pengiriman-modal-title" id="modalSentTitle">Memberangkatkan Pengiriman</h3>
-            <button type="button" class="pengiriman-modal-close" onclick="closeModalSent()" aria-label="Tutup modal">
+            <button type="button" class="pengiriman-modal-close" onclick="closeModalSentPengiriman()" aria-label="Tutup modal">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -221,7 +221,11 @@
         <form action="" method="POST" enctype="multipart/form-data" id="formSentPengiriman">
             @csrf
             <div class="pengiriman-modal-body">
-                <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-between text-xs text-blue-900">
+                <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-between text-xs text-blue-900 gap-2">
+                    <div>
+                        <span class="text-blue-600">Batch:</span>
+                        <strong class="ml-1" id="sent_batch_label">-</strong>
+                    </div>
                     <div>
                         <span class="text-blue-600">Tujuan:</span>
                         <strong class="ml-1" id="sent_dest_label">-</strong>
@@ -253,7 +257,7 @@
             </div>
 
             <div class="pengiriman-modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModalSent()">Batal</button>
+                <button type="button" class="btn-secondary" onclick="closeModalSentPengiriman()">Batal</button>
                 <button type="submit" class="btn-primary" style="background-color: #2563EB;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -273,7 +277,7 @@
     <div class="pengiriman-modal-dialog">
         <div class="pengiriman-modal-header">
             <h3 class="pengiriman-modal-title" id="modalRecvTitle">Bukti Penerimaan Makanan MBG</h3>
-            <button type="button" class="pengiriman-modal-close" onclick="closeModalReceived()" aria-label="Tutup modal">
+            <button type="button" class="pengiriman-modal-close" onclick="closeModalReceivedPengiriman()" aria-label="Tutup modal">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -368,7 +372,7 @@
             </div>
 
             <div class="pengiriman-modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModalReceived()">Batal</button>
+                <button type="button" class="btn-secondary" onclick="closeModalReceivedPengiriman()">Batal</button>
                 <button type="submit" class="btn-primary" style="background-color: #16A34A;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
@@ -387,7 +391,7 @@
     <div class="pengiriman-modal-dialog">
         <div class="pengiriman-modal-header">
             <h3 class="pengiriman-modal-title text-red-600" id="modalCancelTitle">Batalkan Rencana Pengiriman</h3>
-            <button type="button" class="pengiriman-modal-close" onclick="closeModalCancel()" aria-label="Tutup modal">
+            <button type="button" class="pengiriman-modal-close" onclick="closeModalCancelPengiriman()" aria-label="Tutup modal">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -399,7 +403,7 @@
             @csrf
             <div class="pengiriman-modal-body">
                 <div class="p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-800">
-                    <div>Membatalkan alokasi pengiriman ke: <strong id="cancel_dest_label">-</strong></div>
+                    <div>Membatalkan alokasi pengiriman batch <strong id="cancel_batch_label">-</strong> ke <strong id="cancel_dest_label">-</strong></div>
                     <div class="mt-1 text-slate-500">Porsi dari pengiriman ini akan otomatis dikembalikan ke sisa kuota batch terkait.</div>
                 </div>
 
@@ -412,7 +416,7 @@
             </div>
 
             <div class="pengiriman-modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModalCancel()">Kembali</button>
+                <button type="button" class="btn-secondary" onclick="closeModalCancelPengiriman()">Kembali</button>
                 <button type="submit" class="btn-primary" style="background-color: #DC2626;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -429,7 +433,7 @@
 {{-- ==========================================================================
      6. SLIDE-OVER DRAWER DETAIL PENGIRIMAN
      ========================================================================== --}}
-<div class="pengiriman-drawer-backdrop" id="drawerDetailPengiriman" onclick="if(event.target === this) closeDrawerDetail()">
+<div class="pengiriman-drawer-backdrop" id="drawerDetailPengiriman" onclick="if(event.target === this) closeDrawerDetailPengiriman()">
     <div class="pengiriman-drawer-dialog">
         <div class="pengiriman-drawer-header">
             <div>
@@ -441,7 +445,7 @@
                     <span class="status-dot"></span>
                     <span id="drawer_status_text">Direncanakan</span>
                 </span>
-                <button type="button" class="pengiriman-drawer-close" onclick="closeDrawerDetail()" aria-label="Tutup drawer">
+                <button type="button" class="pengiriman-drawer-close" onclick="closeDrawerDetailPengiriman()" aria-label="Tutup drawer">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -553,7 +557,7 @@
 
         {{-- Drawer Footer Actions --}}
         <div class="pengiriman-drawer-footer">
-            <button type="button" class="btn-act btn-act-detail" onclick="closeDrawerDetail()">Tutup</button>
+            <button type="button" class="btn-act btn-act-detail" onclick="closeDrawerDetailPengiriman()">Tutup</button>
             <div id="drawer_footer_actions" class="flex items-center gap-2"></div>
         </div>
     </div>

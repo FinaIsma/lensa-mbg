@@ -114,57 +114,57 @@ window.onBatchChange = function (selectEl) {
             'Accept': 'application/json'
         }
     })
-    .then(res => res.json())
-    .then(res => {
-        if (!res.success || !res.data) {
-            alert(res.message || 'Gagal memuat informasi batch.');
-            return;
-        }
+        .then(res => res.json())
+        .then(res => {
+            if (!res.success || !res.data) {
+                alert(res.message || 'Gagal memuat informasi batch.');
+                return;
+            }
 
-        const data = res.data;
-        document.getElementById('sum_batch_menu').textContent = `${data.batch_code} - ${data.menu_nama}`;
-        document.getElementById('sum_target_porsi').textContent = `${formatNumber(data.target_porsi)} Porsi`;
-        document.getElementById('sum_actual_porsi').textContent = `${formatNumber(data.actual_porsi)} Porsi`;
-        document.getElementById('sum_allocated_porsi').textContent = `${formatNumber(data.allocated_porsi)} Porsi`;
-        
-        const sisaEl = document.getElementById('sum_sisa_porsi');
-        sisaEl.textContent = `${formatNumber(data.sisa_porsi)} Porsi`;
-        sisaEl.style.color = data.sisa_porsi > 0 ? '#10B981' : '#EF4444';
+            const data = res.data;
+            document.getElementById('sum_batch_menu').textContent = `${data.batch_code} - ${data.menu_nama}`;
+            document.getElementById('sum_target_porsi').textContent = `${formatNumber(data.target_porsi)} Porsi`;
+            document.getElementById('sum_actual_porsi').textContent = `${formatNumber(data.actual_porsi)} Porsi`;
+            document.getElementById('sum_allocated_porsi').textContent = `${formatNumber(data.allocated_porsi)} Porsi`;
 
-        const consumeEl = document.getElementById('sum_consume_by');
-        if (consumeEl) {
-            consumeEl.textContent = data.consume_by || 'Maks. 4 Jam';
-        }
+            const sisaEl = document.getElementById('sum_sisa_porsi');
+            sisaEl.textContent = `${formatNumber(data.sisa_porsi)} Porsi`;
+            sisaEl.style.color = data.sisa_porsi > 0 ? '#10B981' : '#EF4444';
 
-        if (portionInput) {
-            portionInput.max = data.sisa_porsi;
-            if (data.sisa_porsi <= 0) {
-                portionInput.value = 0;
-                portionInput.disabled = true;
-            } else {
-                portionInput.disabled = false;
-                if (!portionInput.value || parseInt(portionInput.value) > data.sisa_porsi) {
-                    portionInput.value = data.sisa_porsi;
+            const consumeEl = document.getElementById('sum_consume_by');
+            if (consumeEl) {
+                consumeEl.textContent = data.consume_by || 'Maks. 4 Jam';
+            }
+
+            if (portionInput) {
+                portionInput.max = data.sisa_porsi;
+                if (data.sisa_porsi <= 0) {
+                    portionInput.value = 0;
+                    portionInput.disabled = true;
+                } else {
+                    portionInput.disabled = false;
+                    if (!portionInput.value || parseInt(portionInput.value) > data.sisa_porsi) {
+                        portionInput.value = data.sisa_porsi;
+                    }
                 }
             }
-        }
 
-        // Listener check kuota real-time
-        if (portionInput) {
-            portionInput.oninput = () => {
-                const val = parseInt(portionInput.value) || 0;
-                if (val > data.sisa_porsi) {
-                    warningEl.textContent = `Peringatan: Jumlah input (${val}) melebihi sisa porsi siap kirim (${data.sisa_porsi} porsi).`;
-                    warningEl.style.display = 'block';
-                } else {
-                    warningEl.style.display = 'none';
-                }
-            };
-        }
-    })
-    .catch(err => {
-        console.error('Fetch error:', err);
-    });
+            // Listener check kuota real-time
+            if (portionInput) {
+                portionInput.oninput = () => {
+                    const val = parseInt(portionInput.value) || 0;
+                    if (val > data.sisa_porsi) {
+                        warningEl.textContent = `Peringatan: Jumlah input (${val}) melebihi sisa porsi siap kirim (${data.sisa_porsi} porsi).`;
+                        warningEl.style.display = 'block';
+                    } else {
+                        warningEl.style.display = 'none';
+                    }
+                };
+            }
+        })
+        .catch(err => {
+            console.error('Fetch error:', err);
+        });
 };
 
 /* ==========================================================================
@@ -330,131 +330,131 @@ window.openDrawerDetail = function (id) {
             'Accept': 'application/json'
         }
     })
-    .then(res => res.json())
-    .then(res => {
-        if (!res.success || !res.data) {
-            alert(res.message || 'Gagal memuat detail pengiriman.');
-            closeDrawerDetail();
-            return;
-        }
-
-        const d = res.data;
-
-        const setText = (id, text) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = text !== null && text !== undefined ? text : '-';
-        };
-
-        // Header info
-        setText('drawer_shipment_id', `#KRM-${String(d.id).padStart(4, '0')}`);
-        
-        const badgeEl = document.getElementById('drawer_status_badge');
-        if (badgeEl) {
-            badgeEl.innerHTML = `<span class="status-dot"></span><span>${d.status_label || '-'}</span>`;
-            badgeEl.className = `badge-status ${d.status_badge_class || 'badge-planned'}`;
-        }
-
-        // Timeline Step: 1=planned, 2=sent, 3=received
-        const step1 = document.getElementById('timeline_step_1');
-        const step2 = document.getElementById('timeline_step_2');
-        const step3 = document.getElementById('timeline_step_3');
-
-        if (step1 && step2 && step3) {
-            step1.className = 'timeline-step';
-            step2.className = 'timeline-step';
-            step3.className = 'timeline-step';
-
-            if (d.status === 'cancelled') {
-                step1.classList.add('completed');
-                const lbl = step2.querySelector('.timeline-label');
-                if (lbl) lbl.textContent = 'Dibatalkan';
-                step2.classList.add('active');
-                const node = step2.querySelector('.timeline-node');
-                if (node) {
-                    node.style.backgroundColor = '#EF4444';
-                    node.style.borderColor = '#EF4444';
-                }
-            } else {
-                const lbl = step2.querySelector('.timeline-label');
-                if (lbl) lbl.textContent = 'Dalam Kirim';
-                const node = step2.querySelector('.timeline-node');
-                if (node) {
-                    node.style.backgroundColor = '';
-                    node.style.borderColor = '';
-                }
-
-                if (d.timeline_step >= 1) step1.classList.add(d.timeline_step > 1 ? 'completed' : 'active');
-                if (d.timeline_step >= 2) step2.classList.add(d.timeline_step > 2 ? 'completed' : 'active');
-                if (d.timeline_step >= 3) step3.classList.add('completed');
+        .then(res => res.json())
+        .then(res => {
+            if (!res.success || !res.data) {
+                alert(res.message || 'Gagal memuat detail pengiriman.');
+                closeDrawerDetail();
+                return;
             }
-        }
 
-        // Card Tujuan
-        if (d.destination) {
-            setText('drawer_dest_name', d.destination.nama);
-            setText('drawer_dest_type', d.destination.tipe);
-            setText('drawer_dest_address', d.destination.alamat);
-            setText('drawer_dest_target', `${formatNumber(d.destination.target_penerima)} Porsi Target`);
-        }
+            const d = res.data;
 
-        // Card Batch & Porsi
-        if (d.batch) {
-            setText('drawer_batch_code', d.batch.batch_code);
-            setText('drawer_menu_name', d.batch.menu_nama);
-            setText('drawer_batch_target', formatNumber(d.batch.target_porsi));
-            setText('drawer_batch_actual', formatNumber(d.batch.actual_porsi));
-            setText('drawer_batch_allocated', formatNumber(d.batch.allocated_porsi));
-            setText('drawer_batch_sisa', formatNumber(d.batch.sisa_porsi));
+            const setText = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = text !== null && text !== undefined ? text : '-';
+            };
 
-            // Progress persentase alokasi batch
-            const pctAllocated = d.batch.actual_porsi > 0
-                ? Math.min(100, Math.round((d.batch.allocated_porsi / d.batch.actual_porsi) * 100))
-                : 0;
-            const bar = document.getElementById('drawer_batch_progress_bar');
-            if (bar) bar.style.width = `${pctAllocated}%`;
-            setText('drawer_batch_pct', `${pctAllocated}% Dialokasikan`);
-        }
-        setText('drawer_portions_sent', `${formatNumber(d.portions_sent)} Porsi`);
+            // Header info
+            setText('drawer_shipment_id', `#KRM-${String(d.id).padStart(4, '0')}`);
 
-        // Meta timestamps & Petugas
-        setText('drawer_distributed_at', d.distributed_at);
-        setText('drawer_recorder_name', d.recorder_name);
-        setText('drawer_created_at', d.created_at);
+            const badgeEl = document.getElementById('drawer_status_badge');
+            if (badgeEl) {
+                badgeEl.innerHTML = `<span class="status-dot"></span><span>${d.status_label || '-'}</span>`;
+                badgeEl.className = `badge-status ${d.status_badge_class || 'badge-planned'}`;
+            }
 
-        // Evidence Gallery
-        const evidenceContainer = document.getElementById('drawer_evidences_list');
-        const emptyEvidence = document.getElementById('drawer_no_evidence');
-        if (evidenceContainer) {
-            evidenceContainer.innerHTML = '';
+            // Timeline Step: 1=planned, 2=sent, 3=received
+            const step1 = document.getElementById('timeline_step_1');
+            const step2 = document.getElementById('timeline_step_2');
+            const step3 = document.getElementById('timeline_step_3');
 
-            if (d.evidences && d.evidences.length > 0) {
-                if (emptyEvidence) emptyEvidence.style.display = 'none';
-                d.evidences.forEach(ev => {
-                    const card = document.createElement('a');
-                    card.href = ev.file_url;
-                    card.target = '_blank';
-                    card.className = 'evidence-thumb-card';
-                    card.innerHTML = `
+            if (step1 && step2 && step3) {
+                step1.className = 'timeline-step';
+                step2.className = 'timeline-step';
+                step3.className = 'timeline-step';
+
+                if (d.status === 'cancelled') {
+                    step1.classList.add('completed');
+                    const lbl = step2.querySelector('.timeline-label');
+                    if (lbl) lbl.textContent = 'Dibatalkan';
+                    step2.classList.add('active');
+                    const node = step2.querySelector('.timeline-node');
+                    if (node) {
+                        node.style.backgroundColor = '#EF4444';
+                        node.style.borderColor = '#EF4444';
+                    }
+                } else {
+                    const lbl = step2.querySelector('.timeline-label');
+                    if (lbl) lbl.textContent = 'Dalam Kirim';
+                    const node = step2.querySelector('.timeline-node');
+                    if (node) {
+                        node.style.backgroundColor = '';
+                        node.style.borderColor = '';
+                    }
+
+                    if (d.timeline_step >= 1) step1.classList.add(d.timeline_step > 1 ? 'completed' : 'active');
+                    if (d.timeline_step >= 2) step2.classList.add(d.timeline_step > 2 ? 'completed' : 'active');
+                    if (d.timeline_step >= 3) step3.classList.add('completed');
+                }
+            }
+
+            // Card Tujuan
+            if (d.destination) {
+                setText('drawer_dest_name', d.destination.nama);
+                setText('drawer_dest_type', d.destination.tipe);
+                setText('drawer_dest_address', d.destination.alamat);
+                setText('drawer_dest_target', `${formatNumber(d.destination.target_penerima)} Porsi Target`);
+            }
+
+            // Card Batch & Porsi
+            if (d.batch) {
+                setText('drawer_batch_code', d.batch.batch_code);
+                setText('drawer_menu_name', d.batch.menu_nama);
+                setText('drawer_batch_target', formatNumber(d.batch.target_porsi));
+                setText('drawer_batch_actual', formatNumber(d.batch.actual_porsi));
+                setText('drawer_batch_allocated', formatNumber(d.batch.allocated_porsi));
+                setText('drawer_batch_sisa', formatNumber(d.batch.sisa_porsi));
+
+                // Progress persentase alokasi batch
+                const pctAllocated = d.batch.actual_porsi > 0
+                    ? Math.min(100, Math.round((d.batch.allocated_porsi / d.batch.actual_porsi) * 100))
+                    : 0;
+                const bar = document.getElementById('drawer_batch_progress_bar');
+                if (bar) bar.style.width = `${pctAllocated}%`;
+                setText('drawer_batch_pct', `${pctAllocated}% Dialokasikan`);
+            }
+            setText('drawer_portions_sent', `${formatNumber(d.portions_sent)} Porsi`);
+
+            // Meta timestamps & Petugas
+            setText('drawer_distributed_at', d.distributed_at);
+            setText('drawer_recorder_name', d.recorder_name);
+            setText('drawer_created_at', d.created_at);
+
+            // Evidence Gallery
+            const evidenceContainer = document.getElementById('drawer_evidences_list');
+            const emptyEvidence = document.getElementById('drawer_no_evidence');
+            if (evidenceContainer) {
+                evidenceContainer.innerHTML = '';
+
+                if (d.evidences && d.evidences.length > 0) {
+                    if (emptyEvidence) emptyEvidence.style.display = 'none';
+                    d.evidences.forEach(ev => {
+                        const card = document.createElement('a');
+                        card.href = ev.file_url;
+                        card.target = '_blank';
+                        card.className = 'evidence-thumb-card';
+                        card.innerHTML = `
                         <img src="${ev.file_url}" alt="Bukti Foto" class="evidence-thumb-img" loading="lazy">
                         <div class="evidence-thumb-info">
                             <div class="font-semibold text-slate-800 truncate">${ev.description || 'Foto Pengiriman'}</div>
                             <div class="text-[10px] text-slate-500">${ev.uploaded_at}</div>
                         </div>
                     `;
-                    evidenceContainer.appendChild(card);
-                });
-            } else {
-                if (emptyEvidence) emptyEvidence.style.display = 'block';
+                        evidenceContainer.appendChild(card);
+                    });
+                } else {
+                    if (emptyEvidence) emptyEvidence.style.display = 'block';
+                }
             }
-        }
 
-        // Tombol Aksi di Footer Drawer
-        const footerActions = document.getElementById('drawer_footer_actions');
-        if (footerActions) {
-            footerActions.innerHTML = '';
+            // Tombol Aksi di Footer Drawer
+            const footerActions = document.getElementById('drawer_footer_actions');
+            if (footerActions) {
+                footerActions.innerHTML = '';
 
-            if (d.status === 'planned' && d.destination && d.batch) {
-                footerActions.innerHTML = `
+                if (d.status === 'planned' && d.destination && d.batch) {
+                    footerActions.innerHTML = `
                     <button type="button" class="btn-act btn-act-cancel" onclick="closeDrawerDetail(); openModalCancel(${d.id}, '${d.destination.nama}', '${d.batch.batch_code}')">
                         Batalkan
                     </button>
@@ -462,25 +462,25 @@ window.openDrawerDetail = function (id) {
                         Memberangkatkan
                     </button>
                 `;
-            } else if (d.status === 'sent' && d.destination && d.batch) {
-                footerActions.innerHTML = `
+                } else if (d.status === 'sent' && d.destination && d.batch) {
+                    footerActions.innerHTML = `
                     <button type="button" class="btn-act btn-act-receive" onclick="closeDrawerDetail(); openModalReceived(${d.id}, '${d.destination.nama}', '${d.batch.batch_code}', ${d.portions_sent})">
                         Tandai Telah Diterima
                     </button>
                 `;
+                }
             }
-        }
 
-        const loader = document.getElementById('drawer_loading');
-        if (loader) loader.style.display = 'none';
-        const content = document.getElementById('drawer_content');
-        if (content) content.style.display = 'flex';
-    })
-    .catch(err => {
-        console.error('Drawer fetch error:', err);
-        alert('Terjadi kesalahan saat memuat detail pengiriman.');
-        closeDrawerDetail();
-    });
+            const loader = document.getElementById('drawer_loading');
+            if (loader) loader.style.display = 'none';
+            const content = document.getElementById('drawer_content');
+            if (content) content.style.display = 'flex';
+        })
+        .catch(err => {
+            console.error('Drawer fetch error:', err);
+            alert('Terjadi kesalahan saat memuat detail pengiriman.');
+            closeDrawerDetail();
+        });
 };
 
 window.closeDrawerDetail = function () {
