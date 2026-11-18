@@ -21,9 +21,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if (
+            $this->app->environment('production') ||
+            str_starts_with((string) config('app.url'), 'https://') ||
             (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
-            (isset($_SERVER['HTTP_HOST']) && (str_contains($_SERVER['HTTP_HOST'], 'trycloudflare.com') || str_contains($_SERVER['HTTP_HOST'], 'ngrok'))) ||
-            str_starts_with((string) config('app.url'), 'https://')
+            (isset($_SERVER['HTTP_HOST']) && (str_contains($_SERVER['HTTP_HOST'], 'trycloudflare.com') || str_contains($_SERVER['HTTP_HOST'], 'ngrok')))
         ) {
             URL::forceScheme('https');
         }
