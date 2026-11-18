@@ -150,7 +150,7 @@ class DashboardTest extends TestCase
         $response->assertSee('Monitoring Alur Operasional Dapur Hari Ini');
         $response->assertSee('Pembelian PO');
         $response->assertSee('Penerimaan');
-        $response->assertSee('Pemasakan');
+        $response->assertSee('Pengolahan');
         $response->assertSee('Distribusi');
         $response->assertSee('Antrean Pengiriman Terbaru');
         $response->assertSee('Peringatan Stok');

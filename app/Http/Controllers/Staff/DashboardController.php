@@ -53,54 +53,43 @@ class DashboardController extends Controller
         $todayStr = $now->translatedFormat('l, d F Y');
 
         // ==========================================
-        // 1. STAT CARDS METRIK OPERASIONAL (REAL DATABASE)
+        // 1. PENENTUAN TANGGAL OPERASIONAL HARIAN (MURNI HARI INI)
+        // ==========================================
+        $operationalDate = Carbon::today()->toDateString();
+        $batchesQuery = DB::table('production_batches')->where('id_sppg', $idSppg);
+
+        $distQueryBase = DB::table('distributions')
+            ->join('distribution_destinations', 'distributions.destination_id', '=', 'distribution_destinations.id')
+            ->where('distribution_destinations.id_sppg', $idSppg);
+
+        // ==========================================
+        // 2. STAT CARDS METRIK OPERASIONAL (HARIAN)
         // ==========================================
         $totalMenu = Menu::where('id_sppg', $idSppg)->count();
         $totalResep = Recipe::whereHas('menu', fn ($q) => $q->where('id_sppg', $idSppg))->count();
         $activeResep = Recipe::whereHas('menu', fn ($q) => $q->where('id_sppg', $idSppg))->where('status', 'active')->count();
 
-        // A. Porsi Siap & Target (Sesuai tanggal operasional terkini di database)
-        $batchesQuery = DB::table('production_batches')->where('id_sppg', $idSppg);
-        $hasTodayBatch = (clone $batchesQuery)->whereDate('production_date', Carbon::today())->exists();
-
-        if ($hasTodayBatch) {
-            $batchesScope = (clone $batchesQuery)->whereDate('production_date', Carbon::today())->get();
-        } else {
-            // Ambil tanggal batch operasional terkini
-            $latestBatchDate = (clone $batchesQuery)->orderByDesc('production_date')->value('production_date');
-            if ($latestBatchDate) {
-                $batchesScope = (clone $batchesQuery)->whereDate('production_date', $latestBatchDate)->get();
-            } else {
-                $batchesScope = (clone $batchesQuery)->get();
-            }
-        }
+        // A. Porsi Siap & Target Hari Ini
+        $batchesScope = (clone $batchesQuery)->whereDate('production_date', $operationalDate)->get();
 
         $porsiSiap = (int) $batchesScope->sum(fn ($b) => $b->actual_porsi ?? $b->target_porsi ?? 0);
         $porsiTarget = (int) $batchesScope->sum('target_porsi');
         $batchCount = $batchesScope->count();
 
-        // Jika porsi target dari batch adalah 0, gunakan akumulasi target dari master destinasi
-        if ($porsiTarget <= 0) {
-            $porsiTarget = (int) DB::table('distribution_destinations')->where('id_sppg', $idSppg)->sum('jumlah_penerima');
-            $porsiSiap = (int) (clone $batchesQuery)->sum('actual_porsi');
-            $batchCount = (clone $batchesQuery)->count();
-        }
-
-        // B. Porsi Terdistribusi & Tingkat Capaian Riil
-        $porsiTerdistribusi = (int) DB::table('distributions')
-            ->join('distribution_destinations', 'distributions.destination_id', '=', 'distribution_destinations.id')
-            ->where('distribution_destinations.id_sppg', $idSppg)
+        // B. Porsi Terdistribusi & Tingkat Capaian Riil Hari Ini
+        $porsiTerdistribusi = (int) (clone $distQueryBase)
+            ->whereDate('distributions.distributed_at', $operationalDate)
             ->whereIn('distributions.status', ['sent', 'received'])
             ->sum('distributions.portions_sent');
 
-        $distribusiPct = $porsiTarget > 0 ? min(100, (int) round(($porsiTerdistribusi / $porsiTarget) * 100)) : 100;
+        $distribusiPct = $porsiTarget > 0 ? min(100, (int) round(($porsiTerdistribusi / $porsiTarget) * 100)) : 0;
 
         // C. Tugas Pending Operasional
         $poDraftCount = (int) DB::table('purchases')->where('id_sppg', $idSppg)->where('status', 'draft')->count();
         $batchPendingCount = (int) DB::table('production_batches')->where('id_sppg', $idSppg)->whereIn('status', ['draft', 'confirmed', 'processing'])->count();
         $totalPendingTasks = $poDraftCount + $batchPendingCount;
 
-        // D. Bahan Kritis Menipis (Real Database Stock Condition)
+        // D. Bahan Kritis Menipis (Real Database Stock Condition Saat Ini)
         $materialStats = DB::table('materials')
             ->leftJoin('material_lots', function ($join) use ($idSppg) {
                 $join->on('materials.id', '=', 'material_lots.material_id')
@@ -142,7 +131,7 @@ class DashboardController extends Controller
         ];
 
         // ==========================================
-        // 2. VISUALISASI CAPAIAN PER SASARAN (REAL DATABASE)
+        // 3. VISUALISASI CAPAIAN PER SASARAN (HARIAN HARI INI)
         // ==========================================
         $types = [
             'sekolah' => ['label' => 'Sekolah (SD / SMP / SMA)', 'icon' => '🏫', 'fill' => 'fill-blue'],
@@ -164,10 +153,11 @@ class DashboardController extends Controller
 
             $sent = (int) DB::table('distributions')
                 ->whereIn('destination_id', $destIds)
+                ->whereDate('distributions.distributed_at', $operationalDate)
                 ->whereIn('status', ['sent', 'received'])
                 ->sum('portions_sent');
 
-            $pct = $target > 0 ? min(100, (int) round(($sent / $target) * 100)) : ($sent > 0 ? 100 : 0);
+            $pct = $target > 0 ? min(100, (int) round(($sent / $target) * 100)) : 0;
 
             $targetProgress[] = [
                 'type' => $key,
@@ -181,11 +171,9 @@ class DashboardController extends Controller
         }
 
         // ==========================================
-        // 3. DONUT CHART DATA (STATUS DISTRIBUSI REAL DATABASE)
+        // 4. DONUT CHART DATA (STATUS DISTRIBUSI HARI INI)
         // ==========================================
-        $distQuery = DB::table('distributions')
-            ->join('distribution_destinations', 'distributions.destination_id', '=', 'distribution_destinations.id')
-            ->where('distribution_destinations.id_sppg', $idSppg);
+        $distQuery = (clone $distQueryBase)->whereDate('distributions.distributed_at', $operationalDate);
 
         $porsiReceived = (int) (clone $distQuery)->where('distributions.status', 'received')->sum('distributions.portions_sent');
         $porsiInTransit = (int) (clone $distQuery)->where('distributions.status', 'sent')->sum('distributions.portions_sent');
@@ -193,7 +181,7 @@ class DashboardController extends Controller
         $porsiCancelled = (int) (clone $distQuery)->where('distributions.status', 'cancelled')->sum('distributions.portions_sent');
 
         $totalDistribusiAktif = $porsiReceived + $porsiInTransit + $porsiPlanned;
-        $completionPct = $totalDistribusiAktif > 0 ? min(100, (int) round(($porsiReceived / $totalDistribusiAktif) * 100)) : 100;
+        $completionPct = $totalDistribusiAktif > 0 ? min(100, (int) round(($porsiReceived / $totalDistribusiAktif) * 100)) : 0;
 
         $donutData = [
             'received' => $porsiReceived,
@@ -205,24 +193,54 @@ class DashboardController extends Controller
         ];
 
         // ==========================================
-        // 4. LIVE PIPELINE (REAL DATABASE AGGREGATES)
+        // 5. LIVE PIPELINE (REAL DATABASE AGGREGATES HARI INI)
         // ==========================================
-        $purchasesCount = DB::table('purchases')->where('id_sppg', $idSppg)->count();
-        $receivingsCount = DB::table('receivings')->where('id_sppg', $idSppg)->where('status', 'confirmed')->count();
-        $batchesCount = DB::table('production_batches')->where('id_sppg', $idSppg)->count();
+        $purchasesCount = DB::table('purchases')
+            ->where('id_sppg', $idSppg)
+            ->whereDate('purchase_date', $operationalDate)
+            ->count();
+
+        $receivingsCount = DB::table('receivings')
+            ->where('id_sppg', $idSppg)
+            ->where('status', 'confirmed')
+            ->whereDate('received_at', $operationalDate)
+            ->count();
+
+        $batchesCount = DB::table('production_batches')
+            ->where('id_sppg', $idSppg)
+            ->whereDate('production_date', $operationalDate)
+            ->count();
+
         $qcCount = DB::table('pre_distribution_checks')
             ->join('production_batches', 'pre_distribution_checks.production_batch_id', '=', 'production_batches.id')
             ->where('production_batches.id_sppg', $idSppg)
+            ->where(function ($q) use ($operationalDate) {
+                $q->whereDate('pre_distribution_checks.checked_at', $operationalDate)
+                    ->orWhereDate('production_batches.production_date', $operationalDate);
+            })
             ->count();
-        $distributionsCount = DB::table('distributions')
-            ->join('distribution_destinations', 'distributions.destination_id', '=', 'distribution_destinations.id')
-            ->where('distribution_destinations.id_sppg', $idSppg)
+
+        $distributionsCount = (clone $distQueryBase)
+            ->whereDate('distributions.distributed_at', $operationalDate)
             ->where('distributions.status', 'received')
             ->count();
+
+        $batchProcessingCount = DB::table('production_batches')
+            ->where('id_sppg', $idSppg)
+            ->whereDate('production_date', $operationalDate)
+            ->whereIn('status', ['draft', 'confirmed', 'processing'])
+            ->count();
+
+        $pengolahanState = match (true) {
+            $batchesCount === 0 => 'pending',
+            $qcCount > 0 || $distributionsCount > 0 || $batchProcessingCount === 0 => 'completed',
+            default => 'active',
+        };
 
         $latestBatch = ProductionBatch::query()
             ->with(['menu'])
             ->where('id_sppg', $idSppg)
+            ->whereDate('production_date', $operationalDate)
             ->orderByDesc('id')
             ->first();
 
@@ -243,10 +261,10 @@ class DashboardController extends Controller
             ],
             [
                 'number' => 3,
-                'title' => 'Pemasakan',
-                'desc' => $batchesCount > 0 ? "{$batchesCount} Batch aktif" : '0 Batch aktif',
-                'state' => $batchesCount > 0 ? 'active' : 'pending',
-                'route' => route('staff.batches.index'),
+                'title' => 'Pengolahan',
+                'desc' => $batchesCount > 0 ? ($pengolahanState === 'completed' ? "{$batchesCount} Batch selesai" : "{$batchesCount} Batch aktif") : '0 Batch aktif',
+                'state' => $pengolahanState,
+                'route' => route('staff.pengolahan.index'),
             ],
             [
                 'number' => 4,
@@ -265,11 +283,12 @@ class DashboardController extends Controller
         ];
 
         // ==========================================
-        // 5. DETAIL TABEL & ANTREAN HARIAN (REAL DATABASE)
+        // 6. DETAIL TABEL & ANTREAN HARIAN (REAL DATABASE HARI INI)
         // ==========================================
         $recentDistributions = Distribution::query()
             ->with(['batch.menu', 'destination', 'recorder'])
             ->whereHas('destination', fn ($q) => $q->where('id_sppg', $idSppg))
+            ->whereDate('distributed_at', $operationalDate)
             ->orderByDesc('id')
             ->take(5)
             ->get();

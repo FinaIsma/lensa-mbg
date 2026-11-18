@@ -168,7 +168,7 @@
                 @endif
 
                 {{-- Tombol Tambah / Catat Pengiriman --}}
-                <button type="button" class="btn-pengiriman-primary" onclick="openModalCatat()">
+                <button type="button" class="btn-pengiriman-primary" onclick="openModalCatatPengiriman()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -189,7 +189,7 @@
                         <th style="min-width: 150px;">Status</th>
                         <th style="min-width: 150px;">Waktu berangkat</th>
                         <th style="min-width: 120px;">Petugas</th>
-                        <th style="min-width: 170px; text-align: center;">Aksi</th>
+                        <th style="min-width: 280px; text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -258,10 +258,10 @@
                             </td>
 
                             {{-- Aksi --}}
-                            <td style="text-align: center;">
+                            <td style="text-align: center; white-space: nowrap; min-width: 280px;">
                                 <div class="pengiriman-actions-cell" style="justify-content: center;">
                                     {{-- Tombol Detail (Buka Slide-over Drawer) --}}
-                                    <button type="button" class="btn-act btn-act-detail" onclick="openDrawerDetail({{ $dist->id }})" title="Lihat detail lengkap">
+                                    <button type="button" class="btn-act btn-act-detail" onclick="openDrawerDetailPengiriman({{ $dist->id }})" title="Lihat detail lengkap">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>
@@ -271,7 +271,7 @@
 
                                     @if ($dist->status === 'planned')
                                         {{-- Tombol Kirim / Berangkatkan --}}
-                                        <button type="button" class="btn-act btn-act-send" onclick="openModalSent({{ $dist->id }}, @js($dist->destination?->nama ?? '-'), @js($dist->batch?->batch_code ?? '-'), {{ $dist->portions_sent }})" title="Memberangkatkan pengiriman">
+                                        <button type="button" class="btn-act btn-act-send" onclick="openModalSentPengiriman({{ $dist->id }}, @js($dist->destination?->nama ?? '-'), @js($dist->batch?->batch_code ?? '-'), {{ $dist->portions_sent }})" title="Memberangkatkan pengiriman">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <line x1="22" y1="2" x2="11" y2="13"></line>
                                                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -285,7 +285,7 @@
                                             $maxAvail = $dist->batch ? max(0, (int) $dist->batch->actual_porsi - $allocatedOthers) : $dist->portions_sent;
                                             $distAtRaw = $dist->distributed_at ? $dist->distributed_at->format('Y-m-d\TH:i') : '';
                                         @endphp
-                                        <button type="button" class="btn-act btn-act-detail" onclick="openModalEdit({{ $dist->id }}, {{ $dist->destination_id }}, {{ $dist->portions_sent }}, @js($distAtRaw), @js($dist->batch?->batch_code ?? '-'), {{ $maxAvail }})" title="Ubah data pengiriman">
+                                        <button type="button" class="btn-act btn-act-detail" onclick="openModalEditPengiriman({{ $dist->id }}, {{ $dist->destination_id }}, {{ $dist->portions_sent }}, @js($distAtRaw), @js($dist->batch?->batch_code ?? '-'), {{ $maxAvail }})" title="Ubah data pengiriman">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -294,7 +294,7 @@
                                         </button>
 
                                         {{-- Tombol Batal --}}
-                                        <button type="button" class="btn-act btn-act-cancel" onclick="openModalCancel({{ $dist->id }}, @js($dist->destination?->nama ?? '-'), @js($dist->batch?->batch_code ?? '-'))" title="Batalkan rencana pengiriman">
+                                        <button type="button" class="btn-act btn-act-cancel" onclick="openModalCancelPengiriman({{ $dist->id }}, @js($dist->destination?->nama ?? '-'), @js($dist->batch?->batch_code ?? '-'))" title="Batalkan rencana pengiriman">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <line x1="15" y1="9" x2="9" y2="15"></line>
@@ -304,7 +304,7 @@
                                         </button>
                                     @elseif ($dist->status === 'sent')
                                         {{-- Tombol Konfirmasi Diterima --}}
-                                        <button type="button" class="btn-act btn-act-receive" onclick="openModalReceived({{ $dist->id }}, @js($dist->destination?->nama ?? '-'), @js($dist->batch?->batch_code ?? '-'), {{ $dist->portions_sent }})" title="Tandai telah sampai dan diterima">
+                                        <button type="button" class="btn-act btn-act-receive" onclick="openModalReceivedPengiriman({{ $dist->id }}, @js($dist->destination?->nama ?? '-'), @js($dist->batch?->batch_code ?? '-'), {{ $dist->portions_sent }})" title="Tandai telah sampai dan diterima">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                             </svg>
@@ -330,7 +330,7 @@
                                     <p class="pengiriman-empty-desc">
                                         Data alokasi dan pengiriman makanan akan muncul di sini setelah Anda mencatat pengiriman dari batch yang siap kirim.
                                     </p>
-                                    <button type="button" class="btn-primary" onclick="openModalCatat()">
+                                    <button type="button" class="btn-primary" onclick="openModalCatatPengiriman()">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <line x1="12" y1="5" x2="12" y2="19"></line>
                                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -380,7 +380,9 @@
         </div>
     </div>
 </div>
+@endsection
 
 {{-- Modals & Slide-over Drawer --}}
-@include('staff.pengiriman.partials.modals')
+@section('modals')
+    @include('staff.pengiriman.partials.modals')
 @endsection

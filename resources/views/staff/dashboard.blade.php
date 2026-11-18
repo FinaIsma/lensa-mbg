@@ -12,7 +12,7 @@
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 page-title-section">
         <div>
             <h1 class="page-title">
-                Selamat datang, {{ $user->nama ?? 'Staff' }} di Dashboard Operasional SPPG
+                Selamat datang di Dashboard Operasional SPPG
             </h1>
             <p class="page-subtitle">
                 Ringkasan data dan aktivitas operasional SPPG secara real-time.
