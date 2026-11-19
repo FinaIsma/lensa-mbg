@@ -166,7 +166,7 @@
     <!-- MIDDLE STATS ROW (Dynamic Grid: HP Full Width, iPad & Desktop Balanced Bento) -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6 items-stretch">
         <!-- Kolom Kiri: Produktivitas - Kapasitas Dapur -->
-        <div class="md:col-span-5 lg:col-span-4 bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-4 sm:p-5 shadow-xs flex flex-col justify-between">
+        <div class="order-1 md:order-1 md:col-span-5 lg:col-span-4 bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-4 sm:p-5 shadow-xs flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between">
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-100">
@@ -201,18 +201,8 @@
             </div>
         </div>
 
-        <!-- Kolom Tengah: Maskot makan.png (Responsif & Proporsional di HP & Tablet) -->
-        <div class="md:col-span-2 lg:col-span-4 flex items-center justify-center py-1 sm:py-2 md:py-0">
-            <img 
-                src="{{ asset('images/makan.png') }}" 
-                alt="Maskot Santap Bergizi" 
-                class="w-32 sm:w-40 md:w-48 lg:w-56 aspect-square object-contain hover:scale-105 active:scale-95 transition-transform duration-300 ease-out cursor-pointer select-none"
-                onerror="this.onerror=null; this.src='{{ asset('images/makan-trimmed.png') }}';"
-            >
-        </div>
-
-        <!-- Kolom Kanan: Transparansi - Tingkat Pencatatan -->
-        <div class="md:col-span-5 lg:col-span-4 bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-4 sm:p-5 shadow-xs flex flex-col justify-between">
+        <!-- Kolom Kanan di Desktop / Urutan Ke-2 di HP: Transparansi - Tingkat Pencatatan -->
+        <div class="order-2 md:order-3 md:col-span-5 lg:col-span-4 bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-4 sm:p-5 shadow-xs flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between">
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100">
@@ -240,6 +230,16 @@
                     <span>Audit Trail Terverifikasi</span>
                 </div>
             </div>
+        </div>
+
+        <!-- Maskot makan.png (Setelah Card Pencatatan di HP, Tengah di Desktop) -->
+        <div class="order-3 md:order-2 md:col-span-2 lg:col-span-4 flex items-center justify-center py-2 sm:py-2 md:py-0">
+            <img 
+                src="{{ asset('images/makan.png') }}" 
+                alt="Maskot Santap Bergizi" 
+                class="w-32 sm:w-40 md:w-48 lg:w-56 aspect-square object-contain hover:scale-105 active:scale-95 transition-transform duration-300 ease-out cursor-pointer select-none"
+                onerror="this.onerror=null; this.src='{{ asset('images/makan-trimmed.png') }}';"
+            >
         </div>
     </div>
 
@@ -274,8 +274,8 @@
             </div>
         </div>
 
-        <!-- 4 Cards Grid Tahapan (2x2 di HP agar langsung tampak di layar, 4 di Tablet & Desktop) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <!-- 4 Cards Grid Tahapan (List Memanjang 4 ke Bawah di HP, 4 Kolom di Desktop) -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
             
             <!-- Tahap 01: Bahan Segar Datang -->
             <div 
@@ -283,37 +283,62 @@
                 onclick="toggleTahapDetail(1)"
                 role="button"
                 tabindex="0"
-                class="tahap-card bg-blue-50/25 hover:bg-blue-50/60 border border-blue-100 hover:border-blue-300 rounded-2xl p-3 sm:p-4 flex flex-col justify-between cursor-pointer transition shadow-2xs group relative"
+                class="tahap-card bg-blue-50/25 hover:bg-blue-50/60 border border-blue-100 hover:border-blue-300 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 lg:p-4 flex flex-row lg:flex-col items-center lg:items-stretch justify-between gap-2.5 lg:gap-0 cursor-pointer transition shadow-2xs group relative"
             >
-                <div>
-                    <div class="flex items-center justify-between">
+                <div class="flex items-center lg:block gap-2.5 sm:gap-3 min-w-0 flex-1 lg:flex-initial">
+                    <!-- Header Desktop (Hidden on Mobile) -->
+                    <div class="hidden lg:flex items-center justify-between">
                         <span class="text-xs font-black text-blue-700">Tahap 01</span>
                         <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             <span class="hidden xs:inline">Beres</span>
                         </span>
                     </div>
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-500 group-hover:bg-blue-600 text-white flex items-center justify-center mt-2.5 sm:mt-3 shadow-2xs transition">
+
+                    <!-- Icon -->
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-500 group-hover:bg-blue-600 text-white flex items-center justify-center lg:mt-3 shadow-2xs transition shrink-0">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                         </svg>
                     </div>
-                    <h3 class="font-black text-slate-900 text-xs sm:text-sm mt-2.5 sm:mt-3 group-hover:text-blue-900 transition-colors leading-snug">
-                        Bahan Segar Datang
-                    </h3>
-                    <p class="hidden sm:block text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
-                        Penerimaan & sortir komoditas pangan segar subuh dari mitra petani lokal & Bulog.
-                    </p>
+
+                    <!-- Teks Judul & Metadata -->
+                    <div class="min-w-0 flex-1 lg:flex-initial">
+                        <!-- Sub-header di Mobile: Tahap 01 & Jam -->
+                        <div class="flex lg:hidden items-center gap-1.5 text-[10px] sm:text-[11px] font-bold">
+                            <span class="text-blue-700">Tahap 01</span>
+                            <span class="text-slate-300">•</span>
+                            <span class="text-slate-500 font-semibold truncate">{{ $stepPersiapan?->started_at ? $stepPersiapan->started_at->format('H.i') . ' WIB' : '05.30 WIB' }}</span>
+                        </div>
+
+                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-3 group-hover:text-blue-900 transition-colors leading-tight truncate lg:whitespace-normal">
+                            Bahan Segar Datang
+                        </h3>
+                        
+                        <p class="hidden lg:block text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
+                            Penerimaan & sortir komoditas pangan segar subuh dari mitra petani lokal & Bulog.
+                        </p>
+                    </div>
                 </div>
                 
-                <div class="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-blue-100/70 flex items-center justify-between">
-                    <div class="inline-flex items-center gap-1 bg-white border border-slate-200/80 text-blue-900 text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs">
+                <!-- Sisi Kanan Mobile / Bawah Desktop -->
+                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-4 lg:pt-3 lg:border-t lg:border-blue-100/70">
+                    <!-- Status Beres di Mobile -->
+                    <span class="inline-flex lg:hidden items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        <span>Beres</span>
+                    </span>
+
+                    <!-- Time Badge di Desktop -->
+                    <div class="hidden lg:inline-flex items-center gap-1 bg-white border border-slate-200/80 text-blue-900 text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs">
                         <svg class="w-3 h-3 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>{{ $stepPersiapan?->started_at ? $stepPersiapan->started_at->format('H.i') . ' WIB' : '05.30 WIB' }}</span>
                     </div>
-                    <div class="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-bold text-blue-600 group-hover:translate-y-0.5 transition-transform">
+
+                    <!-- Tombol Rincian -->
+                    <div class="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-bold text-blue-600 group-hover:translate-x-0.5 lg:group-hover:translate-y-0.5 transition-transform">
                         <span id="btn-text-1">Rincian</span>
                         <svg id="chevron-1" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
@@ -328,37 +353,62 @@
                 onclick="toggleTahapDetail(2)"
                 role="button"
                 tabindex="0"
-                class="tahap-card bg-amber-50/25 hover:bg-amber-50/60 border border-amber-100 hover:border-amber-300 rounded-2xl p-3 sm:p-4 flex flex-col justify-between cursor-pointer transition shadow-2xs group relative"
+                class="tahap-card bg-amber-50/25 hover:bg-amber-50/60 border border-amber-100 hover:border-amber-300 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 lg:p-4 flex flex-row lg:flex-col items-center lg:items-stretch justify-between gap-2.5 lg:gap-0 cursor-pointer transition shadow-2xs group relative"
             >
-                <div>
-                    <div class="flex items-center justify-between">
+                <div class="flex items-center lg:block gap-2.5 sm:gap-3 min-w-0 flex-1 lg:flex-initial">
+                    <!-- Header Desktop (Hidden on Mobile) -->
+                    <div class="hidden lg:flex items-center justify-between">
                         <span class="text-xs font-black text-amber-700">Tahap 02</span>
                         <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             <span class="hidden xs:inline">Beres</span>
                         </span>
                     </div>
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500 group-hover:bg-amber-600 text-white flex items-center justify-center mt-2.5 sm:mt-3 shadow-2xs transition">
+
+                    <!-- Icon -->
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500 group-hover:bg-amber-600 text-white flex items-center justify-center lg:mt-3 shadow-2xs transition shrink-0">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
                         </svg>
                     </div>
-                    <h3 class="font-black text-slate-900 text-xs sm:text-sm mt-2.5 sm:mt-3 group-hover:text-amber-900 transition-colors leading-snug">
-                        Masak Matang
-                    </h3>
-                    <p class="hidden sm:block text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
-                        Pengolahan makanan bergizi seimbang dengan suhu higienis & menu teruji.
-                    </p>
+
+                    <!-- Teks Judul & Metadata -->
+                    <div class="min-w-0 flex-1 lg:flex-initial">
+                        <!-- Sub-header di Mobile: Tahap 02 & Jam -->
+                        <div class="flex lg:hidden items-center gap-1.5 text-[10px] sm:text-[11px] font-bold">
+                            <span class="text-amber-700">Tahap 02</span>
+                            <span class="text-slate-300">•</span>
+                            <span class="text-slate-500 font-semibold truncate">06.15 - 08.00 WIB</span>
+                        </div>
+
+                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-3 group-hover:text-amber-900 transition-colors leading-tight truncate lg:whitespace-normal">
+                            Masak Matang
+                        </h3>
+                        
+                        <p class="hidden lg:block text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
+                            Pengolahan makanan bergizi seimbang dengan suhu higienis & menu teruji.
+                        </p>
+                    </div>
                 </div>
 
-                <div class="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-amber-100/70 flex items-center justify-between">
-                    <div class="inline-flex items-center gap-1 bg-white border border-slate-200/80 text-amber-900 text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs">
+                <!-- Sisi Kanan Mobile / Bawah Desktop -->
+                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-4 lg:pt-3 lg:border-t lg:border-amber-100/70">
+                    <!-- Status Beres di Mobile -->
+                    <span class="inline-flex lg:hidden items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        <span>Beres</span>
+                    </span>
+
+                    <!-- Time Badge di Desktop -->
+                    <div class="hidden lg:inline-flex items-center gap-1 bg-white border border-slate-200/80 text-amber-900 text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs">
                         <svg class="w-3 h-3 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>06.15 - 08.00 WIB</span>
                     </div>
-                    <div class="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-bold text-amber-700 group-hover:translate-y-0.5 transition-transform">
+
+                    <!-- Tombol Rincian -->
+                    <div class="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-bold text-amber-700 group-hover:translate-x-0.5 lg:group-hover:translate-y-0.5 transition-transform">
                         <span id="btn-text-2">Rincian</span>
                         <svg id="chevron-2" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
@@ -373,37 +423,62 @@
                 onclick="toggleTahapDetail(3)"
                 role="button"
                 tabindex="0"
-                class="tahap-card bg-emerald-50/25 hover:bg-emerald-50/60 border border-emerald-100 hover:border-emerald-300 rounded-2xl p-3 sm:p-4 flex flex-col justify-between cursor-pointer transition shadow-2xs group relative"
+                class="tahap-card bg-emerald-50/25 hover:bg-emerald-50/60 border border-emerald-100 hover:border-emerald-300 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 lg:p-4 flex flex-row lg:flex-col items-center lg:items-stretch justify-between gap-2.5 lg:gap-0 cursor-pointer transition shadow-2xs group relative"
             >
-                <div>
-                    <div class="flex items-center justify-between">
+                <div class="flex items-center lg:block gap-2.5 sm:gap-3 min-w-0 flex-1 lg:flex-initial">
+                    <!-- Header Desktop (Hidden on Mobile) -->
+                    <div class="hidden lg:flex items-center justify-between">
                         <span class="text-xs font-black text-emerald-700">Tahap 03</span>
                         <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             <span class="hidden xs:inline">Beres</span>
                         </span>
                     </div>
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-500 group-hover:bg-emerald-600 text-white flex items-center justify-center mt-2.5 sm:mt-3 shadow-2xs transition">
+
+                    <!-- Icon -->
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-500 group-hover:bg-emerald-600 text-white flex items-center justify-center lg:mt-3 shadow-2xs transition shrink-0">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                         </svg>
                     </div>
-                    <h3 class="font-black text-slate-900 text-xs sm:text-sm mt-2.5 sm:mt-3 group-hover:text-emerald-900 transition-colors leading-snug">
-                        Cek Gizi & Pack
-                    </h3>
-                    <p class="hidden sm:block text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
-                        Uji fisik organoleptik rasa, timbang porsi presisi, dan uji nutrisi ahli gizi.
-                    </p>
+
+                    <!-- Teks Judul & Metadata -->
+                    <div class="min-w-0 flex-1 lg:flex-initial">
+                        <!-- Sub-header di Mobile: Tahap 03 & Jam -->
+                        <div class="flex lg:hidden items-center gap-1.5 text-[10px] sm:text-[11px] font-bold">
+                            <span class="text-emerald-700">Tahap 03</span>
+                            <span class="text-slate-300">•</span>
+                            <span class="text-slate-500 font-semibold truncate">{{ $qcCheck?->checked_at ? $qcCheck->checked_at->format('H.i') . ' WIB' : '08.15 - 09.00 WIB' }}</span>
+                        </div>
+
+                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-3 group-hover:text-emerald-900 transition-colors leading-tight truncate lg:whitespace-normal">
+                            Cek Gizi & Pack
+                        </h3>
+                        
+                        <p class="hidden lg:block text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
+                            Uji fisik organoleptik rasa, timbang porsi presisi, dan uji nutrisi ahli gizi.
+                        </p>
+                    </div>
                 </div>
 
-                <div class="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-emerald-100/70 flex items-center justify-between">
-                    <div class="inline-flex items-center gap-1 bg-white border border-slate-200/80 text-emerald-900 text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs">
+                <!-- Sisi Kanan Mobile / Bawah Desktop -->
+                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-4 lg:pt-3 lg:border-t lg:border-emerald-100/70">
+                    <!-- Status Beres di Mobile -->
+                    <span class="inline-flex lg:hidden items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        <span>Beres</span>
+                    </span>
+
+                    <!-- Time Badge di Desktop -->
+                    <div class="hidden lg:inline-flex items-center gap-1 bg-white border border-slate-200/80 text-emerald-900 text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs">
                         <svg class="w-3 h-3 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>{{ $qcCheck?->checked_at ? $qcCheck->checked_at->format('H.i') . ' WIB' : '08.15 - 09.00 WIB' }}</span>
                     </div>
-                    <div class="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-bold text-emerald-700 group-hover:translate-y-0.5 transition-transform">
+
+                    <!-- Tombol Rincian -->
+                    <div class="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-bold text-emerald-700 group-hover:translate-x-0.5 lg:group-hover:translate-y-0.5 transition-transform">
                         <span id="btn-text-3">Rincian</span>
                         <svg id="chevron-3" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
@@ -418,37 +493,62 @@
                 onclick="toggleTahapDetail(4)"
                 role="button"
                 tabindex="0"
-                class="tahap-card bg-indigo-50/25 hover:bg-indigo-50/60 border border-indigo-100 hover:border-indigo-300 rounded-2xl p-3 sm:p-4 flex flex-col justify-between cursor-pointer transition shadow-2xs group relative"
+                class="tahap-card bg-indigo-50/25 hover:bg-indigo-50/60 border border-indigo-100 hover:border-indigo-300 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 lg:p-4 flex flex-row lg:flex-col items-center lg:items-stretch justify-between gap-2.5 lg:gap-0 cursor-pointer transition shadow-2xs group relative"
             >
-                <div>
-                    <div class="flex items-center justify-between">
+                <div class="flex items-center lg:block gap-2.5 sm:gap-3 min-w-0 flex-1 lg:flex-initial">
+                    <!-- Header Desktop (Hidden on Mobile) -->
+                    <div class="hidden lg:flex items-center justify-between">
                         <span class="text-xs font-black text-indigo-700">Tahap 04</span>
                         <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             <span class="hidden xs:inline">Beres</span>
                         </span>
                     </div>
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600 group-hover:bg-indigo-700 text-white flex items-center justify-center mt-2.5 sm:mt-3 shadow-2xs transition">
+
+                    <!-- Icon -->
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600 group-hover:bg-indigo-700 text-white flex items-center justify-center lg:mt-3 shadow-2xs transition shrink-0">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
-                    <h3 class="font-black text-slate-900 text-xs sm:text-sm mt-2.5 sm:mt-3 group-hover:text-indigo-900 transition-colors leading-snug">
-                        Meluncur ke Sekolah
-                    </h3>
-                    <p class="hidden sm:block text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
-                        Distribusi logistik rantai hangat ke sekolah binaan dengan armada terverifikasi.
-                    </p>
+
+                    <!-- Teks Judul & Metadata -->
+                    <div class="min-w-0 flex-1 lg:flex-initial">
+                        <!-- Sub-header di Mobile: Tahap 04 & Jam -->
+                        <div class="flex lg:hidden items-center gap-1.5 text-[10px] sm:text-[11px] font-bold">
+                            <span class="text-indigo-700">Tahap 04</span>
+                            <span class="text-slate-300">•</span>
+                            <span class="text-slate-500 font-semibold truncate">09.15 WIB</span>
+                        </div>
+
+                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-3 group-hover:text-indigo-900 transition-colors leading-tight truncate lg:whitespace-normal">
+                            Meluncur ke Sekolah
+                        </h3>
+                        
+                        <p class="hidden lg:block text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2">
+                            Distribusi logistik rantai hangat ke sekolah binaan dengan armada terverifikasi.
+                        </p>
+                    </div>
                 </div>
 
-                <div class="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-indigo-100/70 flex items-center justify-between">
-                    <div class="inline-flex items-center gap-1 bg-white border border-slate-200/80 text-indigo-900 text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs">
+                <!-- Sisi Kanan Mobile / Bawah Desktop -->
+                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-4 lg:pt-3 lg:border-t lg:border-indigo-100/70">
+                    <!-- Status Beres di Mobile -->
+                    <span class="inline-flex lg:hidden items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        <span>Beres</span>
+                    </span>
+
+                    <!-- Time Badge di Desktop -->
+                    <div class="hidden lg:inline-flex items-center gap-1 bg-white border border-slate-200/80 text-indigo-900 text-[10px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs">
                         <svg class="w-3 h-3 text-indigo-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>09.15 WIB</span>
                     </div>
-                    <div class="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-bold text-indigo-600 group-hover:translate-y-0.5 transition-transform">
+
+                    <!-- Tombol Rincian -->
+                    <div class="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-bold text-indigo-600 group-hover:translate-x-0.5 lg:group-hover:translate-y-0.5 transition-transform">
                         <span id="btn-text-4">Rincian</span>
                         <svg id="chevron-4" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
