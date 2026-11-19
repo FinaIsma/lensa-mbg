@@ -144,16 +144,23 @@ class Purchase extends Model
         $prefix = "PO-{$dateStr}-";
 
         $lastNo = static::query()
-            ->when($idSppg, fn ($q) => $q->where('id_sppg', $idSppg))
             ->where('purchase_no', 'like', "{$prefix}%")
             ->orderByDesc('purchase_no')
             ->value('purchase_no');
 
         $seq = 1;
-        if ($lastNo && preg_match('/-(\d{3})$/', $lastNo, $m)) {
+        if ($lastNo && preg_match('/-(\d{3,})$/', $lastNo, $m)) {
             $seq = ((int) $m[1]) + 1;
         }
 
-        return sprintf('%s%03d', $prefix, $seq);
+        do {
+            $candidate = sprintf('%s%03d', $prefix, $seq);
+            $exists = static::where('purchase_no', $candidate)->exists();
+            if ($exists) {
+                $seq++;
+            }
+        } while ($exists);
+
+        return $candidate;
     }
 }

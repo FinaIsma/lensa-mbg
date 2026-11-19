@@ -222,16 +222,23 @@ class ProductionBatch extends Model
         $prefix = "BTH-{$dateStr}-";
 
         $lastCode = static::query()
-            ->when($idSppg, fn ($q) => $q->where('id_sppg', $idSppg))
             ->where('batch_code', 'like', "{$prefix}%")
             ->orderByDesc('batch_code')
             ->value('batch_code');
 
         $seq = 1;
-        if ($lastCode && preg_match('/-(\d{3})$/', $lastCode, $m)) {
+        if ($lastCode && preg_match('/-(\d{3,})$/', $lastCode, $m)) {
             $seq = ((int) $m[1]) + 1;
         }
 
-        return sprintf('%s%03d', $prefix, $seq);
+        do {
+            $candidate = sprintf('%s%03d', $prefix, $seq);
+            $exists = static::where('batch_code', $candidate)->exists();
+            if ($exists) {
+                $seq++;
+            }
+        } while ($exists);
+
+        return $candidate;
     }
 }

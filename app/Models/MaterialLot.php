@@ -155,10 +155,18 @@ class MaterialLot extends Model
             ->value('barcode');
 
         $seq = 1;
-        if ($lastBarcode && preg_match('/-(\d{3})$/', $lastBarcode, $m)) {
+        if ($lastBarcode && preg_match('/-(\d{3,})$/', $lastBarcode, $m)) {
             $seq = ((int) $m[1]) + 1;
         }
 
-        return sprintf('%s%03d', $prefix, $seq);
+        do {
+            $candidate = sprintf('%s%03d', $prefix, $seq);
+            $exists = static::where('barcode', $candidate)->exists();
+            if ($exists) {
+                $seq++;
+            }
+        } while ($exists);
+
+        return $candidate;
     }
 }

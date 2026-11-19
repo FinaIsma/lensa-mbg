@@ -490,3 +490,20 @@ window.closeDrawerDetail = function () {
     }
 };
 
+// ==========================================================================
+// Aliases for compatibility across Blade templates
+// ==========================================================================
+window.openModalCatatPengiriman = window.openModalCatat;
+window.closeModalCatatPengiriman = window.closeModalCatat;
+window.openModalEditPengiriman = window.openModalEdit;
+window.closeModalEditPengiriman = window.closeModalEdit;
+window.openModalSentPengiriman = window.openModalSent;
+window.closeModalSentPengiriman = window.closeModalSent;
+window.openModalReceivedPengiriman = window.openModalReceived;
+window.closeModalReceivedPengiriman = window.closeModalReceived;
+window.openModalCancelPengiriman = window.openModalCancel;
+window.closeModalCancelPengiriman = window.closeModalCancel;
+window.openDrawerDetailPengiriman = window.openDrawerDetail;
+window.closeDrawerDetailPengiriman = window.closeDrawerDetail;
+
+
