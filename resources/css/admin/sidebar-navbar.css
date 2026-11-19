@@ -53,9 +53,15 @@
 }
 
 .brand-logo-img {
-    height: 90px;
+    height: 85px;
     width: auto;
+    max-width: 110px;
     object-fit: contain;
+    transition: transform 0.2s ease;
+}
+
+.brand-link:hover .brand-logo-img {
+    transform: scale(1.04);
 }
 
 .sidebar-nav {

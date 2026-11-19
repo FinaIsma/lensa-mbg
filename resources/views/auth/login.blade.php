@@ -10,7 +10,9 @@
     <body data-init-role="{{ old('role', request('tab', 'admin')) }}" style="background-image: url('{{ asset('images/Background.png') }}');">
         <header class="header">
             <div class="logo-left">
-                <img src="{{ asset('images/LogoLensa.png') }}" alt="Logo Lensa MBG">
+                <a href="{{ route('public.home') }}" title="Kembali ke Beranda">
+                    <img src="{{ asset('images/LogoLensa.png') }}" alt="Logo Lensa MBG">
+                </a>
             </div>
             <div class="logo-right">
                 <img src="{{ asset('images/LogoBGN.png') }}" alt="Logo Badan Gizi Nasional">

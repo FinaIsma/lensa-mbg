@@ -31,21 +31,35 @@ body {
 
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
 
     padding: 20px 55px;
 }
 
+.logo-left a {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
 .logo-left img {
-    width: 240px;
-    height: auto;
+    height: 54px;
+    width: auto;
     display: block;
+    object-fit: contain;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.logo-left a:hover img {
+    transform: scale(1.02);
+    opacity: 0.95;
 }
 
 .logo-right img {
-    width: 145px;
-    height: auto;
+    height: 54px;
+    width: auto;
     display: block;
+    object-fit: contain;
 }
 
 .login-wrapper {
@@ -329,11 +343,13 @@ body {
     }
 
     .logo-left img {
-        width: 180px;
+        height: 44px;
+        width: auto;
     }
 
     .logo-right img {
-        width: 110px;
+        height: 44px;
+        width: auto;
     }
 
     .login-wrapper {
@@ -361,14 +377,17 @@ body {
 
     .header {
         align-items: center;
+        padding: 14px 18px;
     }
 
     .logo-left img {
-        width: 180px;
+        height: 38px;
+        width: auto;
     }
 
     .logo-right img {
-        width: 100px;
+        height: 38px;
+        width: auto;
     }
 
     .login-card {

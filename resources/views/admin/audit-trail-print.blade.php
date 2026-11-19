@@ -333,7 +333,7 @@
     <div class="sheet">
         <div class="kop-wrapper">
             <div class="kop-left">
-                <img src="{{ asset('images/LogoMBG1.png') }}" alt="Logo Lensa MBG" class="kop-logo">
+                <img src="{{ asset('images/logo-trimmed.png') }}" alt="Logo Lensa MBG" class="kop-logo">
                 <div class="kop-title">
                     <h1>Lensa MBG &bull; Sistem Transparansi &amp; Traceability</h1>
                     <p>Laporan Resmi Jejak Audit Sistem &bull; Badan Gizi Nasional (BGN)</p>

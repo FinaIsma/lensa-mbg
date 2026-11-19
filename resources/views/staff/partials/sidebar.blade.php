@@ -1,7 +1,7 @@
 <aside class="sidebar">
     <div class="sidebar-brand">
-        <a href="{{ route('staff.dashboard') }}" class="brand-link">
-            <img src="{{ asset('images/LogoMBG1.png') }}" alt="Logo Lensa MBG" class="brand-logo-img">
+        <a href="{{ route('staff.dashboard') }}" class="brand-link" title="Dashboard Staff">
+            <img src="{{ asset('images/logo-trimmed.png') }}" alt="Logo Lensa MBG" class="brand-logo-img">
         </a>
     </div>
 
