@@ -3,6 +3,7 @@
 namespace Tests\Feature\Staff;
 
 use App\Models\AuditTrail;
+use App\Models\Evidence;
 use App\Models\Material;
 use App\Models\MaterialLot;
 use App\Models\Menu;
@@ -21,7 +22,9 @@ use App\Models\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProductionBatchTest extends TestCase
@@ -605,5 +608,129 @@ class ProductionBatchTest extends TestCase
         $this->assertNotEmpty($batches);
         // Batch hari ini harus berada di urutan pertama
         $this->assertEquals($batchToday->id, $batches->first()->id);
+    }
+
+    public function test_staff_can_add_step_with_multiple_evidence_photos(): void
+    {
+        Storage::fake('public');
+
+        $batch = ProductionBatch::create([
+            'menu_id' => $this->menu->id,
+            'recipe_id' => $this->recipe->id,
+            'id_sppg' => $this->sppg->id_sppg,
+            'created_by' => $this->staff->id,
+            'batch_code' => ProductionBatch::generateBatchCode($this->sppg->id_sppg, date('Y-m-d')),
+            'production_date' => date('Y-m-d'),
+            'target_porsi' => 100,
+            'status' => 'confirmed',
+            'is_locked' => true,
+        ]);
+
+        $file1 = UploadedFile::fake()->image('step_doc_1.jpg');
+        $file2 = UploadedFile::fake()->image('step_doc_2.jpg');
+
+        $response = $this->actingAs($this->staff, 'staff')
+            ->post(route('staff.pengolahan.step.store'), [
+                'production_batch_id' => $batch->id,
+                'step_name' => 'Persiapan Bahan',
+                'started_at' => Carbon::now()->format('Y-m-d\TH:i'),
+                'note' => 'Dokumentasi persiapan bahan',
+                'evidence_files' => [$file1, $file2],
+            ]);
+
+        $response->assertSessionHas('success');
+
+        $step = ProcessingStep::where('production_batch_id', $batch->id)->first();
+        $this->assertNotNull($step);
+
+        $evidences = Evidence::where('evidenceable_type', 'processing_steps')
+            ->where('evidenceable_id', $step->id)
+            ->get();
+
+        $this->assertCount(2, $evidences);
+    }
+
+    public function test_staff_can_complete_step_with_multiple_evidence_photos(): void
+    {
+        Storage::fake('public');
+
+        $batch = ProductionBatch::create([
+            'menu_id' => $this->menu->id,
+            'recipe_id' => $this->recipe->id,
+            'id_sppg' => $this->sppg->id_sppg,
+            'created_by' => $this->staff->id,
+            'batch_code' => ProductionBatch::generateBatchCode($this->sppg->id_sppg, date('Y-m-d')),
+            'production_date' => date('Y-m-d'),
+            'target_porsi' => 100,
+            'status' => 'processing',
+            'is_locked' => true,
+        ]);
+
+        $step = ProcessingStep::create([
+            'production_batch_id' => $batch->id,
+            'recorded_by' => $this->staff->id,
+            'step_name' => 'Pemasakan',
+            'started_at' => Carbon::now()->subHour(),
+            'status' => 'in_progress',
+        ]);
+
+        $file1 = UploadedFile::fake()->image('finish_1.jpg');
+        $file2 = UploadedFile::fake()->image('finish_2.jpg');
+
+        $response = $this->actingAs($this->staff, 'staff')
+            ->post(route('staff.pengolahan.step.complete', $step->id), [
+                'ended_at' => Carbon::now()->format('Y-m-d\TH:i'),
+                'note' => 'Pemasakan selesai sempurna',
+                'evidence_files' => [$file1, $file2],
+            ]);
+
+        $response->assertSessionHas('success');
+
+        $evidences = Evidence::where('evidenceable_type', 'processing_steps')
+            ->where('evidenceable_id', $step->id)
+            ->get();
+
+        $this->assertCount(2, $evidences);
+    }
+
+    public function test_staff_can_upload_additional_step_evidences(): void
+    {
+        Storage::fake('public');
+
+        $batch = ProductionBatch::create([
+            'menu_id' => $this->menu->id,
+            'recipe_id' => $this->recipe->id,
+            'id_sppg' => $this->sppg->id_sppg,
+            'created_by' => $this->staff->id,
+            'batch_code' => ProductionBatch::generateBatchCode($this->sppg->id_sppg, date('Y-m-d')),
+            'production_date' => date('Y-m-d'),
+            'target_porsi' => 100,
+            'status' => 'processing',
+            'is_locked' => true,
+        ]);
+
+        $step = ProcessingStep::create([
+            'production_batch_id' => $batch->id,
+            'recorded_by' => $this->staff->id,
+            'step_name' => 'Pengemasan',
+            'started_at' => Carbon::now()->subMinutes(30),
+            'status' => 'in_progress',
+        ]);
+
+        $file1 = UploadedFile::fake()->image('extra_1.jpg');
+        $file2 = UploadedFile::fake()->image('extra_2.jpg');
+
+        $response = $this->actingAs($this->staff, 'staff')
+            ->post(route('staff.pengolahan.step.evidences', $step->id), [
+                'evidence_files' => [$file1, $file2],
+            ]);
+
+        $response->assertSessionHas('success');
+
+        $evidences = Evidence::where('evidenceable_type', 'processing_steps')
+            ->where('evidenceable_id', $step->id)
+            ->get();
+
+        $this->assertCount(2, $evidences);
     }
 }

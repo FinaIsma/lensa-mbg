@@ -178,6 +178,7 @@ Route::middleware(['role:staff,kepala_sppg'])->prefix('staff')->name('staff.')->
     Route::get('/pengolahan', [PengolahanController::class, 'index'])->name('pengolahan.index');
     Route::post('/pengolahan/tahap', [PengolahanController::class, 'storeStep'])->name('pengolahan.step.store');
     Route::post('/pengolahan/tahap/{id}/selesaikan', [PengolahanController::class, 'completeStep'])->name('pengolahan.step.complete');
+    Route::post('/pengolahan/tahap/{id}/evidences', [PengolahanController::class, 'uploadStepEvidences'])->name('pengolahan.step.evidences');
 
     // Produksi - Hasil
     Route::get('/hasil', [HasilController::class, 'index'])->name('hasil.index');

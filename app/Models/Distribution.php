@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Distribution extends Model
 {
@@ -44,9 +43,10 @@ class Distribution extends Model
         return $this->belongsTo(Staff::class, 'recorded_by');
     }
 
-    public function evidences(): MorphMany
+    public function evidences(): HasMany
     {
-        return $this->morphMany(Evidence::class, 'evidenceable');
+        return $this->hasMany(Evidence::class, 'evidenceable_id', 'id')
+            ->where('evidenceable_type', 'distributions');
     }
 
     public function wasteRecords(): HasMany

@@ -49,4 +49,28 @@ class Sppg extends Model
     {
         return $this->hasMany(Staff::class, 'id_sppg', 'id_sppg')->where('status', 'aktif');
     }
+
+    /**
+     * Resolusi URL foto kantor/gedung SPPG dari database
+     */
+    public function getFotoKantorUrlAttribute(): string
+    {
+        if (empty($this->foto_kantor_sppg)) {
+            return asset('images/dapur-sppg-sample.jpg');
+        }
+
+        if (str_starts_with($this->foto_kantor_sppg, 'http://') || str_starts_with($this->foto_kantor_sppg, 'https://')) {
+            return $this->foto_kantor_sppg;
+        }
+
+        if (str_starts_with($this->foto_kantor_sppg, 'storage/') || str_starts_with($this->foto_kantor_sppg, '/storage/')) {
+            return asset(ltrim($this->foto_kantor_sppg, '/'));
+        }
+
+        if (str_starts_with($this->foto_kantor_sppg, 'uploads/')) {
+            return asset($this->foto_kantor_sppg);
+        }
+
+        return asset('storage/'.ltrim($this->foto_kantor_sppg, '/'));
+    }
 }
