@@ -7,6 +7,7 @@ use App\Models\Distribution;
 use App\Models\DistributionDestination;
 use App\Models\Evidence;
 use App\Models\Menu;
+use App\Models\PreDistributionCheck;
 use App\Models\ProductionBatch;
 use App\Models\Sppg;
 use Carbon\Carbon;
@@ -354,11 +355,19 @@ class PublicPortalController extends Controller
         $activeMenus = collect();
         $recentDistributions = collect();
         $publicPhotos = collect();
+        $tahap1Gallery = collect();
+        $tahap2Gallery = collect();
+        $tahap3Gallery = collect();
+        $tahap4Gallery = collect();
 
         try {
             $sppg = Sppg::with(['user', 'activeStaffs'])
-                ->where('id_sppg', $id)
-                ->orWhere('id_sppg', $lastDigits)
+                ->where(function ($q) use ($id, $lastDigits) {
+                    $q->where('id_sppg', $id);
+                    if ($lastDigits && $lastDigits !== $id) {
+                        $q->orWhere('id_sppg', $lastDigits);
+                    }
+                })
                 ->where('status', 'aktif')
                 ->first();
 
@@ -373,9 +382,11 @@ class PublicPortalController extends Controller
                     'recipe.nutritions.nutritionType',
                     'materialUsages.lot.material',
                     'materialUsages.lot.supplier',
-                    'processingSteps' => fn ($q) => $q->orderBy('started_at', 'asc')->orderBy('id', 'asc'),
-                    'preDistributionCheck',
+                    'materialUsages.lot.receivingItem.receiving.evidences',
+                    'processingSteps' => fn ($q) => $q->with('evidences')->orderBy('started_at', 'asc')->orderBy('id', 'asc'),
+                    'preDistributionCheck.evidences',
                     'distributions.destination',
+                    'distributions.evidences',
                 ])
                     ->where('id_sppg', $sppg->id_sppg)
                     ->latest('production_date')
@@ -410,6 +421,131 @@ class PublicPortalController extends Controller
                                 'qty' => $mu->quantity_used,
                             ];
                         });
+
+                        // 1. Tahap 1: Foto Bahan Baku Segar (dari bukti penerimaan lot atau evidences)
+                        foreach ($activeBatch->materialUsages as $mu) {
+                            $lot = $mu->lot ?? $mu->materialLot;
+                            $receiving = $lot?->receivingItem?->receiving;
+                            if ($receiving && $receiving->evidences->isNotEmpty()) {
+                                foreach ($receiving->evidences as $ev) {
+                                    if (! empty($ev->url)) {
+                                        $tahap1Gallery->push([
+                                            'url' => $ev->url,
+                                            'title' => $lot?->material?->nama ? ('Penerimaan '.$lot->material->nama) : 'Penerimaan Bahan Baku Segar',
+                                            'desc' => $ev->description ?: ('Sortir & verifikasi komoditas '.($lot?->material?->nama ?? 'bahan').' dari '.($lot?->supplier?->nama ?? 'mitra pemasok').'.'),
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. Tahap 2: Foto Proses Olah Masak Matang (multi-foto dari processing_steps)
+                    if ($activeBatch->processingSteps->isNotEmpty()) {
+                        foreach ($activeBatch->processingSteps as $step) {
+                            if ($step->evidences->isNotEmpty()) {
+                                foreach ($step->evidences as $ev) {
+                                    if (! empty($ev->url)) {
+                                        $cleanDesc = $ev->description ?: "Foto bukti tahap {$step->step_name}";
+                                        $title = $step->step_name ?: 'Pengolahan Dapur MBG';
+                                        $desc = $step->note ? ($step->step_name.': '.$step->note) : $cleanDesc;
+                                        $tahap2Gallery->push([
+                                            'url' => $ev->url,
+                                            'title' => $title,
+                                            'desc' => $desc,
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 3. Tahap 3: Foto QC Cek Gizi & Pack (dari pre_distribution_checks & production_batches)
+                    if ($activeBatch->preDistributionCheck && $activeBatch->preDistributionCheck->evidences->isNotEmpty()) {
+                        foreach ($activeBatch->preDistributionCheck->evidences as $ev) {
+                            if (! empty($ev->url)) {
+                                $tahap3Gallery->push([
+                                    'url' => $ev->url,
+                                    'title' => 'Uji Mutu Gizi & Kelaikan Saji',
+                                    'desc' => $ev->description ?: ($activeBatch->preDistributionCheck->reported_condition ?: 'Pemeriksaan organoleptik dan uji porsi saji siap santap.'),
+                                ]);
+                            }
+                        }
+                    }
+
+                    $batchEvidences = Evidence::where('evidenceable_type', 'production_batches')
+                        ->where('evidenceable_id', $activeBatch->id)
+                        ->get();
+                    foreach ($batchEvidences as $ev) {
+                        if (! empty($ev->url)) {
+                            $tahap3Gallery->push([
+                                'url' => $ev->url,
+                                'title' => 'Porsi Makanan Siap Santap',
+                                'desc' => $ev->description ?: 'Dokumentasi porsi matang hasil produksi dapur.',
+                            ]);
+                        }
+                    }
+
+                    if ($tahap3Gallery->count() < 4) {
+                        $otherQcIds = PreDistributionCheck::whereHas('batch', fn ($bq) => $bq->where('id_sppg', $sppg->id_sppg))
+                            ->where('production_batch_id', '!=', $activeBatch->id)
+                            ->pluck('id');
+
+                        $otherQcEvidences = Evidence::where('evidenceable_type', 'pre_distribution_checks')
+                            ->whereIn('evidenceable_id', $otherQcIds)
+                            ->latest('uploaded_at')
+                            ->take(4 - $tahap3Gallery->count())
+                            ->get();
+
+                        foreach ($otherQcEvidences as $ev) {
+                            if (! empty($ev->url)) {
+                                $tahap3Gallery->push([
+                                    'url' => $ev->url,
+                                    'title' => 'Uji Mutu Gizi & Kelaikan Saji',
+                                    'desc' => $ev->description ?: 'Pemeriksaan organoleptik porsi saji siap santap.',
+                                ]);
+                            }
+                        }
+                    }
+
+                    // 4. Tahap 4: Foto Meluncur ke Sekolah (dari distributions)
+                    if ($activeBatch->distributions->isNotEmpty()) {
+                        foreach ($activeBatch->distributions as $dist) {
+                            if ($dist->evidences->isNotEmpty()) {
+                                foreach ($dist->evidences as $ev) {
+                                    if (! empty($ev->url)) {
+                                        $destNama = $dist->destination?->nama ? (' - '.$dist->destination->nama) : '';
+                                        $tahap4Gallery->push([
+                                            'url' => $ev->url,
+                                            'title' => 'Distribusi'.$destNama,
+                                            'desc' => $ev->description ?: ('Pengantaran paket makanan hangat menuju '.($dist->destination?->nama ?? 'sekolah binaan').'.'),
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if ($tahap4Gallery->count() < 4) {
+                        $otherDistIds = Distribution::whereHas('destination', fn ($q) => $q->where('id_sppg', $sppg->id_sppg))
+                            ->where('production_batch_id', '!=', $activeBatch->id)
+                            ->pluck('id');
+
+                        $otherDistEvidences = Evidence::where('evidenceable_type', 'distributions')
+                            ->whereIn('evidenceable_id', $otherDistIds)
+                            ->latest('uploaded_at')
+                            ->take(4 - $tahap4Gallery->count())
+                            ->get();
+
+                        foreach ($otherDistEvidences as $ev) {
+                            if (! empty($ev->url)) {
+                                $tahap4Gallery->push([
+                                    'url' => $ev->url,
+                                    'title' => 'Dokumentasi Armada & Distribusi Sekolah',
+                                    'desc' => $ev->description ?: 'Pengantaran paket makanan bergizi hangat ke sekolah binaan.',
+                                ]);
+                            }
+                        }
                     }
                 }
 
@@ -566,6 +702,146 @@ class PublicPortalController extends Controller
             ]);
         }
 
+        // Default galeri 4 tahapan menggunakan foto riil dari Supabase sebagai fallback
+        $defaultGalleries = [
+            1 => [
+                'badgeText' => 'Tahap 01',
+                'badgeClass' => 'bg-blue-600 text-white',
+                'stageTitle' => 'Dokumentasi Bahan Segar Datang',
+                'photos' => [
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/receivings/1795128583_I6PPbUcJdKl3by3j.jpeg',
+                        'title' => 'Penerimaan Sayur Segar Petani Mitra',
+                        'desc' => 'Penerimaan komoditas sayuran hijau, tahu, dan komoditas lokal langsung dari mitra petani binaan.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/receivings/1795128682_sl7vyVIVf2HXdL88.jpeg',
+                        'title' => 'Pemeriksaan Mutu & Kesegaran Sayur',
+                        'desc' => 'Sortir kesegaran bahan pangan segar sebelum masuk ke cold storage dapur SPPG.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/receivings/1794926336_Td7MSPF3dSue445M.webp',
+                        'title' => 'Penerimaan Buah & Suplemen Segar',
+                        'desc' => 'Pemeriksaan kualitas buah segar sebagai pelengkap menu seimbang siswa.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/receivings/1794926111_o9K8DAKVme0jubv6.png',
+                        'title' => 'Penimbangan & Verifikasi Beras',
+                        'desc' => 'Penimbangan digital beras pulen berstandar kualitas nasional.',
+                    ],
+                ],
+            ],
+            2 => [
+                'badgeText' => 'Tahap 02',
+                'badgeClass' => 'bg-amber-600 text-white',
+                'stageTitle' => 'Dokumentasi Olah Masak Matang',
+                'photos' => [
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/processing/1795129306_dWHvg7U1uHipY7UA.jpeg',
+                        'title' => 'Persiapan Bahan & Higienitas Dapur',
+                        'desc' => 'Penyiapan bahan pangan dalam wadah stainless steel steril sebelum diolah.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/processing/1795129345_r82d0zkOy86GposX.webp',
+                        'title' => 'Pencucian Higienis Berstandar',
+                        'desc' => 'Pencucian bahan pangan dengan air mengalir berstandar sanitasi guna melenyapkan kotoran.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/processing/1795129359_q0KxdZdbXv1lHpnC.webp',
+                        'title' => 'Pemasakan Suhu Kritis >85°C',
+                        'desc' => 'Pengolahan menu dalam suhu tinggi guna memastikan makanan matang merata dan bebas kuman.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/processing/1795129380_gX77sQoj7u2Jet6H.png',
+                        'title' => 'Pengemasan & Penataan Ompreng',
+                        'desc' => 'Seluruh staf pengolah mengenakan APD lengkap saat menata makanan ke ompreng.',
+                    ],
+                ],
+            ],
+            3 => [
+                'badgeText' => 'Tahap 03',
+                'badgeClass' => 'bg-emerald-600 text-white',
+                'stageTitle' => 'Dokumentasi Cek Gizi & Pack',
+                'photos' => [
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/hasil/1795129422_3eEN0FdqIjpa0Yq2.png',
+                        'title' => 'Uji Mutu Organoleptik & Gizi',
+                        'desc' => 'Pemeriksaan organoleptik rasa, aroma, dan tekstur hidangan oleh nutrisionis bersertifikat.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/hasil/1795123635_pUyiJffZZZkMENif.png',
+                        'title' => 'Verifikasi Gramatur Porsi Siswa',
+                        'desc' => 'Penimbangan gramatur porsi siswa agar memenuhi angka kecukupan gizi harian BGN.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/hasil/1795096798_gA0MfAmiaLH509mw.png',
+                        'title' => 'Penyegelan Ompreng Rapat',
+                        'desc' => 'Wadah makanan bersegel rapat menjaga suhu hangat dan kebersihan hingga disantap di sekolah.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/hasil/1794926856_sBLdy2o01zbflatZ.png',
+                        'title' => 'Pemeriksaan Sample Makanan',
+                        'desc' => 'Penyimpanan sampel hidangan untuk uji laboratorium ketahanan pangan berkala.',
+                    ],
+                ],
+            ],
+            4 => [
+                'badgeText' => 'Tahap 04',
+                'badgeClass' => 'bg-indigo-600 text-white',
+                'stageTitle' => 'Dokumentasi Meluncur ke Sekolah',
+                'photos' => [
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/pengiriman/1795129485_oZPq8DEYxRW8tP23.webp',
+                        'title' => 'Pemuatan ke Box Insulasi Termal',
+                        'desc' => 'Makanan ditata rapi ke dalam kontainer thermal insulasi hangat sebelum dinaikkan ke armada.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/pengiriman/1795129521_bxo48Rl0duYsD6Ve.png',
+                        'title' => 'Armada Distribusi Rute Sekolah',
+                        'desc' => 'Armada bergerak serempak menuju sekolah binaan sesuai rute terpetakan.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/pengiriman/1795123909_Kw8vq0tAeih0I8Si.webp',
+                        'title' => 'Serah Terima di Sekolah Binaan',
+                        'desc' => 'Guru piket sekolah memeriksa segel dan menandatangani berita acara serah terima digital.',
+                    ],
+                    [
+                        'url' => 'https://uovagfdbozaeaywzgbpa.supabase.co/storage/v1/object/public/evidences/pengiriman/1795123955_yTv6q6xBikgxfuMM.jpeg',
+                        'title' => 'Santap Makanan Bergizi di Kelas',
+                        'desc' => 'Siswa menikmati menu makanan hangat dan bernutrisi tinggi dengan riang gembira.',
+                    ],
+                ],
+            ],
+        ];
+
+        // Format stageGalleries menggunakan data riil database dengan fallback default
+        $stageGalleries = [
+            1 => [
+                'badgeText' => 'Tahap 01',
+                'badgeClass' => 'bg-blue-600 text-white',
+                'stageTitle' => 'Dokumentasi Bahan Segar Datang',
+                'photos' => $tahap1Gallery->isNotEmpty() ? $tahap1Gallery->values()->all() : $defaultGalleries[1]['photos'],
+            ],
+            2 => [
+                'badgeText' => 'Tahap 02',
+                'badgeClass' => 'bg-amber-600 text-white',
+                'stageTitle' => 'Dokumentasi Olah Masak Matang',
+                'photos' => $tahap2Gallery->isNotEmpty() ? $tahap2Gallery->values()->all() : $defaultGalleries[2]['photos'],
+            ],
+            3 => [
+                'badgeText' => 'Tahap 03',
+                'badgeClass' => 'bg-emerald-600 text-white',
+                'stageTitle' => 'Dokumentasi Cek Gizi & Pack',
+                'photos' => $tahap3Gallery->isNotEmpty() ? $tahap3Gallery->values()->all() : $defaultGalleries[3]['photos'],
+            ],
+            4 => [
+                'badgeText' => 'Tahap 04',
+                'badgeClass' => 'bg-indigo-600 text-white',
+                'stageTitle' => 'Dokumentasi Meluncur ke Sekolah',
+                'photos' => $tahap4Gallery->isNotEmpty() ? $tahap4Gallery->values()->all() : $defaultGalleries[4]['photos'],
+            ],
+        ];
+
         return view('public.sppg-detail', compact(
             'kode',
             'unitCode',
@@ -589,7 +865,8 @@ class PublicPortalController extends Controller
             'nutritionistName',
             'activeMenus',
             'recentDistributions',
-            'publicPhotos'
+            'publicPhotos',
+            'stageGalleries'
         ));
     }
 

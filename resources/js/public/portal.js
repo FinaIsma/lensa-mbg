@@ -708,6 +708,11 @@ function updateModalView() {
 
 // Lightbox Modal Foto dengan Dukungan Slider Navigasi
 function openPhotoModal(imgSrc, caption, galleryList = null, startIndex = 0) {
+    // Dukungan halaman SPPG Detail: delegasikan pemanggilan tahap jika menggunakan modal khusus
+    if (typeof window.openSppgStageModal === 'function' && (typeof imgSrc === 'number' || (typeof imgSrc === 'string' && /^[1-4]$/.test(imgSrc)))) {
+        return window.openSppgStageModal(Number(imgSrc), typeof caption === 'number' ? caption : (startIndex || 0));
+    }
+
     const modal = document.getElementById('photoModal');
     const img = document.getElementById('modalImg');
     const cap = document.getElementById('modalCaption');
@@ -728,7 +733,10 @@ function openPhotoModal(imgSrc, caption, galleryList = null, startIndex = 0) {
         modal.classList.remove('opacity-0');
     }, 10);
 }
-window.openPhotoModal = openPhotoModal;
+window.__portalOpenPhotoModal = openPhotoModal;
+if (typeof window.openSppgStageModal !== 'function') {
+    window.openPhotoModal = openPhotoModal;
+}
 
 function prevPhotoModal(e) {
     if (e) e.stopPropagation();
@@ -747,6 +755,9 @@ function nextPhotoModal(e) {
 window.nextPhotoModal = nextPhotoModal;
 
 function closePhotoModal() {
+    if (typeof window.closeSppgGalleryModal === 'function') {
+        window.closeSppgGalleryModal();
+    }
     const modal = document.getElementById('photoModal');
     if (!modal) return;
 
@@ -755,7 +766,9 @@ function closePhotoModal() {
         modal.classList.add('hidden');
     }, 150);
 }
-window.closePhotoModal = closePhotoModal;
+if (typeof window.closeSppgGalleryModal !== 'function') {
+    window.closePhotoModal = closePhotoModal;
+}
 
 // Navigasi Keyboard: Panah Kiri (Prev), Panah Kanan (Next), Escape (Tutup)
 document.addEventListener('keydown', function (e) {

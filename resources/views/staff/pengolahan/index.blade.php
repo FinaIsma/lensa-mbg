@@ -226,17 +226,25 @@
                                     </div>
                                 @endif
 
-                                @if ($step->evidences->isNotEmpty())
-                                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                         @foreach ($step->evidences as $ev)
-                                            <div onclick="previewEvidence('{{ $ev->url }}', '{{ $step->step_name }}')" 
+                                            <div onclick="previewEvidence('{{ $ev->url }}', '{{ addslashes($step->step_name) }}')" 
                                                  style="cursor: pointer; border-radius: 6px; overflow: hidden; border: 1px solid #CBD5E1; width: 60px; height: 46px;" 
                                                  title="Klik untuk memperbesar bukti">
                                                 <img src="{{ $ev->url }}" alt="Bukti" style="width: 100%; height: 100%; object-fit: cover;">
                                             </div>
                                         @endforeach
                                     </div>
-                                @endif
+                                    <button type="button" 
+                                            onclick="openUploadEvidenceModal({{ $step->id }}, '{{ addslashes($step->step_name) }}')" 
+                                            class="btn-secondary" 
+                                            style="font-size: 11.5px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 5px;" 
+                                            title="Unggah foto dokumentasi tambahan untuk tahap ini">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                        <span>+ Foto Dokumentasi</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -346,13 +354,14 @@
                     <textarea name="note" rows="2" class="form-input" placeholder="Contoh: Suhu air 100°C, menggunakan kuali no. 2..." style="width: 100%; font-size: 13px; padding: 10px; border-radius: 8px; border: 1px solid #CBD5E1;"></textarea>
                 </div>
 
-                {{-- Upload Bukti Foto (Opsional) --}}
+                {{-- Upload Bukti Foto (Opsional, Multiple) --}}
                 <div>
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #071E49; margin-bottom: 6px;">
-                        Foto Bukti Aktivitas (Opsional)
+                        Foto Bukti Aktivitas (Opsional, bisa lebih dari 1 foto)
                     </label>
-                    <input type="file" name="evidence_file" accept="image/*" class="form-input" style="width: 100%; font-size: 13px; padding: 8px; border-radius: 8px; border: 1px solid #CBD5E1;">
-                    <small style="color: #64748B; font-size: 11px; margin-top: 3px; display: block;">Format: JPG, PNG, WEBP. Maks 10 MB.</small>
+                    <input type="file" name="evidence_files[]" multiple accept="image/*" class="form-input" id="addStepFileInput" onchange="updateFileCountText(this, 'addStepCountText')" style="width: 100%; font-size: 13px; padding: 8px; border-radius: 8px; border: 1px solid #CBD5E1;">
+                    <div id="addStepCountText" style="display: none; color: #2563EB; font-size: 11.5px; font-weight: 600; margin-top: 4px;"></div>
+                    <small style="color: #64748B; font-size: 11px; margin-top: 3px; display: block;">Format: JPG, PNG, WEBP. Maks 10 MB per foto. Anda dapat memilih beberapa foto sekaligus.</small>
                 </div>
             </div>
 
@@ -396,18 +405,60 @@
                     <textarea name="note" rows="2" class="form-input" placeholder="Contoh: Tahap selesai tepat waktu, tingkat kematangan pas..." style="width: 100%; font-size: 13px; padding: 10px; border-radius: 8px; border: 1px solid #CBD5E1;"></textarea>
                 </div>
 
-                {{-- Upload Bukti Selesai --}}
+                {{-- Upload Bukti Selesai (Opsional, Multiple) --}}
                 <div>
                     <label style="display: block; font-size: 13px; font-weight: 600; color: #071E49; margin-bottom: 6px;">
-                        Foto Bukti Selesai (Opsional)
+                        Foto Bukti Selesai (Opsional, bisa lebih dari 1 foto)
                     </label>
-                    <input type="file" name="evidence_file" accept="image/*" class="form-input" style="width: 100%; font-size: 13px; padding: 8px; border-radius: 8px; border: 1px solid #CBD5E1;">
+                    <input type="file" name="evidence_files[]" multiple accept="image/*" class="form-input" id="completeStepFileInput" onchange="updateFileCountText(this, 'completeStepCountText')" style="width: 100%; font-size: 13px; padding: 8px; border-radius: 8px; border: 1px solid #CBD5E1;">
+                    <div id="completeStepCountText" style="display: none; color: #16A34A; font-size: 11.5px; font-weight: 600; margin-top: 4px;"></div>
+                    <small style="color: #64748B; font-size: 11px; margin-top: 3px; display: block;">Format: JPG, PNG, WEBP. Maks 10 MB per foto. Anda dapat memilih beberapa foto sekaligus.</small>
                 </div>
             </div>
 
             <div class="modal-footer-custom">
                 <button type="button" onclick="closeCompleteStepModal()" class="btn-secondary">Kembali</button>
                 <button type="submit" class="btn-success">Simpan & Tandai Selesai</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal Tambah Foto Bukti Tambahan --}}
+<div id="modalAddStepEvidences" class="modal-backdrop-custom">
+    <div class="modal-content-custom">
+        <div class="modal-header-custom">
+            <div>
+                <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #071E49;">Tambah Foto Dokumentasi Proses</h3>
+                <p style="margin: 2px 0 0; font-size: 12px; color: #64748B;" id="uploadEvidenceSubtitle">Tahap Pengolahan</p>
+            </div>
+            <button type="button" onclick="closeUploadEvidenceModal()" style="border: none; background: transparent; cursor: pointer; color: #64748B;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <form id="formUploadStepEvidences" method="POST" action="" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-body-custom">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #071E49; margin-bottom: 6px;">
+                        Keterangan Foto (Opsional)
+                    </label>
+                    <input type="text" name="description" class="form-input" placeholder="Contoh: Proses pencucian sayur, pemotongan bahan, pengecekan bumbu..." style="width: 100%; height: 40px; font-size: 13px; padding: 0 12px; border-radius: 8px; border: 1px solid #CBD5E1;">
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #071E49; margin-bottom: 6px;">
+                        Pilih Foto Dokumentasi <span style="color: #DC2626;">*</span>
+                    </label>
+                    <input type="file" name="evidence_files[]" multiple required accept="image/*" class="form-input" id="uploadExtraFileInput" onchange="updateFileCountText(this, 'uploadExtraCountText')" style="width: 100%; font-size: 13px; padding: 8px; border-radius: 8px; border: 1px solid #CBD5E1;">
+                    <div id="uploadExtraCountText" style="display: none; color: #2563EB; font-size: 11.5px; font-weight: 600; margin-top: 4px;"></div>
+                    <small style="color: #64748B; font-size: 11px; margin-top: 3px; display: block;">Format: JPG, PNG, WEBP. Anda dapat memilih lebih dari 1 file foto sekaligus.</small>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom">
+                <button type="button" onclick="closeUploadEvidenceModal()" class="btn-secondary">Batal</button>
+                <button type="submit" class="btn-primary">Unggah Foto Dokumentasi</button>
             </div>
         </form>
     </div>
@@ -524,6 +575,36 @@
 
     function closeCompleteStepModal() {
         document.getElementById('modalCompleteStep').classList.remove('show');
+    }
+
+    function updateFileCountText(input, elementId) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        if (input.files && input.files.length > 0) {
+            el.textContent = `✓ ${input.files.length} foto dipilih`;
+            el.style.display = 'block';
+        } else {
+            el.style.display = 'none';
+        }
+    }
+
+    function openUploadEvidenceModal(stepId, stepName) {
+        const modal = document.getElementById('modalAddStepEvidences');
+        const form = document.getElementById('formUploadStepEvidences');
+        const subtitle = document.getElementById('uploadEvidenceSubtitle');
+        if (!modal || !form) return;
+        form.action = `/staff/pengolahan/tahap/${stepId}/evidences`;
+        subtitle.textContent = `Tahap: ${stepName}`;
+        const input = document.getElementById('uploadExtraFileInput');
+        if (input) input.value = '';
+        const countText = document.getElementById('uploadExtraCountText');
+        if (countText) countText.style.display = 'none';
+        modal.classList.add('show');
+    }
+
+    function closeUploadEvidenceModal() {
+        const modal = document.getElementById('modalAddStepEvidences');
+        if (modal) modal.classList.remove('show');
     }
 
     function previewEvidence(url, caption) {

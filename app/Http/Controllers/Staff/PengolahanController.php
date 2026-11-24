@@ -101,6 +101,8 @@ class PengolahanController extends Controller
             'started_at' => ['required', 'date'],
             'note' => ['nullable', 'string', 'max:1000'],
             'evidence_file' => ['nullable', 'file', 'image', 'max:10240'],
+            'evidence_files' => ['nullable', 'array'],
+            'evidence_files.*' => ['file', 'image', 'max:10240'],
         ]);
 
         try {
@@ -119,9 +121,21 @@ class PengolahanController extends Controller
                     'note' => $validated['note'] ?? null,
                 ]);
 
-                // Simpan bukti foto jika ada
+                // Simpan bukti foto jika ada (bisa lebih dari 1 foto)
+                $filesToUpload = [];
+                if ($request->hasFile('evidence_files')) {
+                    $files = $request->file('evidence_files');
+                    if (is_array($files)) {
+                        $filesToUpload = array_merge($filesToUpload, $files);
+                    } else {
+                        $filesToUpload[] = $files;
+                    }
+                }
                 if ($request->hasFile('evidence_file')) {
-                    $file = $request->file('evidence_file');
+                    $filesToUpload[] = $request->file('evidence_file');
+                }
+
+                foreach ($filesToUpload as $file) {
                     $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'processing');
 
                     Evidence::create([
@@ -178,6 +192,8 @@ class PengolahanController extends Controller
             'ended_at' => ['required', 'date'],
             'note' => ['nullable', 'string', 'max:1000'],
             'evidence_file' => ['nullable', 'file', 'image', 'max:10240'],
+            'evidence_files' => ['nullable', 'array'],
+            'evidence_files.*' => ['file', 'image', 'max:10240'],
         ]);
 
         try {
@@ -203,9 +219,21 @@ class PengolahanController extends Controller
 
                 $step->save();
 
-                // Simpan foto bukti jika diunggah saat penyelesaian
+                // Simpan foto bukti jika diunggah saat penyelesaian (bisa lebih dari 1 foto)
+                $filesToUpload = [];
+                if ($request->hasFile('evidence_files')) {
+                    $files = $request->file('evidence_files');
+                    if (is_array($files)) {
+                        $filesToUpload = array_merge($filesToUpload, $files);
+                    } else {
+                        $filesToUpload[] = $files;
+                    }
+                }
                 if ($request->hasFile('evidence_file')) {
-                    $file = $request->file('evidence_file');
+                    $filesToUpload[] = $request->file('evidence_file');
+                }
+
+                foreach ($filesToUpload as $file) {
                     $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'processing');
 
                     Evidence::create([
@@ -227,6 +255,79 @@ class PengolahanController extends Controller
             });
 
             $msg = 'Tahap pengolahan berhasil diselesaikan.';
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => $msg]);
+            }
+
+            return back()->with('success', $msg);
+        } catch (\Throwable $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+            }
+
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Tambah foto dokumentasi bukti pada tahap pengolahan yang sudah ada.
+     */
+    public function uploadStepEvidences(Request $request, int $id): RedirectResponse|JsonResponse
+    {
+        $idSppg = $this->resolveSppgId();
+        $staff = $this->getAuthenticatedStaff();
+
+        $request->validate([
+            'evidence_file' => ['nullable', 'file', 'image', 'max:10240'],
+            'evidence_files' => ['nullable', 'array'],
+            'evidence_files.*' => ['file', 'image', 'max:10240'],
+            'description' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        if (! $request->hasFile('evidence_file') && ! $request->hasFile('evidence_files')) {
+            $msg = 'Pilih minimal satu file foto dokumentasi.';
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+
+            return back()->with('error', $msg);
+        }
+
+        try {
+            $step = ProcessingStep::whereHas('batch', fn ($q) => $q->where('id_sppg', $idSppg))->findOrFail($id);
+
+            $filesToUpload = [];
+            if ($request->hasFile('evidence_files')) {
+                $files = $request->file('evidence_files');
+                if (is_array($files)) {
+                    $filesToUpload = array_merge($filesToUpload, $files);
+                } else {
+                    $filesToUpload[] = $files;
+                }
+            }
+            if ($request->hasFile('evidence_file')) {
+                $filesToUpload[] = $request->file('evidence_file');
+            }
+
+            $desc = $request->input('description') ?: "Foto dokumentasi proses: {$step->step_name}";
+
+            foreach ($filesToUpload as $file) {
+                $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'processing');
+                Evidence::create([
+                    'uploaded_by' => $staff?->id,
+                    'evidenceable_type' => 'processing_steps',
+                    'evidenceable_id' => $step->id,
+                    'file_path' => $path,
+                    'file_type' => $file->getClientMimeType(),
+                    'description' => $desc,
+                    'is_public' => true,
+                    'uploaded_at' => now(),
+                ]);
+            }
+
+            $count = count($filesToUpload);
+            $msg = "{$count} foto dokumentasi berhasil ditambahkan ke tahap \"{$step->step_name}\".";
+
             if ($request->wantsJson()) {
                 return response()->json(['success' => true, 'message' => $msg]);
             }

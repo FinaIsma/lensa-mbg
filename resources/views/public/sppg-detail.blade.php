@@ -65,10 +65,7 @@
             <div class="md:col-span-5 lg:col-span-5">
                 <div class="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[4/3] md:aspect-[4/3] lg:h-[280px] w-full shadow-2xs bg-slate-100 group">
                     @php
-                        $fotoKantor = asset('images/dapur-sppg-sample.jpg');
-                        if (!empty($sppg->foto_kantor_sppg)) {
-                            $fotoKantor = str_starts_with($sppg->foto_kantor_sppg, 'http') ? $sppg->foto_kantor_sppg : asset('storage/'.$sppg->foto_kantor_sppg);
-                        }
+                        $fotoKantor = $sppg->foto_kantor_url ?? asset('images/dapur-sppg-sample.jpg');
                     @endphp
                     <img 
                         src="{{ $fotoKantor }}" 
@@ -274,6 +271,24 @@
             </div>
         </div>
 
+        @php
+            $tahap1Photos = $stageGalleries[1]['photos'] ?? [];
+            $tahap1Cover = !empty($tahap1Photos) ? $tahap1Photos[0]['url'] : 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';
+            $tahap1Count = count($tahap1Photos);
+
+            $tahap2Photos = $stageGalleries[2]['photos'] ?? [];
+            $tahap2Cover = !empty($tahap2Photos) ? $tahap2Photos[0]['url'] : 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';
+            $tahap2Count = count($tahap2Photos);
+
+            $tahap3Photos = $stageGalleries[3]['photos'] ?? [];
+            $tahap3Cover = !empty($tahap3Photos) ? $tahap3Photos[0]['url'] : 'https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';
+            $tahap3Count = count($tahap3Photos);
+
+            $tahap4Photos = $stageGalleries[4]['photos'] ?? [];
+            $tahap4Cover = !empty($tahap4Photos) ? $tahap4Photos[0]['url'] : 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';
+            $tahap4Count = count($tahap4Photos);
+        @endphp
+
         <!-- 4 Cards Grid Tahapan (List Memanjang 4 ke Bawah di HP, 4 Kolom di Desktop) -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
             
@@ -288,18 +303,53 @@
                 <div class="flex items-center lg:block gap-2.5 sm:gap-3 min-w-0 flex-1 lg:flex-initial">
                     <!-- Header Desktop (Hidden on Mobile) -->
                     <div class="hidden lg:flex items-center justify-between">
-                        <span class="text-xs font-black text-blue-700">Tahap 01</span>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-5 h-5 rounded-md bg-blue-500 text-white flex items-center justify-center shadow-2xs shrink-0">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-black text-blue-700">Tahap 01</span>
+                        </div>
                         <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             <span class="hidden xs:inline">Beres</span>
                         </span>
                     </div>
 
-                    <!-- Icon -->
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-500 group-hover:bg-blue-600 text-white flex items-center justify-center lg:mt-3 shadow-2xs transition shrink-0">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
+                    <!-- Thumbnail Foto Preview Desktop -->
+                    <div 
+                        onclick="event.stopPropagation(); openPhotoModal(1, 0);" 
+                        class="relative rounded-xl overflow-hidden aspect-[16/10] w-full hidden lg:block mt-2.5 mb-2.5 bg-slate-100 border border-blue-200/70 group/thumb cursor-pointer shadow-2xs hover:brightness-105 transition"
+                        title="Klik untuk membuka foto dokumentasi"
+                    >
+                        <img 
+                            src="{{ $tahap1Cover }}" 
+                            alt="Bahan Segar Datang" 
+                            class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';"
+                        >
+                        <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-extrabold flex items-center gap-1 border border-white/20">
+                            <svg class="w-2.5 h-2.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>{{ $tahap1Count }} Foto</span>
+                        </div>
+                    </div>
+
+                    <!-- Thumbnail Mobile (Left on Mobile) -->
+                    <div 
+                        onclick="event.stopPropagation(); openPhotoModal(1, 0);" 
+                        class="lg:hidden relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-blue-200/70 group/thumb cursor-pointer shadow-2xs"
+                        title="Klik untuk membuka foto dokumentasi"
+                    >
+                        <img 
+                            src="{{ $tahap1Cover }}" 
+                            alt="Bahan Segar Datang" 
+                            class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-300"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';"
+                        >
+                        <div class="absolute bottom-0.5 right-0.5 px-1 py-0.2 rounded bg-slate-900/80 text-white text-[8px] font-bold">
+                            {{ $tahap1Count }}
+                        </div>
                     </div>
 
                     <!-- Teks Judul & Metadata -->
@@ -311,7 +361,7 @@
                             <span class="text-slate-500 font-semibold truncate">{{ $stepPersiapan?->started_at ? $stepPersiapan->started_at->format('H.i') . ' WIB' : '05.30 WIB' }}</span>
                         </div>
 
-                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-3 group-hover:text-blue-900 transition-colors leading-tight truncate lg:whitespace-normal">
+                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-1 group-hover:text-blue-900 transition-colors leading-tight truncate lg:whitespace-normal">
                             Bahan Segar Datang
                         </h3>
                         
@@ -322,7 +372,7 @@
                 </div>
                 
                 <!-- Sisi Kanan Mobile / Bawah Desktop -->
-                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-4 lg:pt-3 lg:border-t lg:border-blue-100/70">
+                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-3 lg:pt-2.5 lg:border-t lg:border-blue-100/70">
                     <!-- Status Beres di Mobile -->
                     <span class="inline-flex lg:hidden items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                         <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
@@ -358,18 +408,53 @@
                 <div class="flex items-center lg:block gap-2.5 sm:gap-3 min-w-0 flex-1 lg:flex-initial">
                     <!-- Header Desktop (Hidden on Mobile) -->
                     <div class="hidden lg:flex items-center justify-between">
-                        <span class="text-xs font-black text-amber-700">Tahap 02</span>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-5 h-5 rounded-md bg-amber-500 text-white flex items-center justify-center shadow-2xs shrink-0">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-black text-amber-700">Tahap 02</span>
+                        </div>
                         <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             <span class="hidden xs:inline">Beres</span>
                         </span>
                     </div>
 
-                    <!-- Icon -->
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500 group-hover:bg-amber-600 text-white flex items-center justify-center lg:mt-3 shadow-2xs transition shrink-0">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                        </svg>
+                    <!-- Thumbnail Foto Preview Desktop -->
+                    <div 
+                        onclick="event.stopPropagation(); openPhotoModal(2, 0);" 
+                        class="relative rounded-xl overflow-hidden aspect-[16/10] w-full hidden lg:block mt-2.5 mb-2.5 bg-slate-100 border border-amber-200/70 group/thumb cursor-pointer shadow-2xs hover:brightness-105 transition"
+                        title="Klik untuk membuka foto dokumentasi"
+                    >
+                        <img 
+                            src="{{ $tahap2Cover }}" 
+                            alt="Masak Matang" 
+                            class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';"
+                        >
+                        <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-extrabold flex items-center gap-1 border border-white/20">
+                            <svg class="w-2.5 h-2.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>{{ $tahap2Count }} Foto</span>
+                        </div>
+                    </div>
+
+                    <!-- Thumbnail Mobile (Left on Mobile) -->
+                    <div 
+                        onclick="event.stopPropagation(); openPhotoModal(2, 0);" 
+                        class="lg:hidden relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-amber-200/70 group/thumb cursor-pointer shadow-2xs"
+                        title="Klik untuk membuka foto dokumentasi"
+                    >
+                        <img 
+                            src="{{ $tahap2Cover }}" 
+                            alt="Masak Matang" 
+                            class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-300"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';"
+                        >
+                        <div class="absolute bottom-0.5 right-0.5 px-1 py-0.2 rounded bg-slate-900/80 text-white text-[8px] font-bold">
+                            {{ $tahap2Count }}
+                        </div>
                     </div>
 
                     <!-- Teks Judul & Metadata -->
@@ -381,7 +466,7 @@
                             <span class="text-slate-500 font-semibold truncate">06.15 - 08.00 WIB</span>
                         </div>
 
-                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-3 group-hover:text-amber-900 transition-colors leading-tight truncate lg:whitespace-normal">
+                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-1 group-hover:text-amber-900 transition-colors leading-tight truncate lg:whitespace-normal">
                             Masak Matang
                         </h3>
                         
@@ -392,7 +477,7 @@
                 </div>
 
                 <!-- Sisi Kanan Mobile / Bawah Desktop -->
-                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-4 lg:pt-3 lg:border-t lg:border-amber-100/70">
+                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-3 lg:pt-2.5 lg:border-t lg:border-amber-100/70">
                     <!-- Status Beres di Mobile -->
                     <span class="inline-flex lg:hidden items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                         <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
@@ -428,18 +513,53 @@
                 <div class="flex items-center lg:block gap-2.5 sm:gap-3 min-w-0 flex-1 lg:flex-initial">
                     <!-- Header Desktop (Hidden on Mobile) -->
                     <div class="hidden lg:flex items-center justify-between">
-                        <span class="text-xs font-black text-emerald-700">Tahap 03</span>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-5 h-5 rounded-md bg-emerald-500 text-white flex items-center justify-center shadow-2xs shrink-0">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-black text-emerald-700">Tahap 03</span>
+                        </div>
                         <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             <span class="hidden xs:inline">Beres</span>
                         </span>
                     </div>
 
-                    <!-- Icon -->
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-500 group-hover:bg-emerald-600 text-white flex items-center justify-center lg:mt-3 shadow-2xs transition shrink-0">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                        </svg>
+                    <!-- Thumbnail Foto Preview Desktop -->
+                    <div 
+                        onclick="event.stopPropagation(); openPhotoModal(3, 0);" 
+                        class="relative rounded-xl overflow-hidden aspect-[16/10] w-full hidden lg:block mt-2.5 mb-2.5 bg-slate-100 border border-emerald-200/70 group/thumb cursor-pointer shadow-2xs hover:brightness-105 transition"
+                        title="Klik untuk membuka foto dokumentasi"
+                    >
+                        <img 
+                            src="{{ $tahap3Cover }}" 
+                            alt="Cek Gizi & Pack" 
+                            class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';"
+                        >
+                        <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-extrabold flex items-center gap-1 border border-white/20">
+                            <svg class="w-2.5 h-2.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>{{ $tahap3Count }} Foto</span>
+                        </div>
+                    </div>
+
+                    <!-- Thumbnail Mobile (Left on Mobile) -->
+                    <div 
+                        onclick="event.stopPropagation(); openPhotoModal(3, 0);" 
+                        class="lg:hidden relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-emerald-200/70 group/thumb cursor-pointer shadow-2xs"
+                        title="Klik untuk membuka foto dokumentasi"
+                    >
+                        <img 
+                            src="{{ $tahap3Cover }}" 
+                            alt="Cek Gizi & Pack" 
+                            class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-300"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';"
+                        >
+                        <div class="absolute bottom-0.5 right-0.5 px-1 py-0.2 rounded bg-slate-900/80 text-white text-[8px] font-bold">
+                            {{ $tahap3Count }}
+                        </div>
                     </div>
 
                     <!-- Teks Judul & Metadata -->
@@ -451,7 +571,7 @@
                             <span class="text-slate-500 font-semibold truncate">{{ $qcCheck?->checked_at ? $qcCheck->checked_at->format('H.i') . ' WIB' : '08.15 - 09.00 WIB' }}</span>
                         </div>
 
-                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-3 group-hover:text-emerald-900 transition-colors leading-tight truncate lg:whitespace-normal">
+                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-1 group-hover:text-emerald-900 transition-colors leading-tight truncate lg:whitespace-normal">
                             Cek Gizi & Pack
                         </h3>
                         
@@ -462,7 +582,7 @@
                 </div>
 
                 <!-- Sisi Kanan Mobile / Bawah Desktop -->
-                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-4 lg:pt-3 lg:border-t lg:border-emerald-100/70">
+                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-3 lg:pt-2.5 lg:border-t lg:border-emerald-100/70">
                     <!-- Status Beres di Mobile -->
                     <span class="inline-flex lg:hidden items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                         <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
@@ -498,18 +618,53 @@
                 <div class="flex items-center lg:block gap-2.5 sm:gap-3 min-w-0 flex-1 lg:flex-initial">
                     <!-- Header Desktop (Hidden on Mobile) -->
                     <div class="hidden lg:flex items-center justify-between">
-                        <span class="text-xs font-black text-indigo-700">Tahap 04</span>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-5 h-5 rounded-md bg-indigo-600 text-white flex items-center justify-center shadow-2xs shrink-0">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-black text-indigo-700">Tahap 04</span>
+                        </div>
                         <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             <span class="hidden xs:inline">Beres</span>
                         </span>
                     </div>
 
-                    <!-- Icon -->
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600 group-hover:bg-indigo-700 text-white flex items-center justify-center lg:mt-3 shadow-2xs transition shrink-0">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
+                    <!-- Thumbnail Foto Preview Desktop -->
+                    <div 
+                        onclick="event.stopPropagation(); openPhotoModal(4, 0);" 
+                        class="relative rounded-xl overflow-hidden aspect-[16/10] w-full hidden lg:block mt-2.5 mb-2.5 bg-slate-100 border border-indigo-200/70 group/thumb cursor-pointer shadow-2xs hover:brightness-105 transition"
+                        title="Klik untuk membuka foto dokumentasi"
+                    >
+                        <img 
+                            src="{{ $tahap4Cover }}" 
+                            alt="Meluncur ke Sekolah" 
+                            class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';"
+                        >
+                        <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-extrabold flex items-center gap-1 border border-white/20">
+                            <svg class="w-2.5 h-2.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>{{ $tahap4Count }} Foto</span>
+                        </div>
+                    </div>
+
+                    <!-- Thumbnail Mobile (Left on Mobile) -->
+                    <div 
+                        onclick="event.stopPropagation(); openPhotoModal(4, 0);" 
+                        class="lg:hidden relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-indigo-200/70 group/thumb cursor-pointer shadow-2xs"
+                        title="Klik untuk membuka foto dokumentasi"
+                    >
+                        <img 
+                            src="{{ $tahap4Cover }}" 
+                            alt="Meluncur ke Sekolah" 
+                            class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-300"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';"
+                        >
+                        <div class="absolute bottom-0.5 right-0.5 px-1 py-0.2 rounded bg-slate-900/80 text-white text-[8px] font-bold">
+                            {{ $tahap4Count }}
+                        </div>
                     </div>
 
                     <!-- Teks Judul & Metadata -->
@@ -521,7 +676,7 @@
                             <span class="text-slate-500 font-semibold truncate">09.15 WIB</span>
                         </div>
 
-                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-3 group-hover:text-indigo-900 transition-colors leading-tight truncate lg:whitespace-normal">
+                        <h3 class="font-black text-slate-900 text-xs sm:text-sm lg:mt-1 group-hover:text-indigo-900 transition-colors leading-tight truncate lg:whitespace-normal">
                             Meluncur ke Sekolah
                         </h3>
                         
@@ -532,7 +687,7 @@
                 </div>
 
                 <!-- Sisi Kanan Mobile / Bawah Desktop -->
-                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-4 lg:pt-3 lg:border-t lg:border-indigo-100/70">
+                <div class="flex items-center lg:justify-between shrink-0 gap-2 lg:mt-3 lg:pt-2.5 lg:border-t lg:border-indigo-100/70">
                     <!-- Status Beres di Mobile -->
                     <span class="inline-flex lg:hidden items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                         <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
@@ -606,19 +761,20 @@
             <div id="content-tahap-1" class="tahap-content hidden pt-4 space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
                     <!-- Foto Dokumentasi di Kiri -->
-                    <div class="md:col-span-5 lg:col-span-4">
+                    <div class="md:col-span-5 lg:col-span-4 flex flex-col gap-2.5">
                         <div onclick="openPhotoModal(1, 0)" class="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[4/3] md:aspect-[3/4] w-full bg-slate-100 shadow-2xs border border-slate-200/80 group cursor-pointer" title="Klik untuk membuka pop-up galeri dan geser foto">
                             <img 
-                                src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80" 
+                                src="{{ $tahap1Cover }}" 
                                 alt="Penerimaan Bahan Baku Segar" 
                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
+                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';"
                             >
                             <!-- Badge Preview Banyak Foto -->
                             <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-white/20">
                                 <svg class="w-3 h-3 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>4 Foto</span>
+                                <span>{{ $tahap1Count }} Foto</span>
                             </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 group-hover:from-slate-950/90 transition-colors">
                                 <span class="self-start px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shadow-2xs">Dokumentasi Bahan Masuk</span>
@@ -629,6 +785,27 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Gallery Thumbnails Strip -->
+                        @if(count($tahap1Photos) > 1)
+                            <div class="flex items-center gap-2 overflow-x-auto py-1">
+                                @foreach($tahap1Photos as $idx => $photo)
+                                    <button 
+                                        type="button" 
+                                        onclick="event.stopPropagation(); openPhotoModal(1, {{ $idx }});"
+                                        class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-blue-500 ring-2 ring-blue-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-blue-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
+                                        title="{{ $photo['title'] }}"
+                                    >
+                                        <img 
+                                            src="{{ $photo['url'] }}" 
+                                            alt="{{ $photo['title'] }}" 
+                                            class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
+                                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';"
+                                        >
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Di Samping Kanannya: Card Waktu, Penanggung Jawab, Standar Mutu & Tabel -->
@@ -697,19 +874,20 @@
             <div id="content-tahap-2" class="tahap-content hidden pt-4 space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
                     <!-- Foto Dokumentasi di Kiri -->
-                    <div class="md:col-span-5 lg:col-span-4">
+                    <div class="md:col-span-5 lg:col-span-4 flex flex-col gap-2.5">
                         <div onclick="openPhotoModal(2, 0)" class="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[4/3] md:aspect-[3/4] w-full bg-slate-100 shadow-2xs border border-slate-200/80 group cursor-pointer" title="Klik untuk membuka pop-up galeri dan geser foto">
                             <img 
-                                src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80" 
+                                src="{{ $tahap2Cover }}" 
                                 alt="Proses Pengolahan Dapur MBG" 
                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
+                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';"
                             >
                             <!-- Badge Preview Banyak Foto -->
                             <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-white/20">
                                 <svg class="w-3 h-3 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>4 Foto</span>
+                                <span>{{ $tahap2Count }} Foto</span>
                             </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 group-hover:from-slate-950/90 transition-colors">
                                 <span class="self-start px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white shadow-2xs">Dokumentasi Pengolahan</span>
@@ -720,6 +898,27 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Gallery Thumbnails Strip -->
+                        @if(count($tahap2Photos) > 1)
+                            <div class="flex items-center gap-2 overflow-x-auto py-1">
+                                @foreach($tahap2Photos as $idx => $photo)
+                                    <button 
+                                        type="button" 
+                                        onclick="event.stopPropagation(); openPhotoModal(2, {{ $idx }});"
+                                        class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-amber-500 ring-2 ring-amber-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-amber-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
+                                        title="{{ $photo['title'] }}"
+                                    >
+                                        <img 
+                                            src="{{ $photo['url'] }}" 
+                                            alt="{{ $photo['title'] }}" 
+                                            class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
+                                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';"
+                                        >
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Di Samping Kanannya: Card Waktu, Suhu, Metode, Menu & Catatan -->
@@ -774,19 +973,20 @@
             <div id="content-tahap-3" class="tahap-content hidden pt-4 space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
                     <!-- Foto Dokumentasi di Kiri -->
-                    <div class="md:col-span-5 lg:col-span-4">
+                    <div class="md:col-span-5 lg:col-span-4 flex flex-col gap-2.5">
                         <div onclick="openPhotoModal(3, 0)" class="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[4/3] md:aspect-[3/4] w-full bg-slate-100 shadow-2xs border border-slate-200/80 group cursor-pointer" title="Klik untuk membuka pop-up galeri dan geser foto">
                             <img 
-                                src="https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80" 
+                                src="{{ $tahap3Cover }}" 
                                 alt="Pemeriksaan Kualitas Gizi & Kemasan" 
                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
+                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';"
                             >
                             <!-- Badge Preview Banyak Foto -->
                             <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-white/20">
                                 <svg class="w-3 h-3 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>4 Foto</span>
+                                <span>{{ $tahap3Count }} Foto</span>
                             </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 group-hover:from-slate-950/90 transition-colors">
                                 <span class="self-start px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-2xs">Dokumentasi Uji Gizi</span>
@@ -797,6 +997,27 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Gallery Thumbnails Strip -->
+                        @if(count($tahap3Photos) > 1)
+                            <div class="flex items-center gap-2 overflow-x-auto py-1">
+                                @foreach($tahap3Photos as $idx => $photo)
+                                    <button 
+                                        type="button" 
+                                        onclick="event.stopPropagation(); openPhotoModal(3, {{ $idx }});"
+                                        class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-emerald-500 ring-2 ring-emerald-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-emerald-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
+                                        title="{{ $photo['title'] }}"
+                                    >
+                                        <img 
+                                            src="{{ $photo['url'] }}" 
+                                            alt="{{ $photo['title'] }}" 
+                                            class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
+                                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';"
+                                        >
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Di Samping Kanannya: Card Ahli Gizi, Batas Aman, Porsi Lolos & Hasil Uji Fisik -->
@@ -850,19 +1071,20 @@
             <div id="content-tahap-4" class="tahap-content hidden pt-4 space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
                     <!-- Foto Dokumentasi di Kiri -->
-                    <div class="md:col-span-5 lg:col-span-4">
+                    <div class="md:col-span-5 lg:col-span-4 flex flex-col gap-2.5">
                         <div onclick="openPhotoModal(4, 0)" class="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[4/3] md:aspect-[3/4] w-full bg-slate-100 shadow-2xs border border-slate-200/80 group cursor-pointer" title="Klik untuk membuka pop-up galeri dan geser foto">
                             <img 
-                                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80" 
+                                src="{{ $tahap4Cover }}" 
                                 alt="Distribusi Terjadwal ke Sekolah" 
                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
+                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';"
                             >
                             <!-- Badge Preview Banyak Foto -->
                             <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-white/20">
                                 <svg class="w-3 h-3 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>4 Foto</span>
+                                <span>{{ $tahap4Count }} Foto</span>
                             </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 group-hover:from-slate-950/90 transition-colors">
                                 <span class="self-start px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white shadow-2xs">Dokumentasi Logistik</span>
@@ -873,6 +1095,27 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Gallery Thumbnails Strip -->
+                        @if(count($tahap4Photos) > 1)
+                            <div class="flex items-center gap-2 overflow-x-auto py-1">
+                                @foreach($tahap4Photos as $idx => $photo)
+                                    <button 
+                                        type="button" 
+                                        onclick="event.stopPropagation(); openPhotoModal(4, {{ $idx }});"
+                                        class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-indigo-500 ring-2 ring-indigo-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-indigo-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
+                                        title="{{ $photo['title'] }}"
+                                    >
+                                        <img 
+                                            src="{{ $photo['url'] }}" 
+                                            alt="{{ $photo['title'] }}" 
+                                            class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
+                                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';"
+                                        >
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Di Samping Kanannya: Card Jam Armada, Total Porsi, Status & Daftar Tujuan -->
@@ -1106,9 +1349,9 @@
     </section>
 
     <!-- LIGHTBOX / POPUP GALERI FOTO TAHAPAN (Touch Swipe & Keyboard Friendly) -->
-    <div id="photo-gallery-modal" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md hidden flex-col justify-between p-3 sm:p-5 lg:p-6 transition-opacity duration-300 select-none" role="dialog" aria-modal="true" aria-label="Galeri Foto Aktivitas">
+    <div id="photo-gallery-modal" onclick="if(event.target === this) closePhotoModal();" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md hidden flex-col justify-between p-3 sm:p-5 lg:p-6 transition-opacity duration-300 select-none cursor-pointer" role="dialog" aria-modal="true" aria-label="Galeri Foto Aktivitas">
         <!-- Top Utility Bar Modal -->
-        <div class="flex items-center justify-between pb-3 border-b border-white/10 max-w-5xl mx-auto w-full shrink-0">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10 max-w-5xl mx-auto w-full shrink-0 cursor-default" onclick="event.stopPropagation();">
             <div class="flex items-center gap-2.5 min-w-0">
                 <span id="modal-stage-badge" class="px-2.5 py-1 rounded-md text-xs font-black shadow-xs bg-blue-600 text-white shrink-0">
                     Tahap 01
@@ -1132,7 +1375,7 @@
         </div>
 
         <!-- Main Slide View (Gambar + Tombol Geser) -->
-        <div id="modal-slide-area" class="relative flex items-center justify-center flex-grow max-w-4xl mx-auto w-full my-auto py-3 px-2">
+        <div id="modal-slide-area" onclick="if(event.target === this) closePhotoModal();" class="relative flex items-center justify-center flex-grow max-w-4xl mx-auto w-full my-auto py-3 px-2 cursor-pointer">
             <!-- Tombol Navigasi Kiri (Prev) -->
             <button 
                 type="button" 
@@ -1147,8 +1390,8 @@
             </button>
 
             <!-- Foto Utama -->
-            <div class="relative max-h-[58vh] sm:max-h-[66vh] max-w-full flex items-center justify-center overflow-hidden rounded-2xl bg-black/40">
-                <img id="modal-main-img" src="" alt="Dokumentasi Proses" class="max-h-[58vh] sm:max-h-[66vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-200">
+            <div class="relative max-h-[58vh] sm:max-h-[66vh] max-w-full flex items-center justify-center overflow-hidden rounded-2xl bg-black/40 cursor-default" onclick="event.stopPropagation();">
+                <img id="modal-main-img" src="" alt="Dokumentasi Proses" class="max-h-[58vh] sm:max-h-[66vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-200" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';">
             </div>
 
             <!-- Tombol Navigasi Kanan (Next) -->
@@ -1166,7 +1409,7 @@
         </div>
 
         <!-- Bottom Bar (Keterangan Foto & Thumbnail Geser) -->
-        <div class="max-w-4xl mx-auto w-full border-t border-white/10 pt-3 space-y-2 shrink-0">
+        <div class="max-w-4xl mx-auto w-full border-t border-white/10 pt-3 space-y-2 shrink-0 cursor-default" onclick="event.stopPropagation();">
             <div class="text-center sm:text-left">
                 <div id="modal-photo-title" class="text-xs sm:text-sm font-black text-white">Judul Foto</div>
                 <div id="modal-photo-desc" class="text-[11px] sm:text-xs text-slate-300 mt-0.5 line-clamp-2">Deskripsi Foto</div>
@@ -1194,120 +1437,11 @@
     let currentModalStage = 1;
     let currentModalIndex = 0;
 
-    const galleryData = {
-        1: {
-            badgeText: 'Tahap 01',
-            badgeClass: 'bg-blue-600 text-white',
-            stageTitle: 'Dokumentasi Bahan Segar Datang',
-            photos: [
-                {
-                    url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Sortir Sayur & Pangan Segar Petani Mitra',
-                    desc: 'Penerimaan sayuran hijau, tahu, beras, dan komoditas lokal langsung dari mitra petani terverifikasi BGN.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Pemeriksaan Kualitas & Kesegaran Telur',
-                    desc: 'Uji kebersihan cangkang dan berat telur sesuai spesifikasi gizi per porsi anak sekolah.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Pencucian Higienis Air Mengalir Berstandar',
-                    desc: 'Pencucian 3 tahap dengan air mengalir berstandar sanitasi guna melenyapkan residu dan kotoran.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Penimbangan Digital & Suhu Bahan Dingin',
-                    desc: 'Pencatatan akurat berat bersih dan suhu bahan pangan segar sebelum masuk ke tempat penyimpanan khusus dapur.'
-                }
-            ]
-        },
-        2: {
-            badgeText: 'Tahap 02',
-            badgeClass: 'bg-amber-600 text-white',
-            stageTitle: 'Dokumentasi Olah Masak Matang',
-            photos: [
-                {
-                    url: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Pemasakan Higienis Suhu Titik Didih >85°C',
-                    desc: 'Pengolahan menu aktif dalam wadah stainless steel food-grade bersuhu tinggi guna memastikan bebas kuman.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1577106263724-2c8e03bfe9cf?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Juru Masak Bersertifikat & APD Lengkap',
-                    desc: 'Seluruh staf pengolah wajib mengenakan masker, hairnet, apron, dan sarung tangan steril sesuai SOP sanitasi dapur.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Pemantauan Suhu Inti Masakan Matang',
-                    desc: 'Pengecekan rutin menggunakan digital probe thermo untuk menjamin kematangan merata hingga bagian terdalam makanan.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Dapur Stainless Steel Higienis Bebas Kontaminasi',
-                    desc: 'Area pemisahan zona basah dan matang demi pencegahan kontaminasi silang secara terstandarisasi.'
-                }
-            ]
-        },
-        3: {
-            badgeText: 'Tahap 03',
-            badgeClass: 'bg-emerald-600 text-white',
-            stageTitle: 'Dokumentasi Cek Gizi & Pack',
-            photos: [
-                {
-                    url: 'https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Uji Organoleptik Rasa, Aroma & Tekstur',
-                    desc: 'Nutrisionis dan ahli gizi bersertifikat mencicipi serta memverifikasi cita rasa dan kesegaran hidangan.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1584744982491-665216d95f8b?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Penimbangan Gramatur Porsi Siswa Presisi',
-                    desc: 'Porsi karbohidrat, protein nabati/hewani, sayur, dan buah ditimbang presisi sesuai standar AKG Generasi Emas BGN.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Penyegelan Ompreng Stainless Steel Food Grade',
-                    desc: 'Wadah makanan bersegel rapat anti-tumpah menjaga kehangatan dan kebersihan hingga disantap siswa di sekolah.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Labeling Jam Batas Konsumsi Aman & Batch ID',
-                    desc: 'Setiap kontainer diberi label jam konsumsi maksimal (4 jam) dan kode batch untuk ketertelusuran penuh.'
-                }
-            ]
-        },
-        4: {
-            badgeText: 'Tahap 04',
-            badgeClass: 'bg-indigo-600 text-white',
-            stageTitle: 'Dokumentasi Meluncur ke Sekolah',
-            photos: [
-                {
-                    url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Pemuatan ke Box Thermal Insulasi Suhu Hangat',
-                    desc: 'Makanan disusun rapi ke dalam box berinsulasi khusus rantai hangat sebelum dinaikkan ke armada distribusi.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Armada Siaga & Pengawalan Rute Cepat',
-                    desc: 'Kendaraan distribusi bergerak sesuai jadwal ketat untuk tiba 30 menit sebelum jam istirahat sekolah.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Serah Terima & Pengecekan Suhu di Sekolah',
-                    desc: 'Guru penanggung jawab MBG memeriksa segel dan menandatangani berita acara penerimaan digital.'
-                },
-                {
-                    url: 'https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=1200&q=85',
-                    title: 'Siswa Menikmati Santap Bergizi Gratis',
-                    desc: 'Anak-anak sekolah menyantap menu bergizi seimbang dengan gembira dan penuh energi.'
-                }
-            ]
-        }
-    };
+    const galleryData = @json($stageGalleries ?? []);
 
     function openPhotoModal(stageNum, photoIndex = 0) {
-        currentModalStage = stageNum;
-        currentModalIndex = photoIndex;
+        currentModalStage = Number(stageNum) || 1;
+        currentModalIndex = Number(photoIndex) || 0;
 
         const modal = document.getElementById('photo-gallery-modal');
         if (!modal) return;
@@ -1328,48 +1462,72 @@
         document.body.style.overflow = '';
     }
 
+    // Expose functions globally to prevent Vite/module scoping conflicts
+    window.openPhotoModal = openPhotoModal;
+    window.openSppgStageModal = openPhotoModal;
+    window.closePhotoModal = closePhotoModal;
+    window.closeSppgGalleryModal = closePhotoModal;
+
     function renderModalPhoto() {
-        const stage = galleryData[currentModalStage];
-        if (!stage || !stage.photos.length) return;
+        const stage = galleryData[currentModalStage] || galleryData[1];
+        if (!stage || !stage.photos || !stage.photos.length) return;
 
         const photos = stage.photos;
         if (currentModalIndex < 0) currentModalIndex = photos.length - 1;
         if (currentModalIndex >= photos.length) currentModalIndex = 0;
 
         const photo = photos[currentModalIndex];
+        if (!photo) return;
 
         // Header
         const badgeElem = document.getElementById('modal-stage-badge');
-        badgeElem.className = 'px-2.5 py-1 rounded-md text-xs font-black shadow-xs ' + stage.badgeClass;
-        badgeElem.textContent = stage.badgeText;
+        if (badgeElem) {
+            badgeElem.className = 'px-2.5 py-1 rounded-md text-xs font-black shadow-xs ' + (stage.badgeClass || 'bg-blue-600 text-white');
+            badgeElem.textContent = stage.badgeText || `Tahap 0${currentModalStage}`;
+        }
 
-        document.getElementById('modal-stage-title').textContent = stage.stageTitle;
-        document.getElementById('modal-photo-counter').textContent = `Foto ${currentModalIndex + 1} dari ${photos.length}`;
+        const titleStageElem = document.getElementById('modal-stage-title');
+        if (titleStageElem) titleStageElem.textContent = stage.stageTitle || '';
+
+        const counterElem = document.getElementById('modal-photo-counter');
+        if (counterElem) counterElem.textContent = `Foto ${currentModalIndex + 1} dari ${photos.length}`;
 
         // Foto Utama
         const mainImg = document.getElementById('modal-main-img');
-        mainImg.src = photo.url;
-        mainImg.alt = photo.title;
+        if (mainImg) {
+            mainImg.src = photo.url;
+            mainImg.alt = photo.title || 'Dokumentasi Proses';
+            mainImg.onerror = function() {
+                this.onerror = null;
+                this.src = 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';
+            };
+        }
 
         // Caption
-        document.getElementById('modal-photo-title').textContent = photo.title;
-        document.getElementById('modal-photo-desc').textContent = photo.desc;
+        const photoTitleElem = document.getElementById('modal-photo-title');
+        if (photoTitleElem) photoTitleElem.textContent = photo.title || '';
+
+        const photoDescElem = document.getElementById('modal-photo-desc');
+        if (photoDescElem) photoDescElem.textContent = photo.desc || '';
 
         // Render Thumbnails
         const thumbContainer = document.getElementById('modal-thumbnails');
-        thumbContainer.innerHTML = '';
-        photos.forEach((p, idx) => {
-            const thumb = document.createElement('button');
-            thumb.type = 'button';
-            thumb.title = p.title;
-            thumb.className = `w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${idx === currentModalIndex ? 'border-amber-400 ring-2 ring-amber-400/50 scale-105' : 'border-white/20 opacity-60 hover:opacity-100'}`;
-            thumb.innerHTML = `<img src="${p.url}" alt="${p.title}" class="w-full h-full object-cover">`;
-            thumb.onclick = () => {
-                currentModalIndex = idx;
-                renderModalPhoto();
-            };
-            thumbContainer.appendChild(thumb);
-        });
+        if (thumbContainer) {
+            thumbContainer.innerHTML = '';
+            photos.forEach((p, idx) => {
+                const thumb = document.createElement('button');
+                thumb.type = 'button';
+                thumb.title = p.title || '';
+                thumb.className = `w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${idx === currentModalIndex ? 'border-amber-400 ring-2 ring-amber-400/50 scale-105' : 'border-white/20 opacity-60 hover:opacity-100'}`;
+                thumb.innerHTML = `<img src="${p.url}" alt="${p.title || ''}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';">`;
+                thumb.onclick = (e) => {
+                    if (e) e.stopPropagation();
+                    currentModalIndex = idx;
+                    renderModalPhoto();
+                };
+                thumbContainer.appendChild(thumb);
+            });
+        }
     }
 
     function prevModalPhoto(e) {

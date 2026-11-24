@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Sppg;
 use Tests\TestCase;
 
 class SppgDetailTest extends TestCase
@@ -37,6 +38,21 @@ class SppgDetailTest extends TestCase
         // Status badge di samping nama sppg cukup 'Aktif' bukan 'Dapur Aktif'
         $response->assertDontSee('Dapur Aktif');
         $response->assertSee('Aktif');
+
+        // Foto profil/kantor SPPG diambil dari database
+        $sppg = Sppg::findOrFail(5);
+        $response->assertSee($sppg->foto_kantor_url, false);
+        $response->assertDontSee('https://images.unsplash.com/photo-1577495508048-b635879837f1');
+
+        // Stage galleries data dikirim ke view
+        $response->assertViewHas('stageGalleries');
+        $galleries = $response->viewData('stageGalleries');
+        $this->assertIsArray($galleries);
+        $this->assertArrayHasKey(1, $galleries);
+        $this->assertArrayHasKey(2, $galleries);
+        $this->assertArrayHasKey(3, $galleries);
+        $this->assertArrayHasKey(4, $galleries);
+        $this->assertNotEmpty($galleries[2]['photos']);
     }
 
     public function test_gambar_maskot_tanpa_shadow_dan_menggunakan_hover_zoom(): void
