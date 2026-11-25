@@ -134,9 +134,9 @@ class DashboardController extends Controller
         // 3. VISUALISASI CAPAIAN PER SASARAN (HARIAN HARI INI)
         // ==========================================
         $types = [
-            'sekolah' => ['label' => 'Sekolah (SD / SMP / SMA)', 'icon' => '🏫', 'fill' => 'fill-blue'],
-            'posyandu' => ['label' => 'Posyandu / Balita', 'icon' => '👶', 'fill' => 'fill-emerald'],
-            'lainnya' => ['label' => 'Sasaran Khusus / Lainnya', 'icon' => '🏢', 'fill' => 'fill-amber'],
+            'sekolah' => ['label' => 'Sekolah (SD / SMP / SMA)', 'icon' => '', 'fill' => 'fill-blue'],
+            'posyandu' => ['label' => 'Posyandu / Balita', 'icon' => '', 'fill' => 'fill-emerald'],
+            'lainnya' => ['label' => 'Sasaran Khusus / Lainnya', 'icon' => '', 'fill' => 'fill-amber'],
         ];
 
         $targetProgress = [];

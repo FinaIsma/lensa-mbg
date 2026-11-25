@@ -198,6 +198,72 @@ class ProductionBatch extends Model
     }
 
     /**
+     * Tahap penting / minimal yang wajib diisi:
+     * 1. Persiapan bahan
+     * 2. Pemasakan / pengolahan
+     * 3. Pengemasan
+     * Masing-masing harus selesai dan memiliki foto dokumentasi.
+     */
+    public function getEssentialStepsStatusAttribute(): array
+    {
+        $steps = $this->relationLoaded('processingSteps')
+            ? $this->processingSteps
+            : $this->processingSteps()->with('evidences')->get();
+
+        $stepPersiapan = $steps->first(function ($s) {
+            $n = strtolower($s->step_name ?? '');
+
+            return str_contains($n, 'persiapan') || str_contains($n, 'bahan');
+        });
+
+        $stepPemasakan = $steps->first(function ($s) {
+            $n = strtolower($s->step_name ?? '');
+
+            return str_contains($n, 'masak') || str_contains($n, 'olah');
+        });
+
+        $stepPengemasan = $steps->first(function ($s) {
+            $n = strtolower($s->step_name ?? '');
+
+            return str_contains($n, 'kemas') || str_contains($n, 'pack');
+        });
+
+        $checkStep = function (?ProcessingStep $step, string $label, string $defaultName) {
+            $exists = $step !== null;
+            $isDone = $exists && $step->status === 'done';
+            $hasPhoto = $exists && $step->evidences->isNotEmpty();
+            $photoCount = $exists ? $step->evidences->count() : 0;
+            $isComplete = $isDone && $hasPhoto;
+
+            return [
+                'label' => $label,
+                'default_name' => $defaultName,
+                'step' => $step,
+                'exists' => $exists,
+                'is_done' => $isDone,
+                'has_photo' => $hasPhoto,
+                'photo_count' => $photoCount,
+                'is_complete' => $isComplete,
+            ];
+        };
+
+        $persiapanData = $checkStep($stepPersiapan, 'Persiapan Bahan', 'Persiapan bahan');
+        $pemasakanData = $checkStep($stepPemasakan, 'Pemasakan / Pengolahan', 'Pemasakan/Pengolahan');
+        $pengemasanData = $checkStep($stepPengemasan, 'Pengemasan', 'Pengemasan');
+
+        $allComplete = $persiapanData['is_complete']
+            && $pemasakanData['is_complete']
+            && $pengemasanData['is_complete'];
+
+        return [
+            'persiapan' => $persiapanData,
+            'pemasakan' => $pemasakanData,
+            'pengemasan' => $pengemasanData,
+            'all_complete' => $allComplete,
+        ];
+    }
+
+    /**
      * Tahap yang disarankan per kategori menu
      */
     public function getSuggestedStepsAttribute(): array

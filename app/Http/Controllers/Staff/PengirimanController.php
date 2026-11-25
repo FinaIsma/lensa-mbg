@@ -530,10 +530,15 @@ class PengirimanController extends Controller
                 ->with('error', 'Hanya pengiriman berstatus Dalam Perjalanan yang dapat ditandai Diterima.');
         }
 
+        $hasEvidence = $distribution->evidences()->count() > 0;
         $request->validate([
             'nama_penerima' => 'nullable|string|max:150',
-            'evidence_file' => 'nullable|file|image|max:5120',
+            'evidence_file' => [$hasEvidence ? 'nullable' : 'required', 'file', 'image', 'max:5120'],
             'notes' => 'nullable|string|max:500',
+        ], [
+            'evidence_file.required' => 'Foto bukti serah terima wajib diunggah sebagai dokumentasi penting distribusi.',
+            'evidence_file.image' => 'File bukti serah terima harus berupa gambar (JPG, PNG, WEBP).',
+            'evidence_file.max' => 'Ukuran file foto maksimal 5MB.',
         ]);
 
         DB::beginTransaction();

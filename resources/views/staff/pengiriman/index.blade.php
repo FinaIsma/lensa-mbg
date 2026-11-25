@@ -183,13 +183,12 @@
             <table class="pengiriman-table">
                 <thead>
                     <tr>
-                        <th style="min-width: 180px;">Kode batch & menu</th>
-                        <th style="min-width: 200px;">Tujuan distribusi</th>
-                        <th style="min-width: 140px;">Porsi dikirim</th>
-                        <th style="min-width: 150px;">Status</th>
-                        <th style="min-width: 150px;">Waktu berangkat</th>
-                        <th style="min-width: 120px;">Petugas</th>
-                        <th style="min-width: 280px; text-align: center;">Aksi</th>
+                        <th style="min-width: 140px;">Kode batch & menu</th>
+                        <th style="min-width: 160px;">Tujuan distribusi</th>
+                        <th style="min-width: 95px;">Porsi</th>
+                        <th style="min-width: 125px;">Status & dokumentasi</th>
+                        <th style="min-width: 135px;">Waktu & petugas</th>
+                        <th style="min-width: 140px; text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -232,33 +231,42 @@
                                 @endif
                             </td>
 
-                            {{-- Status Chip (Pill dengan Status Dot sesuai halaman Staff lain) --}}
+                            {{-- Status Chip & Indikator Dokumentasi --}}
                             <td>
-                                <span class="badge-status {{ $dist->status_badge_class }}">
-                                    <span class="status-dot"></span>
-                                    <span>{{ $dist->status_label }}</span>
-                                </span>
+                                <div>
+                                    <span class="badge-status {{ $dist->status_badge_class }}">
+                                        <span class="status-dot"></span>
+                                        <span>{{ $dist->status_label }}</span>
+                                    </span>
+                                </div>
+                                <div style="margin-top: 4px;">
+                                    @if ($dist->evidences->isNotEmpty())
+                                        <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 600; color: #166534; background: #DCFCE7; padding: 1px 6px; border-radius: 4px;" title="Dokumentasi foto pengiriman tersedia">
+                                            {{ $dist->evidences->count() }} foto
+                                        </span>
+                                    @else
+                                        <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; color: #B45309; background: #FEF3C7; padding: 1px 5px; border-radius: 4px;" title="Belum ada foto dokumentasi pengiriman">
+                                            Belum ada foto
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
 
-                            {{-- Waktu Berangkat --}}
+                            {{-- Waktu Berangkat & Petugas --}}
                             <td>
                                 <div class="pengiriman-date-main">
                                     {{ $dist->distributed_at ? $dist->distributed_at->translatedFormat('d M Y') : '-' }}
                                 </div>
                                 <div class="pengiriman-date-sub">
                                     {{ $dist->distributed_at ? $dist->distributed_at->format('H:i') . ' WIB' : '' }}
+                                    @if ($dist->recorder)
+                                        • <span title="Petugas: {{ $dist->recorder->nama }}">{{ Str::limit($dist->recorder->nama, 12) }}</span>
+                                    @endif
                                 </div>
                             </td>
 
-                            {{-- Petugas Pencatat --}}
-                            <td>
-                                <span class="pengiriman-staff-name">
-                                    {{ $dist->recorder?->nama ?? 'Staff' }}
-                                </span>
-                            </td>
-
                             {{-- Aksi --}}
-                            <td style="text-align: center; white-space: nowrap; min-width: 280px;">
+                            <td style="text-align: center; white-space: nowrap; min-width: 140px;">
                                 <div class="pengiriman-actions-cell" style="justify-content: center;">
                                     {{-- Tombol Detail (Buka Slide-over Drawer) --}}
                                     <button type="button" class="btn-act btn-act-detail" onclick="openDrawerDetail({{ $dist->id }})" title="Lihat detail lengkap">
@@ -316,7 +324,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7">
+                            <td colspan="6">
                                 <div class="pengiriman-empty-state">
                                     <div class="pengiriman-empty-icon">
                                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">

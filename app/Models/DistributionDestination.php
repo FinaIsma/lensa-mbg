@@ -51,4 +51,3 @@ class DistributionDestination extends Model
         };
     }
 }
-

@@ -462,6 +462,4 @@ class PurchaseController extends Controller
 
         return (int) $idSppg;
     }
-
-
 }

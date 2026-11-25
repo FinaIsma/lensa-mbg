@@ -353,7 +353,7 @@ function initFileUploads() {
                     <button type="button" class="preview-remove-btn" title="Hapus file" aria-label="Hapus file">&times;</button>
                     ${mediaHtml}
                     <div class="preview-info">
-                        <span class="preview-filename" title="${file.name}">✓ ${file.name}</span>
+                        <span class="preview-filename" title="${file.name}">${file.name}</span>
                         <span class="preview-filesize">${sizeInMB} MB</span>
                         <span class="preview-change-btn">Ganti File</span>
                     </div>

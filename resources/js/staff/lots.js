@@ -321,7 +321,7 @@
             const data = await res.json().catch(() => null);
 
             if (data && data.success && data.lot_id) {
-                setCameraBadge('success', '✓ Ditemukan');
+                setCameraBadge('success', 'Ditemukan');
                 await loadLotInspectionData(data.lot_id);
             } else {
                 hideInspectionLoading();

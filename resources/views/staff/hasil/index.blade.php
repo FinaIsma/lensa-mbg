@@ -373,6 +373,23 @@
             );
         });
     @endif
+
+    // Otomatis buka modal catat hasil jika diarahkan dari pengolahan (batch_id di URL)
+    @if (request('batch_id') || request('catat_batch_id'))
+        document.addEventListener('DOMContentLoaded', function() {
+            const targetBatchId = '{{ request('batch_id') ?: request('catat_batch_id') }}';
+            if (typeof openAddHasilModal === 'function') {
+                openAddHasilModal();
+            }
+            const sel = document.getElementById('hasil_batch_select');
+            if (sel) {
+                sel.value = targetBatchId;
+                if (typeof handleHasilBatchChange === 'function') {
+                    handleHasilBatchChange(sel);
+                }
+            }
+        });
+    @endif
 </script>
 @endpush
 

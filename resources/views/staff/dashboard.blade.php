@@ -122,7 +122,6 @@
                     <a href="{{ route('staff.pengiriman.index', ['tipe' => $tp['type']]) }}" class="dist-target-item block no-underline" title="Filter pengiriman tipe {{ $tp['label'] }}">
                         <div class="dist-target-head">
                             <span class="dist-target-name">
-                                <span>{{ $tp['icon'] }}</span>
                                 <span>{{ $tp['label'] }}</span>
                             </span>
                             <span class="dist-target-pct">{{ $tp['pct'] }}%</span>
@@ -132,7 +131,7 @@
                         </div>
                         <div class="dist-target-meta">
                             <span>Terkirim: <strong>{{ number_format($tp['sent'], 0, ',', '.') }}</strong> dari {{ number_format($tp['target'], 0, ',', '.') }} porsi</span>
-                            <span>{{ $tp['target'] > 0 ? ($tp['pct'] >= 100 ? '✅ Tuntas' : '🚚 Berjalan') : 'Belum Ada Alokasi' }}</span>
+                            <span>{{ $tp['target'] > 0 ? ($tp['pct'] >= 100 ? 'Tuntas' : 'Berjalan') : 'Belum Ada Alokasi' }}</span>
                         </div>
                     </a>
                 @endforeach

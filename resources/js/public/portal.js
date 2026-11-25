@@ -366,8 +366,21 @@ document.addEventListener('DOMContentLoaded', function () {
             const activeSvg = this.querySelector('svg');
             if (activeSvg) activeSvg.classList.replace('text-slate-400', 'text-emerald-400');
 
+            // Update input jadwal di quick search form juga jika ada
+            const quickJadwalInput = document.querySelector('#quickSearchForm input[name="jadwal"]');
+            if (quickJadwalInput) {
+                quickJadwalInput.value = selectedJadwal;
+            }
+
             // Jika sekolah sudah dipilih, auto submit form untuk muat data jadwal
-            if (instansiSelect && instansiSelect.value && filterForm) {
+            const quickContainer = document.getElementById('quickSearchContainer');
+            const quickDestInput = document.getElementById('quick-destination-id');
+            const quickForm = document.getElementById('quickSearchForm');
+
+            if (quickContainer && !quickContainer.classList.contains('hidden') && quickDestInput && quickDestInput.value && quickForm) {
+                showLoadingState();
+                quickForm.submit();
+            } else if (instansiSelect && instansiSelect.value && filterForm) {
                 showLoadingState();
                 filterForm.submit();
             }

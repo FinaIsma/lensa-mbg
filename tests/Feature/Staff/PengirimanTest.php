@@ -12,7 +12,9 @@ use App\Models\Staff;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PengirimanTest extends TestCase
@@ -335,8 +337,14 @@ class PengirimanTest extends TestCase
             'distributed_at' => now(),
         ]);
 
+        Storage::fake('public');
+
         $response = $this->actingAs($this->staff, 'staff')
-            ->post(route('staff.pengiriman.mark-received', $dist->id));
+            ->post(route('staff.pengiriman.mark-received', $dist->id), [
+                'evidence_file' => UploadedFile::fake()->image('bukti_serah_terima.jpg'),
+                'nama_penerima' => 'Bapak Kepala Sekolah',
+                'notes' => 'Diterima dalam kondisi baik',
+            ]);
 
         $response->assertRedirect(route('staff.pengiriman.index'));
         $response->assertSessionHas('success');

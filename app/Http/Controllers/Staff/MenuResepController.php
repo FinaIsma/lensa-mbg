@@ -612,6 +612,4 @@ class MenuResepController extends Controller
 
         return (int) $idSppg;
     }
-
-
 }

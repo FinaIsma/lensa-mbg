@@ -210,16 +210,7 @@ class PengolahanController extends Controller
                     throw new \InvalidArgumentException('Waktu selesai tidak boleh lebih awal dari waktu mulai.');
                 }
 
-                $step->ended_at = $endedAt;
-                $step->status = 'done';
-
-                if (! empty($validated['note'])) {
-                    $step->note = $step->note ? ($step->note."\nCatatan Selesai: ".$validated['note']) : $validated['note'];
-                }
-
-                $step->save();
-
-                // Simpan foto bukti jika diunggah saat penyelesaian (bisa lebih dari 1 foto)
+                // Kumpulkan file bukti foto jika diunggah
                 $filesToUpload = [];
                 if ($request->hasFile('evidence_files')) {
                     $files = $request->file('evidence_files');
@@ -232,6 +223,20 @@ class PengolahanController extends Controller
                 if ($request->hasFile('evidence_file')) {
                     $filesToUpload[] = $request->file('evidence_file');
                 }
+
+                // Verifikasi keberadaan foto dokumentasi (wajib jika belum ada foto sebelumnya)
+                if ($step->evidences()->count() === 0 && empty($filesToUpload)) {
+                    throw new \InvalidArgumentException('Foto dokumentasi wajib diunggah untuk menyelesaikan tahap ini demi transparansi dan penjaminan mutu MBG.');
+                }
+
+                $step->ended_at = $endedAt;
+                $step->status = 'done';
+
+                if (! empty($validated['note'])) {
+                    $step->note = $step->note ? ($step->note."\nCatatan Selesai: ".$validated['note']) : $validated['note'];
+                }
+
+                $step->save();
 
                 foreach ($filesToUpload as $file) {
                     $path = app(SupabaseStorageService::class)->uploadEvidence($file, 'processing');
@@ -340,6 +345,53 @@ class PengolahanController extends Controller
 
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Selesaikan seluruh proses pengolahan batch.
+     * Validasi: 3 tahap penting (persiapan bahan, pemasakan/pengolahan, pengemasan)
+     * wajib berstatus selesai dan masing-masing memiliki foto dokumentasi.
+     */
+    public function completeBatch(Request $request, int $id): RedirectResponse|JsonResponse
+    {
+        $idSppg = $this->resolveSppgId();
+        $batch = ProductionBatch::with(['processingSteps.evidences', 'menu'])
+            ->where('id_sppg', $idSppg)
+            ->findOrFail($id);
+
+        $status = $batch->essential_steps_status;
+        if (! $status['all_complete']) {
+            $missing = [];
+            if (! $status['persiapan']['is_complete']) {
+                $missing[] = 'Persiapan Bahan ('.(! $status['persiapan']['is_done'] ? 'belum selesai' : 'belum ada foto bukti').')';
+            }
+            if (! $status['pemasakan']['is_complete']) {
+                $missing[] = 'Pemasakan/Pengolahan ('.(! $status['pemasakan']['is_done'] ? 'belum selesai' : 'belum ada foto bukti').')';
+            }
+            if (! $status['pengemasan']['is_complete']) {
+                $missing[] = 'Pengemasan ('.(! $status['pengemasan']['is_done'] ? 'belum selesai' : 'belum ada foto bukti').')';
+            }
+
+            $msg = 'Proses pengolahan belum lengkap: '.implode(', ', $missing).'. Ketiga tahap penting wajib berstatus selesai dan memiliki foto dokumentasi.';
+
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+
+            return back()->with('error', $msg);
+        }
+
+        $msg = "Seluruh proses pengolahan batch {$batch->batch_code} selesai dengan dokumentasi lengkap. Silakan lanjutkan ke pencatatan hasil porsi & uji fisik.";
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'redirect_url' => route('staff.hasil.index', ['batch_id' => $batch->id]),
+            ]);
+        }
+
+        return redirect()->route('staff.hasil.index', ['batch_id' => $batch->id])->with('success', $msg);
     }
 
     /**

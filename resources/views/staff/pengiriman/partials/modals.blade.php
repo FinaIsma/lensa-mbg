@@ -105,13 +105,13 @@
                     </div>
                 </div>
 
-                {{-- Upload Bukti Foto (Opsional) --}}
+                {{-- Upload Bukti Foto (Dokumentasi Penting) --}}
                 <div class="pengiriman-form-group">
                     <label for="catat_evidence_file" class="pengiriman-form-label">
-                        Foto Bukti Pengiriman (Opsional)
+                        Foto Bukti Dokumentasi Distribusi (Dokumentasi Penting)
                     </label>
                     <input type="file" name="evidence_file" id="catat_evidence_file" class="pengiriman-form-input" accept="image/*">
-                    <span class="pengiriman-form-help">Format file: JPG, PNG, WEBP (Maksimal 5MB).</span>
+                    <span class="pengiriman-form-help">Dokumentasi penting: muat makanan ke armada atau surat jalan. Format JPG, PNG, WEBP (maks. 5MB).</span>
                 </div>
 
                 {{-- Catatan Pengiriman --}}
@@ -245,9 +245,10 @@
 
                 <div class="pengiriman-form-group">
                     <label for="sent_evidence_file" class="pengiriman-form-label">
-                        Foto Bukti Keberangkatan / Armada (Opsional)
+                        Foto Bukti Keberangkatan / Armada (Dokumentasi Penting)
                     </label>
                     <input type="file" name="evidence_file" id="sent_evidence_file" class="pengiriman-form-input" accept="image/*">
+                    <span class="pengiriman-form-help">Dokumentasi armada sebelum jalan. Format JPG, PNG, WEBP (maks. 5MB).</span>
                 </div>
 
                 <div class="pengiriman-form-group">
@@ -328,11 +329,11 @@
 
                 <div class="pengiriman-form-group">
                     <label class="pengiriman-form-label">
-                        Foto Bukti Serah Terima / Dokumentasi (Opsional)
+                        Foto Bukti Serah Terima / Dokumentasi <span class="required" style="color: #DC2626;">*</span>
                     </label>
 
                     {{-- Hidden Real File Input --}}
-                    <input type="file" name="evidence_file" id="recv_evidence_file" accept="image/*" style="display: none;" onchange="previewReceivedImage(this)">
+                    <input type="file" name="evidence_file" id="recv_evidence_file" accept="image/*" required style="display: none;" onchange="previewReceivedImage(this)">
 
                     {{-- Visual Upload Dropzone --}}
                     <div id="recv_dropzone" class="pengiriman-upload-dropzone" onclick="document.getElementById('recv_evidence_file').click()">
@@ -345,7 +346,7 @@
                                 </svg>
                             </div>
                             <div style="margin-top: 8px;">
-                                <span style="font-size: 13.5px; font-weight: 600; color: #042A70;">Pilih atau unggah foto bukti</span>
+                                <span style="font-size: 13.5px; font-weight: 600; color: #042A70;">Pilih atau unggah foto bukti (Wajib)</span>
                                 <div style="font-size: 11.5px; color: #64748B; margin-top: 2px;">Format JPG, PNG, atau WEBP · Maks. 5MB</div>
                             </div>
                         </div>
@@ -362,7 +363,7 @@
                             </div>
                         </div>
                     </div>
-                    <span class="pengiriman-form-help">Foto penyerahan makanan kepada pihak sekolah/posyandu sebagai arsip fisik.</span>
+                    <span class="pengiriman-form-help">Foto serah terima makanan kepada pihak sekolah/posyandu (Dokumentasi penting MBG).</span>
                 </div>
 
                 <div class="pengiriman-form-group">

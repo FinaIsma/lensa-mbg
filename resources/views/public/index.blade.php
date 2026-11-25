@@ -32,9 +32,10 @@
     <!-- FOCAL POINT UTAMA: RADAR PENCARIAN SEKOLAH SASARAN -->
     <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8 text-slate-800">
-            <!-- Header Kartu: Judul Radar & Pilih Jadwal -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-                <div class="flex items-start sm:items-center gap-3.5">
+            <!-- Header Kartu: Judul Radar di Kiri, Jadwal & Pilihan Mode di Kanan (Seline dengan Judul) -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+                <!-- Sisi Kiri: Judul Radar Pencarian Sekolah Sasaran -->
+                <div class="flex items-start sm:items-center gap-3.5 min-w-0">
                     <div class="w-11 h-11 rounded-xl bg-blue-50 text-[#071E49] flex items-center justify-center shrink-0 border border-blue-100/80">
                         <svg class="w-6 h-6 text-[#071E49]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -46,133 +47,524 @@
                     </div>
                 </div>
 
-                <!-- Segmented Control: Pilih Jadwal (Responsif: 3 Kolom di HP, 1 Baris Ramping di Desktop) -->
-                <div class="w-full md:w-auto shrink-0">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block md:hidden mb-1.5">Pilih Jadwal Penyaluran</span>
-                    <div class="grid grid-cols-3 md:inline-flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200/80 text-xs w-full md:w-auto gap-1 shrink-0">
-                        <span class="hidden md:inline-block px-2 text-xs font-semibold text-slate-500 whitespace-nowrap shrink-0">Pilih Jadwal:</span>
-                        
-                        <!-- 1. Hari Ini -->
-                        <button type="button" data-jadwal="today" class="jadwal-btn flex md:inline-flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2 sm:px-3.5 rounded-lg text-xs transition select-none cursor-pointer text-center whitespace-nowrap shrink-0 {{ $activeJadwal === 'today' ? 'font-bold bg-[#071E49] text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
-                            <svg class="w-3.5 h-3.5 {{ $activeJadwal === 'today' ? 'text-emerald-400' : 'text-slate-400' }} shrink-0 hidden sm:inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <!-- Sisi Kanan: Jadwal di Atas, Pilihan Saring Wilayah vs Cari Sekolah di Bawahnya (Seline dengan Judul) -->
+                <div class="flex flex-col items-stretch lg:items-end gap-2.5 shrink-0">
+                    <!-- Baris 1: Segmented Control Pilih Jadwal Penyaluran -->
+                    <div class="w-full lg:w-auto">
+                        <div class="grid grid-cols-3 sm:inline-flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200/80 text-xs w-full lg:w-auto gap-1">
+                            <span class="hidden sm:inline-block px-2 text-xs font-semibold text-slate-500 whitespace-nowrap shrink-0">Pilih Jadwal:</span>
+                            
+                            <!-- 1. Hari Ini -->
+                            <button type="button" data-jadwal="today" class="jadwal-btn flex sm:inline-flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2 sm:px-3.5 rounded-lg text-xs transition select-none cursor-pointer text-center whitespace-nowrap shrink-0 {{ $activeJadwal === 'today' ? 'font-bold bg-[#071E49] text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                                <svg class="w-3.5 h-3.5 {{ $activeJadwal === 'today' ? 'text-emerald-400' : 'text-slate-400' }} shrink-0 hidden sm:inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span class="hidden sm:inline whitespace-nowrap">Hari Ini ({{ \Carbon\Carbon::now()->translatedFormat('d M') }})</span>
+                                <span class="sm:hidden leading-tight text-center">
+                                    <span class="block font-bold text-[11px] whitespace-nowrap">Hari Ini</span>
+                                    <span class="block text-[9px] opacity-80 font-mono whitespace-nowrap">{{ \Carbon\Carbon::now()->translatedFormat('d M') }}</span>
+                                </span>
+                            </button>
+
+                            <!-- 2. Kemarin -->
+                            <button type="button" data-jadwal="yesterday" class="jadwal-btn flex sm:inline-flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2 sm:px-3.5 rounded-lg text-xs transition select-none cursor-pointer text-center whitespace-nowrap shrink-0 {{ $activeJadwal === 'yesterday' ? 'font-bold bg-[#071E49] text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                                <span class="hidden sm:inline whitespace-nowrap">Kemarin ({{ \Carbon\Carbon::now()->subDay()->translatedFormat('d M') }})</span>
+                                <span class="sm:hidden leading-tight text-center">
+                                    <span class="block font-bold text-[11px] whitespace-nowrap">Kemarin</span>
+                                    <span class="block text-[9px] opacity-80 font-mono whitespace-nowrap">{{ \Carbon\Carbon::now()->subDay()->translatedFormat('d M') }}</span>
+                                </span>
+                            </button>
+
+                            <!-- 3. 7 Hari Terakhir -->
+                            <button type="button" data-jadwal="7days" class="jadwal-btn flex sm:inline-flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2 sm:px-3.5 rounded-lg text-xs transition select-none cursor-pointer text-center whitespace-nowrap shrink-0 {{ $activeJadwal === '7days' ? 'font-bold bg-[#071E49] text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                                <span class="hidden sm:inline whitespace-nowrap">7 Hari Lalu</span>
+                                <span class="sm:hidden leading-tight text-center">
+                                    <span class="block font-bold text-[11px] whitespace-nowrap">7 Hari</span>
+                                    <span class="block text-[9px] opacity-80 font-mono whitespace-nowrap">Terakhir</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Baris 2: Mode Pencarian (Saring by Wilayah vs Cari Langsung Sekolah) -->
+                    <div class="inline-flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200/80 text-xs w-full sm:w-auto gap-1 self-start lg:self-end">
+                        <button type="button" id="tabModeFilter" onclick="switchSearchMode('filter')" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer bg-[#071E49] text-white shadow-2xs">
+                            <svg class="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
-                            <span class="hidden sm:inline whitespace-nowrap">Hari Ini ({{ \Carbon\Carbon::now()->translatedFormat('d M') }})</span>
-                            <span class="sm:hidden leading-tight text-center">
-                                <span class="block font-bold text-[11px] whitespace-nowrap">Hari Ini</span>
-                                <span class="block text-[9px] opacity-80 font-mono whitespace-nowrap">{{ \Carbon\Carbon::now()->translatedFormat('d M') }}</span>
-                            </span>
+                            <span>Saring Berdasarkan Wilayah</span>
                         </button>
-
-                        <!-- 2. Kemarin -->
-                        <button type="button" data-jadwal="yesterday" class="jadwal-btn flex md:inline-flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2 sm:px-3.5 rounded-lg text-xs transition select-none cursor-pointer text-center whitespace-nowrap shrink-0 {{ $activeJadwal === 'yesterday' ? 'font-bold bg-[#071E49] text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
-                            <span class="hidden sm:inline whitespace-nowrap">Kemarin ({{ \Carbon\Carbon::now()->subDay()->translatedFormat('d M') }})</span>
-                            <span class="sm:hidden leading-tight text-center">
-                                <span class="block font-bold text-[11px] whitespace-nowrap">Kemarin</span>
-                                <span class="block text-[9px] opacity-80 font-mono whitespace-nowrap">{{ \Carbon\Carbon::now()->subDay()->translatedFormat('d M') }}</span>
-                            </span>
-                        </button>
-
-                        <!-- 3. 7 Hari Terakhir -->
-                        <button type="button" data-jadwal="7days" class="jadwal-btn flex md:inline-flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2 sm:px-3.5 rounded-lg text-xs transition select-none cursor-pointer text-center whitespace-nowrap shrink-0 {{ $activeJadwal === '7days' ? 'font-bold bg-[#071E49] text-white shadow-xs' : 'font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
-                            <span class="hidden sm:inline whitespace-nowrap">7 Hari Lalu</span>
-                            <span class="sm:hidden leading-tight text-center">
-                                <span class="block font-bold text-[11px] whitespace-nowrap">7 Hari</span>
-                                <span class="block text-[9px] opacity-80 font-mono whitespace-nowrap">Terakhir</span>
-                            </span>
+                        <button type="button" id="tabModeQuick" onclick="switchSearchMode('quick')" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-xs transition cursor-pointer text-slate-600 hover:text-slate-900 hover:bg-slate-200/60">
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <span>Cari Langsung Sekolah</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Form Wilayah & Sekolah: Baris 1 Wilayah (3 Kolom), Baris 2 Sekolah Sasaran di Bawah -->
-            <form id="filterForm" method="GET" action="{{ route('public.home') }}" data-provinsi="{{ request('provinsi', '') }}" data-kabupaten="{{ request('kabupaten_kota', '') }}" data-kecamatan="{{ request('kecamatan', '') }}" data-destination="{{ request('destination_id', '') }}" class="pt-6 space-y-4">
-                <input type="hidden" name="jadwal" id="inputJadwal" value="{{ $activeJadwal }}">
-                
-                <!-- Baris 1: 3 Wilayah (Provinsi, Kota/Kabupaten, Kecamatan) -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <!-- 1. Provinsi -->
-                    <div class="relative custom-select-wrapper">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span>Provinsi</span>
-                        </label>
-                        <select id="select-provinsi" name="provinsi" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 shadow-2xs transition">
-                            <option value="">Pilih Provinsi</option>
-                        </select>
-                    </div>
-
-                    <!-- 2. Kota / Kabupaten -->
-                    <div class="relative custom-select-wrapper">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                            <span>Kota / Kabupaten</span>
-                        </label>
-                        <select id="select-regency" name="kabupaten_kota" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-400 focus:outline-none transition">
-                            <option value="">Pilih provinsi dahulu</option>
-                        </select>
-                    </div>
-
-                    <!-- 3. Kecamatan -->
-                    <div class="relative custom-select-wrapper">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            </svg>
-                            <span>Kecamatan</span>
-                        </label>
-                        <select id="select-district" name="kecamatan" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-400 focus:outline-none transition">
-                            <option value="">Pilih kota/kabupaten dahulu</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Baris 2: Nama Sekolah Sasaran di Bagian Bawah + Tombol Cari Sekolah -->
-                <div class="pt-1">
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center justify-between">
-                        <span class="flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                            </svg>
-                            <span>Nama Sekolah Sasaran</span>
-                        </span>
-                        <span class="text-[11px] text-slate-400 font-normal">Disaring otomatis sesuai wilayah SPPG</span>
-                    </label>
-                    <div class="flex flex-col sm:flex-row items-center gap-3">
-                        <div class="relative flex-1 w-full custom-select-wrapper">
-                            <select id="select-instansi" name="destination_id" {{ $allDestinations->isEmpty() ? 'disabled' : '' }} class="w-full pl-10 pr-8 py-2.5 rounded-xl border border-slate-300 {{ $allDestinations->isEmpty() ? 'bg-slate-50 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-900 font-semibold' }} text-xs focus:ring-2 focus:ring-blue-500 shadow-2xs transition">
-                                <option value="">{{ $allDestinations->isEmpty() ? 'Pilih kecamatan terlebih dahulu' : '-- Pilih Sekolah / Instansi Sasaran --' }}</option>
-                                @foreach($allDestinations as $dest)
-                                    <option value="{{ $dest->id }}" {{ (isset($selectedDestination) && $selectedDestination->id == $dest->id) ? 'selected' : '' }}>
-                                        {{ $dest->nama }} ({{ $dest->sppg?->nama_sppg ?? 'SPPG' }})
-                                    </option>
-                                @endforeach
+            <!-- CONTAINER PILIHAN 1: SARING BERDASARKAN WILAYAH (DEFAULT UTAMA) -->
+            <div id="filterSearchContainer" class="pt-5 space-y-4">
+                <form id="filterForm" method="GET" action="{{ route('public.home') }}" data-provinsi="{{ request('provinsi', '') }}" data-kabupaten="{{ request('kabupaten_kota', '') }}" data-kecamatan="{{ request('kecamatan', '') }}" data-destination="{{ request('destination_id', '') }}" class="space-y-4">
+                    <input type="hidden" name="jadwal" id="inputJadwal" value="{{ $activeJadwal }}">
+                    <input type="hidden" name="mode" value="filter">
+                    
+                    <!-- Baris 1: 3 Wilayah (Provinsi, Kota/Kabupaten, Kecamatan) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <!-- 1. Provinsi -->
+                        <div class="relative custom-select-wrapper">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span>Provinsi</span>
+                            </label>
+                            <select id="select-provinsi" name="provinsi" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 shadow-2xs transition">
+                                <option value="">Pilih Provinsi</option>
                             </select>
                         </div>
-                        <button type="submit" id="submitBtn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs bg-[#071E49] hover:bg-[#042A70] text-white shadow-xs hover:shadow transition flex items-center justify-center gap-2 shrink-0 cursor-pointer">
-                            <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            <span>Cari Sekolah</span>
-                        </button>
-                    </div>
-                </div>
 
-                @if(request()->hasAny(['destination_id', 'provinsi', 'kabupaten_kota', 'kecamatan']))
-                    <div class="pt-2 flex justify-end">
-                        <a href="{{ route('public.home') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
-                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                            <span>Reset Filter Pencarian</span>
-                        </a>
+                        <!-- 2. Kota / Kabupaten -->
+                        <div class="relative custom-select-wrapper">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                <span>Kota / Kabupaten</span>
+                            </label>
+                            <select id="select-regency" name="kabupaten_kota" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-400 focus:outline-none transition">
+                                <option value="">Pilih provinsi dahulu</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Kecamatan -->
+                        <div class="relative custom-select-wrapper">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                </svg>
+                                <span>Kecamatan</span>
+                            </label>
+                            <select id="select-district" name="kecamatan" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-400 focus:outline-none transition">
+                                <option value="">Pilih kota/kabupaten dahulu</option>
+                            </select>
+                        </div>
                     </div>
-                @endif
-            </form>
+
+                    <!-- Baris 2: Nama Sekolah Sasaran di Bagian Bawah + Tombol Cari Sekolah -->
+                    <div class="pt-1">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                </svg>
+                                <span>Nama Sekolah Sasaran</span>
+                            </span>
+                            <span class="text-[11px] text-slate-400 font-normal">Disaring otomatis sesuai wilayah SPPG</span>
+                        </label>
+                        <div class="flex flex-col sm:flex-row items-center gap-3">
+                            <div class="relative flex-1 w-full custom-select-wrapper">
+                                <select id="select-instansi" name="destination_id" {{ $allDestinations->isEmpty() ? 'disabled' : '' }} class="w-full pl-10 pr-8 py-2.5 rounded-xl border border-slate-300 {{ $allDestinations->isEmpty() ? 'bg-slate-50 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-900 font-semibold' }} text-xs focus:ring-2 focus:ring-blue-500 shadow-2xs transition">
+                                    <option value="">{{ $allDestinations->isEmpty() ? 'Pilih kecamatan terlebih dahulu' : '-- Pilih Sekolah / Instansi Sasaran --' }}</option>
+                                    @foreach($allDestinations as $dest)
+                                        <option value="{{ $dest->id }}" {{ (isset($selectedDestination) && $selectedDestination->id == $dest->id) ? 'selected' : '' }}>
+                                            {{ $dest->nama }} ({{ $dest->sppg?->nama_sppg ?? 'SPPG' }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button type="submit" id="submitBtn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs bg-[#071E49] hover:bg-[#042A70] text-white shadow-xs hover:shadow transition flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+                                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <span>Cari Sekolah</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    @if(request()->hasAny(['destination_id', 'provinsi', 'kabupaten_kota', 'kecamatan']))
+                        <div class="pt-2 flex justify-end">
+                            <a href="{{ route('public.home') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                <span>Reset Filter Pencarian</span>
+                            </a>
+                        </div>
+                    @endif
+                </form>
+            </div>
+
+            <!-- CONTAINER PILIHAN 2: CARI LANGSUNG SEKOLAH (INPUT TEXTBOX DENGAN REKOMENDASI OTOMATIS) -->
+            <div id="quickSearchContainer" class="hidden pt-5 space-y-3">
+                <form id="quickSearchForm" method="GET" action="{{ route('public.home') }}" class="space-y-3" autocomplete="off">
+                    <input type="hidden" name="jadwal" value="{{ $activeJadwal }}">
+                    <input type="hidden" name="mode" value="quick">
+                    <input type="hidden" name="destination_id" id="quick-destination-id" value="{{ $selectedDestination?->id ?? request('destination_id', '') }}">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                        <div class="sm:col-span-9 relative">
+                            <label for="school-search-input" class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center justify-between">
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-[#071E49] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                    </svg>
+                                    <span>Ketik Nama Sekolah Sasaran</span>
+                                </span>
+                                <span class="text-[11px] text-slate-500 font-medium">Pilihan sekolah muncul otomatis saat mengetik</span>
+                            </label>
+
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <input 
+                                    type="text" 
+                                    id="school-search-input" 
+                                    value="{{ $selectedDestination?->nama ?? '' }}"
+                                    placeholder="Ketik nama sekolah, SPPG, atau kota (contoh: SDN Arjosari, SMPN 16, SMKN 8)..." 
+                                    class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-2xs transition placeholder:text-slate-400"
+                                    autocomplete="off"
+                                    onfocus="handleSchoolSearchFocus()"
+                                    oninput="handleSchoolSearchInput(event)"
+                                    onkeydown="handleSchoolSearchKeydown(event)"
+                                >
+                                <button 
+                                    type="button" 
+                                    id="btn-clear-school-input" 
+                                    onclick="clearSchoolSearchInput()" 
+                                    class="{{ empty($selectedDestination?->nama) ? 'hidden' : '' }} absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                                    title="Bersihkan teks"
+                                >
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Floating Suggestions Dropdown -->
+                            <div 
+                                id="school-suggestions-dropdown" 
+                                class="hidden absolute left-0 right-0 top-full mt-1.5 z-50 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden max-h-72 overflow-y-auto divide-y divide-slate-100"
+                            >
+                                <!-- Diisi dinamis lewat JS -->
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-3 flex items-end">
+                            <button type="submit" id="btn-submit-quick-search" class="w-full px-5 py-2.5 rounded-xl font-bold text-xs bg-[#071E49] hover:bg-[#042A70] text-white shadow-xs hover:shadow transition flex items-center justify-center gap-2 cursor-pointer h-[42px]">
+                                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <span>Cari Sekolah</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            @php
+                $destinationsForJs = ($quickSearchDestinations ?? $allDestinations)->map(function($d) {
+                    return [
+                        'id' => (int) $d->id,
+                        'nama' => (string) $d->nama,
+                        'tipe' => (string) ($d->tipe ?? 'Sekolah'),
+                        'sppg' => (string) ($d->sppg?->nama_sppg ?? 'SPPG'),
+                        'kota' => (string) ($d->sppg?->kabupaten_kota ?? ''),
+                        'kecamatan' => (string) ($d->sppg?->kecamatan ?? ''),
+                        'alamat' => (string) ($d->alamat ?? ''),
+                        'penerima' => (int) ($d->jumlah_penerima ?? 0),
+                    ];
+                })->values();
+            @endphp
+
+            <script>
+                const schoolDestinations = @json($destinationsForJs);
+                let activeSuggestionIndex = -1;
+                let currentFilteredSchools = [];
+
+                function switchSearchMode(mode) {
+                    const quickContainer = document.getElementById('quickSearchContainer');
+                    const filterContainer = document.getElementById('filterSearchContainer');
+                    const tabQuick = document.getElementById('tabModeQuick');
+                    const tabFilter = document.getElementById('tabModeFilter');
+
+                    if (mode === 'quick') {
+                        if (quickContainer) quickContainer.classList.remove('hidden');
+                        if (filterContainer) filterContainer.classList.add('hidden');
+                        if (tabQuick) {
+                            tabQuick.className = 'flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer bg-[#071E49] text-white shadow-2xs';
+                            const icon = tabQuick.querySelector('svg');
+                            if (icon) icon.className = 'w-3.5 h-3.5 text-slate-300';
+                        }
+                        if (tabFilter) {
+                            tabFilter.className = 'flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-xs transition cursor-pointer text-slate-600 hover:text-slate-900 hover:bg-slate-200/60';
+                            const icon = tabFilter.querySelector('svg');
+                            if (icon) icon.className = 'w-3.5 h-3.5 text-slate-400';
+                        }
+                        try { sessionStorage.setItem('mbg_search_mode', 'quick'); } catch(e){}
+                        const input = document.getElementById('school-search-input');
+                        if (input && !input.value) {
+                            setTimeout(() => input.focus(), 60);
+                        }
+                    } else {
+                        if (quickContainer) quickContainer.classList.add('hidden');
+                        if (filterContainer) filterContainer.classList.remove('hidden');
+                        if (tabFilter) {
+                            tabFilter.className = 'flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer bg-[#071E49] text-white shadow-2xs';
+                            const icon = tabFilter.querySelector('svg');
+                            if (icon) icon.className = 'w-3.5 h-3.5 text-slate-300';
+                        }
+                        if (tabQuick) {
+                            tabQuick.className = 'flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-xs transition cursor-pointer text-slate-600 hover:text-slate-900 hover:bg-slate-200/60';
+                            const icon = tabQuick.querySelector('svg');
+                            if (icon) icon.className = 'w-3.5 h-3.5 text-slate-400';
+                        }
+                        try { sessionStorage.setItem('mbg_search_mode', 'filter'); } catch(e){}
+                    }
+                }
+
+                function highlightMatch(text, query) {
+                    if (!query || !text) return text || '';
+                    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp('(' + escaped + ')', 'gi');
+                    return text.replace(regex, '<mark class="bg-amber-100 text-slate-900 font-bold px-0.5 rounded">$1</mark>');
+                }
+
+                function renderSchoolSuggestions(schools, query) {
+                    const dropdown = document.getElementById('school-suggestions-dropdown');
+                    if (!dropdown) return;
+
+                    currentFilteredSchools = schools;
+                    activeSuggestionIndex = -1;
+
+                    if (schools.length === 0) {
+                        dropdown.innerHTML = `
+                            <div class="p-4 text-center text-xs text-slate-500">
+                                <p class="font-semibold text-slate-700">Tidak ada sekolah yang cocok</p>
+                                <p class="mt-0.5 text-slate-400 text-[11px]">Coba ketik kata kunci lain atau gunakan menu Saring Berdasarkan Wilayah.</p>
+                            </div>
+                        `;
+                        dropdown.classList.remove('hidden');
+                        return;
+                    }
+
+                    let html = '';
+                    schools.forEach((school, index) => {
+                        const highlightedName = highlightMatch(school.nama, query);
+                        const highlightedSppg = highlightMatch(school.sppg, query);
+                        const highlightedKota = highlightMatch(school.kota, query);
+                        const highlightedKec = highlightMatch(school.kecamatan, query);
+
+                        let locParts = [];
+                        if (school.kecamatan) locParts.push(highlightedKec);
+                        if (school.kota) locParts.push(highlightedKota);
+                        const locText = locParts.join(', ');
+
+                        html += `
+                            <div 
+                                class="school-suggestion-item px-3.5 py-2.5 hover:bg-blue-50/80 cursor-pointer transition flex items-start justify-between gap-3 select-none"
+                                data-index="${index}"
+                                data-id="${school.id}"
+                                onclick="selectSchoolSuggestion(${school.id})"
+                            >
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-xs text-slate-900 truncate">${highlightedName}</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 shrink-0">
+                                            ${school.tipe || 'Sekolah'}
+                                        </span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                        <span class="font-medium text-slate-600">${highlightedSppg}</span>
+                                        ${locText ? `<span class="text-slate-300">&bull;</span><span>${locText}</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="shrink-0 text-right">
+                                    ${school.penerima > 0 ? `<span class="text-[10px] font-medium text-slate-400 block">${school.penerima} Penerima</span>` : ''}
+                                    <span class="text-[10px] font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-0.5 mt-0.5">
+                                        Pilih
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    dropdown.innerHTML = html;
+                    dropdown.classList.remove('hidden');
+                }
+
+                function handleSchoolSearchInput(e) {
+                    const query = (e.target.value || '').trim();
+                    const clearBtn = document.getElementById('btn-clear-school-input');
+                    if (clearBtn) {
+                        clearBtn.classList.toggle('hidden', query.length === 0);
+                    }
+
+                    // Reset destination_id jika user mengedit teks manual
+                    const destIdInput = document.getElementById('quick-destination-id');
+                    if (destIdInput) {
+                        destIdInput.value = '';
+                    }
+
+                    if (query.length === 0) {
+                        renderSchoolSuggestions(schoolDestinations.slice(0, 10), '');
+                        return;
+                    }
+
+                    const lowerQuery = query.toLowerCase();
+                    const filtered = schoolDestinations.filter(item => {
+                        return (item.nama && item.nama.toLowerCase().includes(lowerQuery)) ||
+                               (item.sppg && item.sppg.toLowerCase().includes(lowerQuery)) ||
+                               (item.kota && item.kota.toLowerCase().includes(lowerQuery)) ||
+                               (item.kecamatan && item.kecamatan.toLowerCase().includes(lowerQuery)) ||
+                               (item.alamat && item.alamat.toLowerCase().includes(lowerQuery));
+                    });
+
+                    renderSchoolSuggestions(filtered, query);
+                }
+
+                function handleSchoolSearchFocus() {
+                    const input = document.getElementById('school-search-input');
+                    const query = (input?.value || '').trim();
+                    if (query.length === 0) {
+                        renderSchoolSuggestions(schoolDestinations.slice(0, 10), '');
+                    } else {
+                        handleSchoolSearchInput({ target: input });
+                    }
+                }
+
+                function selectSchoolSuggestion(id) {
+                    const school = schoolDestinations.find(s => s.id === id);
+                    if (!school) return;
+
+                    const input = document.getElementById('school-search-input');
+                    const destIdInput = document.getElementById('quick-destination-id');
+                    const dropdown = document.getElementById('school-suggestions-dropdown');
+                    const clearBtn = document.getElementById('btn-clear-school-input');
+
+                    if (input) input.value = school.nama;
+                    if (destIdInput) destIdInput.value = school.id;
+                    if (clearBtn) clearBtn.classList.remove('hidden');
+                    if (dropdown) dropdown.classList.add('hidden');
+
+                    // Otomatis kirim form pencarian sekolah
+                    const form = document.getElementById('quickSearchForm');
+                    if (form) form.submit();
+                }
+
+                function clearSchoolSearchInput() {
+                    const input = document.getElementById('school-search-input');
+                    const destIdInput = document.getElementById('quick-destination-id');
+                    const clearBtn = document.getElementById('btn-clear-school-input');
+                    const dropdown = document.getElementById('school-suggestions-dropdown');
+
+                    if (input) {
+                        input.value = '';
+                        input.focus();
+                    }
+                    if (destIdInput) destIdInput.value = '';
+                    if (clearBtn) clearBtn.classList.add('hidden');
+                    if (dropdown) renderSchoolSuggestions(schoolDestinations.slice(0, 10), '');
+                }
+
+                function handleSchoolSearchKeydown(e) {
+                    const dropdown = document.getElementById('school-suggestions-dropdown');
+                    if (!dropdown || dropdown.classList.contains('hidden')) {
+                        if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            handleSchoolSearchFocus();
+                        }
+                        return;
+                    }
+
+                    const items = dropdown.querySelectorAll('.school-suggestion-item');
+                    if (items.length === 0) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
+                        updateActiveSuggestionHighlight(items);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
+                        updateActiveSuggestionHighlight(items);
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (activeSuggestionIndex >= 0 && activeSuggestionIndex < currentFilteredSchools.length) {
+                            selectSchoolSuggestion(currentFilteredSchools[activeSuggestionIndex].id);
+                        } else if (currentFilteredSchools.length === 1) {
+                            selectSchoolSuggestion(currentFilteredSchools[0].id);
+                        } else {
+                            const destId = document.getElementById('quick-destination-id')?.value;
+                            if (destId) {
+                                document.getElementById('quickSearchForm')?.submit();
+                            } else if (currentFilteredSchools.length > 0) {
+                                selectSchoolSuggestion(currentFilteredSchools[0].id);
+                            }
+                        }
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        dropdown.classList.add('hidden');
+                    }
+                }
+
+                function updateActiveSuggestionHighlight(items) {
+                    items.forEach((item, idx) => {
+                        if (idx === activeSuggestionIndex) {
+                            item.classList.add('bg-blue-100/90', 'ring-1', 'ring-blue-400');
+                            item.scrollIntoView({ block: 'nearest' });
+                        } else {
+                            item.classList.remove('bg-blue-100/90', 'ring-1', 'ring-blue-400');
+                        }
+                    });
+                }
+
+                // Dismiss dropdown on click outside
+                document.addEventListener('click', function(e) {
+                    const dropdown = document.getElementById('school-suggestions-dropdown');
+                    const input = document.getElementById('school-search-input');
+                    const clearBtn = document.getElementById('btn-clear-school-input');
+                    if (dropdown && !dropdown.contains(e.target) && e.target !== input && e.target !== clearBtn && !clearBtn?.contains(e.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+
+                // Form submit check
+                document.getElementById('quickSearchForm')?.addEventListener('submit', function(e) {
+                    const destIdInput = document.getElementById('quick-destination-id');
+                    const searchInput = document.getElementById('school-search-input');
+                    if (!destIdInput?.value && searchInput?.value) {
+                        const query = searchInput.value.trim().toLowerCase();
+                        const matched = schoolDestinations.find(s => s.nama.toLowerCase() === query) ||
+                                        schoolDestinations.find(s => s.nama.toLowerCase().includes(query));
+                        if (matched) {
+                            destIdInput.value = matched.id;
+                        } else {
+                            e.preventDefault();
+                            alert('Silakan pilih salah satu sekolah sasaran dari daftar saran yang muncul.');
+                            handleSchoolSearchFocus();
+                        }
+                    }
+                });
+
+                // Inisialisasi: Default mutlak adalah Saring Berdasarkan Wilayah ('filter')
+                document.addEventListener('DOMContentLoaded', function() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const modeParam = urlParams.get('mode');
+
+                    if (modeParam === 'quick') {
+                        switchSearchMode('quick');
+                    } else {
+                        switchSearchMode('filter');
+                    }
+                });
+            </script>
         </div>
     </section>
 
@@ -423,37 +815,36 @@
             $distStatus = $activeDistribution?->status ?? 'none';
             $distTime = $activeDistribution?->distributed_at ? \Carbon\Carbon::parse($activeDistribution->distributed_at)->format('H:i') : null;
 
-            // Prioritas Foto Porsi Utama
+            // Prioritas Foto Porsi Utama Riil dari Database
+            $realStage1Ev = $stageEvidences['tahap1'] ?? \App\Models\Evidence::where('evidenceable_type', 'receivings')->whereNotNull('file_path')->latest('uploaded_at')->first();
+            $realStage2Ev = $stageEvidences['tahap2'] ?? \App\Models\Evidence::where('evidenceable_type', 'processing_steps')->whereNotNull('file_path')->latest('uploaded_at')->first();
+            $realStage3Ev = $stageEvidences['tahap3'] ?? \App\Models\Evidence::where('evidenceable_type', 'pre_distribution_checks')->whereNotNull('file_path')->latest('uploaded_at')->first();
+            $realStage4Ev = $stageEvidences['tahap4'] ?? \App\Models\Evidence::where('evidenceable_type', 'distributions')->whereNotNull('file_path')->latest('uploaded_at')->first();
+
             $porsiEvidence = $porsiPhotoEvidence 
                 ?? $stageEvidences['tahap3'] 
                 ?? $stageEvidences['tahap4'] 
-                ?? $publicEvidences->first();
-            $mainPhoto = $porsiEvidence ? $porsiEvidence->url : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+                ?? $publicEvidences->first()
+                ?? $realStage3Ev
+                ?? $realStage4Ev;
+            $mainPhoto = $porsiEvidence ? $porsiEvidence->url : asset('images/sample-porsi.jpg');
 
             $porsiTarget = (int) ($selectedDestination->jumlah_penerima ?? 0);
             $porsiRealisasi = $activeDistribution ? (int) $activeDistribution->portions_sent : 0;
             $persenRealisasi = ($porsiTarget > 0 && $activeDistribution) ? min(100, round(($porsiRealisasi / $porsiTarget) * 100)) : 0;
 
             // Foto & Keterangan Riil 4 Tahapan Petualangan Bekal
-            $tahap1Photo = $stageEvidences['tahap1'] 
-                ? $stageEvidences['tahap1']->url 
-                : 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';
-            $tahap1Caption = $stageEvidences['tahap1']?->description ?? 'Foto Penerimaan Bahan Baku di Dapur SPPG';
+            $tahap1Photo = $stageEvidences['tahap1']?->url ?? $realStage1Ev?->url ?? asset('images/sample-penerimaan.jpg');
+            $tahap1Caption = $stageEvidences['tahap1']?->description ?? $realStage1Ev?->description ?? 'Foto Penerimaan Bahan Baku di Dapur SPPG';
 
-            $tahap2Photo = $stageEvidences['tahap2'] 
-                ? $stageEvidences['tahap2']->url 
-                : 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';
-            $tahap2Caption = $stageEvidences['tahap2']?->description ?? 'Foto Pemorsian di Baki Stainless Food-Grade';
+            $tahap2Photo = $stageEvidences['tahap2']?->url ?? $realStage2Ev?->url ?? asset('images/sample-pengolahan.jpg');
+            $tahap2Caption = $stageEvidences['tahap2']?->description ?? $realStage2Ev?->description ?? 'Foto Pemorsian di Baki Stainless Food-Grade';
 
-            $tahap3Photo = $stageEvidences['tahap3'] 
-                ? $stageEvidences['tahap3']->url 
-                : 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';
-            $tahap3Caption = $stageEvidences['tahap3']?->description ?? 'Foto Pemeriksaan Suhu & Muat Armada Khusus';
+            $tahap3Photo = $stageEvidences['tahap3']?->url ?? $realStage3Ev?->url ?? asset('images/sample-qc.jpg');
+            $tahap3Caption = $stageEvidences['tahap3']?->description ?? $realStage3Ev?->description ?? 'Foto Pemeriksaan Suhu & Muat Armada Khusus';
 
-            $tahap4Photo = $stageEvidences['tahap4'] 
-                ? $stageEvidences['tahap4']->url 
-                : 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80';
-            $tahap4Caption = $stageEvidences['tahap4']?->description ?? 'Foto Serah Terima di Lokasi Sasaran';
+            $tahap4Photo = $stageEvidences['tahap4']?->url ?? $realStage4Ev?->url ?? asset('images/sample-distribusi.jpg');
+            $tahap4Caption = $stageEvidences['tahap4']?->description ?? $realStage4Ev?->description ?? 'Foto Serah Terima di Lokasi Sasaran';
         @endphp
 
         <section id="transparencyResult" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -626,7 +1017,7 @@
 
                                 <!-- Showcase Foto Baki Saji -->
                                 <div onclick='openPhotoModal("{{ $mainPhoto }}", "Foto Porsi Makanan Standar Food-Grade 304", @json($portionGallery), 0)' class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-4/3 group shadow-2xs cursor-pointer">
-                                    <img src="{{ $mainPhoto }}" alt="Foto Porsi Aktual" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';" class="w-full h-full object-cover group-hover:scale-102 transition duration-200">
+                                    <img src="{{ $mainPhoto }}" alt="Foto Porsi Aktual" onerror="this.onerror=null; this.src='{{ $mainPhoto }}';" class="w-full h-full object-cover group-hover:scale-102 transition duration-200">
                                     <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <span class="px-3 py-1.5 rounded-lg bg-white/95 text-slate-900 font-bold text-xs shadow-md flex items-center gap-1.5">
                                             <svg class="w-4 h-4 text-[#071E49]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -647,7 +1038,7 @@
                                                 $evUrl = $ev->url;
                                             @endphp
                                             <div onclick='openPhotoModal("{{ $evUrl }}", "{{ addslashes($ev->description ?? 'Dokumentasi Lapangan') }}", @json($portionGallery), {{ $loop->iteration }})' class="rounded-lg overflow-hidden border border-slate-200 aspect-video bg-slate-100 cursor-pointer hover:border-[#071E49] transition">
-                                                <img src="{{ $evUrl }}" alt="{{ $ev->description ?? 'Bukti Publik' }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';" class="w-full h-full object-cover">
+                                                <img src="{{ $evUrl }}" alt="{{ $ev->description ?? 'Bukti Publik' }}" onerror="this.onerror=null; this.src='{{ $mainPhoto }}';" class="w-full h-full object-cover">
                                             </div>
                                         @endforeach
                                     </div>
@@ -772,37 +1163,64 @@
 
                     @php
                         // Data Rantai Pasok Dinamis dari Database
+                        $firstReceiving = null;
+                        $firstReceivingItem = null;
+                        if ($batch?->materialUsages) {
+                            foreach ($batch->materialUsages as $mu) {
+                                $lot = $mu->lot ?? $mu->materialLot;
+                                if ($lot?->receivingItem) {
+                                    $firstReceivingItem = $lot->receivingItem;
+                                    $firstReceiving = $lot->receivingItem->receiving;
+                                    break;
+                                }
+                            }
+                        }
+
                         $bahanNames = $batch?->materialUsages?->map(fn($u) => $u->lot?->material?->nama)->filter()->unique()->values();
-                        $tahap1Bahan = ($bahanNames && $bahanNames->isNotEmpty()) ? $bahanNames->take(4)->implode(', ') : 'Bahan segar terverifikasi FEFO';
+                        $tahap1Bahan = ($bahanNames && $bahanNames->isNotEmpty()) ? $bahanNames->take(4)->implode(', ') : 'Bahan pangan lokal terverifikasi';
                         $tahap1Desc = ($bahanNames && $bahanNames->isNotEmpty())
                             ? "Bahan baku segar disiapkan sesuai takaran resep aktif hari ini: " . $bahanNames->implode(', ') . "."
                             : "Bahan baku segar dipasok langsung oleh mitra lokal berstandar mutu dan FEFO.";
-                        $tahap1Petugas = "Tim Pengadaan " . ($sppg?->nama_sppg ?? 'SPPG');
-                        $tahap1Time = $stageEvidences['tahap1']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap1']->uploaded_at)->format('H:i') . ' WIB' : '05.30 WIB';
+                        $tahap1Petugas = $firstReceiving?->receiver?->nama ?? ("Tim Logistik " . ($sppg?->nama_sppg ?? 'SPPG'));
+                        $tahap1Time = $firstReceiving?->received_at 
+                            ? \Carbon\Carbon::parse($firstReceiving->received_at)->format('H:i') . ' WIB'
+                            : ($stageEvidences['tahap1']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap1']->uploaded_at)->format('H:i') . ' WIB' : '05.30 WIB');
+                        $tahap1Kondisi = $firstReceivingItem?->kondisi_dilaporkan 
+                            ?: ($firstReceiving?->status === 'confirmed' ? 'Segar, lolos verifikasi komoditas lokal' : 'Segar, lolos sortir fisik harian');
 
-                        $stepFirst = $batch?->processingSteps?->sortBy('started_at')->first();
-                        $cookTime = $stepFirst?->started_at ? \Carbon\Carbon::parse($stepFirst->started_at)->format('H:i') . ' WIB' : ($stageEvidences['tahap2']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap2']->uploaded_at)->format('H:i') . ' WIB' : '07.00 WIB');
-                        $stepNames = $batch?->processingSteps?->pluck('step_name')->filter()->unique();
+                        $steps = $batch?->processingSteps?->sortBy('started_at');
+                        $stepFirst = $steps?->first();
+                        $stepLast = $steps?->last();
+                        $stepLastDone = $steps?->where('status', 'done')->last();
+                        $cookTime = ($stepFirst?->started_at && $stepLast?->ended_at)
+                            ? \Carbon\Carbon::parse($stepFirst->started_at)->format('H:i') . ' - ' . \Carbon\Carbon::parse($stepLast->ended_at)->format('H:i') . ' WIB'
+                            : ($stepFirst?->started_at ? \Carbon\Carbon::parse($stepFirst->started_at)->format('H:i') . ' WIB' : ($stageEvidences['tahap2']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap2']->uploaded_at)->format('H:i') . ' WIB' : '06.30 - 08.30 WIB'));
+                        $stepNames = $steps?->pluck('step_name')->filter()->unique();
                         $tahap2Desc = ($stepNames && $stepNames->isNotEmpty())
                             ? "Proses memasak di dapur SPPG meliputi tahapan: " . $stepNames->implode(', ') . " dengan standar sanitasi ketat dan wadah baki stainless food-grade."
                             : "Proses memasak dilakukan di dapur SPPG dengan standar sanitasi ketat, suhu matang terjamin, dan pemorsian stainless steel food-grade.";
-                        $tahap2Petugas = "Tim Dapur " . ($sppg?->nama_sppg ?? 'SPPG');
+                        $tahap2Petugas = $stepFirst?->recorder?->nama ?? ("Tim Dapur " . ($sppg?->nama_sppg ?? 'SPPG'));
+                        $tahap2Kondisi = $stepLastDone?->note 
+                            ?: ($stepNames && $stepNames->isNotEmpty() ? 'Tahapan selesai: ' . $stepNames->implode(', ') . ' (higienis & matang sempurna)' : 'Steril, higienis & matang sempurna');
 
-                        $qcNutrName = $qc?->effective_nutritionist_name ?? $qc?->nutritionist_name ?? 'Tenaga Gizi SPPG';
-                        $qcCondText = $qc?->reported_condition ?? 'Makanan matang sempurna, aroma segar khas rempah, baki tertutup rapat dan higienis';
+                        $qcNutrName = $qc?->checker?->nama ?? $qc?->effective_nutritionist_name ?? $qc?->nutritionist_name ?? 'Tenaga Gizi SPPG';
+                        $qcCondText = $qc?->reported_condition ?: ($qc?->physical_test_status === 'passed' ? 'Lolos Uji Fisik: Matang sempurna, aroma segar, higienis siap santap' : 'Makanan matang sempurna, aroma segar rempah, baki tertutup rapat');
                         $qcCheckedTime = $qc?->checked_at ? \Carbon\Carbon::parse($qc->checked_at)->format('H:i') . ' WIB' : ($stageEvidences['tahap3']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap3']->uploaded_at)->format('H:i') . ' WIB' : '09.30 WIB');
+                        $tahap3Desc = $qc?->note 
+                            ? "Catatan QC: {$qc->note}. Kondisi: {$qcCondText}."
+                            : "Pemeriksaan organoleptik rasa, aroma, suhu saji, dan validasi gramatur porsi oleh {$qcNutrName}.";
 
                         $distReceived = $activeDistribution && $distStatus === 'received';
                         $distSent = $activeDistribution && $distStatus === 'sent';
-                        $tahap4Time = $distTime ? 'Pukul ' . $distTime . ' WIB' : ($stageEvidences['tahap4']?->uploaded_at ? 'Pukul ' . \Carbon\Carbon::parse($stageEvidences['tahap4']->uploaded_at)->format('H:i') . ' WIB' : 'Terjadwal Hari Ini');
-                        $tahap4TimeBadge = $distTime ? $distTime . ' WIB' : ($stageEvidences['tahap4']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap4']->uploaded_at)->format('H:i') . ' WIB' : 'Hari Ini');
-                        $tahap4Cond = $distReceived ? 'Diterima lengkap, kondisi prima & utuh' : ($distSent ? 'Dalam perjalanan armada pengantar' : 'Menunggu pengiriman armada dapur');
+                        $tahap4Time = $distTime ? 'Pukul ' . $distTime . ' WIB' : ($activeDistribution?->distributed_at ? 'Pukul ' . \Carbon\Carbon::parse($activeDistribution->distributed_at)->format('H:i') . ' WIB' : ($stageEvidences['tahap4']?->uploaded_at ? 'Pukul ' . \Carbon\Carbon::parse($stageEvidences['tahap4']->uploaded_at)->format('H:i') . ' WIB' : 'Terjadwal Hari Ini'));
+                        $tahap4TimeBadge = $distTime ? $distTime . ' WIB' : ($activeDistribution?->distributed_at ? \Carbon\Carbon::parse($activeDistribution->distributed_at)->format('H:i') . ' WIB' : ($stageEvidences['tahap4']?->uploaded_at ? \Carbon\Carbon::parse($stageEvidences['tahap4']->uploaded_at)->format('H:i') . ' WIB' : 'Hari Ini'));
+                        $tahap4Cond = $distReceived ? "Diterima lengkap {$porsiRealisasi} baki saji, kondisi prima & hangat" : ($distSent ? "Dalam perjalanan armada pengantar ({$porsiRealisasi} porsi)" : "Alokasi {$porsiTarget} porsi terjadwal pengantaran");
+                        $tahap4Petugas = $activeDistribution?->recorder?->nama ?? ($distReceived ? "Petugas Penerima {$selectedDestination->nama}" : "Tim Armada " . ($sppg?->nama_sppg ?? 'SPPG'));
                         $tahap4Desc = $distReceived
-                            ? "Baki makanan telah tiba di {$selectedDestination->nama} dan diserahterimakan lengkap sebanyak {$porsiRealisasi} baki saji dalam kondisi prima."
+                            ? "Baki makanan telah tiba di {$selectedDestination->nama} dan diserahterimakan lengkap sebanyak {$porsiRealisasi} baki saji dalam kondisi prima oleh {$tahap4Petugas}."
                             : ($distSent
-                                ? "Sebanyak {$porsiRealisasi} porsi makanan sedang dalam pengantaran menuju {$selectedDestination->nama}."
+                                ? "Sebanyak {$porsiRealisasi} porsi makanan sedang dalam pengantaran menuju {$selectedDestination->nama} oleh tim distribusi."
                                 : "Alokasi sebanyak {$porsiTarget} porsi telah disiapkan dan dijadwalkan untuk didistribusikan ke {$selectedDestination->nama}.");
-                        $tahap4Petugas = $distReceived ? "Petugas Penerima {$selectedDestination->nama}" : "Tim Armada " . ($sppg?->nama_sppg ?? 'SPPG');
                     @endphp
 
                     <!-- 5A. NAVIGASI STEP TABS KHUSUS MOBILE (HEMAT LAYAR HP & ZERO SCROLL) -->
@@ -861,7 +1279,7 @@
                              data-photo-caption="{{ $tahap1Caption }}"
                              data-desc="{{ $tahap1Desc }}"
                              data-waktu="Pukul {{ $tahap1Time }}"
-                             data-kondisi="Segar, lolos sortir fisik harian"
+                             data-kondisi="{{ $tahap1Kondisi }}"
                              data-bahan="{{ $tahap1Bahan }}"
                              data-petugas="{{ $tahap1Petugas }}"
                              class="tahap-card desktop-tahap-card active bg-slate-50/70 rounded-xl p-4 sm:p-5 border border-[#071E49] ring-1 ring-[#071E49] shadow-2xs hover:shadow-xs transition cursor-pointer relative">
@@ -897,7 +1315,7 @@
                              data-photo-caption="{{ $tahap2Caption }}"
                              data-desc="{{ $tahap2Desc }}"
                              data-waktu="{{ $cookTime }}"
-                             data-kondisi="Steril, higienis & matang sempurna"
+                             data-kondisi="{{ $tahap2Kondisi }}"
                              data-bahan="Dapur SPPG & Baki Food-Grade"
                              data-petugas="{{ $tahap2Petugas }}"
                              class="tahap-card desktop-tahap-card bg-white rounded-xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-xs transition cursor-pointer relative">
@@ -933,7 +1351,7 @@
                              data-photo-caption="{{ $tahap3Caption }}"
                              data-desc="{{ $qcCondText }}"
                              data-waktu="Pukul {{ $qcCheckedTime }}"
-                             data-kondisi="Lolos uji organoleptik & higienis"
+                             data-kondisi="{{ $qcCondText }}"
                              data-bahan="Box Insulated & Armada Pengantar"
                              data-petugas="{{ $qcNutrName }}"
                              class="tahap-card desktop-tahap-card bg-white rounded-xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-xs transition cursor-pointer relative">
@@ -1063,7 +1481,7 @@
                                 </script>
 
                                 <div id="tahapDetailImgContainer" onclick="openActiveTahapPhoto()" class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-4/3 group shadow-2xs cursor-pointer">
-                                    <img id="tahapDetailImg" src="{{ $tahap1Photo }}" alt="Dokumentasi Tahap" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';" class="w-full h-full object-cover group-hover:scale-102 transition duration-200">
+                                    <img id="tahapDetailImg" src="{{ $tahap1Photo }}" alt="Dokumentasi Tahap" onerror="this.onerror=null; this.src='{{ $tahap1Photo }}';" class="w-full h-full object-cover group-hover:scale-102 transition duration-200">
                                     <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <span class="px-3 py-1.5 rounded-lg bg-white/95 text-slate-900 font-bold text-xs shadow-md flex items-center gap-1.5">
                                             <svg class="w-4 h-4 text-[#071E49]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -1194,7 +1612,7 @@
                                     </div>
                                     <div class="bg-slate-50 border border-slate-200/90 rounded-xl p-3">
                                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">KONDISI BAHAN BAKU</span>
-                                        <span id="tahapDetailKondisi" class="text-xs font-bold text-slate-800 mt-0.5 block">Segar, lolos sortir fisik harian</span>
+                                        <span id="tahapDetailKondisi" class="text-xs font-bold text-slate-800 mt-0.5 block">{{ $tahap1Kondisi }}</span>
                                     </div>
                                     <div class="bg-slate-50 border border-slate-200/90 rounded-xl p-3">
                                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">BAHAN TERPILIH HARI INI</span>

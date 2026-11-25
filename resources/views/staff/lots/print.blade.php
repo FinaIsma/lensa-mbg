@@ -32,15 +32,15 @@
         <div class="format-segmented-group">
             <label class="format-pill active" id="pill-qr">
                 <input type="radio" name="format_choice" value="qr" checked onchange="switchFormat('qr')">
-                <span>🔲 QR Code (Kotak)</span>
+                <span>QR Code (Kotak)</span>
             </label>
             <label class="format-pill" id="pill-barcode">
                 <input type="radio" name="format_choice" value="barcode" onchange="switchFormat('barcode')">
-                <span>📊 Barcode (Garis)</span>
+                <span>Barcode (Garis)</span>
             </label>
             <label class="format-pill" id="pill-both">
                 <input type="radio" name="format_choice" value="both" onchange="switchFormat('both')">
-                <span>📑 Keduanya</span>
+                <span>Keduanya</span>
             </label>
         </div>
     </div>

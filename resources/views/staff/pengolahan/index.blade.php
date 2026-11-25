@@ -129,6 +129,7 @@
             $steps = $batch->processingSteps;
             $allDone = $steps->isNotEmpty() && $steps->every(fn ($s) => $s->status === 'done');
             $hasInProgress = $steps->contains(fn ($s) => $s->status === 'in_progress');
+            $essential = $batch->essential_steps_status;
         @endphp
         <div class="batch-processing-card" id="batch_card_{{ $batch->id }}">
             {{-- Header Kartu Batch --}}
@@ -167,6 +168,77 @@
                 </div>
             </div>
 
+            {{-- 3 Tahap Penting / Minimal Wajib Diisi (Persiapan Bahan, Pemasakan/Pengolahan, Pengemasan) --}}
+            <div style="margin-top: 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px 16px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                    <div style="font-size: 12.5px; font-weight: 700; color: #071E49; display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        <span>3 Tahap Wajib Pengolahan MBG (Wajib Ada Foto Dokumentasi)</span>
+                    </div>
+                    <span style="font-size: 11.5px; font-weight: 600; color: {{ $essential['all_complete'] ? '#16A34A' : '#D97706' }}; background: {{ $essential['all_complete'] ? '#DCFCE7' : '#FEF3C7' }}; padding: 3px 10px; border-radius: 9999px;">
+                        {{ $essential['all_complete'] ? 'Lengkap 3/3 Tahap' : 'Belum Lengkap' }}
+                    </span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
+                    @foreach (['persiapan' => 'Persiapan Bahan', 'pemasakan' => 'Pemasakan / Pengolahan', 'pengemasan' => 'Pengemasan'] as $key => $title)
+                        @php $st = $essential[$key]; @endphp
+                        <div style="background: #FFFFFF; border: 1.5px solid {{ $st['is_complete'] ? '#86EFAC' : ($st['exists'] ? '#FDE68A' : '#E2E8F0') }}; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+                            <div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                                    <span style="font-size: 13px; font-weight: 700; color: #071E49;">{{ $title }}</span>
+                                    @if ($st['is_complete'])
+                                        <span style="font-size: 10.5px; font-weight: 700; color: #166534; background: #DCFCE7; padding: 2px 7px; border-radius: 4px;">Beres</span>
+                                    @elseif ($st['exists'] && $st['is_done'])
+                                        <span style="font-size: 10.5px; font-weight: 700; color: #9A3412; background: #FFEDD5; padding: 2px 7px; border-radius: 4px;">Perlu Foto</span>
+                                    @elseif ($st['exists'])
+                                        <span style="font-size: 10.5px; font-weight: 700; color: #B45309; background: #FEF3C7; padding: 2px 7px; border-radius: 4px;">Berjalan</span>
+                                    @else
+                                        <span style="font-size: 10.5px; font-weight: 600; color: #64748B; background: #F1F5F9; padding: 2px 7px; border-radius: 4px;">Belum Diisi</span>
+                                    @endif
+                                </div>
+                                <div style="font-size: 11.5px; color: #64748B; margin-top: 4px; display: flex; align-items: center; gap: 6px;">
+                                    @if ($st['has_photo'])
+                                        <span style="color: #16A34A; font-weight: 600;">{{ $st['photo_count'] }} foto bukti</span>
+                                    @else
+                                        <span style="color: #DC2626; font-weight: 600;">Wajib ada foto</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                                @if (! $st['exists'])
+                                    <button type="button" 
+                                            onclick="openAddStepModal({{ $batch->id }}, '{{ $batch->batch_code }}', '{{ $batch->menu?->nama }}', '{{ $batch->menu?->kategori }}', '{{ $st['default_name'] }}')" 
+                                            class="btn-primary" 
+                                            style="font-size: 11px; padding: 4px 10px; width: 100%; justify-content: center;">
+                                        + Mulai {{ $st['label'] }}
+                                    </button>
+                                @elseif (! $st['is_done'])
+                                    <button type="button" 
+                                            onclick="openCompleteStepModal({{ $st['step']->id }}, '{{ $st['step']->step_name }}', '{{ $st['step']->started_at->format('Y-m-d\TH:i') }}', {{ $st['has_photo'] ? 'true' : 'false' }})" 
+                                            class="btn-success" 
+                                            style="font-size: 11px; padding: 4px 10px; width: 100%; justify-content: center;">
+                                        Selesaikan Tahap Ini
+                                    </button>
+                                @elseif (! $st['has_photo'])
+                                    <button type="button" 
+                                            onclick="openUploadEvidenceModal({{ $st['step']->id }}, '{{ addslashes($st['step']->step_name) }}')" 
+                                            class="btn-secondary" 
+                                            style="font-size: 11px; padding: 4px 10px; width: 100%; justify-content: center; color: #DC2626; border-color: #FCA5A5;">
+                                        + Unggah Foto (Wajib)
+                                    </button>
+                                @else
+                                    <div style="font-size: 11px; color: #16A34A; font-weight: 600;">
+                                        Selesai ({{ $st['step']->duration_human ?? 'Tercatat' }})
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
             {{-- Linimasa Vertikal Tahap --}}
             @if ($steps->isEmpty())
                 <div style="text-align: center; padding: 18px 16px; background: #F8FAFC; border-radius: 8px; margin-top: 14px; border: 1px dashed #CBD5E1;">
@@ -200,7 +272,7 @@
 
                                     @if ($step->status === 'in_progress')
                                         <button type="button" 
-                                                onclick="openCompleteStepModal({{ $step->id }}, '{{ $step->step_name }}', '{{ $step->started_at->format('Y-m-d\TH:i') }}')" 
+                                                onclick="openCompleteStepModal({{ $step->id }}, '{{ $step->step_name }}', '{{ $step->started_at->format('Y-m-d\TH:i') }}', {{ $step->evidences->isNotEmpty() ? 'true' : 'false' }})" 
                                                 class="btn-success" 
                                                 style="font-size: 12px; padding: 5px 12px;">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -251,21 +323,45 @@
                 </div>
             @endif
 
-            {{-- Banner Jika Semua Tahap Selesai --}}
-            @if ($allDone)
+            {{-- Banner Selesaikan Proses / Progress Tahap --}}
+            @if ($essential['all_complete'])
                 <div style="margin-top: 20px; background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <div style="width: 38px; height: 38px; border-radius: 50%; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
                         <div>
-                            <div style="font-weight: 700; font-size: 14.5px; color: #166534;">Seluruh Tahapan Pengolahan Selesai</div>
-                            <div style="font-size: 12.5px; color: #15803D;">Batch telah melalui seluruh alur kerja dan siap untuk pencatatan hasil porsi & uji kualitas.</div>
+                            <div style="font-weight: 700; font-size: 15px; color: #166534;">3 Tahapan Penting Selesai &amp; Foto Lengkap</div>
+                            <div style="font-size: 12.5px; color: #15803D;">Persiapan Bahan, Pemasakan/Pengolahan, dan Pengemasan telah lengkap dengan foto dokumentasi. Tekan tombol di samping untuk menyelesaikan proses.</div>
                         </div>
                     </div>
-                    <button type="button" onclick="notifyHasil('{{ $batch->batch_code }}', {{ $batch->id }})" class="btn-success" style="padding: 8px 18px; font-size: 13px;">
-                        <span>Catat Hasil Porsi</span>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <form method="POST" action="{{ route('staff.pengolahan.batch.complete', $batch->id) }}">
+                        @csrf
+                        <button type="submit" class="btn-success" style="padding: 9px 20px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border-radius: 8px; box-shadow: 0 2px 4px rgba(22, 163, 74, 0.25);">
+                            <span>Selesaikan Proses &amp; Catat Hasil</span>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                    </form>
+                </div>
+            @else
+                <div style="margin-top: 20px; background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 13.5px; color: #92400E;">Tahapan Penting Belum Lengkap untuk Selesaikan Proses</div>
+                            <div style="font-size: 12px; color: #B45309;">
+                                Wajib mengisi &amp; menyelesaikan 3 tahap: 
+                                <strong>Persiapan Bahan</strong> ({{ $essential['persiapan']['is_complete'] ? 'lengkap' : ($essential['persiapan']['exists'] ? 'belum lengkap' : 'belum diisi') }}), 
+                                <strong>Pemasakan/Pengolahan</strong> ({{ $essential['pemasakan']['is_complete'] ? 'lengkap' : ($essential['pemasakan']['exists'] ? 'belum lengkap' : 'belum diisi') }}), 
+                                dan <strong>Pengemasan</strong> ({{ $essential['pengemasan']['is_complete'] ? 'lengkap' : ($essential['pengemasan']['exists'] ? 'belum lengkap' : 'belum diisi') }}), beserta foto dokumentasi.
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="alert('Lengkapi ketiga tahap wajib (Persiapan Bahan, Pemasakan/Pengolahan, Pengemasan) beserta foto dokumentasi sebelum menyelesaikan proses pengolahan.')" class="btn-secondary" style="font-size: 12px; padding: 7px 14px; opacity: 0.85;">
+                        <span>Selesaikan Proses</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                     </button>
                 </div>
             @endif
@@ -405,14 +501,14 @@
                     <textarea name="note" rows="2" class="form-input" placeholder="Contoh: Tahap selesai tepat waktu, tingkat kematangan pas..." style="width: 100%; font-size: 13px; padding: 10px; border-radius: 8px; border: 1px solid #CBD5E1;"></textarea>
                 </div>
 
-                {{-- Upload Bukti Selesai (Opsional, Multiple) --}}
+                {{-- Upload Bukti Selesai (Wajib jika belum ada foto pada tahap ini) --}}
                 <div>
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #071E49; margin-bottom: 6px;">
-                        Foto Bukti Selesai (Opsional, bisa lebih dari 1 foto)
+                    <label id="completeStepPhotoLabel" style="display: block; font-size: 13px; font-weight: 600; color: #071E49; margin-bottom: 6px;">
+                        Foto Bukti Selesai <span id="completeStepPhotoRequired" style="color: #DC2626;">*</span>
                     </label>
                     <input type="file" name="evidence_files[]" multiple accept="image/*" class="form-input" id="completeStepFileInput" onchange="updateFileCountText(this, 'completeStepCountText')" style="width: 100%; font-size: 13px; padding: 8px; border-radius: 8px; border: 1px solid #CBD5E1;">
                     <div id="completeStepCountText" style="display: none; color: #16A34A; font-size: 11.5px; font-weight: 600; margin-top: 4px;"></div>
-                    <small style="color: #64748B; font-size: 11px; margin-top: 3px; display: block;">Format: JPG, PNG, WEBP. Maks 10 MB per foto. Anda dapat memilih beberapa foto sekaligus.</small>
+                    <small id="completeStepPhotoNote" style="color: #64748B; font-size: 11px; margin-top: 3px; display: block;">Format: JPG, PNG, WEBP. Maks 10 MB per foto. Anda dapat memilih beberapa foto sekaligus.</small>
                 </div>
             </div>
 
@@ -495,18 +591,18 @@
 @push('scripts')
 <script>
     const categorySuggestions = {
-        'makanan_siap_santap': ['Persiapan bahan', 'Pencucian', 'Pemasakan', 'Pengemasan'],
-        'paket_siap_konsumsi': ['Pemeriksaan produk', 'Pengemasan paket'],
-        'pangan_siap_olah': ['Persiapan bahan', 'Pengolahan awal', 'Pengemasan'],
+        'makanan_siap_santap': ['Persiapan bahan', 'Pemasakan/Pengolahan', 'Pengemasan', 'Pencucian'],
+        'paket_siap_konsumsi': ['Persiapan bahan', 'Pemeriksaan produk', 'Pengemasan'],
+        'pangan_siap_olah': ['Persiapan bahan', 'Pemasakan/Pengolahan', 'Pengemasan'],
     };
-    const defaultSuggestions = ['Persiapan bahan', 'Pencucian', 'Pemasakan', 'Pengemasan'];
+    const defaultSuggestions = ['Persiapan bahan', 'Pemasakan/Pengolahan', 'Pengemasan', 'Pencucian'];
 
     function formatDateTimeLocal(d) {
         const pad = (n) => String(n).padStart(2, '0');
         return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
-    function openAddStepModal(batchId = null, batchCode = '', menuName = '', kategori = '') {
+    function openAddStepModal(batchId = null, batchCode = '', menuName = '', kategori = '', prefilledStepName = '') {
         const batchIdInput = document.getElementById('addStepBatchId');
         const batchSelectDiv = document.getElementById('batchSelectContainer');
         const subtitle = document.getElementById('addStepSubtitle');
@@ -526,7 +622,7 @@
             populateSuggestions('');
         }
 
-        document.getElementById('stepNameInput').value = '';
+        document.getElementById('stepNameInput').value = prefilledStepName || '';
         document.getElementById('modalAddStep').classList.add('show');
     }
 
@@ -560,7 +656,7 @@
         document.getElementById('modalAddStep').classList.remove('show');
     }
 
-    function openCompleteStepModal(stepId, stepName, startedAtStr) {
+    function openCompleteStepModal(stepId, stepName, startedAtStr, alreadyHasPhoto = false) {
         const form = document.getElementById('formCompleteStep');
         form.action = `/staff/pengolahan/tahap/${stepId}/selesaikan`;
 
@@ -570,6 +666,21 @@
         endedInput.min = startedAtStr;
 
         document.getElementById('minStartedNote').textContent = `Waktu mulai: ${startedAtStr.replace('T', ' ')}. Waktu selesai tidak boleh lebih awal.`;
+
+        const fileInput = document.getElementById('completeStepFileInput');
+        const reqStar = document.getElementById('completeStepPhotoRequired');
+        const photoNote = document.getElementById('completeStepPhotoNote');
+
+        if (alreadyHasPhoto) {
+            if (fileInput) fileInput.required = false;
+            if (reqStar) reqStar.style.display = 'none';
+            if (photoNote) photoNote.textContent = 'Tahap ini sudah memiliki foto bukti. Anda dapat menambahkan foto selesai tambahan jika diperlukan.';
+        } else {
+            if (fileInput) fileInput.required = true;
+            if (reqStar) reqStar.style.display = 'inline';
+            if (photoNote) photoNote.textContent = 'Tahap ini belum memiliki foto bukti. Wajib unggah minimal 1 foto dokumentasi agar dapat diselesaikan.';
+        }
+
         document.getElementById('modalCompleteStep').classList.add('show');
     }
 
@@ -581,7 +692,7 @@
         const el = document.getElementById(elementId);
         if (!el) return;
         if (input.files && input.files.length > 0) {
-            el.textContent = `✓ ${input.files.length} foto dipilih`;
+            el.textContent = `${input.files.length} foto dipilih`;
             el.style.display = 'block';
         } else {
             el.style.display = 'none';

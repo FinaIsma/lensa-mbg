@@ -446,7 +446,7 @@
                             <span style="font-size: 11.5px; color: #64748B;">Status Uji Fisik:</span>
                             <div style="margin-top: 2px;">
                                 <span style="font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0;">
-                                    ✓ Lolos Uji Fisik (Layak Saji)
+                                    Lolos Uji Fisik (Layak Saji)
                                 </span>
                             </div>
                         </div>
@@ -464,7 +464,7 @@
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                                             <strong style="font-size: 12px; color: #1E293B;">{{ $param['label'] ?? ucfirst($key) }}</strong>
                                             <span style="font-size: 11px; font-weight: 700; color: #059669; background: #ECFDF5; padding: 1px 6px; border-radius: 4px;">
-                                                ✓ {{ ucfirst($param['status'] ?? 'Sesuai') }}
+                                                {{ ucfirst($param['status'] ?? 'Sesuai') }}
                                             </span>
                                         </div>
                                         <div style="font-size: 11.5px; color: #64748B;">

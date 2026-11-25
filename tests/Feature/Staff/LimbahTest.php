@@ -9,13 +9,11 @@ use App\Models\ProductionBatch;
 use App\Models\Recipe;
 use App\Models\Sppg;
 use App\Models\Staff;
-use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Models\WasteSurplusRecord;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -251,4 +249,3 @@ class LimbahTest extends TestCase
         ]);
     }
 }
-

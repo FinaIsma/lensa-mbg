@@ -91,7 +91,7 @@ class HasilController extends Controller
             ->whereDoesntHave('processingSteps', function ($sQ) {
                 $sQ->where('status', '!=', 'done');
             })
-            ->with(['menu', 'recipe', 'processingSteps'])
+            ->with(['menu', 'recipe', 'processingSteps.evidences'])
             ->orderBy('production_date', 'desc')
             ->orderBy('id', 'desc')
             ->get();
@@ -220,10 +220,16 @@ class HasilController extends Controller
                 ->withInput();
         }
 
-        // Validasi semua tahap pengolahan harus sudah done
+        // Validasi semua tahap pengolahan harus sudah done dan memiliki foto pada tahap penting
         $steps = $batch->processingSteps;
         if ($steps->isEmpty() || ! $steps->every(fn ($s) => $s->status === 'done')) {
             return back()->with('error', 'Semua tahapan kerja pengolahan untuk batch ini harus berstatus selesai (done).')
+                ->withInput();
+        }
+
+        $essentialStatus = $batch->essential_steps_status;
+        if (! $essentialStatus['all_complete']) {
+            return back()->with('error', 'Tiga tahapan penting pengolahan (Persiapan Bahan, Pemasakan/Pengolahan, Pengemasan) wajib diselesaikan dan masing-masing memiliki foto dokumentasi.')
                 ->withInput();
         }
 

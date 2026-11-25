@@ -273,19 +273,19 @@
 
         @php
             $tahap1Photos = $stageGalleries[1]['photos'] ?? [];
-            $tahap1Cover = !empty($tahap1Photos) ? $tahap1Photos[0]['url'] : 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';
+            $tahap1Cover = !empty($tahap1Photos) ? $tahap1Photos[0]['url'] : asset('images/sample-penerimaan.jpg');
             $tahap1Count = count($tahap1Photos);
 
             $tahap2Photos = $stageGalleries[2]['photos'] ?? [];
-            $tahap2Cover = !empty($tahap2Photos) ? $tahap2Photos[0]['url'] : 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';
+            $tahap2Cover = !empty($tahap2Photos) ? $tahap2Photos[0]['url'] : asset('images/sample-pengolahan.jpg');
             $tahap2Count = count($tahap2Photos);
 
             $tahap3Photos = $stageGalleries[3]['photos'] ?? [];
-            $tahap3Cover = !empty($tahap3Photos) ? $tahap3Photos[0]['url'] : 'https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';
+            $tahap3Cover = !empty($tahap3Photos) ? $tahap3Photos[0]['url'] : asset('images/sample-qc.jpg');
             $tahap3Count = count($tahap3Photos);
 
             $tahap4Photos = $stageGalleries[4]['photos'] ?? [];
-            $tahap4Cover = !empty($tahap4Photos) ? $tahap4Photos[0]['url'] : 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';
+            $tahap4Cover = !empty($tahap4Photos) ? $tahap4Photos[0]['url'] : asset('images/sample-distribusi.jpg');
             $tahap4Count = count($tahap4Photos);
         @endphp
 
@@ -327,11 +327,11 @@
                             src="{{ $tahap1Cover }}" 
                             alt="Bahan Segar Datang" 
                             class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
-                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';"
+                            onerror="this.onerror=null; this.src='{{ $tahap1Cover }}';"
                         >
                         <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-extrabold flex items-center gap-1 border border-white/20">
                             <svg class="w-2.5 h-2.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span>{{ $tahap1Count }} Foto</span>
+                            <span>{{ $tahap1Count > 1 ? 'Total: ' . $tahap1Count . ' Foto' : ($tahap1Count == 1 ? '1 Foto' : '0 Foto') }}</span>
                         </div>
                     </div>
 
@@ -345,10 +345,10 @@
                             src="{{ $tahap1Cover }}" 
                             alt="Bahan Segar Datang" 
                             class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-300"
-                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';"
+                            onerror="this.onerror=null; this.src='{{ $tahap1Cover }}';"
                         >
                         <div class="absolute bottom-0.5 right-0.5 px-1 py-0.2 rounded bg-slate-900/80 text-white text-[8px] font-bold">
-                            {{ $tahap1Count }}
+                            {{ $tahap1Count > 1 ? 'Total: ' . $tahap1Count : $tahap1Count }}
                         </div>
                     </div>
 
@@ -432,11 +432,11 @@
                             src="{{ $tahap2Cover }}" 
                             alt="Masak Matang" 
                             class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
-                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';"
+                            onerror="this.onerror=null; this.src='{{ $tahap2Cover }}';"
                         >
                         <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-extrabold flex items-center gap-1 border border-white/20">
                             <svg class="w-2.5 h-2.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span>{{ $tahap2Count }} Foto</span>
+                            <span>{{ $tahap2Count > 1 ? 'Total: ' . $tahap2Count . ' Foto' : ($tahap2Count == 1 ? '1 Foto' : '0 Foto') }}</span>
                         </div>
                     </div>
 
@@ -450,10 +450,10 @@
                             src="{{ $tahap2Cover }}" 
                             alt="Masak Matang" 
                             class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-300"
-                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';"
+                            onerror="this.onerror=null; this.src='{{ $tahap2Cover }}';"
                         >
                         <div class="absolute bottom-0.5 right-0.5 px-1 py-0.2 rounded bg-slate-900/80 text-white text-[8px] font-bold">
-                            {{ $tahap2Count }}
+                            {{ $tahap2Count > 1 ? 'Total: ' . $tahap2Count : $tahap2Count }}
                         </div>
                     </div>
 
@@ -537,11 +537,11 @@
                             src="{{ $tahap3Cover }}" 
                             alt="Cek Gizi & Pack" 
                             class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
-                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';"
+                            onerror="this.onerror=null; this.src='{{ $tahap3Cover }}';"
                         >
                         <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-extrabold flex items-center gap-1 border border-white/20">
                             <svg class="w-2.5 h-2.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span>{{ $tahap3Count }} Foto</span>
+                            <span>{{ $tahap3Count > 1 ? 'Total: ' . $tahap3Count . ' Foto' : ($tahap3Count == 1 ? '1 Foto' : '0 Foto') }}</span>
                         </div>
                     </div>
 
@@ -555,10 +555,10 @@
                             src="{{ $tahap3Cover }}" 
                             alt="Cek Gizi & Pack" 
                             class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-300"
-                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';"
+                            onerror="this.onerror=null; this.src='{{ $tahap3Cover }}';"
                         >
                         <div class="absolute bottom-0.5 right-0.5 px-1 py-0.2 rounded bg-slate-900/80 text-white text-[8px] font-bold">
-                            {{ $tahap3Count }}
+                            {{ $tahap3Count > 1 ? 'Total: ' . $tahap3Count : $tahap3Count }}
                         </div>
                     </div>
 
@@ -642,11 +642,11 @@
                             src="{{ $tahap4Cover }}" 
                             alt="Meluncur ke Sekolah" 
                             class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
-                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';"
+                            onerror="this.onerror=null; this.src='{{ $tahap4Cover }}';"
                         >
                         <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-extrabold flex items-center gap-1 border border-white/20">
                             <svg class="w-2.5 h-2.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span>{{ $tahap4Count }} Foto</span>
+                            <span>{{ $tahap4Count > 1 ? 'Total: ' . $tahap4Count . ' Foto' : ($tahap4Count == 1 ? '1 Foto' : '0 Foto') }}</span>
                         </div>
                     </div>
 
@@ -660,10 +660,10 @@
                             src="{{ $tahap4Cover }}" 
                             alt="Meluncur ke Sekolah" 
                             class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-300"
-                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';"
+                            onerror="this.onerror=null; this.src='{{ $tahap4Cover }}';"
                         >
                         <div class="absolute bottom-0.5 right-0.5 px-1 py-0.2 rounded bg-slate-900/80 text-white text-[8px] font-bold">
-                            {{ $tahap4Count }}
+                            {{ $tahap4Count > 1 ? 'Total: ' . $tahap4Count : $tahap4Count }}
                         </div>
                     </div>
 
@@ -767,14 +767,14 @@
                                 src="{{ $tahap1Cover }}" 
                                 alt="Penerimaan Bahan Baku Segar" 
                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
-                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';"
+                                onerror="this.onerror=null; this.src='{{ $tahap1Cover }}';"
                             >
                             <!-- Badge Preview Banyak Foto -->
                             <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-white/20">
                                 <svg class="w-3 h-3 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>{{ $tahap1Count }} Foto</span>
+                                <span>{{ $tahap1Count > 1 ? 'Total: ' . $tahap1Count . ' Foto' : ($tahap1Count == 1 ? '1 Foto' : '0 Foto') }}</span>
                             </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 group-hover:from-slate-950/90 transition-colors">
                                 <span class="self-start px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shadow-2xs">Dokumentasi Bahan Masuk</span>
@@ -788,22 +788,25 @@
 
                         <!-- Gallery Thumbnails Strip -->
                         @if(count($tahap1Photos) > 1)
-                            <div class="flex items-center gap-2 overflow-x-auto py-1">
-                                @foreach($tahap1Photos as $idx => $photo)
-                                    <button 
-                                        type="button" 
-                                        onclick="event.stopPropagation(); openPhotoModal(1, {{ $idx }});"
-                                        class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-blue-500 ring-2 ring-blue-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-blue-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
-                                        title="{{ $photo['title'] }}"
-                                    >
-                                        <img 
-                                            src="{{ $photo['url'] }}" 
-                                            alt="{{ $photo['title'] }}" 
-                                            class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
-                                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';"
+                            <div class="space-y-1">
+                                <div class="text-[11px] font-bold text-slate-500">Dokumentasi Riil (Total {{ $tahap1Count }} Foto):</div>
+                                <div class="flex items-center gap-2 overflow-x-auto py-1">
+                                    @foreach($tahap1Photos as $idx => $photo)
+                                        <button 
+                                            type="button" 
+                                            onclick="event.stopPropagation(); openPhotoModal(1, {{ $idx }});"
+                                            class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-blue-500 ring-2 ring-blue-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-blue-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
+                                            title="{{ $photo['title'] }}"
                                         >
-                                    </button>
-                                @endforeach
+                                            <img 
+                                                src="{{ $photo['url'] }}" 
+                                                alt="{{ $photo['title'] }}" 
+                                                class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
+                                                onerror="this.onerror=null; this.src='{{ $photo['url'] }}';"
+                                            >
+                                        </button>
+                                    @endforeach
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -880,14 +883,14 @@
                                 src="{{ $tahap2Cover }}" 
                                 alt="Proses Pengolahan Dapur MBG" 
                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
-                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';"
+                                onerror="this.onerror=null; this.src='{{ $tahap2Cover }}';"
                             >
                             <!-- Badge Preview Banyak Foto -->
                             <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-white/20">
                                 <svg class="w-3 h-3 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>{{ $tahap2Count }} Foto</span>
+                                <span>{{ $tahap2Count > 1 ? 'Total: ' . $tahap2Count . ' Foto' : ($tahap2Count == 1 ? '1 Foto' : '0 Foto') }}</span>
                             </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 group-hover:from-slate-950/90 transition-colors">
                                 <span class="self-start px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white shadow-2xs">Dokumentasi Pengolahan</span>
@@ -901,22 +904,25 @@
 
                         <!-- Gallery Thumbnails Strip -->
                         @if(count($tahap2Photos) > 1)
-                            <div class="flex items-center gap-2 overflow-x-auto py-1">
-                                @foreach($tahap2Photos as $idx => $photo)
-                                    <button 
-                                        type="button" 
-                                        onclick="event.stopPropagation(); openPhotoModal(2, {{ $idx }});"
-                                        class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-amber-500 ring-2 ring-amber-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-amber-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
-                                        title="{{ $photo['title'] }}"
-                                    >
-                                        <img 
-                                            src="{{ $photo['url'] }}" 
-                                            alt="{{ $photo['title'] }}" 
-                                            class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
-                                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80';"
+                            <div class="space-y-1">
+                                <div class="text-[11px] font-bold text-slate-500">Dokumentasi Riil (Total {{ $tahap2Count }} Foto):</div>
+                                <div class="flex items-center gap-2 overflow-x-auto py-1">
+                                    @foreach($tahap2Photos as $idx => $photo)
+                                        <button 
+                                            type="button" 
+                                            onclick="event.stopPropagation(); openPhotoModal(2, {{ $idx }});"
+                                            class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-amber-500 ring-2 ring-amber-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-amber-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
+                                            title="{{ $photo['title'] }}"
                                         >
-                                    </button>
-                                @endforeach
+                                            <img 
+                                                src="{{ $photo['url'] }}" 
+                                                alt="{{ $photo['title'] }}" 
+                                                class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
+                                                onerror="this.onerror=null; this.src='{{ $photo['url'] }}';"
+                                            >
+                                        </button>
+                                    @endforeach
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -979,14 +985,14 @@
                                 src="{{ $tahap3Cover }}" 
                                 alt="Pemeriksaan Kualitas Gizi & Kemasan" 
                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
-                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';"
+                                onerror="this.onerror=null; this.src='{{ $tahap3Cover }}';"
                             >
                             <!-- Badge Preview Banyak Foto -->
                             <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-white/20">
                                 <svg class="w-3 h-3 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>{{ $tahap3Count }} Foto</span>
+                                <span>{{ $tahap3Count > 1 ? 'Total: ' . $tahap3Count . ' Foto' : ($tahap3Count == 1 ? '1 Foto' : '0 Foto') }}</span>
                             </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 group-hover:from-slate-950/90 transition-colors">
                                 <span class="self-start px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-2xs">Dokumentasi Uji Gizi</span>
@@ -1000,22 +1006,25 @@
 
                         <!-- Gallery Thumbnails Strip -->
                         @if(count($tahap3Photos) > 1)
-                            <div class="flex items-center gap-2 overflow-x-auto py-1">
-                                @foreach($tahap3Photos as $idx => $photo)
-                                    <button 
-                                        type="button" 
-                                        onclick="event.stopPropagation(); openPhotoModal(3, {{ $idx }});"
-                                        class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-emerald-500 ring-2 ring-emerald-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-emerald-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
-                                        title="{{ $photo['title'] }}"
-                                    >
-                                        <img 
-                                            src="{{ $photo['url'] }}" 
-                                            alt="{{ $photo['title'] }}" 
-                                            class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
-                                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1576867757603-05b134ebc379?auto=format&fit=crop&w=800&q=80';"
+                            <div class="space-y-1">
+                                <div class="text-[11px] font-bold text-slate-500">Dokumentasi Riil (Total {{ $tahap3Count }} Foto):</div>
+                                <div class="flex items-center gap-2 overflow-x-auto py-1">
+                                    @foreach($tahap3Photos as $idx => $photo)
+                                        <button 
+                                            type="button" 
+                                            onclick="event.stopPropagation(); openPhotoModal(3, {{ $idx }});"
+                                            class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-emerald-500 ring-2 ring-emerald-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-emerald-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
+                                            title="{{ $photo['title'] }}"
                                         >
-                                    </button>
-                                @endforeach
+                                            <img 
+                                                src="{{ $photo['url'] }}" 
+                                                alt="{{ $photo['title'] }}" 
+                                                class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
+                                                onerror="this.onerror=null; this.src='{{ $photo['url'] }}';"
+                                            >
+                                        </button>
+                                    @endforeach
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -1077,14 +1086,14 @@
                                 src="{{ $tahap4Cover }}" 
                                 alt="Distribusi Terjadwal ke Sekolah" 
                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
-                                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';"
+                                onerror="this.onerror=null; this.src='{{ $tahap4Cover }}';"
                             >
                             <!-- Badge Preview Banyak Foto -->
                             <div class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-white/20">
                                 <svg class="w-3 h-3 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <span>{{ $tahap4Count }} Foto</span>
+                                <span>{{ $tahap4Count > 1 ? 'Total: ' . $tahap4Count . ' Foto' : ($tahap4Count == 1 ? '1 Foto' : '0 Foto') }}</span>
                             </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-3.5 group-hover:from-slate-950/90 transition-colors">
                                 <span class="self-start px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white shadow-2xs">Dokumentasi Logistik</span>
@@ -1098,22 +1107,25 @@
 
                         <!-- Gallery Thumbnails Strip -->
                         @if(count($tahap4Photos) > 1)
-                            <div class="flex items-center gap-2 overflow-x-auto py-1">
-                                @foreach($tahap4Photos as $idx => $photo)
-                                    <button 
-                                        type="button" 
-                                        onclick="event.stopPropagation(); openPhotoModal(4, {{ $idx }});"
-                                        class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-indigo-500 ring-2 ring-indigo-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-indigo-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
-                                        title="{{ $photo['title'] }}"
-                                    >
-                                        <img 
-                                            src="{{ $photo['url'] }}" 
-                                            alt="{{ $photo['title'] }}" 
-                                            class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
-                                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80';"
+                            <div class="space-y-1">
+                                <div class="text-[11px] font-bold text-slate-500">Dokumentasi Riil (Total {{ $tahap4Count }} Foto):</div>
+                                <div class="flex items-center gap-2 overflow-x-auto py-1">
+                                    @foreach($tahap4Photos as $idx => $photo)
+                                        <button 
+                                            type="button" 
+                                            onclick="event.stopPropagation(); openPhotoModal(4, {{ $idx }});"
+                                            class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 {{ $idx === 0 ? 'border-indigo-500 ring-2 ring-indigo-300/60' : 'border-slate-200 opacity-75 hover:opacity-100 hover:border-indigo-300' }} shrink-0 transition relative group/thumb cursor-pointer shadow-2xs"
+                                            title="{{ $photo['title'] }}"
                                         >
-                                    </button>
-                                @endforeach
+                                            <img 
+                                                src="{{ $photo['url'] }}" 
+                                                alt="{{ $photo['title'] }}" 
+                                                class="w-full h-full object-cover group-hover/thumb:scale-110 transition duration-300"
+                                                onerror="this.onerror=null; this.src='{{ $photo['url'] }}';"
+                                            >
+                                        </button>
+                                    @endforeach
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -1391,7 +1403,7 @@
 
             <!-- Foto Utama -->
             <div class="relative max-h-[58vh] sm:max-h-[66vh] max-w-full flex items-center justify-center overflow-hidden rounded-2xl bg-black/40 cursor-default" onclick="event.stopPropagation();">
-                <img id="modal-main-img" src="" alt="Dokumentasi Proses" class="max-h-[58vh] sm:max-h-[66vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-200" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';">
+                <img id="modal-main-img" src="" alt="Dokumentasi Proses" class="max-h-[58vh] sm:max-h-[66vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-200" onerror="this.onerror=null;">
             </div>
 
             <!-- Tombol Navigasi Kanan (Next) -->
@@ -1421,7 +1433,7 @@
             </div>
             
             <div class="text-center text-[10px] text-slate-400 font-medium pb-0.5">
-                💡 Geser layar (swipe) atau tekan panah kiri/kanan. Tekan <kbd class="px-1.5 py-0.5 bg-white/10 rounded text-slate-200">Esc</kbd> untuk menutup.
+                Geser layar (swipe) atau tekan panah kiri/kanan. Tekan <kbd class="px-1.5 py-0.5 bg-white/10 rounded text-slate-200">Esc</kbd> untuk menutup.
             </div>
         </div>
     </div>
@@ -1490,7 +1502,7 @@
         if (titleStageElem) titleStageElem.textContent = stage.stageTitle || '';
 
         const counterElem = document.getElementById('modal-photo-counter');
-        if (counterElem) counterElem.textContent = `Foto ${currentModalIndex + 1} dari ${photos.length}`;
+        if (counterElem) counterElem.textContent = photos.length > 1 ? `Foto ${currentModalIndex + 1} dari ${photos.length} (Total: ${photos.length} Foto)` : '1 Foto Dokumentasi';
 
         // Foto Utama
         const mainImg = document.getElementById('modal-main-img');
@@ -1499,7 +1511,6 @@
             mainImg.alt = photo.title || 'Dokumentasi Proses';
             mainImg.onerror = function() {
                 this.onerror = null;
-                this.src = 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';
             };
         }
 
@@ -1519,7 +1530,7 @@
                 thumb.type = 'button';
                 thumb.title = p.title || '';
                 thumb.className = `w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${idx === currentModalIndex ? 'border-amber-400 ring-2 ring-amber-400/50 scale-105' : 'border-white/20 opacity-60 hover:opacity-100'}`;
-                thumb.innerHTML = `<img src="${p.url}" alt="${p.title || ''}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';">`;
+                thumb.innerHTML = `<img src="${p.url}" alt="${p.title || ''}" class="w-full h-full object-cover" onerror="this.onerror=null;">`;
                 thumb.onclick = (e) => {
                     if (e) e.stopPropagation();
                     currentModalIndex = idx;

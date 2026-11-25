@@ -100,4 +100,3 @@ class WasteSurplusRecord extends Model
         return 'porsi';
     }
 }
-

@@ -299,6 +299,4 @@ class DestinationController extends Controller
 
         return (int) ($idSppg ?? 1);
     }
-
-
 }
